@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: Git-sans;
+    src: url(./font/gitSans/Git-Sans.ttf);
+}
+
+@font-face {
+    font-family: formular-extralight;
+    src: url(./font/formular/formular-extralight-trial.woff);
+}
+
+@font-face {
+    font-family: formular-light;
+    src: url(./font/formular/formular-light-trial.woff);
+}
+
+@font-face {
+    font-family: formular-regular;
+    src: url(./font/formular/formular-regular-trial.woff);
+}
+
+@font-face {
+    font-family: formular-medium;
+    src: url(./font/formular/formular-medium-trial.woff);
+}
+
+@font-face {
+    font-family: formular-bold;
+    src: url(./font/formular/formular-bold-trial.woff);
+}
+
+@font-face {
+    font-family: formular-ultra;
+    src: url(./font/formular/formular-ultra-trial.woff);
+}
