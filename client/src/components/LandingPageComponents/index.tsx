@@ -1,1 +1,1 @@
-export { default as Pillow } from "./Pillow";
+export { default as Authentic } from "./Authentic";
