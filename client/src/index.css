@@ -1,3 +1,69 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base{
+    @font-face {
+        font-family: Git-sans;
+        src: url(./font/gitSans/Git-Sans.ttf) format('otf');
+    }
+    @font-face {
+        font-family: Utile-extralight;
+        font-weight: 200;
+        src: url(./font/Utile/Utile-Book.otf) format('otf');
+    }
+    @font-face {
+        font-family: Utile-light;
+        font-weight: 300;
+        src: url(./font/Utile/Utile-Light.otf) format('otf');
+    }
+    @font-face {
+        font-family: Utile-regular;
+        font-weight: 400;
+        src: url(./font/Utile/Utile-Regular.otf) format('otf');
+    }
+    @font-face {
+        font-family: Utile-medium;
+        font-weight: 500;
+        src: url(./font/Utile/Utile-Medium.otf) format('otf');
+    }
+    
+    @font-face {
+        font-family: Utile-bold;
+        font-weight: 700;
+        src: url(./font/Utile/Utile-Bold.otf) format('otf');
+    }
+    @font-face {
+        font-family: formular-extralight;
+        font-weight: 200;
+        src: url(./font/formular/formular-extralight-trial.woff);
+    }
+    
+    @font-face {
+        font-family: formular-light;
+        font-weight: 300;
+        src: url(./font/formular/formular-light-trial.woff) format('woff');
+    }
+    @font-face {
+        font-family: formular-regular;
+        font-weight: 400;
+        src: url(./font/formular/formular-regular-trial.woff) format('woff');
+    }
+    @font-face {
+        font-family: formular-medium;
+        font-weight: 500;
+        src: url(./font/formular/formular-medium-trial.woff) format('woff');
+    }
+    
+    @font-face {
+        font-family: formular-bold;
+        font-weight: 700;
+        src: url(./font/formular/formular-bold-trial.woff) format('woff');
+    }
+    @font-face {
+        font-family: formular-ultra;
+        font-weight: 900;
+        src: url(./font/formular/formular-ultra-trial.woff) format('woff');
+    }
+}
+

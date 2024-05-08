@@ -1,11 +1,12 @@
-import { Routes } from "react-router-dom"
-import {Navbar} from "./components"
+import { Route, Routes } from "react-router-dom"
+import Landing from "./Pages/Landing"
+
 function App() {
 
   return (
     <>
-      <Navbar/>
       <Routes>
+        <Route path="/" element={<Landing/>} /> 
 
       </Routes>
     </>
