@@ -29,7 +29,9 @@ export default {
         'Utile-regular' : ['Utile-regular'],
         'Utile-medium' : ['Utile-medium'],
         'Utile-bold' : ['Utile-bold']
-
+      },
+      backgroundImage : {
+        syncbg : "url('/src/assets/syncbg.png')"
       }
     },
   },

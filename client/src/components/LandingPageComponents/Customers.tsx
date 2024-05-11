@@ -3,6 +3,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from "swiper/modules";
 import { customerSaid } from "../../constants";
+import PrimaryButton from "../Button";
 
 
 const Customers = () => {
@@ -44,6 +45,14 @@ const Customers = () => {
                     </Swiper>
                     <h4 className="text-[#999896] font-Utile-medium drop-shadow-sm text-xs mt-10 ml-5 lg:ml-20 cursor-pointer next"> Next</h4>
             </div>
+      </div>
+      <div className="bg-syncbg mt-5 bg-[#161616]  px-6 py-9 md:px-20 md:py-14 lg:px-[clamp(170px,13.6vw,196px)]  lg:py-[84px] rounded-xl lg:rounded-[20px] lg:flex items-center gap-28">
+      <h2 className="text-grey-100 font-gitSans text-3xl md:text-5xl 
+                lg:text-[clamp(56px,4.44vw,64px)] pb-10 md:pb-14 lg:pb-0">
+                Stop settling for generic, <br /> Embrace the authentic.
+        </h2>
+
+        <PrimaryButton text="Join the waitlist" />
       </div>
     </div>
   )
