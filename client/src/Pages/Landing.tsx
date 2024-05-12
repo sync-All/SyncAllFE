@@ -1,11 +1,14 @@
-import {Navbar} from "../components"
-import { Authentic } from "../components/LandingPageComponents"
+import {Footer, Navbar} from "../components"
+import { Authentic, Customers, Play } from "../components/LandingPageComponents"
 
 const Landing = () => {
   return (
-    <div className="bg-black px-3 md:px-10 lg:px-14">
+    <div className="bg-black ">
       <Navbar/>
       <Authentic/>
+      <Play/>
+      <Customers/>
+      <Footer/>
     </div>
   )
 }
