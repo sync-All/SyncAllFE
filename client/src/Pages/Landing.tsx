@@ -1,5 +1,5 @@
 import {Footer, Navbar} from "../components"
-import { Authentic, Customers, Play } from "../components/LandingPageComponents"
+import { Authentic,PartnersPerks, Customers, Play } from "../components/LandingPageComponents"
 
 const Landing = () => {
   return (
@@ -7,6 +7,7 @@ const Landing = () => {
       <Navbar/>
       <Authentic/>
       <Play/>
+      <PartnersPerks />
       <Customers/>
       <Footer/>
     </div>
