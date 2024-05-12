@@ -14,11 +14,11 @@ const Footer = () => {
                   PRODUCT
                   </h4>
                   <div className="text-white flex flex-col text-sm gap-5">
-                  <Link className="hover:text-yellow">Music</Link>
-                  <Link className="hover:text-yellow">Sound Effects</Link>
-                  <Link className="hover:text-yellow">Pricing</Link>
-                  <Link className="hover:text-yellow">Log in</Link>
-                  <Link className="hover:text-yellow">Start free trial</Link>
+                  <Link to="#" className="hover:text-yellow">Music</Link>
+                  <Link to="#" className="hover:text-yellow">Sound Effects</Link>
+                  <Link to="#" className="hover:text-yellow">Pricing</Link>
+                  <Link to="#" className="hover:text-yellow">Log in</Link>
+                  <Link to="#" className="hover:text-yellow">Start free trial</Link>
                   </div>
                 </div>
                 <div className="flex flex-col gap-8">
@@ -26,14 +26,14 @@ const Footer = () => {
                   LEARN MORE
                   </h4>
                   <div className="text-white flex flex-col text-sm gap-5">
-                  <Link className="hover:text-yellow">How it Works</Link>
-                  <Link className="hover:text-yellow">For Artists</Link>
-                  <Link className="hover:text-yellow">For Developers</Link>
-                  <Link className="hover:text-yellow">Mobile App</Link>
-                  <Link className="hover:text-yellow">In-store Music</Link>
-                  <Link className="hover:text-yellow">Entreprise</Link>
-                  <Link className="hover:text-yellow">Community</Link>
-                  <Link className="hover:text-yellow">Solutions</Link>
+                  <Link to="#" className="hover:text-yellow">How it Works</Link>
+                  <Link to="#" className="hover:text-yellow">For Artists</Link>
+                  <Link to="#" className="hover:text-yellow">For Developers</Link>
+                  <Link to="#" className="hover:text-yellow">Mobile App</Link>
+                  <Link to="#" className="hover:text-yellow">In-store Music</Link>
+                  <Link to="#" className="hover:text-yellow">Entreprise</Link>
+                  <Link to="#" className="hover:text-yellow">Community</Link>
+                  <Link to="#" className="hover:text-yellow">Solutions</Link>
                   </div>
                 </div>
                 <div className="flex flex-col gap-8">
@@ -41,11 +41,11 @@ const Footer = () => {
                   ABOUT
                   </h4>
                   <div className="text-white flex flex-col text-sm gap-5">
-                  <Link className="hover:text-yellow">About Us</Link>
-                  <Link className="hover:text-yellow">Press</Link>
-                  <Link className="hover:text-yellow">Careers</Link>
-                  <Link className="hover:text-yellow">Blog</Link>
-                  <Link className="hover:text-yellow">Help</Link>
+                  <Link to="#" className="hover:text-yellow">About Us</Link>
+                  <Link to="#" className="hover:text-yellow">Press</Link>
+                  <Link to="#" className="hover:text-yellow">Careers</Link>
+                  <Link to="#" className="hover:text-yellow">Blog</Link>
+                  <Link to="#" className="hover:text-yellow">Help</Link>
                   </div>
                 </div>
                 <div className="flex flex-col gap-8">
@@ -53,10 +53,10 @@ const Footer = () => {
                   OTHER
                   </h4>
                   <div className="text-white flex flex-col text-sm gap-5">
-                  <Link className="hover:text-yellow">Legal Information</Link>
-                  <Link className="hover:text-yellow">Privacy</Link>
-                  <Link className="hover:text-yellow">Cookie</Link>
-                  <Link className="hover:text-yellow">Languages</Link>
+                  <Link to="#" className="hover:text-yellow">Legal Information</Link>
+                  <Link to="#" className="hover:text-yellow">Privacy</Link>
+                  <Link to="#" className="hover:text-yellow">Cookie</Link>
+                  <Link to="#" className="hover:text-yellow">Languages</Link>
                   </div>
                 </div>
             </section>
