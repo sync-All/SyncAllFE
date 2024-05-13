@@ -63,7 +63,7 @@ const Modal = () => {
                 })}
                 onSubmit={async (values,{resetForm}) => {
                     setLoading(true)
-                    await axios.post("http://localhost:3000/api/waitlist",{
+                    await axios.post("https://syncallfe.onrender.com/api/waitlist",{
                         email : values.email
                     })
                     .then(result =>{
