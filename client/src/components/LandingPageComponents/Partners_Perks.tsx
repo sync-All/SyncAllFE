@@ -263,7 +263,7 @@ const PartnersPerks = () => {
         </div>
       </section>
       <section
-        className="bg-no-repeat bg-center bg-cover mt-[24px] xl:w-[1254px] mx-auto rounded-[20px] "
+        className="bg-no-repeat bg-center bg-cover mt-[24px] xl:w-[1254px] mx-auto rounded-[20px] px-[10px] "
         style={{ backgroundImage: `url(${Background})` }}
       >
         <div className="pt-[100px] ">
