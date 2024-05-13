@@ -24,7 +24,7 @@ import Album5 from '../../assets/images/album-5.png';
 
 const PartnersPerks = () => {
   return (
-    <section className="text-white">
+    <section className="text-white mt-[228px] ">
       <section>
         <div>
           <h1 className="font-formular-regular text-center text-white text-[32px] leading-[24px] tracking-[-0.4px] mb-[72px] ">
@@ -72,9 +72,9 @@ const PartnersPerks = () => {
         </div>
       </section>
       <section className="mt-[230px] md:px-0 overflow-x-hidden  ">
-        <div className="flex flex-col md:flex-row justify-center items-center gap-[24px] mx-auto flex-wrap xl:w-[1254px] ">
+        <div className="flex flex-col md:flex-row justify-center gap-[24px] mx-auto flex-wrap xl:w-[1254px] px-[10px] ">
           <div className="flex flex-col gap-[24px] md:min-w-[500px]  ">
-            <div className="min-w-[300px] md:max-w-[500px] xl:max-w-[615px] min-h-[520px] bg-grey-600 rounded-[20px] py-[64px] ">
+            <div className="min-h-[392px] min-w-[300px] xl:min-w-[615px] bg-grey-600 rounded-[20px] py-[64px] ">
               <h3 className="font-formular-bold text-[20px] xl:text-[32px] text-grey-100 leading-[40px] pl-[14px] xl:pl-[64px] ">
                 Safe <span className="font-Utile-bold text-grey-100">&</span>{' '}
                 Secure <br />
@@ -147,7 +147,7 @@ const PartnersPerks = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-[24px] md:min-w-[500px]">
+          <div className="flex flex-col gap-[24px] md:min-w-[500px] ">
             <div className="min-h-[392px] min-w-[300px] xl:min-w-[615px] bg-grey-600 rounded-[20px] py-[64px] ">
               <h3 className="font-formular-bold text-[20px] xl:text-[32px] text-grey-100 leading-[40px] pl-[14px] xl:pl-[64px]">
                 Diverse <br /> Music Library
@@ -210,13 +210,13 @@ const PartnersPerks = () => {
           </div>
         </div>
       </section>
-      <section className="flex flex-col xl:flex-row mt-[24px] gap-[24px]  mx-auto xl:w-[1254px]">
-        <div className=" flex flex-col px-[20px] xl:px-[85px] pt-[64px] pb-[76px] rounded-[20px] bg-grey-600 gap-[48px] min-w-[300px] w-full mx-auto md:max-w-[500px] xl:max-w-[67.6%] xl:max-h-[531px] ">
+      <section className="flex flex-col xl:flex-row mt-[24px] gap-[24px] px-[10px] mx-auto xl:w-[1254px]">
+        <div className=" flex flex-col px-[20px] xl:px-[85px] pt-[64px] pb-[76px] rounded-[20px] bg-grey-600 gap-[48px] min-w-[300px] w-full mx-auto md:max-w-[500px] xl:max-w-[67.6%]  ">
           <h3 className="text-grey-100 text-[32px] font-Utile-bold leading-[26px] xl:leading-[56px] xl:text-[56px] tracking-[-0.792px] ">
             Our quest is clear: to give creators control, and to forge a path
             where integrity triumphs over exploitation.
           </h3>
-          <p className="font-Utile-regular text-[18px] xl:text-[32px] text-[#E4E7EC] leading-[20px] xl:leading-[48px] tracking-[-0.792px] ">
+          <p className="font-Utile-light text-[18px] xl:text-[32px] text-[#E4E7EC] leading-[20px] xl:leading-[48px] tracking-[-0.792px] ">
             SyncAll is more than a platform – it's a revolution. Here, what was
             once lost is found anew your voice, your vision, your sovereignty
           </p>
@@ -263,7 +263,7 @@ const PartnersPerks = () => {
         </div>
       </section>
       <section
-        className="bg-no-repeat bg-center bg-cover mt-[24px] xl:w-[1254px] mx-auto"
+        className="bg-no-repeat bg-center bg-cover mt-[24px] xl:w-[1254px] mx-auto rounded-[20px] "
         style={{ backgroundImage: `url(${Background})` }}
       >
         <div className="pt-[100px] ">
