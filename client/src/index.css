@@ -70,37 +70,37 @@
 
     /* for the font i don't have now */
 
-    @font-face {
+    /* @font-face {
         font-family: BebasNeue-extralight;
         font-weight: 200;
-        src: url(./font/formular/formular-extralight-trial.woff);
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
     }
     
     @font-face {
         font-family: BebasNeue-light;
         font-weight: 300;
-        src: url(./font/formular/formular-light-trial.woff) format('woff');
-    }
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
+    } */
     @font-face {
-        font-family: BebasNeue-regular;
+        font-family: Bebasneue-regular;
         font-weight: 400;
-        src: url(./font/formular/formular-regular-trial.woff) format('woff');
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf );
     }
-    @font-face {
+    /* @font-face {
         font-family: BebasNeue-medium;
         font-weight: 500;
-        src: url(./font/formular/formular-medium-trial.woff) format('woff');
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
     }
     
     @font-face {
         font-family: BebasNeue-bold;
         font-weight: 700;
-        src: url(./font/formular/formular-bold-trial.woff) format('woff');
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
     }
     @font-face {
         font-family: BebasNeue-ultra;
         font-weight: 900;
-        src: url(./font/formular/formular-ultra-trial.woff) format('woff');
-    }
+        src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
+    } */
 }
 
