@@ -12,6 +12,7 @@
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@types/node": "^20.12.11",
+    "axios": "^1.6.8",
     "clsx": "^2.1.1",
     "formik": "^2.4.6",
     "localforage": "^1.10.0",

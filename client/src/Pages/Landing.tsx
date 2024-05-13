@@ -1,8 +1,9 @@
 import {Footer, Navbar} from "../components"
 import { Authentic,PartnersPerks, Customers, Play, Modal } from "../components/LandingPageComponents"
-import { ModalProvider } from "../Context/ModatContext"
+import  { ModalProvider } from "../Context/ModatContext"
 
 const Landing = () => {
+
   
   return (
     <div className="bg-black ">
