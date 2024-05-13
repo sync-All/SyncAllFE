@@ -1,15 +1,20 @@
 import {Footer, Navbar} from "../components"
-import { Authentic,PartnersPerks, Customers, Play } from "../components/LandingPageComponents"
+import { Authentic,PartnersPerks, Customers, Play, Modal } from "../components/LandingPageComponents"
+import { ModalProvider } from "../Context/ModatContext"
 
 const Landing = () => {
+  
   return (
     <div className="bg-black ">
-      <Navbar/>
+      <ModalProvider>
+      <Navbar />
       <Authentic/>
       <Play/>
       <PartnersPerks />
       <Customers/>
       <Footer/>
+      <Modal />
+      </ModalProvider>
     </div>
   )
 }

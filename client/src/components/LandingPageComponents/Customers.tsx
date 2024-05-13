@@ -4,10 +4,12 @@ import 'swiper/css/navigation';
 import { Navigation } from "swiper/modules";
 import { customerSaid } from "../../constants";
 import PrimaryButton from "../Button";
+import { useContext } from "react";
+import ModalContext from "../../Context/ModatContext";
 
 
 const Customers = () => {
-
+  const values = useContext(ModalContext)
   return (
     <div className="px-3 md:px-10 lg:px-14 py-12 md:py-20 lg:py-32">
       <div className="bg-black2 px-6 py-9 md:px-20 md:py-14 
@@ -52,7 +54,7 @@ const Customers = () => {
                 Stop settling for generic, <br /> Embrace the authentic.
         </h2>
 
-        <PrimaryButton text="Join the waitlist" />
+        <PrimaryButton text="Join the waitlist" onClick={values.openModal}/>
       </div>
     </div>
   )

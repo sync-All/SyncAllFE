@@ -102,5 +102,20 @@
         font-weight: 900;
         src: url(./font/bebasNeue/BebasNeue-Regular.otf ) format('otf');
     } */
+
+
+    
 }
 
+.modal{
+    position: absolute;
+    top: 50%;
+    left: '50%';
+right: 'auto';
+bottom: 'auto';
+    background: white;
+}
+.overlay{
+    position: fixed;
+    background: white;
+}
