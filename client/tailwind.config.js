@@ -36,6 +36,7 @@ export default {
         'Utile-regular': ['Utile-regular'],
         'Utile-medium': ['Utile-medium'],
         'Utile-bold': ['Utile-bold'],
+        'poppins-medium': ['poppins-medium']
       },
       fontFamily : {
         'inter': ['Inter', 'sans-serif'],
