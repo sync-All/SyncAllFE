@@ -1,11 +1,11 @@
 import {useState, useEffect} from 'react';
 
-const AuthImageSlider = ({images, interval=3000}) => {
-  const [currentIndex, setCurrentIndex] = useState(0)
+const AuthImageSlider = ({images, interval=3000}: {images: string[], interval?: number}) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0)
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
+      setCurrentIndex((prevIndex: number) => (prevIndex + 1) % images.length)
       
     }, interval)
 
@@ -14,7 +14,7 @@ const AuthImageSlider = ({images, interval=3000}) => {
 
   return (
     <div className="relative w-full min-h-full ">
-      {images.map((image, index) => (
+      {images.map((image: string, index: number) => (
         <div
           key={index}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${

@@ -48,9 +48,10 @@ const Login = () => {
                   'user-password': '',
                 }}
                 validationSchema={SigninSchema}
-                // onSubmit={(values) => {
-                //   // handle form submission
-                // }}
+                onSubmit={(values) => {
+                  // handle form submission
+                  console.log(values)
+                }}
               >
                 {({ handleSubmit }) => (
                   <Form
