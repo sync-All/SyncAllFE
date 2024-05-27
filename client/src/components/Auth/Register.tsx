@@ -68,9 +68,10 @@ const Register = () => {
                 'user-password': '',
               }}
               validationSchema={SignupSchema}
-              // onSubmit={(values) => {
-              //   // handle form submission
-              // }}
+              onSubmit={(values) => {
+                // handle form submission
+                console.log(values);
+              }}
             >
               {({ handleSubmit }) => (
                 <Form
