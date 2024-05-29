@@ -1,4 +1,4 @@
-import EmailConfirmation from '../components/Auth/EmailConfirmation';
+import EmailConfirmation from '../components/Auth/Registration/EmailConfirmation';
 const ConfirmEmail = () => {
   return <div>
     <EmailConfirmation />

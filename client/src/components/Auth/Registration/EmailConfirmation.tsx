@@ -1,7 +1,7 @@
-import EmailVerificationImg from '../../assets/images/email-confirmation-img.png'
-import syncLogo from '../../assets/logo-black.png'
-import Mail from '../../assets/images/mail.svg'
-import ArrowLeft from '../../assets/images/arrow-left.svg'
+import EmailVerificationImg from '../../../assets/images/email-confirmation-img.png';
+import syncLogo from '../../../assets/logo-black.png';
+import Mail from '../../../assets/images/mail.svg';
+import ArrowLeft from '../../../assets/images/arrow-left.svg';
 
 const EmailConfirmation = () => {
   return (
@@ -21,7 +21,7 @@ const EmailConfirmation = () => {
             <p className="text-[14px] text-[#475467] mt-[8px] leading-[20px] font-formular-light ">
               open mail app to verify
             </p>
-            <button className="bg-black text-white px-[43px] py-[22px] w-full poppins-medium text-[18.6px] leading-[26.49px] mt-[36px] xl:min-w-[441px] ">
+            <button className="bg-black text-white px-[43px] py-[22px] w-full poppins-medium text-[18.6px] leading-[26.49px] mt-[36px] xl:min-w-[441px] " >
               Go to email
             </button>
           </div>
