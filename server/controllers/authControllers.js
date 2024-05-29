@@ -26,7 +26,7 @@ const signup = async function(req, res, next) {
                const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(user)
                const grabber = EmailDomain.grabEmailDomain(user)
                confirmEmail.sendConfirmationMail(user,toBeIssuedJwt.token)
-              res.json({success : "User added successfully", token : toBeIssuedJwt.token, emailDomain : grabber})
+              res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
           })
           .catch(err = console.log(err))
           
