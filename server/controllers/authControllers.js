@@ -2,16 +2,26 @@ const confirmEmail = require('../utils/mailer');
 const issueJwt = require('../utils/issueJwt')
 const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
-const User = require('../models/usermodel')
+const User = require('../models/usermodel');
 
 const signup = async function(req, res, next) {
     const {name, email, password, role, userType} = req.body
     if(!name || !email || !password || !role || !userType){
-      res.json({message : "MIssing Field, please review input"})
+      if(!name){
+        return res.json({success: false , message : "Name Field Missing, please review input"})
+      }else if(!email){
+        return res.json({success : false, message : "Email Field Missing, please review input"})
+      }else if(!password){
+        return res.json({success : false, message : "Password Field Missing, please review input"})
+      }else if(!role){
+        return res.json({success : false, message : "Role Field Missing, please review input"})
+      }else if(!userType){
+        return res.json({success : false, message : "UserType Field Missing, please review input"})
+      }
     }else{
       const getIdentity = await User.findOne({ email : email}).exec()
       if(getIdentity){
-        res.json({error : "Email Already in use"})
+        res.json({success: false, message : "Email Already in use"})
       }else{
         bcrypt.hash(password, 10, function(err, password){
           const user = new User({
@@ -51,7 +61,17 @@ const signup = async function(req, res, next) {
     }
   }
 
+const allUsers = async (req,res,next) =>{
+  const users = await User.find().exec()
+  if(users){
+    res.json({success : true, message : users})
+  }else{
+    res.json({success : false, message : "Error fetching users"})
+  }
+}
+
 module.exports.signup = signup
 module.exports.signin = signin
+module.exports.allUsers = allUsers
 
   
