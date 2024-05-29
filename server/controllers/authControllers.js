@@ -21,7 +21,7 @@ const signup = async function(req, res, next) {
     }else{
       const getIdentity = await User.findOne({ email : email}).exec()
       if(getIdentity){
-        res.json({error : "Email Already in use"})
+        res.json({success: false, message : "Email Already in use"})
       }else{
         bcrypt.hash(password, 10, function(err, password){
           const user = new User({
