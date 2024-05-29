@@ -1,17 +1,16 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 import syncLogo from '../../assets/logo-black.png';
 import LoginImg from '../../assets/images/email-confirmation-img.png';
 import Google from '../../assets/images/google.svg';
-import axios from 'axios'; 
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const SigninSchema = Yup.object().shape({
-  'email': Yup.string()
-    .email('Invalid email')
-    .required('Email is required'),
-  'password': Yup.string()
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string()
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
 });
@@ -20,21 +19,46 @@ interface LoginProps {
   setToken: (token: string) => void;
 }
 
+interface ResponseData {
+  message?: string;
+}
+
 const Login: React.FC<LoginProps> = ({ setToken }) => {
-  const handleLogin = async (values: {
-    'email': string;
-    'password': string;
-  }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const handleNavigationTODashboard = () => {
+    navigate('/');
+  };
+
+  const handleLogin = async (values: { email: string; password: string }) => {
     try {
-      const response = await axios.post('http://your-api-endpoint/login', {
-        email: values['email'],
-        password: values['password'],
-      });
-      setToken(response.data.token);
-      localStorage.setItem('token', response.data.token);
-      toast.success('Login successful');
-    } catch (error) {
-      toast.error('Login unsuccessful');
+      const response = await axios.post(
+        'https://syncallfe.onrender.com/api/v1/signin',
+        {
+          email: values['email'],
+          password: values['password'],
+        }
+      );
+      if (response && response.data) {
+        setToken(response.data.token);
+        localStorage.setItem('token', response.data.token);
+        toast.success('Login successful');
+      } else {
+        throw new Error('Response or response data is undefined');
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      console.error(
+        axiosError.response ? axiosError.response.data : axiosError
+      );
+      toast.error(
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message
+          : axiosError.message
+      );
+    } finally {
+      setIsLoading(false);
+      handleNavigationTODashboard();
     }
   };
 
@@ -66,8 +90,8 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
             <div className="mt-[56px]">
               <Formik
                 initialValues={{
-                  'email': '',
-                  'password': '',
+                  email: '',
+                  password: '',
                 }}
                 validationSchema={SigninSchema}
                 onSubmit={handleLogin}
@@ -124,6 +148,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                       <button
                         type="submit"
                         className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px]"
+                        disabled={isLoading}
                       >
                         Sign In
                       </button>
@@ -133,6 +158,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                       <button
                         type="button"
                         className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px]"
+                        disabled={isLoading}
                       >
                         <img src={Google} alt="google icon" />
                         <span className="text-[16px] poppins-medium leading-[24px] text-black">

@@ -1,4 +1,5 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import syncLogo from '../../../assets/logo-black.png';
@@ -12,36 +13,57 @@ import AuthSliderImage6 from '../../../assets/images/auth-img-6.png';
 import AuthSliderImage7 from '../../../assets/images/auth-img-7.png';
 import AuthSliderImage8 from '../../../assets/images/auth-img-8.png';
 import AuthImageSlider from '../../../constants/auth-image-slider';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const SignupSchema = Yup.object().shape({
-  'userType': Yup.string()
+  userType: Yup.string()
     .oneOf(['individual', 'company'], 'Invalid user type')
     .required('User type is required'),
-  'name': Yup.string()
+  name: Yup.string()
     .min(2, 'Too Short!')
     .max(50, 'Too Long!')
     .required('Name is required'),
-  'email': Yup.string()
-    .email('Invalid email')
-    .required('Email is required'),
-  'password': Yup.string()
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string()
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
 });
 
-
-
-
 interface RegisterProps {
   selectedRole: string | null;
 }
+interface FormValues {
+  userType: string;
+  name: string;
+  password: string;
+  email: string;
+}
 
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
-const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = () => {
     navigate('/email-confirmation');
   };
-  
+
+  const handleFormSubmit = async (values: FormValues) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        'https://syncallfe.onrender.com/api/v1/signup',
+        values
+      );
+      console.log(response.data);
+      toast.success('Account created successfully');
+      handleRedirectionToEmailConfirmation();
+    } catch (error) {
+      toast.error('Account created unsuccessfully');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const images = [
     AuthSliderImage1,
     AuthSliderImage2,
@@ -75,18 +97,14 @@ const navigate = useNavigate();
           <div className="mt-[56px]">
             <Formik
               initialValues={{
-                'userType': '',
-                'name': '',
-                'email': '',
-                'password': '',
+                userType: '',
+                name: '',
+                email: '',
+                password: '',
+                role: selectedRole,
               }}
               validationSchema={SignupSchema}
-              onSubmit={(values) => {
-                // handle form submission
-                console.log({ ...values, 'role': selectedRole });
-                handleRedirectionToEmailConfirmation()
-                // Send form data to backend
-              }}
+              onSubmit={handleFormSubmit}
             >
               {({ handleSubmit }) => (
                 <Form
@@ -104,7 +122,7 @@ const navigate = useNavigate();
                       <Field
                         as="select"
                         name="userType"
-                        id=""
+                        id="userType"
                         required
                         className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 "
                       >
@@ -181,13 +199,20 @@ const navigate = useNavigate();
                   </div>
 
                   <div className="mt-[51px] ">
-                    <button className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] " type='submit'>
+                    <button
+                      className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:blur-sm  disabled:cursor-not-allowed"
+                      type="submit"
+                      disabled={isLoading}
+                    >
                       Sign Up
                     </button>
                     <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px] ">
                       OR
                     </p>
-                    <button className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] ">
+                    <button
+                      className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] "
+                      disabled={isLoading}
+                    >
                       <img src={Google} alt="google icon" />
                       <span className="text-[16px] poppins-medium leading-[24px] text-black ">
                         Continue with Google
