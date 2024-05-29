@@ -6,7 +6,7 @@ const User = require('../models/usermodel');
 
 const signup = async function(req, res, next) {
     const {name, email, password, role, userType} = req.body
-    if(req.body){
+    if(!name || !email || !password || !role || !userType){
       if(!name){
         return res.json({success: false , message : "Name Field Missing, please review input"})
       }else if(!email){
