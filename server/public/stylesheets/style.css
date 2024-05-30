@@ -446,6 +446,54 @@ video {
   display: none;
 }
 
+@font-face {
+  font-family: formular-extralight;
+
+  font-weight: 200;
+
+  src: url(./font/formular/formular-extralight-trial.woff);
+}
+
+@font-face {
+  font-family: formular-light;
+
+  font-weight: 300;
+
+  src: url(./font/formular/formular-light-trial.woff);
+}
+
+@font-face {
+  font-family: formular-regular;
+
+  font-weight: 400;
+
+  src: url(./font/formular/formular-regular-trial.woff);
+}
+
+@font-face {
+  font-family: formular-medium;
+
+  font-weight: 500;
+
+  src: url(./font/formular/formular-medium-trial.woff);
+}
+
+@font-face {
+  font-family: formular-bold;
+
+  font-weight: 700;
+
+  src: url(./font/formular/formular-bold-trial.woff);
+}
+
+@font-face {
+  font-family: formular-ultra;
+
+  font-weight: 900;
+
+  src: url(./font/formular/formular-ultra-trial.woff);
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -554,12 +602,139 @@ video {
   --tw-contain-style:  ;
 }
 
+.flex {
+  display: flex;
+}
+
 .hidden {
   display: none;
 }
 
+.h-screen {
+  height: 100vh;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.object-center {
+  -o-object-position: center;
+     object-position: center;
+}
+
+.px-20 {
+  padding-left: 5rem;
+  padding-right: 5rem;
+}
+
+.py-24 {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.pb-3 {
+  padding-bottom: 0.75rem;
+}
+
+.pt-6 {
+  padding-top: 1.5rem;
+}
+
+.pb-5 {
+  padding-bottom: 1.25rem;
+}
+
+.pb-7 {
+  padding-bottom: 1.75rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-formular-bold {
+  font-family: formular-bold;
+}
+
+.font-formular-light {
+  font-family: formular-light;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
 .italic {
   font-style: italic;
+}
+
+.text-\[\#101828\] {
+  --tw-text-opacity: 1;
+  color: rgb(16 24 40 / var(--tw-text-opacity));
+}
+
+.text-\[\#667185\] {
+  --tw-text-opacity: 1;
+  color: rgb(102 113 133 / var(--tw-text-opacity));
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 @media (min-width: 1024px) {
@@ -567,11 +742,24 @@ video {
     display: flex;
   }
 
-  .lg\:w-\[59\] {
-    width: 59;
+  .lg\:w-\[41vw\] {
+    width: 41vw;
   }
 
   .lg\:w-\[59\.3vw\] {
     width: 59.3vw;
+  }
+
+  .lg\:py-5 {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .lg\:pb-\[139px\] {
+    padding-bottom: 139px;
+  }
+
+  .lg\:text-\[22px\] {
+    font-size: 22px;
   }
 }

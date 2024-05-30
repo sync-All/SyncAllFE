@@ -6,16 +6,11 @@ require("dotenv").config()
 const pubKey = process.env.PUB_KEY
 
 const options = {
-    jwtFromRequest : extractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest : extractJwt.fromExtractors([extractJwt.fromUrlQueryParameter('token'),extractJwt.fromAuthHeaderAsBearerToken()]),
     secretOrKey : pubKey,
     algorithms : ['RS256']
 };
 
-const options2 = {
-    jwtFromRequest : extractJwt.fromUrlQueryParameter('token'),
-    secretOrKey : pubKey,
-    algorithms : ['RS256']
-}
 
 const strategy = new jwtStrategy(options, (payload, done)=>{
     User.findOne({_id : payload.sub})
@@ -23,11 +18,13 @@ const strategy = new jwtStrategy(options, (payload, done)=>{
         if(user){
             return done(null, user)
         }else{
+            console.log('here i am')
             return done(null, false)
         }
     })
     .catch((err)=>{
-        return done(err, false)
+        console.log('here i am')
+        return done(null, false)
     })
 })
 

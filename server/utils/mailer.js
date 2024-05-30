@@ -18,7 +18,7 @@ function sendConfirmationMail(user, issuedJwt){
 const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
 
 console.log(pathtofile)
-ejs.renderFile(pathtofile,{ name: user.name, link :`https://localhost:3000/verifyToken/${issuedJwt}`}, (err, renderedHtml) => {
+ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, (err, renderedHtml) => {
   if (err) {
     console.error('Error rendering EJS template:', err);
     return;
@@ -28,7 +28,7 @@ ejs.renderFile(pathtofile,{ name: user.name, link :`https://localhost:3000/verif
   const mainOptions = {
     from: '"Ezekiel"info@syncallmusic.com',
     to: user.email,
-    subject: 'Hello, world',
+    subject: 'Hello, Sync USer',
     html: renderedHtml,
   };
 
