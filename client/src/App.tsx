@@ -1,21 +1,34 @@
-import { Route, Routes } from "react-router-dom"
-import Landing from "./Pages/Landing"
-import Registration from "./Pages/Registration"
-import SignIn from "./Pages/Sign-in";
-import ConfirmEmail from "./Pages/ConfirmEmail";
+import { Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import Landing from './Pages/Landing';
+import Registration from './Pages/Registration';
+import SignIn from './Pages/Sign-in';
+import ConfirmEmail from './Pages/ConfirmEmail';
+import RegisterUserRole from './Pages/RegisterUserRole';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/register" element={<Registration />}></Route>
-        <Route path="/login" element={<SignIn />}></Route>
-        <Route path='/email-confirmation' element={<ConfirmEmail />}></Route>
+        <Route
+          path="/select-role"
+          element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
+        />
+        <Route
+          path="/register"
+          element={<Registration selectedRole={selectedRole} />}
+        />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/email-confirmation" element={<ConfirmEmail />} />
       </Routes>
     </>
   );
 }
 
-export default App
+export default App;
