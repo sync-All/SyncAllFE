@@ -28,7 +28,7 @@ router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failur
 
 // , {session : false, successRedirect : '/confirmedEmail', failureRedirect : '/notConfirmed'}
 
-router.get('/ ',(req,res,next)=>{
+router.get('/confirmedEmail',(req,res,next)=>{
     res.render('emailConfirmed', {title : 'Email Verified',icon : '/images/verifiedIcon.png',heading : "Email Verified", message : "Your email address has been successfully verified. Click below to proceed."})
 })
 
