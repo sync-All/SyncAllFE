@@ -12,7 +12,7 @@ const RegisterUserRole = ({
 
   const handleRoleClick = (role: string) => {
     setSelectedRole(role);
-    navigate('/register');
+    navigate('/register2');
   };
 
   return (
