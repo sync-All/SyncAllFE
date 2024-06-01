@@ -22,7 +22,7 @@ export const ModalProvider = ({children}:Providerprops)=>{
   }
 
   function afterOpenModal() {
-    // references are now sync'd and can be accessed.
+    // reference are now sync'd and can be accessed.
     
   }
 
