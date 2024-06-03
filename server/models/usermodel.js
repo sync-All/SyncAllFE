@@ -25,7 +25,17 @@ const userSchema = new Schema({
     emailConfirmedStatus : {
         type : Boolean,
         default : false
-    }
+    },
+    fullName : {
+        type : String,
+    },
+    spotifyLink : {
+        type : String,
+    },
+    bio: {
+        type : String,
+    },
+
 })
 
 const user = mongoose.model('user',userSchema)

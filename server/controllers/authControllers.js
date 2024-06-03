@@ -51,10 +51,13 @@ const signup = async function(req, res, next) {
     if(!user){
       return res.status(401).json({success : false, message : "User doesn't Exists"})
     }
-    console.log(user)
     const match = await bcrypt.compare(password, user.password);
     if(!match){
       res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
+    }else if(!user.emailConfirmedStatus){
+      const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(user)
+      confirmEmail.sendConfirmationMail(user,toBeIssuedJwt.token)
+      res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
     }else{
       const toBeIssuedJwt = issueJwt.issueJwtLogin(user)
       res.status(200).json({success : true, user : user, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
