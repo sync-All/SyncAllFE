@@ -1,9 +1,15 @@
+import { useLocation } from 'react-router-dom'
+import React from 'react'
 import EmailVerificationImg from '../../../assets/images/email-confirmation-img.png';
 import syncLogo from '../../../assets/logo-black.png';
 import Mail from '../../../assets/images/mail.svg';
 import ArrowLeft from '../../../assets/images/arrow-left.svg';
 
-const EmailConfirmation = () => {
+const EmailConfirmation: React.FC = () => {
+  const location = useLocation();
+  const emailDomain = location.state.emailDomain;
+  console.log(emailDomain)
+
   return (
     <div className="flex flex-col lg:flex-row">
       <div
@@ -21,8 +27,10 @@ const EmailConfirmation = () => {
             <p className="text-[14px] text-[#475467] mt-[8px] leading-[20px] font-formular-light ">
               open mail app to verify
             </p>
-            <button className="bg-black text-white px-[43px] py-[22px] w-full poppins-medium text-[18.6px] leading-[26.49px] mt-[36px] xl:min-w-[441px] " >
-              Go to email
+            <button className="bg-black text-white px-[43px] py-[22px] w-full poppins-medium text-[18.6px] leading-[26.49px] mt-[36px] xl:min-w-[441px] ">
+              <a href={`${emailDomain}`} rel="noreferrer" target="_blank">
+                Go to email
+              </a>
             </button>
           </div>
         </div>

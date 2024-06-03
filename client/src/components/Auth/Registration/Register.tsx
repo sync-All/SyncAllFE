@@ -43,8 +43,9 @@ interface FormValues {
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const handleRedirectionToEmailConfirmation = () => {
-    navigate('/email-confirmation');
+  const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
+    navigate('/email-confirmation', { state: {emailDomain}});
+    
   };
 
   const handleFormSubmit = async (values: FormValues) => {
@@ -55,8 +56,9 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
         values
       );
       console.log(response.data);
+      console.log(response.data.emailDomain)
       toast.success('Account created successfully');
-      handleRedirectionToEmailConfirmation();
+      handleRedirectionToEmailConfirmation(response.data.emailDomain);
     } catch (error) {
       toast.error('Account created unsuccessfully');
     } finally {

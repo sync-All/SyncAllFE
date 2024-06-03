@@ -17,11 +17,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route
-          path="/select-role"
+          path="/register1"
           element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
         />
         <Route
-          path="/register"
+          path="/register2"
           element={<Registration selectedRole={selectedRole} />}
         />
         <Route path="/login" element={<SignIn />} />
