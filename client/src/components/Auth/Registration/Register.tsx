@@ -202,7 +202,7 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
 
                   <div className="mt-[51px] ">
                     <button
-                      className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:blur-sm  disabled:cursor-not-allowed"
+                      className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px]  disabled:cursor-not-allowed"
                       type="submit"
                       disabled={isLoading}
                     >
