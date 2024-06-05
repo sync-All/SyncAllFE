@@ -1,5 +1,5 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import * as Yup from 'yup';
 import syncLogo from '../../assets/logo-black.png';
 import LoginImg from '../../assets/images/email-confirmation-img.png';
@@ -7,6 +7,7 @@ import Google from '../../assets/images/google.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../Context/UserRole';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -21,14 +22,16 @@ interface LoginProps {
 
 interface ResponseData {
   message?: string;
+  role?: { userType: string };
 }
 
 const Login: React.FC<LoginProps> = ({ setToken }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleNavigationTODashboard = () => {
-    navigate('/');
+    navigate('/onboarding-details');
   };
+  const { setUserRole } = useContext(UserContext);
 
   const handleLogin = async (values: { email: string; password: string }) => {
     try {
@@ -41,11 +44,15 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
       );
       if (response && response.data) {
         setToken(response.data.token);
+        setUserRole(response.data.user.role); // Set the user type here
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
         toast.success('Login successful');
+        handleNavigationTODashboard();
       } else {
         throw new Error('Response or response data is undefined');
       }
+      console.log(response)
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       console.error(
@@ -58,7 +65,6 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
       );
     } finally {
       setIsLoading(false);
-      handleNavigationTODashboard();
     }
   };
 
@@ -147,7 +153,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                     <div className="mt-[51px]">
                       <button
                         type="submit"
-                        className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px]"
+                        className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:cursor-not-allowed"
                         disabled={isLoading}
                       >
                         Sign In
@@ -157,7 +163,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                       </p>
                       <button
                         type="button"
-                        className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px]"
+                        className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px]  "
                         disabled={isLoading}
                       >
                         <img src={Google} alt="google icon" />
@@ -169,7 +175,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                     <div className="my-[26px]">
                       <p className="poppins-medium text-[16px] leading-[24px]">
                         Don’t have an account?{' '}
-                        <a href="/register" className="poppins-bold">
+                        <a href="/register1" className="poppins-bold">
                           Sign-Up
                         </a>
                       </p>

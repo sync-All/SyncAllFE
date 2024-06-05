@@ -45,7 +45,7 @@ const EmailConfirmation: React.FC = () => {
             <span>
               <img src={ArrowLeft} alt="" />
             </span>
-            <a href="/register">Back to SignUp</a>
+            <a href="/register1">Back to SignUp</a>
           </p>
         </div>
       </div>
