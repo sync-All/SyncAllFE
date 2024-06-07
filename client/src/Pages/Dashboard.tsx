@@ -1,0 +1,41 @@
+import { useState } from "react";
+import MusicUploaderDashboardSidebar from "../components/MusicUploaderJourney/MusicUploaderDashboardSidebar";
+import MusicUploaderDashboard from "../components/MusicUploaderJourney/MusicUploaderDashboard";
+import Hamburger from '../assets/images/Hambuger.svg'
+
+const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setIsMenuOpen(false); // close the menu when a tab is clicked
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    <div className="flex">
+      <button onClick={toggleMenu} className="lg:hidden"><img src={Hamburger} alt="" /></button> {/* Hamburger icon */}
+      {isMenuOpen && (
+        <div className={`fixed inset-0 z-50 bg-white lg:static lg:bg-transparent lg:w-1/6 lg:h-auto`}>
+          <MusicUploaderDashboardSidebar
+            activeItem={activeTab}
+            onTabChange={handleTabChange}
+          />
+        </div>
+      )}
+      <div className="flex-grow">
+        {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
+        {/* {activeTab === 'Upload Track' && <UploadTrackContent />}
+        {activeTab === 'My Tracks' && <MyTracksContent />}
+        {activeTab === 'Earnings' && <EarningsContent />}
+        {activeTab === 'User Profile' && <UserProfileContent />} */}
+      </div>
+    </div>
+  );
+}
+
+export default Dashboard;

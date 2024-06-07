@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserContext } from './Context/UserRole';
 import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
+import Dashboard from './Pages/Dashboard';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -34,6 +35,7 @@ function App() {
             element={<UserTypeOnboardingPage />}
           ></Route>
           <Route path="/email-confirmation" element={<ConfirmEmail />} />
+          <Route path='/dashboard' element={<Dashboard/>} />
         </Routes>
       </UserContext.Provider>
     </>
