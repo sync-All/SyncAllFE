@@ -78,6 +78,8 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
+const profileSetup = 
+
 module.exports.signup = signup
 module.exports.signin = signin
 module.exports.allUsers = allUsers
