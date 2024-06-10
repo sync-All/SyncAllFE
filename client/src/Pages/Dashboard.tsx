@@ -18,15 +18,20 @@ const Dashboard = () => {
 
   return (
     <div className="flex">
-      <button onClick={toggleMenu} className="lg:hidden"><img src={Hamburger} alt="" /></button> {/* Hamburger icon */}
-      {isMenuOpen && (
-        <div className={`fixed inset-0 z-50 bg-white lg:static lg:bg-transparent lg:w-1/6 lg:h-auto`}>
-          <MusicUploaderDashboardSidebar
-            activeItem={activeTab}
-            onTabChange={handleTabChange}
-          />
-        </div>
-      )}
+      <button onClick={toggleMenu} className="lg:hidden h-fit mt-7 ml-4">
+        <img src={Hamburger} alt="" />
+      </button>{' '}
+      {/* Hamburger icon */}
+      <div
+        className={`fixed inset-0 z-50 bg-white lg:static lg:bg-transparent lg:w-1/6 lg:h-auto ${
+          isMenuOpen ? 'block' : 'hidden'
+        } lg:block`}
+      >
+        <MusicUploaderDashboardSidebar
+          activeItem={activeTab}
+          onTabChange={handleTabChange}
+        />
+      </div>
       <div className="flex-grow">
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
         {/* {activeTab === 'Upload Track' && <UploadTrackContent />}
