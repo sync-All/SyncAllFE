@@ -3,8 +3,9 @@ const issueJwt = require('../utils/issueJwt')
 const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel');
+const Dashboard = require('../models/dashboard.model');
 
-const signup = async function(req, res, next) {
+const signup = async function(req, res) {
     const {name, email, password, role, userType} = req.body
     if(!name || !email || !password || !role || !userType){
       if(!name){
@@ -24,18 +25,22 @@ const signup = async function(req, res, next) {
         res.json({success: false, message : "Email Already in use"})
       }else{
         bcrypt.hash(password, 10, function(err, password){
-          const user = new User({
+          const users = new User({
             name,
             email,
             password,
             role,
             userType,
           })
-          user.save()
-          .then((user)=> {
-               const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(user)
-               const grabber = EmailDomain.grabEmailDomain(user)
-               confirmEmail.sendConfirmationMail(user,toBeIssuedJwt.token)
+          users.save()
+          .then((users)=> {
+               const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
+               const grabber = EmailDomain.grabEmailDomain(users)
+               confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
+               const dashboard = new Dashboard({
+                user : users._id
+               })
+               dashboard.save()
               res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
           })
           .catch(err = console.log(err))
