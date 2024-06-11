@@ -2,6 +2,8 @@ import { useState } from "react";
 import MusicUploaderDashboardSidebar from "../components/MusicUploaderJourney/MusicUploaderDashboardSidebar";
 import MusicUploaderDashboard from "../components/MusicUploaderJourney/MusicUploaderDashboard";
 import Hamburger from '../assets/images/Hambuger.svg'
+import MusicUploaderNavbar from "../components/MusicUploaderJourney/MusicUploaderNavbar";
+import UploadTrackContent from "../components/MusicUploaderJourney/UploadTrackContent";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -33,11 +35,13 @@ const Dashboard = () => {
         />
       </div>
       <div className="flex-grow">
+        <MusicUploaderNavbar
+          activeItem={activeTab}        />
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
-        {/* {activeTab === 'Upload Track' && <UploadTrackContent />}
-        {activeTab === 'My Tracks' && <MyTracksContent />}
+        {activeTab === 'Upload Track' && <UploadTrackContent />}
+        {/* {activeTab === 'My Tracks' && <MyTracksContent />}
         {activeTab === 'Earnings' && <EarningsContent />}
-        {activeTab === 'User Profile' && <UserProfileContent />} */}
+        {activeTab === 'User Profile' && <UserProfileContent />} */} 
       </div>
     </div>
   );
