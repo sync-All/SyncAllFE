@@ -1,13 +1,14 @@
 import React from 'react';
-import { Field } from 'formik';
+import { Field, ErrorMessage } from 'formik';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
 const applyFormDiv = 'flex flex-col items-start mb-4 gap-10';
+const applyErrorStyles = 'italic text-red-600';
 
-const MinimumRecordingInfo: React.FC = () => {
+const CopyrightOwnerClaim: React.FC = () => {
   return (
     <div className="flex flex-col mt-[60px]">
       <div className={applyFormDiv}>
@@ -21,6 +22,11 @@ const MinimumRecordingInfo: React.FC = () => {
             <option value="composition">Composition</option>
             <option value="both">Both</option>
           </Field>
+          <ErrorMessage
+            name="basisOfClaim"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="claimingUser" className={applyLabelStyles}>
@@ -31,6 +37,11 @@ const MinimumRecordingInfo: React.FC = () => {
             name="claimingUser"
             className={applyInputStyles}
             placeholder="Enter your name"
+          />
+          <ErrorMessage
+            name="claimingUser"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -45,6 +56,11 @@ const MinimumRecordingInfo: React.FC = () => {
             <option value="writer">Writer</option>
             <option value="author">Author</option>
           </Field>
+          <ErrorMessage
+            name="role"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="percentageClaim" className={applyLabelStyles}>
@@ -56,11 +72,15 @@ const MinimumRecordingInfo: React.FC = () => {
             className={applyInputStyles}
             placeholder="Composition and/or Masters"
           />
+          <ErrorMessage
+            name="percentageClaim"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
       </div>
-      
     </div>
   );
 };
 
-export default MinimumRecordingInfo;
+export default CopyrightOwnerClaim;

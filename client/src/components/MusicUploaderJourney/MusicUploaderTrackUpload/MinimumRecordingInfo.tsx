@@ -1,9 +1,8 @@
 import React from 'react';
-import { Field, ErrorMessage, FormikProps } from 'formik';
+import { Field, ErrorMessage } from 'formik';
 import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
 
-interface MinimumRecordingInfoProps extends FormikProps<FormData> {}
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -12,13 +11,8 @@ const applyLabelStyles =
 const applyFormDiv = 'flex items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
 
-const MinimumRecordingInfo: React.FC<MinimumRecordingInfoProps> = ({
-  setFieldValue,
-}) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.currentTarget.files ? e.currentTarget.files[0] : null;
-    setFieldValue('digitalArtwork', file);
-  };
+const MinimumRecordingInfo: React.FC = () => {
+  
 
   return (
     <div className="flex flex-col mt-[60px]">
@@ -39,6 +33,11 @@ const MinimumRecordingInfo: React.FC<MinimumRecordingInfoProps> = ({
             label="Featured Artist"
             name="featuredArtist"
             placeholder=""
+          />
+          <ErrorMessage
+            name="featuredArtist"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -147,7 +146,6 @@ const MinimumRecordingInfo: React.FC<MinimumRecordingInfoProps> = ({
                 id="digitalArtwork"
                 name="digitalArtwork"
                 className="hidden"
-                onChange={handleFileChange}
               />
             </label>
           </div>

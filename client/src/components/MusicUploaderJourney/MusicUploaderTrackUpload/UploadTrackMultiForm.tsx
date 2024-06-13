@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Formik, Form, FormikProps } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import MinimumRecordingInfo from './MinimumRecordingInfo';
 import AdditionalRecordingInfo from './AdditionalRecordingInfo';
@@ -17,6 +17,18 @@ interface FormData {
   isrc: string;
   genre: string;
   digitalArtwork: File | null;
+  recordingVersion: string;
+  featuredInstrument: string[];
+  producer: string[];
+  recordingDate: Date;
+  countryOfRecording: string;
+  writer: string[];
+  composer: string[];
+  publisher: string[];
+  basisOfClaim: string;
+  claimingUser: string;
+  role: string;
+  percentageClaim: string;
 }
 
 const initialFormData: FormData = {
@@ -30,10 +42,23 @@ const initialFormData: FormData = {
   isrc: '',
   genre: '',
   digitalArtwork: null,
+  recordingVersion: '',
+  featuredInstrument: [],
+  producer: [],
+  recordingDate: new Date(),
+  countryOfRecording: '',
+  writer: [],
+  composer: [],
+  publisher: [],
+  basisOfClaim: '',
+  claimingUser: '',
+  role: '',
+  percentageClaim: ''
 };
 
 const validationSchema = Yup.object().shape({
   mainArtist: Yup.string().required('Required'),
+  featuredArtist: Yup.array().of(Yup.string()),
   releaseType: Yup.string().required('Required'),
   releaseTitle: Yup.string().required('Required'),
   trackTitle: Yup.string().required('Required'),
@@ -42,6 +67,18 @@ const validationSchema = Yup.object().shape({
   isrc: Yup.string().required('Required'),
   genre: Yup.string().required('Required'),
   digitalArtwork: Yup.mixed().required('A file is required'),
+  recordingVersion: Yup.string().required('Required'),
+  featuredInstrument: Yup.array().of(Yup.string()),
+  producer: Yup.array().of(Yup.string()),
+  recordingDate: Yup.date().required('Required'),
+  countryOfRecording: Yup.string().required('Required'),
+  writer: Yup.array().of(Yup.string()),
+  composer: Yup.array().of(Yup.string()),
+  publisher: Yup.array().of(Yup.string()),
+  basisOfClaim: Yup.string().required('Required'),
+  claimingUser: Yup.string().required('Required'),
+  role: Yup.string().required('Required'),
+  percentageClaim: Yup.number().min(0).max(100).required('Required'),
 });
 
 const UploadTrackMultiForm: React.FC = () => {
@@ -53,28 +90,16 @@ const UploadTrackMultiForm: React.FC = () => {
     'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer';
   const activeLiClass = 'border-b border-[#013131] text-[#013131]';
 
-  const renderSection = (formikProps: FormikProps<FormData>) => {
-    const { values, errors, touched, handleChange, handleBlur, setFieldValue } =
-      formikProps;
-
-    const commonProps = {
-      values,
-      errors,
-      touched,
-      handleChange,
-      handleBlur,
-      setFieldValue,
-    };
-
+  const renderSection = () => {
     switch (currentSection) {
       case 'Minimum Recording Information':
-        return <MinimumRecordingInfo {...commonProps} />;
+        return <MinimumRecordingInfo />;
       case 'Additional Recording Information':
-        return <AdditionalRecordingInfo {...commonProps} />;
+        return <AdditionalRecordingInfo />;
       case 'Copyright Owner Claim':
-        return <CopyrightOwnerClaim {...commonProps} />;
+        return <CopyrightOwnerClaim />;
       case 'Release Information':
-        return <ReleaseInformation {...commonProps} />;
+        return <ReleaseInformation />;
       default:
         return null;
     }
@@ -170,38 +195,34 @@ const UploadTrackMultiForm: React.FC = () => {
           console.log(values);
         }}
       >
-        {(formikProps) => (
-          <Form>
-            {renderSection(formikProps)}
-            <div className="buttons flex justify-between mt-4">
-              {currentSection !== 'Minimum Recording Information' && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCurrentSection(previousSection(currentSection))
-                  }
-                  className="btn-secondary"
-                >
-                  Previous
-                </button>
-              )}
-              {currentSection !== 'Release Information' && (
-                <button
-                  type="button"
-                  onClick={() => setCurrentSection(nextSection(currentSection))}
-                  className="btn-primary"
-                >
-                  Next
-                </button>
-              )}
-              {currentSection === 'Release Information' && (
-                <button type="submit" className="btn-primary">
-                  Submit
-                </button>
-              )}
-            </div>
-          </Form>
-        )}
+        <Form>
+          {renderSection()}
+          <div className="buttons flex justify-between mt-4">
+            {currentSection !== 'Minimum Recording Information' && (
+              <div
+                onClick={() =>
+                  setCurrentSection(previousSection(currentSection))
+                }
+                className="btn-secondary"
+              >
+                Previous
+              </div>
+            )}
+            {currentSection !== 'Release Information' && (
+              <div
+                onClick={() => setCurrentSection(nextSection(currentSection))}
+                className="btn-primary"
+              >
+                Next
+              </div>
+            )}
+            {currentSection === 'Release Information' && (
+              <button type="submit" className="btn-primary">
+                Submit
+              </button>
+            )}
+          </div>
+        </Form>
       </Formik>
     </div>
   );

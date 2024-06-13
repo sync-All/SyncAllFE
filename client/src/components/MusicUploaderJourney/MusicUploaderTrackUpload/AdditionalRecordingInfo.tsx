@@ -1,5 +1,5 @@
 import React from 'react';
-import { Field } from 'formik';
+import { Field, ErrorMessage } from 'formik';
 import InputField from '../../InputField';
 
 
@@ -9,6 +9,7 @@ const applyInputStyles =
 const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
 const applyFormDiv = 'flex items-center mb-4 gap-8';
+const applyErrorStyles = 'italic text-red-600';
 
 const AdditionalRecordingInfo: React.FC = () => {
   return (
@@ -24,12 +25,22 @@ const AdditionalRecordingInfo: React.FC = () => {
             placeholder="E.g “live”, “dance remix”, etc"
             className={applyInputStyles}
           />
+          <ErrorMessage
+            name="recordingVersion"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
             label="Featured Instrument"
             name="featuredInstrument"
             placeholder="e.g saxophone, lead guitar"
+          />
+          <ErrorMessage
+            name="featuredInstrument"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -40,6 +51,11 @@ const AdditionalRecordingInfo: React.FC = () => {
             name="producer"
             placeholder="add all producers involved"
           />
+          <ErrorMessage
+            name="producer"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="recordingDate" className={applyLabelStyles}>
@@ -49,6 +65,11 @@ const AdditionalRecordingInfo: React.FC = () => {
             type="date"
             name="recordingDate"
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="recordingDate"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -62,12 +83,22 @@ const AdditionalRecordingInfo: React.FC = () => {
             name="countryOfRecording"
             className={applyInputStyles}
           />
+          <ErrorMessage
+            name="countryOfRecording"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
             label="Writer(s)"
             name="writer"
             placeholder="add all producer(s) involved"
+          />
+          <ErrorMessage
+            name="writer"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -78,12 +109,22 @@ const AdditionalRecordingInfo: React.FC = () => {
             name="composer"
             placeholder="add all composer(s) involved"
           />
+          <ErrorMessage
+            name="composer"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
             label="Publisher(s)"
             name="publisher"
             placeholder="add all publisher(s) involved"
+          />
+          <ErrorMessage
+            name="publisher"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
