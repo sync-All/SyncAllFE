@@ -1,9 +1,10 @@
-import { useState } from "react";
-import MusicUploaderDashboardSidebar from "../components/MusicUploaderJourney/MusicUploaderDashboardSidebar";
-import MusicUploaderDashboard from "../components/MusicUploaderJourney/MusicUploaderDashboard";
-import Hamburger from '../assets/images/Hambuger.svg'
-import MusicUploaderNavbar from "../components/MusicUploaderJourney/MusicUploaderNavbar";
-import UploadTrackContent from "../components/MusicUploaderJourney/UploadTrackContent";
+import { useState } from 'react';
+import MusicUploaderDashboardSidebar from '../components/MusicUploaderJourney/MusicUploaderDashboardSidebar';
+import MusicUploaderDashboard from '../components/MusicUploaderJourney/MusicUploaderDashboard';
+import Hamburger from '../assets/images/Hambuger.svg';
+import MusicUploaderNavbar from '../components/MusicUploaderJourney/MusicUploaderNavbar';
+import UploadTrackContent from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/UploadTrackContent';
+import UploadTrackMultiForm from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/UploadTrackMultiForm';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -35,16 +36,15 @@ const Dashboard = () => {
         />
       </div>
       <div className="flex-grow">
-        <MusicUploaderNavbar
-          activeItem={activeTab}        />
+        <MusicUploaderNavbar activeItem={activeTab} />
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
-        {activeTab === 'Upload Track' && <UploadTrackContent />}
+        {activeTab === 'Upload Track' && <UploadTrackMultiForm />}
         {/* {activeTab === 'My Tracks' && <MyTracksContent />}
         {activeTab === 'Earnings' && <EarningsContent />}
-        {activeTab === 'User Profile' && <UserProfileContent />} */} 
+        {activeTab === 'User Profile' && <UserProfileContent />} */}
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
