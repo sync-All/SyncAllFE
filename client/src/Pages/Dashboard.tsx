@@ -1,9 +1,8 @@
-import { useState } from "react";
-import MusicUploaderDashboardSidebar from "../components/MusicUploaderJourney/MusicUploaderDashboardSidebar";
-import MusicUploaderDashboard from "../components/MusicUploaderJourney/MusicUploaderDashboard";
-import Hamburger from '../assets/images/Hambuger.svg'
-import MusicUploaderNavbar from "../components/MusicUploaderJourney/MusicUploaderNavbar";
-import UploadTrackContent from "../components/MusicUploaderJourney/UploadTrackContent";
+import { useState } from 'react';
+import MusicUploaderDashboardSidebar from '../components/MusicUploaderJourney/MusicUploaderDashboardSidebar';
+import MusicUploaderDashboard from '../components/MusicUploaderJourney/MusicUploaderDashboard';
+import MusicUploaderNavbar from '../components/MusicUploaderJourney/MusicUploaderNavbar';
+import UploadTrackMultiForm from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/UploadTrackMultiForm';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -20,10 +19,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex">
-      <button onClick={toggleMenu} className="lg:hidden h-fit mt-7 ml-4">
-        <img src={Hamburger} alt="" />
-      </button>{' '}
-      {/* Hamburger icon */}
       <div
         className={`fixed inset-0 z-50 bg-white lg:static lg:bg-transparent lg:w-1/6 lg:h-auto ${
           isMenuOpen ? 'block' : 'hidden'
@@ -35,16 +30,15 @@ const Dashboard = () => {
         />
       </div>
       <div className="flex-grow">
-        <MusicUploaderNavbar
-          activeItem={activeTab}        />
+        <MusicUploaderNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
-        {activeTab === 'Upload Track' && <UploadTrackContent />}
+        {activeTab === 'Upload Track' && <UploadTrackMultiForm />}
         {/* {activeTab === 'My Tracks' && <MyTracksContent />}
         {activeTab === 'Earnings' && <EarningsContent />}
-        {activeTab === 'User Profile' && <UserProfileContent />} */} 
+        {activeTab === 'User Profile' && <UserProfileContent />} */}
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
