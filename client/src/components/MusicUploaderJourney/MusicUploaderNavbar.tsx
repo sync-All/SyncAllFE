@@ -2,19 +2,26 @@ import Search from '../../assets/images/search-1.svg';
 import Notification from '../../assets/images/Notification.svg';
 import ArrowDowm from '../../assets/images/select-input-arrow.svg';
 import UserImg from '../../assets/images/Photo (replace).svg';
-
+import Hamburger from '../../assets/images/Hambuger.svg';
 
 interface MusicUploaderNavbarProp {
   activeItem: string
+  toggleMenu: () => void;
 
 }
-const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({activeItem}) => {
+const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
+  toggleMenu,
+  activeItem,
+}) => {
   return (
     <div>
-      <nav className="lg:mx-8">
-        <div className="flex mt-6 justify-between items-center mb-9">
+      <nav className="lg:mx-8 flex items-center mt-6 gap-3 mb-9 ">
+        <button onClick={toggleMenu} className="lg:hidden ml-[18px] h-[20px] ">
+          <img src={Hamburger} alt="" />
+        </button>
+        <div className="flex justify-between items-center w-full ">
           <div className="mr-auto">
-            <h1 className="text-[#667185] text-[24px] font-formular-light leading-normal">
+            <h1 className="text-[#667185] text-[14px] lg:text-[24px] font-formular-light leading-normal mr-auto">
               {activeItem}
             </h1>
           </div>

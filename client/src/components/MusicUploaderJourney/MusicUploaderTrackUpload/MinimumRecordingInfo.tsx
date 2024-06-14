@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Field, ErrorMessage } from 'formik';
 import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
-
+import { useFormikContext } from 'formik';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
-const applyFormDiv = 'flex items-center mb-4 gap-8';
+const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
 
 const MinimumRecordingInfo: React.FC = () => {
-  
+  const { setFieldValue } = useFormikContext();
+  const [fileName, setFileName] = useState('Click to upload jpeg or png');
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.currentTarget.files) {
+      setFieldValue('digitalArtwork', event.currentTarget.files[0]);
+      setFileName(event.currentTarget.files[0].name);
+    }
+  };
 
   return (
     <div className="flex flex-col mt-[60px]">
@@ -139,13 +147,15 @@ const MinimumRecordingInfo: React.FC = () => {
               htmlFor="digitalArtwork"
               className="cursor-pointer shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 text-[#98A2B3] leading-4 focus:outline-none focus:shadow-outline font-inter flex justify-between items-center"
             >
-              <span>Click to upload jpeg or png</span>
+              <span>{fileName}</span>
               <img src={Attach} alt="Upload Icon" />
               <input
                 type="file"
                 id="digitalArtwork"
                 name="digitalArtwork"
                 className="hidden"
+                accept=".jpeg, .jpg, .png"
+                onChange={handleFileChange}
               />
             </label>
           </div>

@@ -1,12 +1,14 @@
 import React from 'react';
 import { Field, ErrorMessage } from 'formik';
 import InputField from '../../InputField';
+import { COUNTRIES } from '../../../constants/countries';
+import { LANGUAGES } from '../../../constants/languages';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
-const applyFormDiv = 'flex items-center mb-4 gap-8';
+const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
 
 const ReleaseInformation: React.FC = () => {
@@ -59,10 +61,17 @@ const ReleaseInformation: React.FC = () => {
             Country Of Release
           </label>
           <Field
-            type="text"
+            as="select"
             name="countryOfRelease"
             className={applyInputStyles}
-          />
+          >
+            <option value="">Select a country</option>
+            {COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </Field>
           <ErrorMessage
             name="countryOfRelease"
             component="div"
@@ -108,11 +117,14 @@ const ReleaseInformation: React.FC = () => {
           <label htmlFor="audioLanguage" className={applyLabelStyles}>
             Audio Language
           </label>
-          <Field
-            type="text"
-            name="audioLanguage"
-            className={applyInputStyles}
-          />
+          <Field as="select" name="audioLanguage" className={applyInputStyles}>
+            <option value="">Select a language</option>
+            {LANGUAGES.map((language) => (
+              <option key={language} value={language}>
+                {language}
+              </option>
+            ))}
+          </Field>
           <ErrorMessage
             name="audioLanguage"
             component="div"

@@ -12,7 +12,7 @@ interface InputFieldProps {
 const InputField: React.FC<InputFieldProps> = ({ label, name, placeholder }) => {
   const [showSecondaryInput, setShowSecondaryInput] = useState(false);
   const [secondaryInputValue, setSecondaryInputValue] = useState('');
-  const { setFieldValue } = useFormikContext<any>();
+  const { setFieldValue } = useFormikContext<InputFieldProps>();
   const [field, meta] = useField(name);
 
   const handleAddClick = () => {

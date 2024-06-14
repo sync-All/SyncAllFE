@@ -90,7 +90,7 @@ const MusicUploaderDashboard = () => {
   return (
     <div>
       
-      <div className="ml-[-20px] mr-[20px] lg:mx-8">
+      <div className="ml-[20px] mr-[20px] lg:mx-8">
         <div className="flex mt-7 lg:mt-8">
           <span className="mr-auto">
             <h1 className="text-[#667185] text-[16px] font-Utile-regular leading-normal">
