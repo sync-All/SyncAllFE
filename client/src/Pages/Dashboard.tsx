@@ -3,6 +3,8 @@ import MusicUploaderDashboardSidebar from '../components/MusicUploaderJourney/Mu
 import MusicUploaderDashboard from '../components/MusicUploaderJourney/MusicUploaderDashboard';
 import MusicUploaderNavbar from '../components/MusicUploaderJourney/MusicUploaderNavbar';
 import UploadTrackMultiForm from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/UploadTrackMultiForm';
+import MusicUploaderTracks from '../components/MusicUploaderJourney/MusicUploaderTracks';
+import MusicUploaderEarnings from '../components/MusicUploaderJourney/MusicUploaderEarnings';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -20,7 +22,7 @@ const Dashboard = () => {
   return (
     <div className="flex">
       <div
-        className={`fixed inset-0 z-50 bg-white lg:static lg:bg-transparent lg:w-1/6 lg:h-auto ${
+        className={`fixed inset-0 z-50 bg-white  lg:bg-transparent lg:w-1/6 lg:h-screen lg:fixed lg:top-0 lg:left-0 ${
           isMenuOpen ? 'block' : 'hidden'
         } lg:block`}
       >
@@ -29,13 +31,13 @@ const Dashboard = () => {
           onTabChange={handleTabChange}
         />
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow lg:ml-[16.67%] lg:h-screen lg:overflow-auto">
         <MusicUploaderNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
         {activeTab === 'Upload Track' && <UploadTrackMultiForm />}
-        {/* {activeTab === 'My Tracks' && <MyTracksContent />}
-        {activeTab === 'Earnings' && <EarningsContent />}
-        {activeTab === 'User Profile' && <UserProfileContent />} */}
+        {activeTab === 'My Tracks' && <MusicUploaderTracks />}
+        {activeTab === 'Earnings' && <MusicUploaderEarnings />}
+        {/*activeTab === 'User Profile' && <UserProfileContent />} */}
       </div>
     </div>
   );
