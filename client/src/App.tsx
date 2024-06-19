@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { UserContext } from './Context/UserRole';
 import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
 import Dashboard from './Pages/Dashboard';
-
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -31,12 +31,23 @@ function App() {
             element={<Registration selectedRole={selectedRole} />}
           />
           <Route path="/login" element={<SignIn />} />
+          <Route path="/email-confirmation" element={<ConfirmEmail />} />
           <Route
             path="/onboarding-details"
-            element={<UserTypeOnboardingPage />}
+            element={
+              <ProtectedRoute
+                path="/onboarding-details"
+                element={<UserTypeOnboardingPage />}
+              />
+            }
           ></Route>
-          <Route path="/email-confirmation" element={<ConfirmEmail />} />
-          <Route path='/dashboard' element={<Dashboard/>} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+            }
+          />
         </Routes>
       </UserContext.Provider>
     </>
