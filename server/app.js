@@ -13,6 +13,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users')
 var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
+const unauthorizedRouter = require('./routes/unauthorized')
 
 var app = express();
 
@@ -48,6 +49,7 @@ app.use('/', waitlistRouter)
 app.use('/', indexRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
+app.use('/', unauthorizedRouter);
 
 
 // catch 404 and forward to error handler

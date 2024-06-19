@@ -78,10 +78,46 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
-const profileSetup = 
+const profileSetup = async (req,res,next)=>{
 
-module.exports.signup = signup
-module.exports.signin = signin
-module.exports.allUsers = allUsers
+  if(req.isAuthenticated()){
+      const {fullName, spotifyLink, bio} = req.body
+      if(!fullName || !spotifyLink || !bio){
+          res.status(401).json({success : false, message : 'Missing field please check and confirm'})
+      }else{
+          const userId = req.params.userId
+          const profileUpdate = await User.findByIdAndUpdate(userId, {fullName, spotifyLink, bio}, {new : true})
+
+          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      }
+  }else{
+      res.status(401).json({success : false, message : "Unauthorized, Please proceed to login"})
+  }
+}
+
+const profileInfo = async(req,res,next)=>{
+  try {
+    const userId = req.params.userId
+    const profileInfo = await User.findById(userId)
+
+    res.status(200).json({success : true, profileInfo})
+  } catch (error) {
+    res.status(401).json('An error occured')
+  }
+}
+
+const verifyEmail =  async (req,res,next)=>{
+  if(req.user.emailConfirmedStatus){
+      res.redirect('/AlreadyConfirmed')
+  }
+  else if(req.isAuthenticated()){
+      const user = await User.findOneAndUpdate({_id : req.user._id},{emailConfirmedStatus : true},{new : true})
+      res.redirect('/confirmedEmail')
+  }else{
+      res.redirect('/notConfirmed')
+  }
+}
+
+module.exports = {signup, signin, allUsers, profileSetup,profileInfo, verifyEmail}
 
   
