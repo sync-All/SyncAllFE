@@ -4,6 +4,9 @@ const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel');
 const Dashboard = require('../models/dashboard.model');
+const passport = require('passport')
+require('dotenv').config()
+
 
 const signup = async function(req, res) {
     const {name, email, password, role, userType} = req.body
@@ -24,7 +27,7 @@ const signup = async function(req, res) {
       if(getIdentity){
         res.json({success: false, message : "Email Already in use"})
       }else{
-        bcrypt.hash(password, 10, function(err, password){
+        bcrypt.hash(password, process.env.SALT_ROUNDS, function(err, password){
           const users = new User({
             name,
             email,
@@ -79,9 +82,8 @@ const allUsers = async (req,res,next) =>{
 }
 
 const profileSetup = async (req,res,next)=>{
-
-  if(req.isAuthenticated()){
-      const {fullName, spotifyLink, bio} = req.body
+  try {
+    const {fullName, spotifyLink, bio} = req.body
       if(!fullName || !spotifyLink || !bio){
           res.status(401).json({success : false, message : 'Missing field please check and confirm'})
       }else{
@@ -90,8 +92,8 @@ const profileSetup = async (req,res,next)=>{
 
           res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
       }
-  }else{
-      res.status(401).json({success : false, message : "Unauthorized, Please proceed to login"})
+  } catch (error) {
+    res.status(401).json({success : false, message : "An error occured, please try again"})
   }
 }
 

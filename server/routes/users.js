@@ -2,6 +2,7 @@ var express = require('express');
 const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers')
 const passport = require('passport')
+const bcrypt = require('bcrypt')
 const User = require("../models/usermodel")
 
 var router = express.Router();
@@ -15,7 +16,7 @@ router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers))
 
 router.post('/api/v1/profilesetup/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asynchandler(authcontroller.profileSetup) )
 
-router.get('/api/v1/profileinfo/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),authcontroller.profileInfo)
+
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 

@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
 const dashboardSchema = new Schema({
-    totalTracks : {
-        type : Number,
-        default : 0
-    },
+    totalTracks : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "activity",
+        }
+    ],
     totalEarnings : {
         type : Number,
         default : 0
@@ -29,6 +31,20 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
+})
+
+const trackSchema = new Schema({
+    mainArtist : {
+        type : String,
+        required : true
+    },
+    featuredArtist : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    
 })
 
 const dashboard = mongoose.model('dashboard',dashboardSchema)
