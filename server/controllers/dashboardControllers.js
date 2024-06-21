@@ -1,4 +1,5 @@
-const dashboard = require("../models/dashboard.model")
+const dashboard = require("../models/dashboard.model").dashboard
+const Track = require("../models/dashboard.model").track
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel")
 require('dotenv').config()
@@ -18,6 +19,47 @@ const dashboardcontrol = async (req,res,next)=>{
         }
 
 }
+
+const verifyTrackUpload = async(req,res,next)=>{
+        try{
+            const isrc = req.params.isrc
+            const confirmTrackUploaded = await Track.findOne({isrc : isrc}).exec()
+            console.log(confirmTrackUploaded)
+            if(confirmTrackUploaded){
+                res.status(401).json('Track already exists')
+            }else{
+                res.status(200).json({success : true, message : 'Specific track with ISRC is not available'})
+            }
+        }catch {
+            res.status(404).json("Not found")
+        }
+    }
+
+const trackUpload = async(req,res,next)=>{
+        if(req.user.role == "Music Uploader"){
+            try {
+                const {isrc} = req.body
+                const confirmTrackUploaded = await Track.findOne({isrc : isrc}).exec()
+                if(confirmTrackUploaded){
+                    res.status(401).json('Track already exists')
+                }else{
+                    const songInfo = req.body
+                    const track = new Track(songInfo)
+                    track.save()
+                    .then(()=>{
+                        res.status(200).json({success : true, message : 'Music Information has been successfully added'})
+                    })
+                    .catch(()=>{
+                        res.status(401).json('An error Ocurred')
+                    })
+                }
+            } catch (error) {
+                res.status(401).json('An error ocurred, please try again')
+            }
+        }else{
+            res.status(401).json('Unauthorized Access, Role not Supported')
+        }
+    }
 
 const passwordreset = async (req,res,next)=>{
     try {
@@ -44,4 +86,4 @@ const passwordreset = async (req,res,next)=>{
     }
 }
 
-module.exports = {dashboardcontrol, passwordreset}
+module.exports = {dashboardcontrol, passwordreset, verifyTrackUpload, trackUpload}

@@ -3,7 +3,7 @@ const issueJwt = require('../utils/issueJwt')
 const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel');
-const Dashboard = require('../models/dashboard.model');
+const Dashboard = require('../models/dashboard.model').dashboard;
 const passport = require('passport')
 require('dotenv').config()
 
@@ -68,7 +68,8 @@ const signup = async function(req, res) {
       res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
     }else{
       const toBeIssuedJwt = issueJwt.issueJwtLogin(user)
-      res.status(200).json({success : true, user : user, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+      const userDetails = await User.findOne({email : email}).select('-password').exec()
+      res.status(200).json({success : true, user : userDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
   }
 

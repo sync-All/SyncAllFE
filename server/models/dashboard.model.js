@@ -119,11 +119,79 @@ const trackSchema = new Schema({
             type : String,
             required : true
         }
-    ]
-
-    
+    ],
+    claimBasis :  {
+        type : String,
+        required : true
+    },
+    claimOwnerName : {
+        type : String,
+        required : true
+    },
+    role : {
+        type : String,
+        required : true
+    },
+    percentClaim : {
+        type : Number,
+        required : true
+    },
+    copyrightName : {
+        type : String,
+        required : true
+    },
+    copyrightYear : {
+        type : String,
+        required : true
+    },
+    releaseDate : {
+        type : Date,
+        required : true
+    },
+    releaseDate : {
+        type : Date,
+        required : true
+    },
+    countryOfRelease : {
+        type : String,
+        required : true
+    },
+    mood : {
+        type : String,
+        required : true
+    },
+    tag : {
+        type : String,
+        required : true
+    },
+    lyrics : {
+        type : String,
+        required : true
+    },
+    audioLang : {
+        type : String,
+        required : true
+    },
+    explicitCont : {
+        type : Boolean,
+        required : true
+    },
+    releaseLabel : {
+        type : String,
+        required : true
+    },
+    releaseDesc : {
+        type : String,
+        required : true
+    },
+    user : {
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    },
 })
 
+const track = mongoose.model('track', trackSchema)
 const dashboard = mongoose.model('dashboard',dashboardSchema)
 
-module.exports = dashboard
+module.exports.dashboard = dashboard
+module.exports.track = track
