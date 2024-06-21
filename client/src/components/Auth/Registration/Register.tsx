@@ -48,12 +48,13 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
     
   };
 
-  const urlVar =  import.meta.env.REACT_APP_API_URL
-const apiUrl = `${urlVar}/signup`;
+  const urlVar =  import.meta.env.VITE_APP_API_URL
+  const apiUrl = `${urlVar}/signup`;
     console.log(apiUrl);
     console.log(urlVar);
     
   const handleFormSubmit = async (values: FormValues) => {
+    console.log(urlVar)
     setIsLoading(true);
     const config = {
       headers: {
