@@ -47,8 +47,10 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
         setUserRole(response.data.user.role); // Set the user type here
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userId', response.data.user._id )
         toast.success('Login successful');
         handleNavigationTODashboard();
+        console.log(response)
       } else {
         throw new Error('Response or response data is undefined');
       }

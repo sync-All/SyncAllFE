@@ -48,12 +48,27 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
     
   };
 
+  const urlVar =  import.meta.env.REACT_APP_API_URL
+const apiUrl = `${urlVar}/signup`;
+    console.log(apiUrl);
+    console.log(urlVar);
+    
   const handleFormSubmit = async (values: FormValues) => {
     setIsLoading(true);
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'http://localhost:5173'
+
+      },
+      withCredentials:true
+    } 
+    
     try {
+      
       const response = await axios.post(
-        'https://syncallfe.onrender.com/api/v1/signup',
-        values
+       apiUrl,
+        values, config
       );
       console.log(response.data);
       console.log(response.data.emailDomain)

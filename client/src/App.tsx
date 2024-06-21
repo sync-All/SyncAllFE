@@ -11,6 +11,7 @@ import { UserContext } from './Context/UserRole';
 import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
 import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import DashboardDataProvider from './Context/DashboardDataProvider';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -18,38 +19,40 @@ function App() {
 
   return (
     <>
-      <UserContext.Provider value={{ userRole, setUserRole }}>
-        <ToastContainer />
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route
-            path="/register1"
-            element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
-          />
-          <Route
-            path="/register2"
-            element={<Registration selectedRole={selectedRole} />}
-          />
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/email-confirmation" element={<ConfirmEmail />} />
-          <Route
-            path="/onboarding-details"
-            element={
-              <ProtectedRoute
-                path="/onboarding-details"
-                element={<UserTypeOnboardingPage />}
-              />
-            }
-          ></Route>
+      <DashboardDataProvider>
+        <UserContext.Provider value={{ userRole, setUserRole }}>
+          <ToastContainer />
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route
+              path="/register1"
+              element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
+            />
+            <Route
+              path="/register2"
+              element={<Registration selectedRole={selectedRole} />}
+            />
+            <Route path="/login" element={<SignIn />} />
+            <Route path="/email-confirmation" element={<ConfirmEmail />} />
+            <Route
+              path="/onboarding-details"
+              element={
+                <ProtectedRoute
+                  path="/onboarding-details"
+                  element={<UserTypeOnboardingPage />}
+                />
+              }
+            ></Route>
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute path="/dashboard" element={<Dashboard />} />
-            }
-          />
-        </Routes>
-      </UserContext.Provider>
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+              }
+            />
+          </Routes>
+        </UserContext.Provider>
+      </DashboardDataProvider>
     </>
   );
 }

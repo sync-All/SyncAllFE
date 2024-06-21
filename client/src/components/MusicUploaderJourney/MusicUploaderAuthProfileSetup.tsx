@@ -1,22 +1,29 @@
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import axios, { AxiosError } from 'axios';
 import Logo from '../../assets/logo-black.png';
 import BackgroundPattern from '../../assets/images/user-role-pattern.svg';
 import BadgeCheck from '../../assets/images/badge-check.svg';
 import BadgeUncheck from '../../assets/images/unnamed.png';
 import InfoIcon from '../../assets/images/info-fill.svg';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object({
-  name: Yup.string()
-    .required('Required'),
-  spotifyLink: Yup.string()
-    .url('Invalid url')
-    .required('Required'),
-  bio: Yup.string()
-    .required('Required'),
+  fullName: Yup.string().required('Required'),
+  spotifyLink: Yup.string().url('Invalid url').required('Required'),
+  bio: Yup.string().required('Required'),
 });
 
+interface ResponseData {
+  message?: string;
+}
+
 const MusicUploaderAuthProfileSetup = () => {
+  const navigate = useNavigate()
+  const handleNavigationTODashboard = () => {
+    navigate('/dashboard')
+  }
   return (
     <div className="bg-[#013131]">
       <div
@@ -47,11 +54,35 @@ const MusicUploaderAuthProfileSetup = () => {
             </span>
           </div>
           <Formik
-            initialValues={{ name: '', spotifyLink: '', bio: '' }}
+            initialValues={{ fullName: '', spotifyLink: '', bio: '' }}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={async (values, { setSubmitting }) => {
+              const userId = localStorage.getItem('userId');
+              const token = localStorage.getItem('token');
+              const config = {
+                headers: {
+                  Authorization: `${token}`,
+                },
+              };
+              console.log(userId);
+              try {
+               await axios.post(
+                  `https://syncallfe.onrender.com/api/v1/profilesetup/${userId}`,
+                  values,
+                  config
+                );
+                handleNavigationTODashboard()
+           
+              } catch (error: unknown) {
+                const axiosError = error as AxiosError<ResponseData>;
+              
+                toast.error(
+                  axiosError.response && axiosError.response.data
+                    ? axiosError.response.data.message
+                    : axiosError.message
+                );
+              } 
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2));
                 setSubmitting(false);
               }, 400);
             }}
@@ -64,12 +95,12 @@ const MusicUploaderAuthProfileSetup = () => {
                   </label>
                   <Field
                     type="text"
-                    name="name"
+                    name="fullName"
                     placeholder="Enter your full name"
                     className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
                   />
                   <ErrorMessage
-                    name="name"
+                    name="fullName"
                     component="div"
                     className="text-red-400 italic text-sm py-[4px]"
                   />
