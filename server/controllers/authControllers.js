@@ -12,20 +12,20 @@ const signup = async function(req, res) {
     const {name, email, password, role, userType} = req.body
     if(!name || !email || !password || !role || !userType){
       if(!name){
-        return res.json({success: false , message : "Name Field Missing, please review input"})
+        return res.status(401).json({success: false , message : "Name Field Missing, please review input"})
       }else if(!email){
-        return res.json({success : false, message : "Email Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Email Field Missing, please review input"})
       }else if(!password){
-        return res.json({success : false, message : "Password Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Password Field Missing, please review input"})
       }else if(!role){
-        return res.json({success : false, message : "Role Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Role Field Missing, please review input"})
       }else if(!userType){
-        return res.json({success : false, message : "UserType Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
       }
     }else{
       const getIdentity = await User.findOne({ email : email}).exec()
       if(getIdentity){
-        res.json({success: false, message : "Email Already in use"})
+        res.status(401).json({success: false, message : "Email Already in use"})
       }else{
         bcrypt.hash(password, process.env.SALT_ROUNDS, function(err, password){
           const users = new User({
