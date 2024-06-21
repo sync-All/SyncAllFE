@@ -44,6 +44,36 @@ const trackSchema = new Schema({
             required : true
         }
     ],
+    releaseType : {
+        type : String,
+        required : true
+    },
+    releaseTitle: {
+        type : String,
+        required : true
+    },
+    trackTitle : {
+        type : String,
+        required : true
+    },
+    trackLink : {
+        type : String,
+        required : true
+    },
+    upc : {
+        type : Number,
+        required : true
+    },
+    isrc : {
+        type : Number,
+        required : true
+    },
+
+    
+    
+    
+    
+
     
 })
 
