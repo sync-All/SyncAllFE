@@ -27,7 +27,7 @@ const signup = async function(req, res) {
       if(getIdentity){
         res.status(401).json({success: false, message : "Email Already in use"})
       }else{
-        bcrypt.hash(password, process.env.SALT_ROUNDS, function(err, password){
+        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
           const users = new User({
             name,
             email,
