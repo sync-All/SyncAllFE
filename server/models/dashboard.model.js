@@ -34,6 +34,8 @@ const dashboardSchema = new Schema({
 })
 
 const trackSchema = new Schema({
+
+    
     mainArtist : {
         type : String,
         required : true
@@ -68,11 +70,56 @@ const trackSchema = new Schema({
         type : Number,
         required : true
     },
-
-    
-    
-    
-    
+    genre : {
+        type : String,
+        required : true
+    },
+    artWork : {
+        type : String,
+        required : true
+    },
+    recordingVersion : {
+        type : String,
+        required : true
+    },
+    featuredInstrument : {
+        type : String,
+        required : true
+    },
+    producers : {
+        type : String,
+        required : true
+    },
+    recordingDate : {
+        type : String,
+        required : true
+    },
+    countryOfRecording : {
+        type : String,
+        required : true
+    },
+    countryOfRecording : {
+        type : String,
+        required : true
+    },
+    writers : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    composers : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    publishers : [
+        {
+            type : String,
+            required : true
+        }
+    ]
 
     
 })
