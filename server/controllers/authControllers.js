@@ -97,17 +97,6 @@ const profileSetup = async (req,res,next)=>{
   }
 }
 
-const profileInfo = async(req,res,next)=>{
-  try {
-    const userId = req.params.userId
-    const profileInfo = await User.findById(userId)
-
-    res.status(200).json({success : true, profileInfo})
-  } catch (error) {
-    res.status(401).json('An error occured')
-  }
-}
-
 const verifyEmail =  async (req,res,next)=>{
   if(req.user.emailConfirmedStatus){
       res.redirect('/AlreadyConfirmed')
@@ -120,6 +109,6 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-module.exports = {signup, signin, allUsers, profileSetup,profileInfo, verifyEmail}
+module.exports = {signup, signin, allUsers, profileSetup, verifyEmail}
 
   

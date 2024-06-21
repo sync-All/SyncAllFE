@@ -5,7 +5,7 @@ const dashboardSchema = new Schema({
     totalTracks : [
         {
             type : Schema.Types.ObjectId,
-            ref : "activity",
+            ref : "tracks",
         }
     ],
     totalEarnings : {

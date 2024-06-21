@@ -8,7 +8,8 @@ const dashboardcontrol = async (req,res,next)=>{
         try {
             if(req.user.role == "Music Uploader"){
                 const userDashboardDetails = await dashboard.findOne({user : userId}).exec()
-            res.status(200).json({success : true, dashboardDetails : userDashboardDetails})
+                const profileInfo = await User.findById(userId)
+            res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo})
             }else{
                 res.status(401).json('Unauthorized access')
             }
