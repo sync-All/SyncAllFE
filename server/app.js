@@ -17,8 +17,19 @@ const unauthorizedRouter = require('./routes/unauthorized')
 
 var app = express();
 
+var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app']
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (allowlist.indexOf(req.header('Origin')) !== -1) {
+    corsOptions = {credentials : true, origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false } // disable CORS for this request
+  }
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
 // cors setup
-app.use(cors({credentials : true, origin : 'http://localhost:5173'}))
+app.use(cors(corsOptionsDelegate))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
