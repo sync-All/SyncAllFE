@@ -16,8 +16,6 @@ router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers))
 
 router.post('/api/v1/profilesetup/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asynchandler(authcontroller.profileSetup) )
 
-
-
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 
 router.get('/confirmedEmail',(req,res,next)=>{

@@ -18,7 +18,7 @@ const unauthorizedRouter = require('./routes/unauthorized')
 var app = express();
 
 // cors setup
-app.use(cors())
+app.use(cors({credentials : true, origin : 'http://localhost:5173'}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
