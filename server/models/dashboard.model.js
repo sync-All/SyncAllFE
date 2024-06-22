@@ -67,7 +67,7 @@ const trackSchema = new Schema({
         required : true
     },
     isrc : {
-        type : Number,
+        type : String,
         required : true
     },
     genre : {
@@ -91,10 +91,6 @@ const trackSchema = new Schema({
         required : true
     },
     recordingDate : {
-        type : String,
-        required : true
-    },
-    countryOfRecording : {
         type : String,
         required : true
     },

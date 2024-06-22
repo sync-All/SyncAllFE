@@ -2,7 +2,16 @@ const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/dashboard.model").track
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel")
+const cloudinary = require("cloudinary").v2
+const fs = require("node:fs")
 require('dotenv').config()
+
+cloudinary.config({
+    cloud_name : process.env.CLOUD_NAME,
+    api_key : process.env.CLOUD_API_KEY,
+    secure : true,
+    api_secret : process.env.CLOUD_API_SECRET
+})
 
 const dashboardcontrol = async (req,res,next)=>{
         const userId = req.params.userId
@@ -43,14 +52,16 @@ const trackUpload = async(req,res,next)=>{
                 if(confirmTrackUploaded){
                     res.status(401).json('Track already exists')
                 }else{
-                    const songInfo = req.body
+                    let songInfo = req.body
+                    var artWork = await cloudinary.uploader.upload(req.file.path)
+                    songInfo = {...songInfo, artWork : artWork}
                     const track = new Track(songInfo)
                     track.save()
                     .then(()=>{
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
-                    .catch(()=>{
-                        res.status(401).json('An error Ocurred')
+                    .catch((err)=>{
+                        res.status(401).json(err)
                     })
                 }
             } catch (error) {
