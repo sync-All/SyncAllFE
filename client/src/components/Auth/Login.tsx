@@ -8,6 +8,8 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserRole';
+import { getAdditionalUserInfo } from 'firebase/auth';
+import { signInWithGooglePopup } from '../../../firebase';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -67,6 +69,35 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
       setIsLoading(false);
     }
   };
+
+  const logGoogleUser = async () => {
+    // Authenticate user
+      const response = await signInWithGooglePopup()
+      // get concise information about logged in user
+      const userInfo = getAdditionalUserInfo(response)
+      // COlate values and assign to their proper fields
+      const values = {
+        email : userInfo?.profile?.email,
+      }
+      // POst request to server to validate user
+      await axios.post('https://syncallfe.onrender.com/api/v1/googleauth',values)
+      .then((response)=>{
+        setUserRole(response.data.user.role); // Set the user type here
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userRole', response.data.user.role);
+          toast.success('Login successful');
+          handleNavigationTODashboard();
+      })
+      .catch((err)=>{
+        const axiosError = err as AxiosError<ResponseData>;
+        toast.error(
+          axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message
+            : axiosError.message
+        );
+      })
+
+  }
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
@@ -161,16 +192,16 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                       <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px]">
                         OR
                       </p>
-                      <button
-                        type="button"
+                      <div 
+                      onClick={logGoogleUser}
                         className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px]  "
-                        disabled={isLoading}
+                        
                       >
                         <img src={Google} alt="google icon" />
                         <span className="text-[16px] poppins-medium leading-[24px] text-black">
                           Continue with Google
                         </span>
-                      </button>
+                      </div>
                     </div>
                     <div className="my-[26px]">
                       <p className="poppins-medium text-[16px] leading-[24px]">
