@@ -12,7 +12,6 @@ const userSchema = new Schema({
     },
     password : {
         type : String,
-        required : true
     },
     role : {
         type : String,
@@ -25,6 +24,15 @@ const userSchema = new Schema({
     emailConfirmedStatus : {
         type : Boolean,
         default : false
+    },
+    img : {
+        type : String,
+        required : true
+    },
+    authSource : {
+        type : String,
+        enum : ['local', 'googleAuth'],
+        default : 'local'
     },
     fullName : {
         type : String,

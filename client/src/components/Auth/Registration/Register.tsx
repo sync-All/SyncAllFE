@@ -1,6 +1,7 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {signInWithGooglePopup} from '../../../../firebase';
 import * as Yup from 'yup';
 import syncLogo from '../../../assets/logo-black.png';
 import Google from '../../../assets/images/google.svg';
@@ -13,8 +14,10 @@ import AuthSliderImage6 from '../../../assets/images/auth-img-6.png';
 import AuthSliderImage7 from '../../../assets/images/auth-img-7.png';
 import AuthSliderImage8 from '../../../assets/images/auth-img-8.png';
 import AuthImageSlider from '../../../constants/auth-image-slider';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { getAdditionalUserInfo } from 'firebase/auth';
+import { UserContext } from '../../../Context/UserRole';
 
 const SignupSchema = Yup.object().shape({
   userType: Yup.string()
@@ -30,6 +33,11 @@ const SignupSchema = Yup.object().shape({
     .required('Password is required'),
 });
 
+interface ResponseData {
+  message?: string;
+  role?: { userType: string };
+}
+
 interface RegisterProps {
   selectedRole: string | null;
 }
@@ -40,6 +48,7 @@ interface FormValues {
   email: string;
 }
 
+
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -47,13 +56,58 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
     navigate('/email-confirmation', { state: {emailDomain}});
     
   };
+  const handleNavigationTODashboard = () => {
+    navigate('/onboarding-details');
+  };
+  const { setUserRole } = useContext(UserContext);
+
+const logGoogleUser = async () => {
+  // Check if user has filled first part of the form previously
+  if(!selectedRole){
+    toast.error('Role has not Been Selected, Redirecting...')
+    setTimeout(()=>{
+      navigate('/register1')
+    },1500)
+  }else{
+    const response = await signInWithGooglePopup()
+    // get concise information about logged in user
+    const userInfo = getAdditionalUserInfo(response)
+    // COlate values and assign to their proper fields
+    const values = {
+      name : userInfo?.profile?.name,
+      email : userInfo?.profile?.email,
+      img : userInfo?.profile?.picture,
+      role : selectedRole,
+      emailConfirmedStatus :  userInfo?.profile?.verified_email,
+      userType : 'individual',
+      newUser : userInfo?.isNewUser
+    }
+    // POst request to server to validate user
+    await axios.post('https://syncallfe.onrender.com/api/v1/googleauth',values)
+    .then((response)=>{
+      setUserRole(response.data.user.role); // Set the user type here
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        toast.success('Login successful');
+        handleNavigationTODashboard();
+    })
+    .catch((err)=>{
+      const axiosError = err as AxiosError<ResponseData>;
+      toast.error(
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message
+          : axiosError.message
+      );
+    })
+    }
+}
 
   const handleFormSubmit = async (values: FormValues) => {
     setIsLoading(true);
+
     try {
       const response = await axios.post(
-        'https://syncallfe.onrender.com/api/v1/signup',
-        values
+        'https://syncallfe.onrender.com/api/v1/signup',values
       );
       console.log(response.data);
       console.log(response.data.emailDomain)
@@ -211,15 +265,16 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
                     <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px] ">
                       OR
                     </p>
-                    <button
+                    <div
+                    onClick={logGoogleUser}
                       className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] "
-                      disabled={isLoading}
+                      
                     >
                       <img src={Google} alt="google icon" />
                       <span className="text-[16px] poppins-medium leading-[24px] text-black ">
                         Continue with Google
                       </span>
-                    </button>
+                    </div>
                   </div>
                   <div className="my-[26px]  ">
                     <p className="poppins-medium text-[16px] leading-[24px] ">
