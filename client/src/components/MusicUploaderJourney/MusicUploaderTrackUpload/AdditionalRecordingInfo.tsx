@@ -46,12 +46,12 @@ const AdditionalRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
-            label="Producer(s)"
-            name="producer"
+            label="producers(s)"
+            name="producers"
             placeholder="add all producers involved"
           />
           <ErrorMessage
-            name="producer"
+            name="producers"
             component="div"
             className={applyErrorStyles}
           />
@@ -97,12 +97,12 @@ const AdditionalRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
-            label="Writer(s)"
-            name="writer"
-            placeholder="add all producer(s) involved"
+            label="writers(s)"
+            name="writers"
+            placeholder="add all producers(s) involved"
           />
           <ErrorMessage
-            name="writer"
+            name="writers"
             component="div"
             className={applyErrorStyles}
           />
@@ -111,24 +111,24 @@ const AdditionalRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
-            label="Composer(s)"
-            name="composer"
-            placeholder="add all composer(s) involved"
+            label="composers(s)"
+            name="composers"
+            placeholder="add all composers(s) involved"
           />
           <ErrorMessage
-            name="composer"
+            name="composers"
             component="div"
             className={applyErrorStyles}
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
-            label="Publisher(s)"
-            name="publisher"
-            placeholder="add all publisher(s) involved"
+            label="publishers(s)"
+            name="publishers"
+            placeholder="add all publishers(s) involved"
           />
           <ErrorMessage
-            name="publisher"
+            name="publishers"
             component="div"
             className={applyErrorStyles}
           />

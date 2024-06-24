@@ -3,6 +3,7 @@ import Notification from '../../assets/images/Notification.svg';
 import ArrowDowm from '../../assets/images/select-input-arrow.svg';
 import UserImg from '../../assets/images/Photo (replace).svg';
 import Hamburger from '../../assets/images/Hambuger.svg';
+import { useDataContext } from '../../Context/DashboardDataProvider';
 
 interface MusicUploaderNavbarProp {
   activeItem: string
@@ -12,7 +13,12 @@ interface MusicUploaderNavbarProp {
 const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
   toggleMenu,
   activeItem,
-}) => {
+}) => 
+  
+  {
+
+    const profileInfo = useDataContext()
+    const profileDetails = profileInfo.dashboardData?.profileInfo
   return (
     <div>
       <nav className="lg:mx-8 flex items-center mt-6 gap-3 mb-9 ">
@@ -34,10 +40,10 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
               </span>
               <span className="hidden lg:block ml-2">
                 <p className="font-inter text-[14px] font-medium leading-5">
-                  Asuquo Victor
+                  {profileDetails?.fullName}
                 </p>
                 <p className="font-inter text-[12px] font-regular leading-4">
-                  @talktoasuquo
+                 {profileDetails?.email}
                 </p>
               </span>
               <img src={ArrowDowm} alt="" className="hidden lg:block ml-4" />

@@ -19,6 +19,9 @@ const Dashboard = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+   const userId = localStorage.getItem('userId');
+   console.log(userId);
+
   return (
     <div className="flex">
       <div

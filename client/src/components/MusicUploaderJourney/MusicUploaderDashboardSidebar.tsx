@@ -7,6 +7,7 @@ import ProfileIcon from '../../assets/images/User Rounded.svg';
 import Chat_Support from '../../assets/images/chat, support.svg';
 import LogoutIcon from '../../assets/images/Login 2.svg';
 import UserImg from '../../assets/images/Photo (replace).svg';
+import { useDataContext } from '../../Context/DashboardDataProvider';
 
 interface MusicUploaderDashboardSidebarProps {
   activeItem: string
@@ -14,6 +15,15 @@ interface MusicUploaderDashboardSidebarProps {
 }
 
 const MusicUploaderDashboardSidebar: React.FC<MusicUploaderDashboardSidebarProps> = ({ activeItem, onTabChange }) => {
+
+const profileInfo = useDataContext();
+const profileDetails = profileInfo.dashboardData?.profileInfo;
+
+const logout = () => {
+    localStorage.clear();
+    window.location.href = '/';
+}
+
 
   const pStyle = (item: string) => ({
     color: item === activeItem ? 'var(--black2)' : 'var(--Grey-500, #667185)',
@@ -97,20 +107,20 @@ const MusicUploaderDashboardSidebar: React.FC<MusicUploaderDashboardSidebarProps
             Contact Us
           </button>
         </div>
-        <div className="flex items-center mx-3 mt-6 mb-9 ">
+        <div className="flex items-center mx-3 mt-6 mb-9 overflow-hidden">
           <span>
             <img src={UserImg} alt="" />
           </span>
-          <span className="ml-2">
+          <span className="ml-2 w-1/2 break-words">
             <p className="font-inter text-[14px] font-medium leading-5">
-              Asuquo Victor
+              {profileDetails?.fullName}
             </p>
-            <p className="font-inter text-[12px] font-regular leading-4">
-              @talktoasuquo
+            <p className="font-inter text-[12px] font-regular leading-4 ">
+              {profileDetails?.email}
             </p>
           </span>
           <span className="ml-auto">
-            <img src={LogoutIcon} alt="" />
+            <img src={LogoutIcon} alt="" onClick={logout} />
           </span>
         </div>
       </div>

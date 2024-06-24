@@ -1,4 +1,3 @@
-
 import Folder from '../../assets/images/Folder-icon.svg';
 import Uploaded from '../../assets/images/Upload Track 2.svg';
 import Earning from '../../assets/images/Cash Out.svg';
@@ -15,8 +14,18 @@ import {
   // Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { useDataContext } from '../../Context/DashboardDataProvider';
 
-const MusicUploaderDashboard = () => {
+interface Activity {
+  title: string;
+  description: string;
+}
+
+const MusicUploaderDashboard: React.FC<Activity> = () => {
+  const dashdata = useDataContext();
+  const dashboardDetails = dashdata.dashboardData?.dashboardDetails;
+  const profileDetails = dashdata.dashboardData?.profileInfo;
+
   const data = [
     { name: '12', uv: 120 },
     { name: '13', uv: 150 },
@@ -31,11 +40,13 @@ const MusicUploaderDashboard = () => {
     { name: '22', uv: 100 },
   ];
 
+  const totalTracksCount = dashboardDetails?.totalTracks.length || 0;
+
   const cardData = [
     {
       image: Uploaded,
       title: 'Total Tracks Uploaded',
-      value: '17',
+      value: `${totalTracksCount}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -43,7 +54,8 @@ const MusicUploaderDashboard = () => {
     {
       image: Earning,
       title: 'Total Earnings',
-      value: '$132,600',
+      dollar: '$',
+      value: `$${dashboardDetails?.totalEarnings || 0}`,
       percentage: '16%',
       color: '#f62c2c',
       bgColor: 'bg-red-300',
@@ -51,7 +63,7 @@ const MusicUploaderDashboard = () => {
     {
       image: Earth,
       title: 'Countries Reached',
-      value: '68',
+      value: `${dashboardDetails?.countryReached || 'N/A'}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -59,42 +71,21 @@ const MusicUploaderDashboard = () => {
     {
       image: Stream,
       title: 'Total Plays',
-      value: '57,500',
+      value: `${dashboardDetails?.totalPlays || 0}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
     },
   ];
 
-  const activityData = [
-    {
-      title: 'You have 10k+ Plays 🎉',
-      description: 'Your track Hamba Wena has gotten over 10k plays',
-    },
-    {
-      title: 'New Earnings 💸',
-      description: "You earned $50 from 'African Sunset'.",
-    },
-    {
-      title: 'Movie Consideration 🎬',
-      description: "Your track 'Ocean Waves' is in consideration for a movie",
-    },
-    {
-      title: 'Track Approval ✅',
-      description: "Your track 'Summer Vibes' was approved",
-    },
-  ];
-
-  
-
   return (
     <div>
-      
       <div className="ml-[20px] mr-[20px] lg:mx-8">
         <div className="flex mt-7 lg:mt-8">
           <span className="mr-auto">
             <h1 className="text-[#667185] text-[16px] font-Utile-regular leading-normal">
-              Welcome, Victor!
+              Welcome,{' '}
+              {profileDetails?.name ? profileDetails?.name : 'Loading ...'}!
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
@@ -128,7 +119,11 @@ const MusicUploaderDashboard = () => {
                 </p>
                 <div className="flex items-center mt-[5px]">
                   <p className="text-[20px] font-formular-regular text-[#1d2739] lg:text-[32px] mr-auto">
-                    {card.value}
+                    <span className="font-Utile-regular">{card.dollar}</span>{' '}
+                    {card.value.includes('totalTracksCount') &&
+                    !dashboardDetails
+                      ? 'Loading...'
+                      : card.value}
                   </p>
                   <p
                     className={`text-[8px] font-Utile-medium text-[${card.color}] ${card.bgColor} lg:text-[14px]`}
@@ -211,16 +206,24 @@ const MusicUploaderDashboard = () => {
               Top Activities
             </h2>
             <div className="border border-[#E4E7EC] px-10 pt-8 pb-11 rounded-[11px] mt-6 gap-6 flex flex-col">
-              {activityData.map((activity, index) => (
-                <div key={index} className="flex flex-col gap-[6px]">
-                  <h3 className="font-formular-regular text-base tracking-[-0.32px] text-[#475367] leading-normal">
-                    {activity.title}
-                  </h3>
-                  <p className="font-Utile-regular text-[#98A2B3] text-[14px] tracking-[-0.28px] leading-normal w-[202px]">
-                    {activity.description}
+              {dashboardDetails?.activities?.length > 0 ? (
+                dashboardDetails.activities.map((activity, index) => (
+                  <div key={index} className="flex flex-col gap-[6px]">
+                    <h3 className="font-formular-regular text-base tracking-[-0.32px] text-[#475367] leading-normal">
+                      {activity.title}
+                    </h3>
+                    <p className="font-Utile-regular text-[#98A2B3] text-[14px] tracking-[-0.28px] leading-normal w-[202px]">
+                      {activity.description}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center">
+                  <p className="font-Utile-regular text-[#98A2B3]">
+                    No activities
                   </p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

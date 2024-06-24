@@ -47,14 +47,15 @@ interface FormValues {
   password: string;
   email: string;
 }
-
+interface ResponseData {
+  message: string;
+}
 
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
-    navigate('/email-confirmation', { state: {emailDomain}});
-    
+    navigate('/email-confirmation', { state: { emailDomain } });
   };
   const handleNavigationTODashboard = () => {
     navigate('/onboarding-details');
@@ -103,9 +104,12 @@ const logGoogleUser = async () => {
 }
 
   const handleFormSubmit = async (values: FormValues) => {
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/signup`;
     setIsLoading(true);
 
     try {
+      const response = await axios.post(apiUrl, values);
       const response = await axios.post(
         'https://syncallfe.onrender.com/api/v1/signup',values
       );
@@ -113,8 +117,13 @@ const logGoogleUser = async () => {
       console.log(response.data.emailDomain)
       toast.success('Account created successfully');
       handleRedirectionToEmailConfirmation(response.data.emailDomain);
-    } catch (error) {
-      toast.error('Account created unsuccessfully');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message
+          : axiosError.message
+      );
     } finally {
       setIsLoading(false);
     }

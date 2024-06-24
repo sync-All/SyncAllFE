@@ -13,7 +13,7 @@
 //   upc: string;
 //   isrc: string;
 //   genre: string;
-//   digitalArtwork: File | null;
+//   artWork: File | null;
 // }
 
 // const initialFormData: FormData = {
@@ -26,7 +26,7 @@
 //   upc: '',
 //   isrc: '',
 //   genre: '',
-//   digitalArtwork: null,
+//   artWork: null,
 // };
 
 // const UploadTrackMultiForm: React.FC = () => {
@@ -49,7 +49,7 @@
 //   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
 //     setFormData((prevData) => ({
 //       ...prevData,
-//       digitalArtwork: e.target.files ? e.target.files[0] : null,
+//       artWork: e.target.files ? e.target.files[0] : null,
 //     }));
 //   };
 

@@ -11,6 +11,7 @@ import { UserContext } from './Context/UserRole';
 import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
 import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import DashboardDataProvider from './Context/DashboardDataProvider';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -42,10 +43,13 @@ function App() {
             }
           ></Route>
 
+          {/* Wrap the DashboardDataProvider around the routes that require it */}
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+              <DashboardDataProvider>
+                <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+              </DashboardDataProvider>
             }
           />
         </Routes>
