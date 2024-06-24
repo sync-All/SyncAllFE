@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserRole';
 import { getAdditionalUserInfo } from 'firebase/auth';
 import { signInWithGooglePopup } from '../../../firebase';
+import { useDataContext } from '../../Context/DashboardDataProvider';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -30,9 +31,17 @@ interface ResponseData {
 const Login: React.FC<LoginProps> = ({ setToken }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const dashdata = useDataContext();
+  const profileDetails = dashdata.dashboardData?.profileInfo;
+
   const handleNavigationTODashboard = () => {
-    navigate('/onboarding-details');
+    if(profileDetails ) {
+      navigate('/onboarding-details');
+    } else {
+      navigate('/dashboard');
+    }    
   };
+  
   const { setUserRole } = useContext(UserContext);
 
   const handleLogin = async (values: { email: string; password: string }) => {

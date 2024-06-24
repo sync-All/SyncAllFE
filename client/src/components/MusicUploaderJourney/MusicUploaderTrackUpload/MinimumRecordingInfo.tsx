@@ -3,6 +3,8 @@ import { Field, ErrorMessage } from 'formik';
 import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
 import { useFormikContext } from 'formik';
+import axios from 'axios';
+// import { toast } from 'react-toastify';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -11,9 +13,12 @@ const applyLabelStyles =
 const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
 
+
+
 const MinimumRecordingInfo: React.FC = () => {
   const { setFieldValue } = useFormikContext();
   const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  const [isrcValidationMessage, setIsrcValidationMessage] = useState('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.currentTarget.files) {
@@ -21,6 +26,37 @@ const MinimumRecordingInfo: React.FC = () => {
       setFileName(event.currentTarget.files[0].name);
     }
   };
+
+  const verifyISRC = async (isrc: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/verifyTrackUploaded/${isrc}`;
+     console.log(` ${token} + ${apiUrl}`);
+    const config = {
+      headers: {
+        Authorization: ` ${token}`,
+      },
+    };
+    try {
+      const response = await axios.get(apiUrl, config);
+      // Assuming the API returns a JSON object with a boolean 'isValid' field
+      if (response.data.isValid) {
+        setIsrcValidationMessage('ISRC is valid.');
+      } else {
+        setIsrcValidationMessage('ISRC is not valid.');
+      }
+    } catch (error) {
+      console.error('Error verifying ISRC:', error);
+      setIsrcValidationMessage('Failed to verify ISRC.');
+    }
+  };
+
+    const handleIsrcBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      const isrc = e.target.value;
+      if (isrc) {
+        verifyISRC(isrc);
+      }
+    };
 
   return (
     <div className="flex flex-col mt-[60px]">
@@ -118,12 +154,20 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="isrc" className={applyLabelStyles}>
             ISRC
           </label>
-          <Field type="text" name="isrc" className={applyInputStyles} />
+          <Field
+            type="text"
+            name="isrc"
+            className={applyInputStyles}
+            onBlur={handleIsrcBlur}
+          />
           <ErrorMessage
             name="isrc"
             component="div"
             className={applyErrorStyles}
           />
+          {isrcValidationMessage && (
+            <div className={applyErrorStyles}>{isrcValidationMessage}</div>
+          )}
         </div>
       </div>
       <div className={applyFormDiv}>
