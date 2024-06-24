@@ -144,10 +144,6 @@ const trackSchema = new Schema({
         type : Date,
         required : true
     },
-    releaseDate : {
-        type : Date,
-        required : true
-    },
     countryOfRelease : {
         type : String,
         required : true
