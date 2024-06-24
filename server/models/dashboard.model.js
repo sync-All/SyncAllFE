@@ -180,11 +180,20 @@ const trackSchema = new Schema({
         type : String,
         required : true
     },
+    uploadStatus : {
+        type : String,
+        enum : ['Pending', 'Approved', 'Rejected'],
+        default : 'Pending'
+    },
+    earnings : {
+        type : Number,
+        default : 0
+    },
     user : {
         type : Schema.Types.ObjectId,
         ref : "user"
     },
-})
+},{timestamps : true})
 
 const track = mongoose.model('track', trackSchema)
 const dashboard = mongoose.model('dashboard',dashboardSchema)
