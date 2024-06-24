@@ -16,12 +16,12 @@ import {
 } from 'recharts';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 
-interface Activity {
-  title: string;
-  description: string;
-}
+// interface Activity {
+//   title: string;
+//   description: string;
+// }
 
-const MusicUploaderDashboard: React.FC<Activity> = () => {
+const MusicUploaderDashboard= () => {
   const dashdata = useDataContext();
   const dashboardDetails = dashdata?.dashboardData?.dashboardDetails;
   const dashboardActivities = dashboardDetails?.activities
