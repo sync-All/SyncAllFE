@@ -46,7 +46,6 @@ const verifyTrackUpload = async(req,res,next)=>{
 
 const trackUpload = async(req,res,next)=>{
         if(req.user.role == "Music Uploader"){
-            try {
                 const {isrc} = req.body
                 const confirmTrackUploaded = await Track.findOne({isrc : isrc}).exec()
                 if(confirmTrackUploaded){
@@ -65,9 +64,6 @@ const trackUpload = async(req,res,next)=>{
                         res.status(401).json(err)
                     })
                 }
-            } catch (error) {
-                res.status(401).json('An error ocurred, please try again')
-            }
         }else{
             res.status(401).json('Unauthorized Access, Role not Supported')
         }

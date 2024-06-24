@@ -148,14 +148,18 @@ const trackSchema = new Schema({
         type : String,
         required : true
     },
-    mood : {
-        type : String,
-        required : true
-    },
-    tag : {
-        type : String,
-        required : true
-    },
+    mood : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    tag : [
+        {
+            type : String,
+            required : true
+        }
+    ],
     lyrics : {
         type : String,
         required : true
