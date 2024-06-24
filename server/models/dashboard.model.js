@@ -82,16 +82,20 @@ const trackSchema = new Schema({
         type : String,
         required : true
     },
-    featuredInstrument : {
-        type : String,
-        required : true
-    },
-    producers : {
-        type : String,
-        required : true
-    },
+    featuredInstrument : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    producers : [
+        {
+            type : String,
+            required : true
+        }
+    ],
     recordingDate : {
-        type : String,
+        type : Date,
         required : true
     },
     countryOfRecording : {
@@ -120,7 +124,7 @@ const trackSchema = new Schema({
         type : String,
         required : true
     },
-    claimOwnerName : {
+    claimingUser : {
         type : String,
         required : true
     },

@@ -53,7 +53,7 @@ const trackUpload = async(req,res,next)=>{
                 }else{
                     let songInfo = req.body
                     var artWork = await cloudinary.uploader.upload(req.file.path)
-                    songInfo = {...songInfo, artWork : artWork, user : req.params.userId}
+                    songInfo = {...songInfo, artWork : artWork.secure_url, user : req.params.userId}
                     const track = new Track(songInfo)
                     track.save()
                     .then(()=>{
