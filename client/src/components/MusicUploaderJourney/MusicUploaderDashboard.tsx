@@ -23,7 +23,8 @@ interface Activity {
 
 const MusicUploaderDashboard: React.FC<Activity> = () => {
   const dashdata = useDataContext();
-  const dashboardDetails = dashdata.dashboardData?.dashboardDetails;
+  const dashboardDetails = dashdata?.dashboardData?.dashboardDetails;
+  const dashboardActivities = dashboardDetails?.activities
   const profileDetails = dashdata.dashboardData?.profileInfo;
 
   const data = [
@@ -206,7 +207,7 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
               Top Activities
             </h2>
             <div className="border border-[#E4E7EC] px-10 pt-8 pb-11 rounded-[11px] mt-6 gap-6 flex flex-col">
-              {dashboardDetails?.activities?.length > 0 ? (
+              {dashboardActivities ? (
                 dashboardDetails.activities.map((activity, index) => (
                   <div key={index} className="flex flex-col gap-[6px]">
                     <h3 className="font-formular-regular text-base tracking-[-0.32px] text-[#475367] leading-normal">
