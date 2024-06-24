@@ -24,10 +24,7 @@ interface Activity {
 const MusicUploaderDashboard: React.FC<Activity> = () => {
   const dashdata = useDataContext();
   const dashboardDetails = dashdata.dashboardData?.dashboardDetails;
-
-  if (!dashboardDetails) {
-    return <div>Loading...</div>;
-  }
+  const profileDetails = dashdata.dashboardData?.profileInfo;
 
   const data = [
     { name: '12', uv: 120 },
@@ -43,11 +40,13 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
     { name: '22', uv: 100 },
   ];
 
+  const totalTracksCount = dashboardDetails?.totalTracks.length || 0;
+
   const cardData = [
     {
       image: Uploaded,
       title: 'Total Tracks Uploaded',
-      value: ``,
+      value: `${totalTracksCount}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -56,7 +55,7 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
       image: Earning,
       title: 'Total Earnings',
       dollar: '$',
-      value: `$${dashboardDetails?.totalEarnings}`,
+      value: `$${dashboardDetails?.totalEarnings || 0}`,
       percentage: '16%',
       color: '#f62c2c',
       bgColor: 'bg-red-300',
@@ -64,7 +63,7 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
     {
       image: Earth,
       title: 'Countries Reached',
-      value: `${dashboardDetails?.countryReached}`,
+      value: `${dashboardDetails?.countryReached || 'N/A'}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -72,7 +71,7 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
     {
       image: Stream,
       title: 'Total Plays',
-      value: `${dashboardDetails?.totalPlays}`,
+      value: `${dashboardDetails?.totalPlays || 0}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -85,7 +84,8 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
         <div className="flex mt-7 lg:mt-8">
           <span className="mr-auto">
             <h1 className="text-[#667185] text-[16px] font-Utile-regular leading-normal">
-              Welcome, Victor!
+              Welcome,{' '}
+              {profileDetails?.name ? profileDetails?.name : 'Loading ...'}!
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
@@ -120,7 +120,10 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
                 <div className="flex items-center mt-[5px]">
                   <p className="text-[20px] font-formular-regular text-[#1d2739] lg:text-[32px] mr-auto">
                     <span className="font-Utile-regular">{card.dollar}</span>{' '}
-                    {card.value}
+                    {card.value.includes('totalTracksCount') &&
+                    !dashboardDetails
+                      ? 'Loading...'
+                      : card.value}
                   </p>
                   <p
                     className={`text-[8px] font-Utile-medium text-[${card.color}] ${card.bgColor} lg:text-[14px]`}
@@ -203,7 +206,7 @@ const MusicUploaderDashboard: React.FC<Activity> = () => {
               Top Activities
             </h2>
             <div className="border border-[#E4E7EC] px-10 pt-8 pb-11 rounded-[11px] mt-6 gap-6 flex flex-col">
-              {dashboardDetails.activities.length > 0 ? (
+              {dashboardDetails?.activities?.length > 0 ? (
                 dashboardDetails.activities.map((activity, index) => (
                   <div key={index} className="flex flex-col gap-[6px]">
                     <h3 className="font-formular-regular text-base tracking-[-0.32px] text-[#475367] leading-normal">

@@ -114,10 +114,10 @@ const ReleaseInformation: React.FC = () => {
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="audioLanguage" className={applyLabelStyles}>
+          <label htmlFor="audioLang" className={applyLabelStyles}>
             Audio Language
           </label>
-          <Field as="select" name="audioLanguage" className={applyInputStyles}>
+          <Field as="select" name="audioLang" className={applyInputStyles}>
             <option value="">Select a language</option>
             {LANGUAGES.map((language) => (
               <option key={language} value={language}>
@@ -126,7 +126,7 @@ const ReleaseInformation: React.FC = () => {
             ))}
           </Field>
           <ErrorMessage
-            name="audioLanguage"
+            name="audioLang"
             component="div"
             className={applyErrorStyles}
           />
@@ -134,20 +134,16 @@ const ReleaseInformation: React.FC = () => {
       </div>
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="explicitContent" className={applyLabelStyles}>
+          <label htmlFor="explicitCont" className={applyLabelStyles}>
             Explicit Content
           </label>
-          <Field
-            name="explicitContent"
-            className={applyInputStyles}
-            as="select"
-          >
+          <Field name="explicitCont" className={applyInputStyles} as="select">
             <option value="">Select...</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
           </Field>
           <ErrorMessage
-            name="explicitContent"
+            name="explicitCont"
             component="div"
             className={applyErrorStyles}
           />
@@ -166,16 +162,12 @@ const ReleaseInformation: React.FC = () => {
       </div>
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="releaseDescription" className={applyLabelStyles}>
+          <label htmlFor="releaseDesc" className={applyLabelStyles}>
             Release Description
           </label>
-          <Field
-            type="text"
-            name="releaseDescription"
-            className={applyInputStyles}
-          />
+          <Field type="text" name="releaseDesc" className={applyInputStyles} />
           <ErrorMessage
-            name="releaseDescription"
+            name="releaseDesc"
             component="div"
             className={applyErrorStyles}
           />

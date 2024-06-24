@@ -19,40 +19,41 @@ function App() {
 
   return (
     <>
-      <DashboardDataProvider>
-        <UserContext.Provider value={{ userRole, setUserRole }}>
-          <ToastContainer />
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route
-              path="/register1"
-              element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
-            />
-            <Route
-              path="/register2"
-              element={<Registration selectedRole={selectedRole} />}
-            />
-            <Route path="/login" element={<SignIn />} />
-            <Route path="/email-confirmation" element={<ConfirmEmail />} />
-            <Route
-              path="/onboarding-details"
-              element={
-                <ProtectedRoute
-                  path="/onboarding-details"
-                  element={<UserTypeOnboardingPage />}
-                />
-              }
-            ></Route>
+      <UserContext.Provider value={{ userRole, setUserRole }}>
+        <ToastContainer />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route
+            path="/register1"
+            element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
+          />
+          <Route
+            path="/register2"
+            element={<Registration selectedRole={selectedRole} />}
+          />
+          <Route path="/login" element={<SignIn />} />
+          <Route path="/email-confirmation" element={<ConfirmEmail />} />
+          <Route
+            path="/onboarding-details"
+            element={
+              <ProtectedRoute
+                path="/onboarding-details"
+                element={<UserTypeOnboardingPage />}
+              />
+            }
+          ></Route>
 
-            <Route
-              path="/dashboard"
-              element={
+          {/* Wrap the DashboardDataProvider around the routes that require it */}
+          <Route
+            path="/dashboard"
+            element={
+              <DashboardDataProvider>
                 <ProtectedRoute path="/dashboard" element={<Dashboard />} />
-              }
-            />
-          </Routes>
-        </UserContext.Provider>
-      </DashboardDataProvider>
+              </DashboardDataProvider>
+            }
+          />
+        </Routes>
+      </UserContext.Provider>
     </>
   );
 }

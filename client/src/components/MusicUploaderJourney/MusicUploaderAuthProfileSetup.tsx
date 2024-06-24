@@ -20,10 +20,10 @@ interface ResponseData {
 }
 
 const MusicUploaderAuthProfileSetup = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleNavigationTODashboard = () => {
-    navigate('/dashboard')
-  }
+    navigate('/dashboard');
+  };
   return (
     <div className="bg-[#013131]">
       <div
@@ -59,29 +59,26 @@ const MusicUploaderAuthProfileSetup = () => {
             onSubmit={async (values, { setSubmitting }) => {
               const userId = localStorage.getItem('userId');
               const token = localStorage.getItem('token');
+              const urlVar = import.meta.env.VITE_APP_API_URL;
+              const apiUrl = `${urlVar}/profilesetup/${userId}`;
+
               const config = {
                 headers: {
                   Authorization: `${token}`,
                 },
               };
-              console.log(userId);
               try {
-               await axios.post(
-                  `https://syncallfe.onrender.com/api/v1/profilesetup/${userId}`,
-                  values,
-                  config
-                );
-                handleNavigationTODashboard()
-           
+                await axios.post(apiUrl, values, config);
+                handleNavigationTODashboard();
               } catch (error: unknown) {
                 const axiosError = error as AxiosError<ResponseData>;
-              
+
                 toast.error(
                   axiosError.response && axiosError.response.data
                     ? axiosError.response.data.message
                     : axiosError.message
                 );
-              } 
+              }
               setTimeout(() => {
                 setSubmitting(false);
               }, 400);

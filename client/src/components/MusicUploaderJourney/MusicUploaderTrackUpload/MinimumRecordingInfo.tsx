@@ -17,7 +17,7 @@ const MinimumRecordingInfo: React.FC = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.currentTarget.files) {
-      setFieldValue('digitalArtwork', event.currentTarget.files[0]);
+      setFieldValue('artWork', event.currentTarget.files[0]);
       setFileName(event.currentTarget.files[0].name);
     }
   };
@@ -107,7 +107,7 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="upc" className={applyLabelStyles}>
             UPC
           </label>
-          <Field type="text" name="upc" className={applyInputStyles} />
+          <Field type="number" name="upc" className={applyInputStyles} />
           <ErrorMessage
             name="upc"
             component="div"
@@ -139,20 +139,20 @@ const MinimumRecordingInfo: React.FC = () => {
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="digitalArtwork" className={applyLabelStyles}>
+          <label htmlFor="artWork" className={applyLabelStyles}>
             Upload Digital Artwork
           </label>
           <div className="relative">
             <label
-              htmlFor="digitalArtwork"
+              htmlFor="artWork"
               className="cursor-pointer shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 text-[#98A2B3] leading-4 focus:outline-none focus:shadow-outline font-inter flex justify-between items-center"
             >
               <span>{fileName}</span>
               <img src={Attach} alt="Upload Icon" />
               <input
                 type="file"
-                id="digitalArtwork"
-                name="digitalArtwork"
+                id="artWork"
+                name="artWork"
                 className="hidden"
                 accept=".jpeg, .jpg, .png"
                 onChange={handleFileChange}
@@ -160,7 +160,7 @@ const MinimumRecordingInfo: React.FC = () => {
             </label>
           </div>
           <ErrorMessage
-            name="digitalArtwork"
+            name="artWork"
             component="div"
             className={applyErrorStyles}
           />

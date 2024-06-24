@@ -13,17 +13,17 @@ const CopyrightOwnerClaim: React.FC = () => {
     <div className="flex flex-col mt-[60px]">
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="basisOfClaim" className={applyLabelStyles}>
+          <label htmlFor="claimBasis" className={applyLabelStyles}>
             What is the basis of your claim?
           </label>
-          <Field as="select" name="basisOfClaim" className={applyInputStyles}>
+          <Field as="select" name="claimBasis" className={applyInputStyles}>
             <option value="">Select...</option>
             <option value="sound-recording">Sound Recording</option>
             <option value="composition">Composition</option>
             <option value="both">Both</option>
           </Field>
           <ErrorMessage
-            name="basisOfClaim"
+            name="claimBasis"
             component="div"
             className={applyErrorStyles}
           />
@@ -52,8 +52,8 @@ const CopyrightOwnerClaim: React.FC = () => {
           </label>
           <Field as="select" name="role" className={applyInputStyles}>
             <option value="">Select...</option>
-            <option value="composer">Composer</option>
-            <option value="writer">Writer</option>
+            <option value="composers">composers</option>
+            <option value="writers">writers</option>
             <option value="author">Author</option>
           </Field>
           <ErrorMessage
@@ -63,17 +63,17 @@ const CopyrightOwnerClaim: React.FC = () => {
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="percentageClaim" className={applyLabelStyles}>
+          <label htmlFor="percentClaim" className={applyLabelStyles}>
             Percentage Claim Share
           </label>
           <Field
-            type="text"
-            name="percentageClaim"
+            type="number"
+            name="percentClaim"
             className={applyInputStyles}
             placeholder="Composition and/or Masters"
           />
           <ErrorMessage
-            name="percentageClaim"
+            name="percentClaim"
             component="div"
             className={applyErrorStyles}
           />

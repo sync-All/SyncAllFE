@@ -13,7 +13,7 @@ import AuthSliderImage6 from '../../../assets/images/auth-img-6.png';
 import AuthSliderImage7 from '../../../assets/images/auth-img-7.png';
 import AuthSliderImage8 from '../../../assets/images/auth-img-8.png';
 import AuthImageSlider from '../../../constants/auth-image-slider';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
 const SignupSchema = Yup.object().shape({
@@ -40,43 +40,33 @@ interface FormValues {
   email: string;
 }
 
+interface ResponseData {
+  message: string;
+}
+
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
-    navigate('/email-confirmation', { state: {emailDomain}});
-    
+    navigate('/email-confirmation', { state: { emailDomain } });
   };
 
-  const urlVar =  import.meta.env.VITE_APP_API_URL
-  const apiUrl = `${urlVar}/signup`;
-    console.log(apiUrl);
-    console.log(urlVar);
-    
   const handleFormSubmit = async (values: FormValues) => {
-    console.log(urlVar)
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/signup`;
     setIsLoading(true);
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:5173'
 
-      },
-      withCredentials:true
-    } 
-    
     try {
-      
-      const response = await axios.post(
-       apiUrl,
-        values, config
-      );
-      console.log(response.data);
-      console.log(response.data.emailDomain)
+      const response = await axios.post(apiUrl, values);
       toast.success('Account created successfully');
       handleRedirectionToEmailConfirmation(response.data.emailDomain);
-    } catch (error) {
-      toast.error('Account created unsuccessfully');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message
+          : axiosError.message
+      );
     } finally {
       setIsLoading(false);
     }
