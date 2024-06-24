@@ -16,10 +16,13 @@ cloudinary.config({
 const dashboardcontrol = async (req,res,next)=>{
         const userId = req.params.userId
         try {
+            console.log('eee')
             if(req.user.role == "Music Uploader"){
-                const userDashboardDetails = await dashboard.findOne({user : userId}).exec()
+                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
+                console.log(userDashboardDetails)
                 const profileInfo = await User.findById(userId)
             res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo})
+            console.log(userDashboardDetails)
             }else{
                 res.status(401).json('Unauthorized access')
             }
@@ -56,7 +59,8 @@ const trackUpload = async(req,res,next)=>{
                     songInfo = {...songInfo, artWork : artWork.secure_url, user : req.params.userId}
                     const track = new Track(songInfo)
                     track.save()
-                    .then(()=>{
+                    .then(async (track)=>{
+                        await dashboard.findOneAndUpdate({user : req.params.userId},{ $push: { totalTracks: track._id } }).exec()
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
                     .catch((err)=>{
