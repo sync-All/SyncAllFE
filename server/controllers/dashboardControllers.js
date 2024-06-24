@@ -61,6 +61,7 @@ const trackUpload = async(req,res,next)=>{
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
                     .catch((err)=>{
+                        console.log(err)
                         res.status(401).json(err)
                     })
                 }
