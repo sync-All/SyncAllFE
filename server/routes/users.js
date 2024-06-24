@@ -3,11 +3,8 @@ const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
 const User = require('../models/usermodel');
-const authcontroller = require('../controllers/authControllers')
-const passport = require('passport')
 const bcrypt = require('bcrypt')
 const issueJwt = require('../utils/issueJwt')
-const User = require("../models/usermodel")
 var router = express.Router();
 
 /* GET users listing. */
