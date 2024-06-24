@@ -48,7 +48,7 @@ interface FormValues {
   email: string;
 }
 interface ResponseData {
-  message: string;
+  message?: string;
 }
 
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
@@ -110,9 +110,6 @@ const logGoogleUser = async () => {
 
     try {
       const response = await axios.post(apiUrl, values);
-      const response = await axios.post(
-        'https://syncallfe.onrender.com/api/v1/signup',values
-      );
       console.log(response.data);
       console.log(response.data.emailDomain)
       toast.success('Account created successfully');
