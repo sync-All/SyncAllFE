@@ -27,7 +27,6 @@ const userSchema = new Schema({
     },
     img : {
         type : String,
-        required : true
     },
     authSource : {
         type : String,
