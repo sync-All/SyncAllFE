@@ -56,7 +56,8 @@ const trackUpload = async(req,res,next)=>{
                     songInfo = {...songInfo, artWork : artWork.secure_url, user : req.params.userId}
                     const track = new Track(songInfo)
                     track.save()
-                    .then(()=>{
+                    .then(async (track)=>{
+                        await dashboard.findOneAndUpdate({user : req.params.userId},{ $push: { totalTracks: track._id } }).exec()
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
                     .catch((err)=>{
