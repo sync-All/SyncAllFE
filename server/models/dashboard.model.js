@@ -137,7 +137,7 @@ const trackSchema = new Schema({
         required : true
     },
     copyrightYear : {
-        type : String,
+        type : Number,
         required : true
     },
     releaseDate : {
