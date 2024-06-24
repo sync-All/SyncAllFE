@@ -31,7 +31,12 @@ function App() {
             path="/register2"
             element={<Registration selectedRole={selectedRole} />}
           />
-          <Route path="/login" element={<SignIn />} />
+          <Route
+            path="/login"
+            element={
+              <DashboardDataProvider>{<SignIn />}</DashboardDataProvider>
+            }
+          />
           <Route path="/email-confirmation" element={<ConfirmEmail />} />
           <Route
             path="/onboarding-details"

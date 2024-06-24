@@ -61,7 +61,7 @@ const MusicUploaderAuthProfileSetup = () => {
               const token = localStorage.getItem('token');
               const urlVar = import.meta.env.VITE_APP_API_URL;
               const apiUrl = `${urlVar}/profilesetup/${userId}`;
-
+             
               const config = {
                 headers: {
                   Authorization: `${token}`,
