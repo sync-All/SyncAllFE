@@ -3,16 +3,38 @@ const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
 const User = require('../models/usermodel');
-
+const authcontroller = require('../controllers/authControllers')
+const passport = require('passport')
+const bcrypt = require('bcrypt')
+const issueJwt = require('../utils/issueJwt')
+const User = require("../models/usermodel")
 var router = express.Router();
 
 /* GET users listing. */
 router.post('/api/v1/signup', asynchandler(authcontroller.signup));
 
 router.post('/api/v1/signin', asynchandler(authcontroller.signin));
+router.post('/api/v1/googleauth', async(req,res,next)=>{
+    try {
+        const user = await User.findOne({email : req.body.email}).exec()
+        if (!user){
+            const user = new User({...req.body,authSource : 'googleAuth'})
+            await user.save()
+        }
+        const toBeIssuedJwt = issueJwt.issueJwtLogin(user)
+        const userDetails = await User.findOne({email : req.body.email}).select('-password').exec()
+        console.log(userDetails)
+        res.status(200).json({success : true, user : userDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(401).json(error)
+    }
+})
+
+router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
-
 router.post('/api/v1/profilesetup/:userId', async (req, res, next) => {
   if (req.isAuthenticated) {
     const { fullName, spotifyLink, bio } = req.body;
@@ -70,8 +92,9 @@ router.get(
     }
   }
 );
+router.post('/api/v1/profilesetup/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asynchandler(authcontroller.profileSetup) )
 
-// , {session : false, successRedirect : '/confirmedEmail', failureRedirect : '/notConfirmed'}
+router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 
 router.get('/confirmedEmail', (req, res, next) => {
   res.render('emailConfirmed', {

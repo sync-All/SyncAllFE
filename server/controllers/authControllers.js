@@ -3,28 +3,31 @@ const issueJwt = require('../utils/issueJwt')
 const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel');
-const Dashboard = require('../models/dashboard.model');
+const Dashboard = require('../models/dashboard.model').dashboard;
+const passport = require('passport')
+require('dotenv').config()
+
 
 const signup = async function(req, res) {
     const {name, email, password, role, userType} = req.body
     if(!name || !email || !password || !role || !userType){
       if(!name){
-        return res.json({success: false , message : "Name Field Missing, please review input"})
+        return res.status(401).json({success: false , message : "Name Field Missing, please review input"})
       }else if(!email){
-        return res.json({success : false, message : "Email Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Email Field Missing, please review input"})
       }else if(!password){
-        return res.json({success : false, message : "Password Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Password Field Missing, please review input"})
       }else if(!role){
-        return res.json({success : false, message : "Role Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "Role Field Missing, please review input"})
       }else if(!userType){
-        return res.json({success : false, message : "UserType Field Missing, please review input"})
+        return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
       }
     }else{
       const getIdentity = await User.findOne({ email : email}).exec()
       if(getIdentity){
-        res.json({success: false, message : "Email Already in use"})
+        res.status(401).json({success: false, message : "Email Already in use"})
       }else{
-        bcrypt.hash(password, 10, function(err, password){
+        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
           const users = new User({
             name,
             email,
@@ -65,7 +68,8 @@ const signup = async function(req, res) {
       res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
     }else{
       const toBeIssuedJwt = issueJwt.issueJwtLogin(user)
-      res.status(200).json({success : true, user : user, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+      const userDetails = await User.findOne({email : email}).select('-password').exec()
+      res.status(200).json({success : true, user : userDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
   }
 
@@ -78,10 +82,34 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
-const profileSetup = 
+const profileSetup = async (req,res,next)=>{
+  try {
+    const {fullName, spotifyLink, bio} = req.body
+      if(!fullName || !spotifyLink || !bio){
+          res.status(401).json({success : false, message : 'Missing field please check and confirm'})
+      }else{
+          const userId = req.params.userId
+          const profileUpdate = await User.findByIdAndUpdate(userId, {fullName, spotifyLink, bio}, {new : true})
 
-module.exports.signup = signup
-module.exports.signin = signin
-module.exports.allUsers = allUsers
+          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      }
+  } catch (error) {
+    res.status(401).json({success : false, message : "An error occured, please try again"})
+  }
+}
+
+const verifyEmail =  async (req,res,next)=>{
+  if(req.user.emailConfirmedStatus){
+      res.redirect('/AlreadyConfirmed')
+  }
+  else if(req.isAuthenticated()){
+      const user = await User.findOneAndUpdate({_id : req.user._id},{emailConfirmedStatus : true},{new : true})
+      res.redirect('/confirmedEmail')
+  }else{
+      res.redirect('/notConfirmed')
+  }
+}
+
+module.exports = {signup, signin, allUsers, profileSetup, verifyEmail}
 
   

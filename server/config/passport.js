@@ -13,6 +13,7 @@ const options = {
 
 
 const strategy = new jwtStrategy(options, (payload, done)=>{
+    console.log('here')
     User.findOne({_id : payload.sub})
     .then((user)=>{
         if(user){
