@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import ProfileBg from '../../../assets/images/profile-bg.png';
 import { useDataContext } from '../../../Context/DashboardDataProvider';
 import Avatar from '../../../assets/images/Avatar.png';
@@ -7,6 +6,7 @@ import Eye from '../../../assets/images/eye.svg';
 import ProfileInformation from './ProfileInformation';
 import PasswordSetting from './PasswordSetting';
 import PaymentInformation from './PaymentInfo';
+import { useState } from 'react';
 
 const ProfileMultiStep = () => {
   const userData = useDataContext();
