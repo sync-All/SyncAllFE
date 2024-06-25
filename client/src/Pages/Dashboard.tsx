@@ -5,6 +5,7 @@ import MusicUploaderNavbar from '../components/MusicUploaderJourney/MusicUploade
 import UploadTrackMultiForm from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/UploadTrackMultiForm';
 import MusicUploaderTracks from '../components/MusicUploaderJourney/MusicUploaderTracks';
 import MusicUploaderEarnings from '../components/MusicUploaderJourney/MusicUploaderEarnings';
+import ProfileMultiStep from '../components/MusicUploaderJourney/MusicUploaderUserProfile/ProfileMultiStep';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard');
@@ -40,7 +41,7 @@ const Dashboard = () => {
         {activeTab === 'Upload Track' && <UploadTrackMultiForm />}
         {activeTab === 'My Tracks' && <MusicUploaderTracks />}
         {activeTab === 'Earnings' && <MusicUploaderEarnings />}
-        {/*activeTab === 'User Profile' && <UserProfileContent />} */}
+       { activeTab === 'User Profile' && <ProfileMultiStep />}
       </div>
     </div>
   );

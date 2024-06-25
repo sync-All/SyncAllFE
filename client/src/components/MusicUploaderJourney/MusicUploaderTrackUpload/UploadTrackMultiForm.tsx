@@ -5,8 +5,6 @@ import MinimumRecordingInfo from './MinimumRecordingInfo';
 import AdditionalRecordingInfo from './AdditionalRecordingInfo';
 import CopyrightOwnerClaim from './CopyrightOwnerClaim';
 import ReleaseInformation from './ReleaseInformation';
-import axios, { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
 
 interface FormData {
   mainArtist: string;
@@ -15,22 +13,22 @@ interface FormData {
   releaseTitle: string;
   trackTitle: string;
   trackLink: string;
-  upc: number;
+  upc: string;
   isrc: string;
   genre: string;
-  artWork: File | null;
+  digitalArtwork: File | null;
   recordingVersion: string;
   featuredInstrument: string[];
-  producers: string[];
+  producer: string[];
   recordingDate: Date;
   countryOfRecording: string;
-  writers: string[];
-  composers: string[];
-  publishers: string[];
-  claimBasis: string;
+  writer: string[];
+  composer: string[];
+  publisher: string[];
+  basisOfClaim: string;
   claimingUser: string;
   role: string;
-  percentClaim: number;
+  percentageClaim: string;
   copyrightName: string;
   copyrightYear: number;
   releaseDate: Date;
@@ -38,14 +36,10 @@ interface FormData {
   mood: string[];
   tag: string[];
   lyrics: string;
-  audioLang: string;
-  explicitCont: boolean;
+  audioLanguage: string;
+  explicitContent: string;
   releaseLabel: string;
-  releaseDesc: string;
-}
-
-interface ResponseData {
-  message?: string;
+  releaseDescription: string;
 }
 
 const initialFormData: FormData = {
@@ -55,22 +49,22 @@ const initialFormData: FormData = {
   releaseTitle: '',
   trackTitle: '',
   trackLink: '',
-  upc: 0,
+  upc: '',
   isrc: '',
   genre: '',
-  artWork: null,
+  digitalArtwork: null,
   recordingVersion: '',
   featuredInstrument: [],
-  producers: [],
+  producer: [],
   recordingDate: new Date(),
   countryOfRecording: '',
-  writers: [],
-  composers: [],
-  publishers: [],
-  claimBasis: '',
+  writer: [],
+  composer: [],
+  publisher: [],
+  basisOfClaim: '',
   claimingUser: '',
   role: '',
-  percentClaim: 0,
+  percentageClaim: '',
   copyrightName: '',
   copyrightYear: 0,
   releaseDate: new Date(),
@@ -78,10 +72,10 @@ const initialFormData: FormData = {
   mood: [],
   tag: [],
   lyrics: '',
-  audioLang: '',
-  explicitCont: false,
+  audioLanguage: '',
+  explicitContent: '',
   releaseLabel: '',
-  releaseDesc: '',
+  releaseDescription: '',
 };
 
 const validationSchema = Yup.object().shape({
@@ -91,48 +85,35 @@ const validationSchema = Yup.object().shape({
   releaseTitle: Yup.string().required('Required'),
   trackTitle: Yup.string().required('Required'),
   trackLink: Yup.string().url('Must be a valid URL').required('Required'),
-  upc: Yup.number().min(0).required('Required'),
+  upc: Yup.string().required('Required'),
   isrc: Yup.string().required('Required'),
   genre: Yup.string().required('Required'),
-  artWork: Yup.mixed().required('A file is required'),
+  digitalArtwork: Yup.mixed().required('A file is required'),
   recordingVersion: Yup.string().required('Required'),
-  featuredInstrument: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one featured instrument is required'),
-  producers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one producers is required'),
+  featuredInstrument: Yup.array().of(Yup.string()).min(1, 'At least one featured instrument is required'),
+  producer: Yup.array().of(Yup.string()).min(1, 'At least one producer is required'),
   recordingDate: Yup.date().required('Required'),
   countryOfRecording: Yup.string().required('Required'),
-  writers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one writers is required'),
-  composers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one composers is required'),
-  publishers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one publishers is required'),
-  claimBasis: Yup.string().required('Required'),
+  writer: Yup.array().of(Yup.string()).min(1, 'At least one writer is required'),
+  composer: Yup.array().of(Yup.string()).min(1, 'At least one composer is required'),
+  publisher: Yup.array().of(Yup.string()).min(1, 'At least one publisher is required'),
+  basisOfClaim: Yup.string().required('Required'),
   claimingUser: Yup.string().required('Required'),
   role: Yup.string().required('Required'),
-  percentClaim: Yup.number().min(0).max(100).required('Required'),
+  percentageClaim: Yup.number().min(0).max(100).required('Required'),
   copyrightName: Yup.string().required('Required'),
-  copyrightYear: Yup.number()
-    .required('Required')
-    .positive()
-    .integer()
-    .test('len', 'Must be exactly 4 digits', val => val.toString().length === 4),
+  copyrightYear: Yup.number().required('Required').positive().integer(),
   releaseDate: Yup.date().required('Required'),
   countryOfRelease: Yup.string().required('Required'),
   mood: Yup.array().of(Yup.string()).min(1, 'At least one mood is required'),
   tag: Yup.array().of(Yup.string()).min(1, 'At least one tag is required'),
   lyrics: Yup.string().required('Required'),
-  audioLang: Yup.string().required('Required'),
-  explicitCont: Yup.boolean().required('Required'),
+  audioLanguage: Yup.string().required('Required'),
+  explicitContent: Yup.string().required('Required'),
   releaseLabel: Yup.string().required('Required'),
-  releaseDesc: Yup.string().required('Required'),
+  releaseDescription: Yup.string().required('Required'),
 });
+
 
 const UploadTrackMultiForm: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>(
@@ -189,6 +170,7 @@ const UploadTrackMultiForm: React.FC = () => {
   return (
     <div className="lg:mx-8 ml-5">
       <div>
+        
         <span className="flex gap-2">
           <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
             New Track Upload
@@ -248,45 +230,7 @@ const UploadTrackMultiForm: React.FC = () => {
         <Formik
           initialValues={initialFormData}
           validationSchema={validationSchema}
-          onSubmit={async (values, { validateForm }) => {
-            const userId = localStorage.getItem('userId');
-            const token = localStorage.getItem('token');
-            const urlVar = import.meta.env.VITE_APP_API_URL;
-            const apiUrl = `${urlVar}/trackUpload/${userId}`;
-            const config = {
-              headers: {
-                Authorization: `${token}`,
-              },
-            };
-
-            const errors = await validateForm(values);
-
-            if (Object.keys(errors).length) {
-              // Iterate over the errors object and toast each error message
-              Object.values(errors).forEach((error) => {
-                if (typeof error === 'string') {
-                  toast.error(error);
-                }
-              });
-              return; // Prevent form submission if there are errors
-            }
-
-            console.log(config);
-            try {
-              await axios.postForm(apiUrl, values, config);
-              console.log('successfull');
-            } catch (error: unknown) {
-              const axiosError = error as AxiosError<ResponseData>;
-
-              toast.error(
-                axiosError.response && axiosError.response.data
-                  ? axiosError.response.data.message
-                  : axiosError.message
-              );
-
-              console.log(error);
-            }
-
+          onSubmit={(values) => {
             console.log(values);
           }}
         >

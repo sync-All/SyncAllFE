@@ -4,6 +4,7 @@ import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
 import { useFormikContext } from 'formik';
 import axios from 'axios';
+import IsrcError from './IsrcError';
 // import { toast } from 'react-toastify';
 
 const applyInputStyles =
@@ -18,7 +19,16 @@ const applyErrorStyles = 'italic text-red-600';
 const MinimumRecordingInfo: React.FC = () => {
   const { setFieldValue } = useFormikContext();
   const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  const [isIsrcErrorModalOpen, setIsIsrcErrorModalOpen] = useState(false);
+
   const [isrcValidationMessage, setIsrcValidationMessage] = useState('');
+  const closeIsrcErrorModal = () => setIsIsrcErrorModalOpen(false);
+
+  const handleDispute = () => {
+    console.log('Dispute action');
+    // Implement your dispute logic here
+    closeIsrcErrorModal();
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.currentTarget.files) {
@@ -44,10 +54,12 @@ const MinimumRecordingInfo: React.FC = () => {
         setIsrcValidationMessage('ISRC is valid.');
       } else {
         setIsrcValidationMessage('ISRC is not valid.');
+        setIsIsrcErrorModalOpen(true); 
       }
     } catch (error) {
       console.error('Error verifying ISRC:', error);
       setIsrcValidationMessage('Failed to verify ISRC.');
+      
     }
   };
 
@@ -210,6 +222,11 @@ const MinimumRecordingInfo: React.FC = () => {
           />
         </div>
       </div>
+      <IsrcError
+        isOpen={isIsrcErrorModalOpen}
+        onClose={closeIsrcErrorModal}
+        onDispute={handleDispute}
+      />
     </div>
   );
 };
