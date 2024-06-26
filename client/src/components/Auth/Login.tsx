@@ -38,7 +38,7 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
     if(profileDetails ) {
       navigate('/onboarding-details');
     } else {
-      navigate('/dashboard');
+      navigate('/onboarding-details');
     }    
   };
   

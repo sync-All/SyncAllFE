@@ -11,7 +11,7 @@ const ProfileInformation = () => {
 
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
-  const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
+  const applyFormDiv = 'flex flex-col lg:flex-row mb-4 gap-8';
   const input = 'w-[367px] flex flex-col gap-2 mb-4';
 
   return (

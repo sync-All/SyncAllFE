@@ -31,12 +31,12 @@ const ProfileMultiStep = () => {
 
   return (
     <div className="lg:mx-8 ml-5 mt-[29px]  block">
-      <div className="flex relative mb-[140px]">
+      <div className="flex relative mb-[200px] lg:mb-[140px]">
         <span className="w-full ">
           <img src={ProfileBg} alt="" className="w-full object-cover" />
         </span>
-        <div className="flex justify-between items-center top-[85%] absolute w-full">
-          <div className="flex items-center gap-[32px] ml-12">
+        <div className="flex flex-col lg:flex-row justify-between items-center top-[85%] absolute w-full">
+          <div className="flex items-center gap-[32px] ml-3 lg:ml-12">
             <img src={Avatar} alt="" />
             <span className="">
               <h1 className="poppins-semibold text-[24px] leading-normal text-[#1D2739] ">
@@ -82,7 +82,8 @@ const ProfileMultiStep = () => {
           <li
             className={`${liClass} ${
               activeSection === 'Payment Information' ? `${activeLiClass}` : ''
-            }`} onClick={() => setActiveSecton('Payment Information')}
+            }`}
+            onClick={() => setActiveSecton('Payment Information')}
           >
             {' '}
             Payment Information
