@@ -8,9 +8,38 @@ const dashboardSchema = new Schema({
             ref : "track",
         }
     ],
-    totalEarnings : {
-        type : Number,
-        default : 0
+    earnings : {
+
+        availableBal : {
+            type : Number,
+        },
+
+        accNumber : {
+            type : Number
+        },
+
+        accName : {
+            type : String
+        },
+
+        bankName : {
+            type : String
+        },
+
+        totalEarnings : {
+            type : Number,
+            default : 0
+        },
+
+        totalWithdrawals : {
+            type : Number,
+            default : 0
+        },
+        averageMonthlyEarnings : {
+            type : Number,
+            default : 0
+        }
+        
     },
     countryReached : {
         type : Number,

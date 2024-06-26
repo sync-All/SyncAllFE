@@ -2,6 +2,7 @@ const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/dashboard.model").track
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel")
+const Transaction = require('../models/transactions.model').transaction
 const cloudinary = require("cloudinary").v2
 const fs = require("node:fs")
 require('dotenv').config()
@@ -21,7 +22,8 @@ const dashboardcontrol = async (req,res,next)=>{
                 const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
                 console.log(userDashboardDetails)
                 const profileInfo = await User.findById(userId)
-            res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo})
+                const transactions = await Transaction.find({user : userId})
+            res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             console.log(userDashboardDetails)
             }else{
                 res.status(401).json('Unauthorized access')
@@ -61,6 +63,7 @@ const trackUpload = async(req,res,next)=>{
                     track.save()
                     .then(async (track)=>{
                         await dashboard.findOneAndUpdate({user : req.params.userId},{ $push: { totalTracks: track._id } }).exec()
+                        fs.unlinkSync(req.file.path)
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
                     .catch((err)=>{
