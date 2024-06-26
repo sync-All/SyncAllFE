@@ -26,6 +26,22 @@ const dashboardSchema = new Schema({
             type : String
         },
 
+        bankAddress : {
+            type : String
+        },
+
+        country : {
+            type : String
+        },
+
+        bicCode : {
+            type : String
+        },
+
+        sortCode : {
+            type : Number
+        },
+        
         totalEarnings : {
             type : Number,
             default : 0
@@ -39,7 +55,7 @@ const dashboardSchema = new Schema({
             type : Number,
             default : 0
         }
-        
+
     },
     countryReached : {
         type : Number,
