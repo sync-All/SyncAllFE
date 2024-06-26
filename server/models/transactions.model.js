@@ -12,7 +12,7 @@ const transactionSchema = new Schema({
     enum : ['Completed', 'Pending']
    },
    amount : {
-    type : number
+    type : Number
    },
    user : {
     type : Schema.Types.ObjectId,
