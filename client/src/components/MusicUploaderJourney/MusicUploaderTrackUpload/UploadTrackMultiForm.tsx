@@ -122,7 +122,11 @@ const validationSchema = Yup.object().shape({
     .required('Required')
     .positive()
     .integer()
-    .test('len', 'Must be exactly 4 digits', val => val.toString().length === 4),
+    .test(
+      'len',
+      'Must be exactly 4 digits',
+      (val) => val.toString().length === 4
+    ),
   releaseDate: Yup.date().required('Required'),
   countryOfRelease: Yup.string().required('Required'),
   mood: Yup.array().of(Yup.string()).min(1, 'At least one mood is required'),

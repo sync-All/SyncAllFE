@@ -56,7 +56,7 @@ const MusicUploaderDashboard= () => {
       image: Earning,
       title: 'Total Earnings',
       dollar: '$',
-      value: `$${dashboardDetails?.totalEarnings || 0}`,
+      value: `${dashboardDetails?.totalEarnings || 0}`,
       percentage: '16%',
       color: '#f62c2c',
       bgColor: 'bg-red-300',

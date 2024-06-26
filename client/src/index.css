@@ -140,3 +140,8 @@
   background-size: 12px; /* Adjust size as needed */
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

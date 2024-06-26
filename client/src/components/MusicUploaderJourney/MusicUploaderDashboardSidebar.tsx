@@ -85,6 +85,13 @@ const logout = () => {
             <img src={ProfileIcon} alt="" />
             <p style={pStyle('User Profile')}>User Profile</p>
           </li>
+          <li
+            onClick={() => onTabChange('Dispute')}
+            style={liStyle('Dispute')}
+          >
+            <img src={ProfileIcon} alt="" />
+            <p style={pStyle('Dispute')}>Dispute</p>
+          </li>
         </ul>
       </div>
       <div className=" mt-auto ">
