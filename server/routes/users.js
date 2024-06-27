@@ -5,6 +5,8 @@ const passport = require('passport');
 const User = require('../models/usermodel');
 const bcrypt = require('bcrypt')
 const issueJwt = require('../utils/issueJwt')
+const multer = require("multer")
+const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
 
 /* GET users listing. */
@@ -89,7 +91,7 @@ router.get(
     }
   }
 );
-router.post('/api/v1/profilesetup/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asynchandler(authcontroller.profileSetup) )
+router.post('/api/v1/profileupdate/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 

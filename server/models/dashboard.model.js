@@ -41,7 +41,7 @@ const dashboardSchema = new Schema({
         sortCode : {
             type : Number
         },
-        
+
         totalEarnings : {
             type : Number,
             default : 0
@@ -244,8 +244,38 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
+const disputeSchema = new Schema({
+    nameOfTrack  : {
+        type : String
+    },
+    issueType : {
+        type : String
+    },
+
+    desc : {
+        type : String
+    },
+
+    supportingDoc : {
+        type : Buffer
+    },
+
+    isrc : {
+        type : String
+    },
+
+    user : {
+        type : Schema.Types.ObjectId,
+        ref : 'user'
+    }
+
+
+},{timestamps : true})
+
 const track = mongoose.model('track', trackSchema)
 const dashboard = mongoose.model('dashboard',dashboardSchema)
+const dispute = mongoose.model('dispute',disputeSchema)
 
 module.exports.dashboard = dashboard
 module.exports.track = track
+module.exports.dispute = dispute

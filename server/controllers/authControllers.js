@@ -4,8 +4,17 @@ const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel');
 const Dashboard = require('../models/dashboard.model').dashboard;
+const cloudinary = require("cloudinary").v2
 const passport = require('passport')
 require('dotenv').config()
+
+
+cloudinary.config({
+  cloud_name : process.env.CLOUD_NAME,
+  api_key : process.env.CLOUD_API_KEY,
+  secure : true,
+  api_secret : process.env.CLOUD_API_SECRET
+})
 
 
 const signup = async function(req, res) {
@@ -82,19 +91,25 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
-const profileSetup = async (req,res,next)=>{
+const profileUpdate = async (req,res,next)=>{
   try {
-    const {fullName, spotifyLink, bio} = req.body
-      if(!fullName || !spotifyLink || !bio){
-          res.status(401).json({success : false, message : 'Missing field please check and confirm'})
-      }else{
-          const userId = req.params.userId
-          const profileUpdate = await User.findByIdAndUpdate(userId, {fullName, spotifyLink, bio}, {new : true})
+    const userId = req.params.userId
+    if(req.user.role == "Music Uploader"){
 
+      if(req.file){
+          var profilePicture = await cloudinary.uploader.upload(req.file.path)
+          const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+          fs.unlinkSync(req.file.path)
+          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      }else{
+        const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
           res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
       }
+    }else{
+      res.status(401).send('Unauthorized')
+    }    
   } catch (error) {
-    res.status(401).json({success : false, message : "An error occured, please try again"})
+    res.status(401).json(error)
   }
 }
 
@@ -110,6 +125,6 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-module.exports = {signup, signin, allUsers, profileSetup, verifyEmail}
+module.exports = {signup, signin, allUsers, profileUpdate, verifyEmail}
 
   
