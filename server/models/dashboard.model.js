@@ -62,7 +62,7 @@ const dashboardSchema = new Schema({
         default : 0,
     },
     totalPlays : {
-        type : String,
+        type : Number,
         default : 0
     },
     activities : [
