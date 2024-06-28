@@ -33,6 +33,9 @@ const userSchema = new Schema({
         enum : ['local', 'googleAuth'],
         default : 'local'
     },
+    phoneNumber :{
+        type : String
+    },
     fullName : {
         type : String,
     },
