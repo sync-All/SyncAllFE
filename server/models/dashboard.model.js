@@ -8,7 +8,7 @@ const dashboardSchema = new Schema({
             ref : "track",
         }
     ],
-    earnings : {
+    earnings : [{
 
         availableBal : {
             type : Number,
@@ -56,7 +56,7 @@ const dashboardSchema = new Schema({
             default : 0
         }
 
-    },
+    }],
     countryReached : {
         type : Number,
         default : 0,

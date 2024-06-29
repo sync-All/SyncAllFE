@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const User = require("../models/usermodel")
 const Transaction = require('../models/transactions.model').transaction
 const cloudinary = require("cloudinary").v2
+const Dispute = require('../models/dashboard.model').dispute
 const fs = require("node:fs")
 require('dotenv').config()
 
@@ -101,6 +102,63 @@ const passwordreset = async (req,res,next)=>{
     }
 }
 
+const fileDispute = async (req,res,next)=>{
+    if(req.user.role == "Music Uploader"){
+        if(req.file){
+            const fileBuffer = fs.readFileSync(req.file.path)
+            let newDispute = new Dispute({
+                ...req.body, supportingDoc : fileBuffer, user : req.params.userId
+            })
+            newDispute.save()
+                .then((response)=>{
+                    fs.unlinkSync(req.file.path)
+                    res.status(200).json({success : true, message : response})
+                })
+                .catch((err)=>{
+                    console.log(err)
+                    res.status(404).json(err)
+                })
+        }else{
+            let newDispute = new Dispute({
+                ...req.body, user : req.params.userId
+            })
+                newDispute.save()
+                .then((response)=>{
+                    res.status(200).json({success : true, message : response})
+                })
+                .catch((err)=>{
+                    console.log(err)
+                    res.status(404).json(err)
+                })
+        }
+    }else{
+        res.status(401).json('Unauthorized')
+    }
+}
+
+const allDispute = async (req,res,next)=>{
+    if(req.user.role == "Music Uploader"){
+        const user = req.user.id
+        const allUserDispute = await Dispute.find({user}).exec()
+        res.status(200).json({success : true, message : allUserDispute})
+    }else{
+        res.status(401).json('Unauthorized')
+    }
+}
+
+const updatePaymentInfo = async (req,res,next)=>{
+    if(req.user.role == 'Music Uploader'){
+        const userId = req.user.id
+        const dashboardAccInfoUpdate = await dashboard.findOneAndUpdate({user : userId}, {
+           '$set' : {
+            'earnings' : {...req.body}
+           }
+        },{new : true})
+        res.status(200).json({success : true, message : dashboardAccInfoUpdate})
+    }else{
+        res.status(401).json('Unauthorized you are')
+    }
+}
 
 
-module.exports = {dashboardcontrol, passwordreset, verifyTrackUpload, trackUpload}
+module.exports = {dashboardcontrol, passwordreset, verifyTrackUpload, trackUpload, fileDispute, updatePaymentInfo, allDispute}
