@@ -156,7 +156,7 @@ const updatePaymentInfo = async (req,res,next)=>{
         },{new : true})
         res.status(200).json({success : true, message : dashboardAccInfoUpdate})
     }else{
-        res.status(401).json('Unauthorized you are')
+        res.status(401).json('Unauthorized')
     }
 }
 
