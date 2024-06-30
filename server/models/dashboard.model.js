@@ -12,6 +12,7 @@ const dashboardSchema = new Schema({
 
         availableBal : {
             type : Number,
+            default : 0
         },
 
         accNumber : {
