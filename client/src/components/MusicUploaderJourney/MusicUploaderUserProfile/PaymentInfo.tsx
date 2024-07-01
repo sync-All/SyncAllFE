@@ -21,8 +21,12 @@ interface ResponseData {
 
 const PaymentInfo = () => {
   const paymentInfo = useDataContext();
-  const paymentDetails =
-    paymentInfo.dashboardData?.dashboardDetails?.earnings?.[0];
+ const paymentDetails = Array.isArray(
+   paymentInfo.dashboardData?.dashboardDetails?.earnings
+ )
+   ? paymentInfo.dashboardData.dashboardDetails.earnings[0]
+   : {};
+
 
   console.log(paymentDetails);
   const initialValues: FormData = {

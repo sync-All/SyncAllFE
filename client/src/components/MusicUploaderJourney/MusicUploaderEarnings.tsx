@@ -65,10 +65,13 @@ const MusicUploaderEarnings: React.FC = () => {
   };
 
   const earningInfo = useDataContext();
-  const earningDetails =
-    earningInfo.dashboardData?.dashboardDetails?.earnings?.[0];
-  const transactionDetails = earningInfo.dashboardData?.transactions;
+  const earningDetails = Array.isArray(
+    earningInfo.dashboardData?.dashboardDetails?.earnings
+  )
+    ? earningInfo.dashboardData.dashboardDetails.earnings[0]
+    : {};
 
+  const transactionDetails = earningInfo.dashboardData?.transactions || [];
 
   const sortedData = useMemo(() => {
     return [...transactionDetails].sort((a, b) => {
@@ -82,15 +85,13 @@ const MusicUploaderEarnings: React.FC = () => {
     });
   }, [transactionDetails, sortConfig]);
 
- 
-
-   const handleSort = (key: keyof TableData) => {
-     let direction: 'ascending' | 'descending' = 'ascending';
-     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-       direction = 'descending';
-     }
-     setSortConfig({ key, direction });
-   };
+  const handleSort = (key: keyof TableData) => {
+    let direction: 'ascending' | 'descending' = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
   return (
     <div className="lg:mx-8 ml-5 mt-[38px] mb-[96px]">
       <div className="relative bg-black2 rounded-[20px] flex flex-col w-full px-10 text-white">
@@ -99,13 +100,13 @@ const MusicUploaderEarnings: React.FC = () => {
             Your available balance:
           </p>
           <h2 className="font-Utile-bold text-[36px] tracking-[-1.44px] leading-[43.2px]">
-            {earningDetails.totalEarnings}
+            {earningDetails?.availableBal}
           </h2>
         </div>
         <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 ">
           <p>
-            {earningDetails.accNumber} <br />
-            {earningDetails.accName}, {earningDetails.bankName}
+            {earningDetails?.accNumber} <br />
+            {earningDetails?.accName}, {earningDetails?.bankName}
           </p>
           <span>
             <button
@@ -130,7 +131,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h2 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails.totalEarnings}
+              {earningDetails?.totalEarnings}
             </h2>
           </div>
         </div>
@@ -142,7 +143,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails.totalWithdrawals}
+              {earningDetails?.totalWithdrawals}
             </h3>
           </div>
         </div>
@@ -154,7 +155,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails.averageMonthlyEarnings}
+              {earningDetails?.averageMonthlyEarnings}
             </h3>
           </div>
         </div>
@@ -212,7 +213,7 @@ const MusicUploaderEarnings: React.FC = () => {
                 sortConfig={sortConfig}
                 sortKey="amount"
                 onSort={handleSort}
-                />
+              />
             </th>
             <th className={ThStyles}>
               Date
@@ -220,7 +221,7 @@ const MusicUploaderEarnings: React.FC = () => {
                 sortConfig={sortConfig}
                 sortKey="date"
                 onSort={handleSort}
-                />
+              />
             </th>
             <th className="bg-grey-100 py-3 px-6"></th>
           </tr>
