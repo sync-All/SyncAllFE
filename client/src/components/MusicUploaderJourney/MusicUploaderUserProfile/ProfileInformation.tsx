@@ -11,9 +11,11 @@ const ProfileInformation = () => {
   const userData = useDataContext();
   const userDetails = userData.dashboardData?.profileInfo;
   const [fileName, setFileName] = useState('');
-  const createdAt = userDetails?.createdAt
-  const dateOnly = createdAt.split('T')[0];
-  const dateJoined = dateOnly
+   const dateCreated = userDetails?.createdAt
+     ? new Date(userDetails.createdAt)
+     : null;
+   const dateOnly = dateCreated ? dateCreated.toISOString().split('T')[0] : '';
+   const dateJoined = dateOnly;
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';

@@ -54,6 +54,8 @@ interface ProfileInfo {
   fullName: string;
   spotifyLink: string;
   img: string;
+  createdAt: string
+  phoneNumber: number
 }
 
 interface transactions {
