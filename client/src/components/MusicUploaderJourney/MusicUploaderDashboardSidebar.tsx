@@ -7,7 +7,6 @@ import ProfileIcon from '../../assets/images/User Rounded.svg';
 import DisputeIcon from '../../assets/images/dispute.svg';
 import Chat_Support from '../../assets/images/chat, support.svg';
 import LogoutIcon from '../../assets/images/Login 2.svg';
-import UserImg from '../../assets/images/Photo (replace).svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 
 interface MusicUploaderDashboardSidebarProps {

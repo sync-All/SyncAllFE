@@ -1,7 +1,6 @@
 import Search from '../../assets/images/search-1.svg';
 import Notification from '../../assets/images/Notification.svg';
 import ArrowDowm from '../../assets/images/select-input-arrow.svg';
-import UserImg from '../../assets/images/Photo (replace).svg';
 import Hamburger from '../../assets/images/Hambuger.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 
