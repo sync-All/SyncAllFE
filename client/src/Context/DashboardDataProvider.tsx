@@ -14,9 +14,25 @@ interface Activity {
   description: string;
 }
 
+interface Earnings {
+  _id: string;
+  accName: string;
+  accNumber: string;
+  bankName: string;
+  bankAddress: string;
+  country: string;
+  code: string;
+  bicCode: number;
+  totalEarnings: number;
+  totalWithdrawals: number
+  averageMonthlyEarnings: number
+  availableBal: number
+}
+
 interface DashboardDetails {
   _id: string;
   totalTracks: [];
+  earnings: Earnings;
   totalEarnings: number;
   countryReached: number;
   totalPlays: string;
@@ -37,12 +53,26 @@ interface ProfileInfo {
   bio: string;
   fullName: string;
   spotifyLink: string;
+  img: string;
+  createdAt: string
+  phoneNumber: number
+}
+
+interface transactions {
+  _id: string;
+  transactionId: string;
+  transactionType: string;
+  transactionStatus: string;
+  amount: string;
+  date: Date;
+
 }
 
 interface DashboardData {
   success: boolean;
   dashboardDetails: DashboardDetails;
   profileInfo: ProfileInfo;
+  transactions: transactions[];
 }
 
 interface DataContextType {

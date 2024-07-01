@@ -1,7 +1,6 @@
 import Search from '../../assets/images/search-1.svg';
 import Notification from '../../assets/images/Notification.svg';
 import ArrowDowm from '../../assets/images/select-input-arrow.svg';
-import UserImg from '../../assets/images/Photo (replace).svg';
 import Hamburger from '../../assets/images/Hambuger.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 
@@ -36,14 +35,18 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
             <img src={Notification} alt="" />
             <div className="flex items-center lg:mx-3">
               <span className="">
-                <img src={UserImg} alt="" className="" />
+                <img
+                  src={profileDetails?.img}
+                  alt=""
+                  className="w-10 h-10 object-cover rounded-[50%]"
+                />
               </span>
               <span className="hidden lg:block ml-2">
                 <p className="font-inter text-[14px] font-medium leading-5">
                   {profileDetails?.fullName}
                 </p>
                 <p className="font-inter text-[12px] font-regular leading-4">
-                 {profileDetails?.email}
+                  {profileDetails?.email}
                 </p>
               </span>
               <img src={ArrowDowm} alt="" className="hidden lg:block ml-4" />
