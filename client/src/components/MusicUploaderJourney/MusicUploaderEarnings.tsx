@@ -6,17 +6,18 @@ import Filter from '../../assets/images/Filter-lines.svg';
 import Download from '../../assets/images/download-cloud.svg';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/AddCircle.svg';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
 import WithdrawalModal from './WithdrawalModal';
+import { useDataContext } from '../../Context/DashboardDataProvider';
 
 interface TableData {
   transactionId: string;
   transactionType: string;
   transactionStatus: string;
   amount: string;
-  date: Date
+  date: Date;
 }
 
 interface SortConfig {
@@ -24,6 +25,26 @@ interface SortConfig {
   direction: 'ascending' | 'descending';
 }
 
+const SortButton: React.FC<{
+  sortConfig: SortConfig;
+  sortKey: keyof TableData;
+  onSort: (key: keyof TableData) => void;
+}> = ({ sortConfig, sortKey, onSort }) => (
+  <button
+    type="button"
+    onClick={() => onSort(sortKey)}
+    aria-label={`Sort by ${sortKey}`}
+  >
+    <img
+      src={
+        sortConfig.key === sortKey && sortConfig.direction === 'ascending'
+          ? ArrowUp
+          : ArrowDown
+      }
+      alt="Sort"
+    />
+  </button>
+);
 
 const MusicUploaderEarnings: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -35,8 +56,6 @@ const MusicUploaderEarnings: React.FC = () => {
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
-  
-
   const openModal = () => {
     setModalIsOpen(true);
   };
@@ -45,97 +64,33 @@ const MusicUploaderEarnings: React.FC = () => {
     setModalIsOpen(false);
   };
 
-    const tableData: TableData[] = [
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Withdraw',
-        transactionStatus: 'Completed',
-        amount: '$465,900',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Deposit',
-        transactionStatus: 'Pending',
-        amount: '$300,500',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Withdraw',
-        transactionStatus: 'Rejected',
-        amount: '$0',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Deposit',
-        transactionStatus: 'Approved',
-        amount: '$100,000',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Withdraw',
-        transactionStatus: 'Pending',
-        amount: '$465,900',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Deposit',
-        transactionStatus: 'Completed',
-        amount: '$300,500',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Withdraw',
-        transactionStatus: 'Rejected',
-        amount: '$0',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Deposit',
-        transactionStatus: 'Approved',
-        amount: '$100,000',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Withdraw',
-        transactionStatus: 'Pending',
-        amount: '$465,900',
-        date: new Date(2024, 6, 10)
-      },
-      {
-        transactionId: 'vrbheug573ui589393h',
-        transactionType: 'Deposit',
-        transactionStatus: 'Completed',
-        amount: '$300,500',
-        date: new Date(2024, 6, 10)
-      }
-    ];
+  const earningInfo = useDataContext();
+  const earningDetails =
+    earningInfo.dashboardData?.dashboardDetails?.earnings?.[0];
+  const transactionDetails = earningInfo.dashboardData?.transactions;
 
-const sortedData = [...tableData].sort((a, b) => {
-  if (sortConfig.key === null) return 0;
-  const aValue = a[sortConfig.key];
-  const bValue = b[sortConfig.key];
 
-  if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-  if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
-  return 0;
-});
+  const sortedData = useMemo(() => {
+    return [...transactionDetails].sort((a, b) => {
+      if (sortConfig.key === null) return 0;
+      const aValue = a[sortConfig.key as keyof TableData];
+      const bValue = b[sortConfig.key as keyof TableData];
 
-const handleSort = (key: keyof TableData) => {
-  let direction: 'ascending' | 'descending' = 'ascending';
-  if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-    direction = 'descending';
-  }
-  setSortConfig({ key, direction });
-};
+      if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+      return 0;
+    });
+  }, [transactionDetails, sortConfig]);
 
+ 
+
+   const handleSort = (key: keyof TableData) => {
+     let direction: 'ascending' | 'descending' = 'ascending';
+     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+       direction = 'descending';
+     }
+     setSortConfig({ key, direction });
+   };
   return (
     <div className="lg:mx-8 ml-5 mt-[38px] mb-[96px]">
       <div className="relative bg-black2 rounded-[20px] flex flex-col w-full px-10 text-white">
@@ -144,13 +99,13 @@ const handleSort = (key: keyof TableData) => {
             Your available balance:
           </p>
           <h2 className="font-Utile-bold text-[36px] tracking-[-1.44px] leading-[43.2px]">
-            $ 46,350,060.00
+            {earningDetails.totalEarnings}
           </h2>
         </div>
         <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 ">
           <p>
-            0768010549 <br />
-            VICTOR EDET ASUQUO, Access Bank
+            {earningDetails.accNumber} <br />
+            {earningDetails.accName}, {earningDetails.bankName}
           </p>
           <span>
             <button
@@ -174,7 +129,8 @@ const handleSort = (key: keyof TableData) => {
               Total Earnings:
             </p>
             <h2 className="font-formular-regular text-[32px] text-[#1D2739]">
-              <span className="font-Utile-regular">&#36;</span> 3,762,600
+              <span className="font-Utile-regular">&#36;</span>{' '}
+              {earningDetails.totalEarnings}
             </h2>
           </div>
         </div>
@@ -185,7 +141,8 @@ const handleSort = (key: keyof TableData) => {
               Total Withdrawals
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
-              <span className="font-Utile-regular">&#36;</span> 2,742,600
+              <span className="font-Utile-regular">&#36;</span>{' '}
+              {earningDetails.totalWithdrawals}
             </h3>
           </div>
         </div>
@@ -196,7 +153,8 @@ const handleSort = (key: keyof TableData) => {
               Average Monthly Earnings
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
-              <span className="font-Utile-regular">&#36;</span> 72,600
+              <span className="font-Utile-regular">&#36;</span>{' '}
+              {earningDetails.averageMonthlyEarnings}
             </h3>
           </div>
         </div>
@@ -231,62 +189,38 @@ const handleSort = (key: keyof TableData) => {
           <tr>
             <th className={ThStyles}>
               Transaction ID
-              <button onClick={() => handleSort('transactionId')}>
-                <img
-                  src={
-                    sortConfig.key === 'transactionId' &&
-                    sortConfig.direction === 'ascending'
-                      ? ArrowUp
-                      : ArrowDown
-                  }
-                  alt="Sort"
-                />
-              </button>
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="transactionId"
+                onSort={handleSort}
+              />
             </th>
             <th className={ThStyles}>
               Transaction Type{' '}
-              <button onClick={() => handleSort('transactionType')}>
-                <img
-                  src={
-                    sortConfig.key === 'transactionType' &&
-                    sortConfig.direction === 'ascending'
-                      ? ArrowUp
-                      : ArrowDown
-                  }
-                  alt="Sort"
-                />
-              </button>
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="transactionType"
+                onSort={handleSort}
+              />
             </th>
             <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ">
               Transaction Status
             </th>
             <th className={ThStyles}>
               Amount{' '}
-              <button onClick={() => handleSort('amount')}>
-                <img
-                  src={
-                    sortConfig.key === 'amount' &&
-                    sortConfig.direction === 'ascending'
-                      ? ArrowUp
-                      : ArrowDown
-                  }
-                  alt="Sort"
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="amount"
+                onSort={handleSort}
                 />
-              </button>
             </th>
             <th className={ThStyles}>
               Date
-              <button onClick={() => handleSort('date')}>
-                <img
-                  src={
-                    sortConfig.key === 'date' &&
-                    sortConfig.direction === 'ascending'
-                      ? ArrowUp
-                      : ArrowDown
-                  }
-                  alt="Sort"
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="date"
+                onSort={handleSort}
                 />
-              </button>
             </th>
             <th className="bg-grey-100 py-3 px-6"></th>
           </tr>

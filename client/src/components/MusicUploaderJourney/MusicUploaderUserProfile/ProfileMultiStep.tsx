@@ -15,8 +15,7 @@ const ProfileMultiStep = () => {
 
   const liClass =
     'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
-      const activeLiClass = 'border-b border-[#013131] text-[#013131]';
-
+  const activeLiClass = 'border-b border-[#013131] text-[#013131]';
 
   const renderSection = () => {
     switch (activeSection) {
@@ -37,7 +36,11 @@ const ProfileMultiStep = () => {
         </span>
         <div className="flex flex-col lg:flex-row justify-between items-center top-[85%] absolute w-full">
           <div className="flex items-center gap-[32px] ml-3 lg:ml-12">
-            <img src={Avatar} alt="" />
+            <img
+              src={profileDetails?.img || Avatar}
+              alt=""
+              className="h-[145px] w-[145px] rounded-[50%] object-cover"
+            />
             <span className="">
               <h1 className="poppins-semibold text-[24px] leading-normal text-[#1D2739] ">
                 {profileDetails?.fullName}

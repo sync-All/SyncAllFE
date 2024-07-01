@@ -278,7 +278,7 @@ const UploadTrackMultiForm: React.FC = () => {
             console.log(config);
             try {
               await axios.postForm(apiUrl, values, config);
-              console.log('successfull');
+              toast.success('Track Uploaded Successfully');
             } catch (error: unknown) {
               const axiosError = error as AxiosError<ResponseData>;
 

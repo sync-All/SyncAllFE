@@ -118,7 +118,12 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="releaseTitle" className={applyLabelStyles}>
             Release Title
           </label>
-          <Field type="text" name="releaseTitle" className={applyInputStyles} />
+          <Field as="select" name="releaseTitle" className={applyInputStyles} >
+            <option value="">Select...</option>
+            <option value="Album">Album title</option>
+            <option value="Single">Single title</option>
+            <option value="EP">EP ttle</option>
+          </Field>
           <ErrorMessage
             name="releaseTitle"
             component="div"

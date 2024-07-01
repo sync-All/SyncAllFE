@@ -4,6 +4,7 @@ import UploadTrackIcon from '../../assets/images/Upload Track 2.svg';
 import TrackIcon from '../../assets/images/Music Library 2.svg';
 import EarningIcon from '../../assets/images/Banknote 2.svg';
 import ProfileIcon from '../../assets/images/User Rounded.svg';
+import DisputeIcon from '../../assets/images/dispute.svg';
 import Chat_Support from '../../assets/images/chat, support.svg';
 import LogoutIcon from '../../assets/images/Login 2.svg';
 import UserImg from '../../assets/images/Photo (replace).svg';
@@ -25,6 +26,7 @@ const logout = () => {
 }
 
 
+
   const pStyle = (item: string) => ({
     color: item === activeItem ? 'var(--black2)' : 'var(--Grey-500, #667185)',
     fontSize: '14px',
@@ -42,6 +44,9 @@ const logout = () => {
     cursor: 'pointer',
   });
 
+// 
+   
+
 
   return (
     <div className="h-screen border border-r-[#E4E7EC] flex flex-col">
@@ -54,7 +59,10 @@ const logout = () => {
             onClick={() => onTabChange('Dashboard')}
             style={liStyle('Dashboard')}
           >
-            <img src={DashboardIcon} alt=""></img>
+            <img
+              src={DashboardIcon}
+              alt=""
+            ></img>
             <p style={pStyle('Dashboard')}>Dashboard</p>
           </li>
           <li
@@ -85,11 +93,8 @@ const logout = () => {
             <img src={ProfileIcon} alt="" />
             <p style={pStyle('User Profile')}>User Profile</p>
           </li>
-          <li
-            onClick={() => onTabChange('Dispute')}
-            style={liStyle('Dispute')}
-          >
-            <img src={ProfileIcon} alt="" />
+          <li onClick={() => onTabChange('Dispute')} style={liStyle('Dispute')}>
+            <img src={DisputeIcon} alt="" />
             <p style={pStyle('Dispute')}>Dispute</p>
           </li>
         </ul>
@@ -116,7 +121,7 @@ const logout = () => {
         </div>
         <div className="flex items-center mx-3 mt-6 mb-9 overflow-hidden">
           <span>
-            <img src={UserImg} alt="" />
+            <img src={profileDetails?.img} alt="" className='w-10 h-10 object-cover rounded-[50%]' />
           </span>
           <span className="ml-2 w-1/2 break-words">
             <p className="font-inter text-[14px] font-medium leading-5">
