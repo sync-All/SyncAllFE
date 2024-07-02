@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useDataContext } from '../../../Context/DashboardDataProvider';
+import useLoading from '../../../constants/loading';
 
 interface FormData {
   accName: string;
@@ -12,7 +13,7 @@ interface FormData {
   bankAddress: string;
   country: string;
   code: string;
-  bicCode: number;
+  bicCode: string;
 }
 
 interface ResponseData {
@@ -21,21 +22,24 @@ interface ResponseData {
 
 const PaymentInfo = () => {
   const paymentInfo = useDataContext();
+const { loading, setLoading } = useLoading();
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
  const paymentDetails = Array.isArray(
    paymentInfo.dashboardData?.dashboardDetails?.earnings
  )
    ? paymentInfo.dashboardData.dashboardDetails.earnings[0]
    : {};
 
-
-  console.log(paymentDetails);
   const initialValues: FormData = {
     accName: paymentDetails.accName,
     accNumber: paymentDetails.accNumber,
     bankName: paymentDetails.bankName,
     bankAddress: paymentDetails.bankAddress,
     country: paymentDetails.country,
-    code: '',
+    code: paymentDetails.sortCode,
     bicCode: paymentDetails.bicCode,
   };
 
@@ -45,8 +49,8 @@ const PaymentInfo = () => {
     bankName: yup.string().required('Bank name is required'),
     bankAddress: yup.string().required('Bank address is required'),
     country: yup.string().required('Country is required'),
-    code: yup.string().required('Swift/BIC code is required'),
-    bicCode: yup.number().required('Sort code is required'),
+    bicCode: yup.string().required('Swift/BIC code is required'),
+    code: yup.number().required('Sort code is required'),
   });
 
   const applyInputStyles =
@@ -71,7 +75,7 @@ const PaymentInfo = () => {
         validationSchema={validateForm}
         initialValues={initialValues}
         onSubmit={async (values) => {
-          // const userId = localStorage.getItem('userId');
+          setLoading(true)
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
           const apiUrl = `${urlVar}/updatepaymentinfo/`;
@@ -80,18 +84,22 @@ const PaymentInfo = () => {
               Authorization: `${token}`,
             },
           };
-          console.log(values);
+          
           try {
+            await delay(2000)
             await axios.post(apiUrl, values, config);
-            toast.success('Update successful');
+            toast.success('Payment Information Updated successful');
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
             toast.error(
-              axiosError.response && axiosError.response.data
-                ? axiosError.response.data.message
-                : axiosError.message
+              (axiosError.response && axiosError.response.data
+                ? axiosError.response.data.message || axiosError.response.data
+                : axiosError.message || 'An error occurred'
+              ).toString()
             );
-            console.log(error);
+           
+          }finally{
+            setLoading(false)
           }
         }}
       >
@@ -212,8 +220,10 @@ const PaymentInfo = () => {
               <button
                 type="submit"
                 className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px]"
+                disabled={loading}
               >
-                Update Payment Information
+                {loading ? 'Updating...' : 'Update Payment Information'}
+                
               </button>
             </div>
           </Form>

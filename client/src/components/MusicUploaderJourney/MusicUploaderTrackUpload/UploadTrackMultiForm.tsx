@@ -7,6 +7,7 @@ import CopyrightOwnerClaim from './CopyrightOwnerClaim';
 import ReleaseInformation from './ReleaseInformation';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
 
 interface FormData {
   mainArtist: string;
@@ -143,6 +144,11 @@ const UploadTrackMultiForm: React.FC = () => {
     'Minimum Recording Information'
   );
 
+  const {loading, setLoading} = useLoading()
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const liClass =
     'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
   const activeLiClass = 'border-b border-[#013131] text-[#013131]';
@@ -253,6 +259,7 @@ const UploadTrackMultiForm: React.FC = () => {
           initialValues={initialFormData}
           validationSchema={validationSchema}
           onSubmit={async (values, { validateForm }) => {
+            setLoading(true)
             const userId = localStorage.getItem('userId');
             const token = localStorage.getItem('token');
             const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -274,24 +281,27 @@ const UploadTrackMultiForm: React.FC = () => {
               });
               return; // Prevent form submission if there are errors
             }
-
-            console.log(config);
             try {
+              await delay(2000)
               await axios.postForm(apiUrl, values, config);
               toast.success('Track Uploaded Successfully');
             } catch (error: unknown) {
               const axiosError = error as AxiosError<ResponseData>;
 
-              toast.error(
-                axiosError.response && axiosError.response.data
-                  ? axiosError.response.data.message
-                  : axiosError.message
-              );
+               toast.error(
+                 (axiosError.response && axiosError.response.data
+                   ? axiosError.response.data.message ||
+                     axiosError.response.data
+                   : axiosError.message || 'An error occurred'
+                 ).toString()
+               );
 
-              console.log(error);
+             
+            }finally {
+              setLoading(false)
             }
 
-            console.log(values);
+           
           }}
         >
           <Form>
@@ -316,8 +326,9 @@ const UploadTrackMultiForm: React.FC = () => {
                 </div>
               )}
               {currentSection === 'Release Information' && (
-                <button type="submit" className={controlBtn}>
-                  Submit
+                <button type="submit" className={controlBtn} disabled={loading}>
+                  {loading ? 'Uploading...' : 'Upload Track'}
+                 
                 </button>
               )}
             </div>

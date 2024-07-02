@@ -5,17 +5,22 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-
+import useLoading from '../../../constants/loading';
 
 const ProfileInformation = () => {
   const userData = useDataContext();
   const userDetails = userData.dashboardData?.profileInfo;
   const [fileName, setFileName] = useState('');
-   const dateCreated = userDetails?.createdAt
-     ? new Date(userDetails.createdAt)
-     : null;
-   const dateOnly = dateCreated ? dateCreated.toISOString().split('T')[0] : '';
-   const dateJoined = dateOnly;
+
+  const { loading, setLoading } = useLoading();
+
+
+  
+  const dateCreated = userDetails?.createdAt
+    ? new Date(userDetails.createdAt)
+    : null;
+  const dateOnly = dateCreated ? dateCreated.toISOString().split('T')[0] : '';
+  const dateJoined = dateOnly;
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -41,13 +46,16 @@ const ProfileInformation = () => {
     phoneNumber: userDetails?.phoneNumber,
     socials: userDetails?.spotifyLink,
     bio: userDetails?.bio,
-    img: userDetails?.img
+    img: userDetails?.img,
   };
- 
+
   interface ResponseData {
     message?: string;
   }
 
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   return (
     <div className="lg:mx-8 ml-5 mt-12">
@@ -55,6 +63,7 @@ const ProfileInformation = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
+          setLoading(true);
           const userId = localStorage.getItem('userId');
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -65,19 +74,21 @@ const ProfileInformation = () => {
             },
           };
 
-          console.log(values);
-
           try {
+            await delay(2000)
             await axios.postForm(apiUrl, values, config);
+            toast.success('Profile Information Updated successful');
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
 
             toast.error(
-              axiosError.response && axiosError.response.data
-                ? axiosError.response.data.message
-                : axiosError.message
+              (axiosError.response && axiosError.response.data
+                ? axiosError.response.data.message || axiosError.response.data
+                : axiosError.message || 'An error occurred'
+              ).toString()
             );
-            console.log(error);
+          } finally {
+            setLoading(false);
           }
         }}
       >
@@ -253,9 +264,10 @@ const ProfileInformation = () => {
             </div>
             <button
               type="submit"
-              className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px]"
+              className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px] disabled:cursor-not-allowed"
+              disabled={loading}
             >
-              Save Changes
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </Form>
         )}

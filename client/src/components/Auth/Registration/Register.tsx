@@ -1,7 +1,7 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {signInWithGooglePopup} from '../../../../firebase';
+import { signInWithGooglePopup } from '../../../../firebase';
 import * as Yup from 'yup';
 import syncLogo from '../../../assets/logo-black.png';
 import Google from '../../../assets/images/google.svg';
@@ -18,6 +18,7 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { getAdditionalUserInfo } from 'firebase/auth';
 import { UserContext } from '../../../Context/UserRole';
+import useLoading from '../../../constants/loading';
 
 const SignupSchema = Yup.object().shape({
   userType: Yup.string()
@@ -52,7 +53,6 @@ interface ResponseData {
 }
 
 const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
     navigate('/email-confirmation', { state: { emailDomain } });
@@ -61,69 +61,79 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
     navigate('/onboarding-details');
   };
   const { setUserRole } = useContext(UserContext);
+  const { loading, setLoading } = useLoading();
 
-const logGoogleUser = async () => {
-  // Check if user has filled first part of the form previously
-  if(!selectedRole){
-    toast.error('Role has not Been Selected, Redirecting...')
-    setTimeout(()=>{
-      navigate('/register1')
-    },1500)
-  }else{
-    const response = await signInWithGooglePopup()
-    // get concise information about logged in user
-    const userInfo = getAdditionalUserInfo(response)
-    // COlate values and assign to their proper fields
-    const values = {
-      name : userInfo?.profile?.name,
-      email : userInfo?.profile?.email,
-      img : userInfo?.profile?.picture,
-      role : selectedRole,
-      emailConfirmedStatus :  userInfo?.profile?.verified_email,
-      userType : 'individual',
-      newUser : userInfo?.isNewUser
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  const logGoogleUser = async () => {
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/googleauth`;
+
+    // Check if user has filled first part of the form previously
+    if (!selectedRole) {
+      toast.error('Role has not Been Selected, Redirecting...');
+      setTimeout(() => {
+        navigate('/register1');
+      }, 1500);
+    } else {
+      const response = await signInWithGooglePopup();
+      // get concise information about logged in user
+      const userInfo = getAdditionalUserInfo(response);
+      // COlate values and assign to their proper fields
+      const values = {
+        name: userInfo?.profile?.name,
+        email: userInfo?.profile?.email,
+        img: userInfo?.profile?.picture,
+        role: selectedRole,
+        emailConfirmedStatus: userInfo?.profile?.verified_email,
+        userType: 'individual',
+        newUser: userInfo?.isNewUser,
+      };
+      // POst request to server to validate user
+      await axios
+        .post(apiUrl, values)
+        .then((response) => {
+          setUserRole(response.data.user.role); // Set the user type here
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userRole', response.data.user.role);
+          localStorage.setItem('userId', response.data.user._id);
+          toast.success('Login successful');
+          handleNavigationTODashboard();
+        })
+        .catch((err) => {
+          const axiosError = err as AxiosError<ResponseData>;
+          toast.error(
+            (axiosError.response && axiosError.response.data
+              ? axiosError.response.data.message || axiosError.response.data
+              : axiosError.message || 'An error occurred'
+            ).toString()
+          );
+        });
     }
-    // POst request to server to validate user
-    await axios.post('https://syncallfe.onrender.com/api/v1/googleauth',values)
-    .then((response)=>{
-      setUserRole(response.data.user.role); // Set the user type here
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userRole', response.data.user.role);
-        localStorage.setItem('userId', response.data.user._id);
-        toast.success('Login successful');
-        handleNavigationTODashboard();
-    })
-    .catch((err)=>{
-      const axiosError = err as AxiosError<ResponseData>;
-      toast.error(
-        axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message
-      );
-    })
-    }
-}
+  };
 
   const handleFormSubmit = async (values: FormValues) => {
+    setLoading(true);
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/signup`;
-    setIsLoading(true);
 
     try {
+      await delay(2000)
       const response = await axios.post(apiUrl, values);
-      console.log(response.data);
-      console.log(response.data.emailDomain)
       toast.success('Account created successfully');
       handleRedirectionToEmailConfirmation(response.data.emailDomain);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
-        axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
       );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -265,17 +275,17 @@ const logGoogleUser = async () => {
                     <button
                       className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px]  disabled:cursor-not-allowed"
                       type="submit"
-                      disabled={isLoading}
+                      disabled={loading}
                     >
-                      Sign Up
+                      {loading ? 'Loading...' : 'Sign Up'}
+                      
                     </button>
                     <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px] ">
                       OR
                     </p>
                     <div
-                    onClick={logGoogleUser}
+                      onClick={logGoogleUser}
                       className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] "
-                      
                     >
                       <img src={Google} alt="google icon" />
                       <span className="text-[16px] poppins-medium leading-[24px] text-black ">
