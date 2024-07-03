@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ArrowDown from '../assets/images/arrow-down.svg';
 
 const Mood = () => {
