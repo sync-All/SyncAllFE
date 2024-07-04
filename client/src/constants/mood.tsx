@@ -82,9 +82,21 @@ const Mood = () => {
       <div className="flex gap-[7px] items-center uppercase font-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px] cursor-pointer group">
         Mood <img src={ArrowDown} alt="Arrow down" />
         {isDropdownOpen && (
-          <div className="fixed top-[210px] left-0 w-screen h-[80vh] z-50 overflow-y-auto flex flex-wrap mx-20 bg-white">
+          <div className="fixed bottom-0 lg:top-[210px] left-0 w-screen h-[75vh]  lg:h-[80vh] z-50 overflow-y-auto flex flex-col lg:flex-row lg:flex-wrap px-[44px] lg:px-0 lg:mx-20 bg-white">
+            <div className="flex justify-between lg:hidden">
+              {' '}
+              <h1
+                className="font-formular-medium text-[24px] uppercase
+            leading-[18.729px] tracking-[0.271px] text-black my-[40px]  "
+              >
+                Select Mood
+              </h1>
+            </div>
             {moods.map((mood, index) => (
-              <div key={index} className="w-1/6 ">
+              <div
+                key={index}
+                className="lg:w-1/6 p-2 text-[14px] font-formular-regular leading-[18.729px] tracking-[0.271px] text-[#475367] capitalize "
+              >
                 {mood}
               </div>
             ))}
