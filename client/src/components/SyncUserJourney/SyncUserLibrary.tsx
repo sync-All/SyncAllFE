@@ -2,32 +2,31 @@ import Search from '../../assets/images/search-1.svg';
 import Genre from '../../constants/genre';
 import Mood from '../../constants/mood';
 import Instrument from '../../constants/instrument';
-import Background from '../../assets/images/user-homepage-head.png';
-import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
-import MusicWave from '../../assets/images/musicwave.svg';
-import Favorite from '../../assets/images/favorite.svg';
-import Copy from '../../assets/images/copy-link.svg';
-import AddMusic from '../../assets/images/add-music.svg';
+import Background from '../../assets/images/bg-plain.png';
 import MusicImg from '../../assets/images/3000x3000.jpg.png';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
-import { useState } from 'react';
+import MusicWave from '../../assets/images/musicwave.svg';
+import Favorite from '../../assets/images/favorite.svg';
+import Copy from '../../assets/images/copy-link.svg';
+import AddMusic from '../../assets/images/add-music.svg';
 import Closemenu from '../../assets/images/close-circle.svg';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SyncUserHome = () => {
+const SyncUserLibrary = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const redirectMetadata = () => {
-    navigate('/metadata')
-  }
+    navigate('/metadata');
+  };
 
   const musicDetails = [
     {
@@ -52,88 +51,11 @@ const SyncUserHome = () => {
       mood: 'Calm, Uplifting',
       actions: [Favorite, AddMusic, Copy],
     },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    // Add more items here as needed
   ];
+
   return (
-    <div className="px-5 xl:px-20 relative mb-[331px]">
-      <section>
+    <div className="px-5 xl:px-20 mb-[221px]">
+      <div>
         <div className="relative w-full my-24px">
           <input
             type="text"
@@ -159,27 +81,26 @@ const SyncUserHome = () => {
             </li>
           </ul>
         </div>
+      </div>
+      <div>
         <div className="relative mt-[55px]">
           <span className="w-full">
-            <img src={Background} alt="" className="hidden md:block w-full" />
-            <img src={BackgroundMobile} alt="" className="w-full md:hidden" />
+            <img src={Background} alt="" className=" w-full" />
           </span>
           <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6">
             <h2 className="text-[40px] lg:text-[64px] leading-[45px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
-              Explore Our <br /> Music Library
+              Your Personal Tracks Collection
             </h2>
-            <p className="font-formular-regular text-[16px] xl:text-[24px] leading-[24px] xl:leading-[32px] md:max-w-[550px] text-grey-300 max-w-[242px] ">
-              Discover, listen, and license authentic african music for your
-              projects
+            <p className="font-formular-regular text-[16px] xl:text-[24px] leading-[24px] xl:leading-[32px] text-grey-300  ">
+              Access all the tracks you've added from the music library.
             </p>
           </div>
         </div>
-      </section>
+      </div>
       <section className="mt-[63px] relative">
         <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
-          Browse Songs
+          Tracks List
         </h3>
-
         <div className=" hidden flex-col gap-[56px] lg:flex">
           {musicDetails.map((detail, index) => (
             <div
@@ -303,4 +224,4 @@ const SyncUserHome = () => {
   );
 };
 
-export default SyncUserHome;
+export default SyncUserLibrary;

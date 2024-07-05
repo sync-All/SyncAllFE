@@ -48,7 +48,7 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
-      comparePlansPriceBorder: 'border-r-0'
+      comparePlansPriceBorder: 'border-r-0',
     },
   ];
 
@@ -148,8 +148,8 @@ const Pricing = () => {
         </p>
       </div>
       <div>
-        <span className="flex justify-center items-center gap-[36px] my-12">
-          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
+        <span className="flex lg:justify-center w-full items-center gap-3 lg:gap-[36px] my-12 flex-wrap">
+          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-3 lg:px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
             Monthly
           </p>
           <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
@@ -281,6 +281,17 @@ const Pricing = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className='flex flex-col gap-4 mt-[94px] p-6 ml-[56px] mb-[118px]'>
+          <p className="text-[#1B2128] font-formular-bold text-[17px] leading-6 ">
+            Enterprise
+          </p>
+          <h2 className="text-[#1B2128] font-formular-bold text-[48px] leading-[52px] tracking-[-0.96px] ">
+            Contact Us
+          </h2>
+          <p className="text-[#1B2128] font-Utile-regular text-[24px] leading-[52px] tracking-[-0.48px] ">
+            Send an email to <b>enterpriserequest@syncall.com</b>{' '}
+          </p>
         </div>
       </section>
     </div>

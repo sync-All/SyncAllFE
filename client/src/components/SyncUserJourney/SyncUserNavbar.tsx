@@ -22,25 +22,34 @@ const SyncUserNavbar: React.FC = () => {
             menuOpen ? 'hidden' : 'flex'
           } md:flex`}
         >
-          <li className="text-[#475367] font-formular-regular capitalize text-[16px]">
-            Music
-          </li>
+          <a href="/home">
+            <li className="text-[#475367] font-formular-regular capitalize text-[16px]">
+              Music
+            </li>
+          </a>
+
           <a href="/pricing">
             <li className="text-[#475367] font-formular-regular capitalize text-[16px]">
               Pricing
             </li>
           </a>
-          <li className="text-[#475367] font-formular-regular capitalize text-[16px]">
-            My Library
-          </li>
+          <a href="/mylibrary">
+            <li className="text-[#475367] font-formular-regular capitalize text-[16px]">
+              My Library
+            </li>
+          </a>
         </ul>
-        <span className={`flex gap-2 ${menuOpen ? 'hidden' : 'hidden'} md:flex`}>
-          <img src={Placeholder} alt="User Placeholder" className="h-8 w-8" />
-          <p className="text-[#475367] font-formular-regular capitalize text-[16px]">
-            My Account
-          </p>
-          <img src={ArrowDown} alt="Arrow Down" className="h-4 w-4" />
-        </span>
+        <a href="/myAccount">
+          <span
+            className={`flex gap-2 ${menuOpen ? 'hidden' : 'hidden'} md:flex`}
+          >
+            <img src={Placeholder} alt="User Placeholder" className="h-8 w-8" />
+            <p className="text-[#475367] font-formular-regular capitalize text-[16px]">
+              My Account
+            </p>
+            <img src={ArrowDown} alt="Arrow Down" className="h-4 w-4" />
+          </span>
+        </a>
         <button className="md:hidden" onClick={toggleMenu}>
           <img src={MenuIcon} alt="Menu Icon" className="h-8 w-8" />
         </button>
