@@ -1,5 +1,5 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import * as Yup from 'yup';
 import syncLogo from '../../assets/logo-black.png';
 import LoginImg from '../../assets/images/email-confirmation-img.png';
@@ -11,6 +11,7 @@ import { UserContext } from '../../Context/UserRole';
 import { getAdditionalUserInfo } from 'firebase/auth';
 import { signInWithGooglePopup } from '../../../firebase';
 import { useDataContext } from '../../Context/DashboardDataProvider';
+import useLoading from '../../constants/loading';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -29,25 +30,31 @@ interface ResponseData {
 }
 
 const Login: React.FC<LoginProps> = ({ setToken }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const dashdata = useDataContext();
   const profileDetails = dashdata.dashboardData?.profileInfo;
+  const { loading, setLoading } = useLoading();
 
   const handleNavigationTODashboard = () => {
-    if(profileDetails ) {
+    if (profileDetails) {
       navigate('/dashboard');
     } else {
       navigate('/onboarding-details');
-    }    
+    }
   };
-  
+
   const { setUserRole } = useContext(UserContext);
 
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const handleLogin = async (values: { email: string; password: string }) => {
+    setLoading(true);
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/signin`;
     try {
+      await delay(2000);
       const response = await axios.post(apiUrl, {
         email: values['email'],
         password: values['password'],
@@ -66,44 +73,48 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
-        axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
       );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   const logGoogleUser = async () => {
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/googleauth`;
     // Authenticate user
-      const response = await signInWithGooglePopup()
-      // get concise information about logged in user
-      const userInfo = getAdditionalUserInfo(response)
-      // COlate values and assign to their proper fields
-      const values = {
-        email : userInfo?.profile?.email,
-      }
-      // POst request to server to validate user
-      await axios.post('https://syncallfe.onrender.com/api/v1/googleauth',values)
-      .then((response)=>{
+    const response = await signInWithGooglePopup();
+    // get concise information about logged in user
+    const userInfo = getAdditionalUserInfo(response);
+    // COlate values and assign to their proper fields
+    const values = {
+      email: userInfo?.profile?.email,
+    };
+    // POst request to server to validate user
+    await axios
+      .post(apiUrl, values)
+      .then((response) => {
         setUserRole(response.data.user.role); // Set the user type here
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userRole', response.data.user.role);
-          localStorage.setItem('userId', response.data.user._id);
-          toast.success('Login successful');
-          handleNavigationTODashboard();
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userId', response.data.user._id);
+        toast.success('Login successful');
+        handleNavigationTODashboard();
       })
-      .catch((err)=>{
+      .catch((err) => {
         const axiosError = err as AxiosError<ResponseData>;
         toast.error(
-          axiosError.response && axiosError.response.data
-            ? axiosError.response.data.message
-            : axiosError.message
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
         );
-      })
-
-  }
+      });
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
@@ -191,17 +202,16 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                       <button
                         type="submit"
                         className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:cursor-not-allowed"
-                        disabled={isLoading}
+                        disabled={loading}
                       >
-                        Sign In
+                        {loading ? 'Loading...' : 'Sign In'}
                       </button>
                       <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px]">
                         OR
                       </p>
-                      <div 
-                      onClick={logGoogleUser}
+                      <div
+                        onClick={logGoogleUser}
                         className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px]  "
-                        
                       >
                         <img src={Google} alt="google icon" />
                         <span className="text-[16px] poppins-medium leading-[24px] text-black">

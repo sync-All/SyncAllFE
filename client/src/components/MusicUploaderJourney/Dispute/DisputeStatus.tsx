@@ -82,11 +82,12 @@ const DisputeStatus = () => {
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
 
-      toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message).toString()
-      );
+       toast.error(
+         (axiosError.response && axiosError.response.data
+           ? axiosError.response.data.message || axiosError.response.data
+           : axiosError.message || 'An error occurred'
+         ).toString()
+       );
     }
   };
 

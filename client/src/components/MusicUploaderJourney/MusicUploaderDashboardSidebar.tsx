@@ -8,6 +8,8 @@ import DisputeIcon from '../../assets/images/dispute.svg';
 import Chat_Support from '../../assets/images/chat, support.svg';
 import LogoutIcon from '../../assets/images/Login 2.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
+import Placeholder from '../../assets/images/placeholder.png';
+
 
 interface MusicUploaderDashboardSidebarProps {
   activeItem: string
@@ -120,7 +122,7 @@ const logout = () => {
         </div>
         <div className="flex items-center mx-3 mt-6 mb-9 overflow-hidden">
           <span>
-            <img src={profileDetails?.img} alt="" className='w-10 h-10 object-cover rounded-[50%]' />
+            <img src={profileDetails?.img || Placeholder} alt="" className='w-10 h-10 object-cover rounded-[50%]' />
           </span>
           <span className="ml-2 w-1/2 break-words">
             <p className="font-inter text-[14px] font-medium leading-5">

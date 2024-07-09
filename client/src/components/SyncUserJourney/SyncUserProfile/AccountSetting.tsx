@@ -1,28 +1,16 @@
-import { useState } from 'react';
-import { useDataContext } from '../../../Context/DashboardDataProvider';
 import Attach from '../../../assets/images/attachimage.svg';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios, { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
-import useLoading from '../../../constants/loading';
+// import axios, { AxiosError } from 'axios';
+// import { toast } from 'react-toastify';
+// import useLoading from '../../../constants/loading';
+import { useState } from 'react';
 
-const ProfileInformation = () => {
-  const userData = useDataContext();
-  const userDetails = userData.dashboardData?.profileInfo;
+const AccountSetting = () => {
   const [fileName, setFileName] = useState('');
+    // const { loading, setLoading } = useLoading();
 
-  const { loading, setLoading } = useLoading();
-
-
-  
-  const dateCreated = userDetails?.createdAt
-    ? new Date(userDetails.createdAt)
-    : null;
-  const dateOnly = dateCreated ? dateCreated.toISOString().split('T')[0] : '';
-  const dateJoined = dateOnly;
-
-  const applyInputStyles =
+    const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 
   const applyLabelStyles =
@@ -40,100 +28,61 @@ const ProfileInformation = () => {
   });
 
   const initialValues = {
-    username: userDetails?.name,
-    fullName: userDetails?.fullName,
-    email: userDetails?.email,
-    phoneNumber: userDetails?.phoneNumber,
-    socials: userDetails?.spotifyLink,
-    bio: userDetails?.bio,
-    img: userDetails?.img,
+    username: '',
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    socials:'',
+    bio: '',
+    img: '',
   };
-
-  interface ResponseData {
-    message?: string;
-  }
-
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   return (
-    <div className="lg:mx-8 ml-5 mt-12">
+    <div className='mt-[49px]'>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          setLoading(true);
-          const userId = localStorage.getItem('userId');
-          const token = localStorage.getItem('token');
-          const urlVar = import.meta.env.VITE_APP_API_URL;
-          const apiUrl = `${urlVar}/profileUpdate/${userId}`;
-          const config = {
-            headers: {
-              Authorization: `${token}`,
-            },
-          };
+          console.log(values);
+          //   setLoading(true);
+          //   const userId = localStorage.getItem('userId');
+          //   const token = localStorage.getItem('token');
+          //   const urlVar = import.meta.env.VITE_APP_API_URL;
+          //   const apiUrl = `${urlVar}/profileUpdate/${userId}`;
+          //   const config = {
+          //     headers: {
+          //       Authorization: `${token}`,
+          //     },
+          //   };
 
-          try {
-            await delay(2000)
-            await axios.postForm(apiUrl, values, config);
-            toast.success('Profile Information Updated successful');
-          } catch (error: unknown) {
-            const axiosError = error as AxiosError<ResponseData>;
+          //   try {
+          //     await delay(2000);
+          //     await axios.postForm(apiUrl, values, config);
+          //     toast.success('Profile Information Updated successful');
+          //   } catch (error: unknown) {
+          //     const axiosError = error as AxiosError<ResponseData>;
 
-            toast.error(
-              (axiosError.response && axiosError.response.data
-                ? axiosError.response.data.message || axiosError.response.data
-                : axiosError.message || 'An error occurred'
-              ).toString()
-            );
-          } finally {
-            setLoading(false);
-          }
+          //     toast.error(
+          //       (axiosError.response && axiosError.response.data
+          //         ? axiosError.response.data.message || axiosError.response.data
+          //         : axiosError.message || 'An error occurred'
+          //       ).toString()
+          //     );
+          //   } finally {
+          //     setLoading(false);
+          //   }
         }}
       >
         {({ setFieldValue }) => (
           <Form>
             <div className={applyFormDiv}>
               <div className={input}>
-                <label htmlFor="name" className={applyLabelStyles}>
-                  Username
+                <label htmlFor="firstName" className={applyLabelStyles}>
+                  First Name
                 </label>
                 <Field
                   type="text"
-                  name="name"
+                  name="firstName"
                   className={applyInputStyles}
-                  placeholder={userDetails?.name}
-                />
-                <ErrorMessage
-                  name="name"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
-              <div className={input}>
-                <label htmlFor="dateJoined" className={applyLabelStyles}>
-                  Date Joined
-                </label>
-                <Field
-                  type="text"
-                  name="dateJoined"
-                  className={applyInputStyles}
-                  placeholder={`Member since ${dateJoined}`}
-                  disabled={true}
-                />
-              </div>
-            </div>
-            <div className={applyFormDiv}>
-              <div className={input}>
-                <label htmlFor="fullName" className={applyLabelStyles}>
-                  Full Name
-                </label>
-                <Field
-                  type="text"
-                  name="fullName"
-                  className={applyInputStyles}
-                  placeholder={userDetails?.fullName}
                 />
                 <ErrorMessage
                   name="fullName"
@@ -142,14 +91,14 @@ const ProfileInformation = () => {
                 />
               </div>
               <div className={input}>
-                <label htmlFor="email" className={applyLabelStyles}>
-                  Email Address
+                <label htmlFor="lastName" className={applyLabelStyles}>
+                  Last Name
                 </label>
                 <Field
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="lastName"
                   className={applyInputStyles}
-                  placeholder={userDetails?.email}
+               
                 />
                 <ErrorMessage
                   name="email"
@@ -158,8 +107,7 @@ const ProfileInformation = () => {
                 />
               </div>
             </div>
-            <div className={applyFormDiv}>
-              <div className={input}>
+            <div className={applyFormDiv}> <div className={input}>
                 <label htmlFor="phoneNumber" className={applyLabelStyles}>
                   Phone Number
                 </label>
@@ -175,21 +123,21 @@ const ProfileInformation = () => {
                 />
               </div>
               <div className={input}>
-                <label htmlFor="socials" className={applyLabelStyles}>
-                  Social Media Links
+                <label htmlFor="email" className={applyLabelStyles}>
+                  Email Address
                 </label>
                 <Field
-                  type="text"
-                  name="socials"
+                  type="email"
+                  name="email"
                   className={applyInputStyles}
-                  placeholder={userDetails?.spotifyLink}
                 />
                 <ErrorMessage
-                  name="socials"
+                  name="email"
                   component="div"
                   className="text-red-500"
                 />
               </div>
+             
             </div>
             <div className={applyFormDiv}>
               <div className={`${input} relative `}>
@@ -245,35 +193,20 @@ const ProfileInformation = () => {
                 />
                 <ErrorMessage component="span" name="img" />
               </div>
-              <div className={input}>
-                <label htmlFor="bio" className={applyLabelStyles}>
-                  Your Bio
-                </label>
-                <Field
-                  as="textarea"
-                  name="bio"
-                  className={`${applyInputStyles} h-[147px]`}
-                  placeholder="Describe yourself a little"
-                />
-                <ErrorMessage
-                  name="bio"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
+          
             </div>
             <button
               type="submit"
               className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px] disabled:cursor-not-allowed"
-              disabled={loading}
+              
             >
-              {loading ? 'Saving...' : 'Save Changes'}
+             'Save Changes
             </button>
           </Form>
         )}
       </Formik>
     </div>
   );
-};
+}
 
-export default ProfileInformation;
+export default AccountSetting;

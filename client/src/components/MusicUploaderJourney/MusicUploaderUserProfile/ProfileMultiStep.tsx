@@ -1,6 +1,6 @@
 import ProfileBg from '../../../assets/images/profile-bg.png';
 import { useDataContext } from '../../../Context/DashboardDataProvider';
-import Avatar from '../../../assets/images/Avatar.png';
+import Placeholder from '../../../assets/images/placeholder.png'
 import Share from '../../../assets/images/share.svg';
 import Eye from '../../../assets/images/eye.svg';
 import ProfileInformation from './ProfileInformation';
@@ -37,7 +37,7 @@ const ProfileMultiStep = () => {
         <div className="flex flex-col lg:flex-row justify-between items-center top-[85%] absolute w-full">
           <div className="flex items-center gap-[32px] ml-3 lg:ml-12">
             <img
-              src={profileDetails?.img || Avatar}
+              src={profileDetails?.img || Placeholder}
               alt=""
               className="h-[145px] w-[145px] rounded-[50%] object-cover"
             />

@@ -5,6 +5,7 @@ import Attach from '../../../assets/images/attachimage.svg';
 import DisputeSuccess from './DisputeSuccess';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
 
 interface FormData {
   nameOfTrack: string;
@@ -28,6 +29,8 @@ const FileDispute: React.FC = () => {
   const [isDisputeSuccessModal, setIsDisputeSuccessModal] = useState(false);
   const closeIsDisputeSuccessModal = () => setIsDisputeSuccessModal(false);
   const [fileName, setFileName] = useState('');
+  const { loading, setLoading } = useLoading();
+
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -47,13 +50,17 @@ const FileDispute: React.FC = () => {
     supportingDoc: Yup.mixed().required('A document is required'),
   });
 
+   function delay(ms: number) {
+     return new Promise((resolve) => setTimeout(resolve, ms));
+   }
+
   return (
     <div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          console.log('Form submitted', values); // Debug line
+          setLoading(true)
           const userId = localStorage.getItem('userId');
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -64,20 +71,21 @@ const FileDispute: React.FC = () => {
             },
           };
           try {
+            await delay(2000);
             await axios.postForm(apiUrl, values, config);
             toast.success('Dispute filled successfully');
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
 
             toast.error(
-              axiosError.response && axiosError.response.data
-                ? axiosError.response.data.message
-                : axiosError.message
+              (axiosError.response && axiosError.response.data
+                ? axiosError.response.data.message || axiosError.response.data
+                : axiosError.message || 'An error occurred'
+              ).toString()
             );
-            console.error(error);
+          } finally {
+            setLoading(false);
           }
-
-          console.log(values);
           setIsDisputeSuccessModal(true);
         }}
       >
@@ -197,8 +205,9 @@ const FileDispute: React.FC = () => {
             <button
               type="submit"
               className="bg-yellow py-2.5 px-4 border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-5 text-black2"
+              disabled={loading}
             >
-              File Dispute
+           {loading ? "Filing a dispute..." : "File Dispute"}   
             </button>
           </Form>
         )}

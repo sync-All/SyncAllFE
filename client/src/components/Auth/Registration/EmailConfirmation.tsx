@@ -8,7 +8,6 @@ import ArrowLeft from '../../../assets/images/arrow-left.svg';
 const EmailConfirmation: React.FC = () => {
   const location = useLocation();
   const emailDomain = location.state.emailDomain;
-  console.log(emailDomain)
 
   return (
     <div className="flex flex-col lg:flex-row">

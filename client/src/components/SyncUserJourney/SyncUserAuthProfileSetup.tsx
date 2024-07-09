@@ -5,6 +5,7 @@ import BackgroundPattern from '../../assets/images/user-role-pattern.svg';
 import BadgeCheck from '../../assets/images/badge-check.svg';
 import BadgeUncheck from '../../assets/images/unnamed.png';
 import InfoIcon from '../../assets/images/info-fill.svg';
+import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Required'),
@@ -13,6 +14,12 @@ const validationSchema = Yup.object({
 });
 
 const SyncUserAuthProfileSetup = () => {
+const navigate = useNavigate()
+const handleNavigationToHome = () => {
+  navigate('/home')
+}
+
+
   return (
     <div className="bg-[#013131]">
       <div
@@ -46,6 +53,7 @@ const SyncUserAuthProfileSetup = () => {
             initialValues={{ name: '', spotifyLink: '', bio: '' }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
+              handleNavigationToHome()
               setTimeout(() => {
                 alert(JSON.stringify(values, null, 2));
                 setSubmitting(false);

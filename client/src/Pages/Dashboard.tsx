@@ -14,15 +14,13 @@ const Dashboard = () => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setIsMenuOpen(false); // close the menu when a tab is clicked
+    setIsMenuOpen(false);
   };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-   const userId = localStorage.getItem('userId');
-   console.log(userId);
 
   return (
     <div className="flex">

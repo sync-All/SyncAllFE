@@ -8,8 +8,6 @@ path: string
 }
 const ProtectedRoute: React.FC<ProtectedRouteProp > = ({element}) => {
   const token = localStorage.getItem('token')
-
-  console.log(token)
   return token ? element : <Navigate to="/login" replace />;
 }
 

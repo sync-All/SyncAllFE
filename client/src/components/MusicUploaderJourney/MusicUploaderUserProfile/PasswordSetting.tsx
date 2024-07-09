@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { Formik, Form, ErrorMessage, Field } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
 
 interface FormValues {
   oldPassword: string;
@@ -40,7 +41,13 @@ const applyErrorStyles = 'italic text-red-600';
 const input = 'w-[367px] flex flex-col gap-2 mb-4';
 
 const PasswordSetting = () => {
+const { loading, setLoading } = useLoading();
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
   const handlePasswordChange = async (values: FormValues) => {
+    setLoading(true)
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -53,15 +60,20 @@ const PasswordSetting = () => {
     };
 
     try {
+      await delay(2000)
       await axios.post(apiUrl, values, config);
+      toast.success('Password Updated Successfully');
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
 
       toast.error(
-        axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
       );
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -132,8 +144,9 @@ const PasswordSetting = () => {
           <button
             type="submit"
             className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[66px] mb-[26px]"
+            disabled={loading}
           >
-            Update Password
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </Form>
       </Formik>
