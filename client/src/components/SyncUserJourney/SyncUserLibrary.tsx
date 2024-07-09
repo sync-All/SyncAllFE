@@ -85,7 +85,11 @@ const SyncUserLibrary = () => {
       <div>
         <div className="relative mt-[55px]">
           <span className="w-full">
-            <img src={Background} alt="" className=" w-full" />
+            <img
+              src={Background}
+              alt=""
+              className="h-[400px] lg:h-full w-full"
+            />
           </span>
           <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6">
             <h2 className="text-[40px] lg:text-[64px] leading-[45px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
@@ -159,7 +163,7 @@ const SyncUserLibrary = () => {
           ))}
         </div>
         {/* Mobile */}
-        <div className="lg:hidden">
+        <div className="lg:hidden flex flex-col gap-6">
           {musicDetails.map((detail, index) => (
             <div
               key={index}
@@ -184,40 +188,46 @@ const SyncUserLibrary = () => {
         </div>
 
         {menuOpen && (
-          <div
-            className="fixed bottom-0 left-0 right-0 bg-white z-50 h-1/2 overflow-y-auto p-8"
-            onClick={redirectMetadata}
-          >
-            <span className="flex justify-between">
-              <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6 ">
-                Song Options
-              </h4>
-              <img src={Closemenu} alt="" onClick={closeMenu} />
-            </span>
-            <ul className="mt-8 flex flex-col gap-8 ">
-              <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                <img src={Favorite} alt="" />
-                Favorite
-              </li>
-              <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                {' '}
-                <img src={AddMusic} alt="" />
-                Add to Library
-              </li>
-              <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                <img src={Copy} alt="" />
-                Copy Track Link
-              </li>
-              <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                <img src={ViewMore} alt="" />
-                View More
-              </li>
-              <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                <img src={getQuote} alt="" />
-                Get Qoute
-              </li>
-            </ul>
-          </div>
+          <>
+            <div
+              className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
+              onClick={closeMenu}
+            ></div>
+
+            <div className=" h-full z-50">
+              <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-1/2 overflow-y-auto p-8">
+                <span className="flex justify-between">
+                  <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6 ">
+                    Song Options
+                  </h4>
+                  <img src={Closemenu} alt="" onClick={closeMenu} />
+                </span>
+                <ul className="mt-8 flex flex-col gap-8 ">
+                  <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    <img src={Favorite} alt="" />
+                    Favorite
+                  </li>
+                  <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    {' '}
+                    <img src={AddMusic} alt="" />
+                    Add to Library
+                  </li>
+                  <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    <img src={Copy} alt="" />
+                    Copy Track Link
+                  </li>
+                  <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    <img src={ViewMore} alt="" />
+                    View More
+                  </li>
+                  <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    <img src={getQuote} alt="" />
+                    Get Qoute
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </>
         )}
       </section>
     </div>

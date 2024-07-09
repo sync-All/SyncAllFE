@@ -10,7 +10,7 @@ const AccountOverview = () => {
         <h3 className="text-[#98A2B3] font-Utile-regular text-[24px] ">
           Quick Stats:
         </h3>
-        <div className="flex mt-4 gap-6">
+        <div className="flex flex-col items-center lg:flex-row mt-4 gap-6">
           <div className="border border-[#E4E7EC]  py-5 text-center max-w-[264px] w-[264px] rounded-[10px] ">
             <img
               src={Uploaded}

@@ -9,25 +9,25 @@ const TrackMetadata = () => {
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">
-        <div className="w-[40%]">
+        <div className="lg:w-[40%]">
           <img src={MusicImg} alt="" className="w-full object-cover" />
         </div>
-        <div className="flex flex-col w-[60%]">
+        <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
           <div className="flex justify-between flex-col md:flex-row">
-            <div className="flex flex-col gap-4 w-full">
-              <p className="text-[#475367] text-[56px] font-formular-bold  ">
+            <div className="flex flex-col gap-2 lg:gap-4 w-full">
+              <p className="text-[#475367] text-[32px] lg:text-[56px] font-formular-bold ">
                 Original Remix
               </p>
-              <p className="text-[#667185] text-[24px] font-Utile-regular  ">
+              <p className="text-[#667185] text-[16px] lg:text-[24px] font-Utile-regular  ">
                 GBASKY Feat. MOELOGO
               </p>
             </div>
 
-            <div className="flex gap-[25px] items-center lg:items-start ">
+            <div className="flex mt-[27px] gap-[25px] items-center lg:items-start ">
               <img src={Favorite} alt="" />
               <img src={AddMusic} alt="" />
               <img src={Copy} alt="" />
-              <button className="min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] w-full">
+              <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
                 Get Quote
               </button>
             </div>
@@ -49,8 +49,8 @@ const TrackMetadata = () => {
               Track Details
             </h4>
             <hr />
-            <div className="mt-6 flex gap-10 justify-between ">
-              <div className="flex flex-col gap-6">
+            <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
+              <div className="flex flex-col gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Genre</p>
                   <p className="text-[#475367]">RnB</p>
@@ -64,7 +64,7 @@ const TrackMetadata = () => {
                   <p className="text-[#475367]">3 minutes, 33 seconds</p>
                 </span>
               </div>
-              <div className="flex flex-col justify-between">
+              <div className="flex flex-col justify-between gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Mood</p>
                   <p className="text-[#475367]">Dreamy, Love</p>
@@ -78,7 +78,7 @@ const TrackMetadata = () => {
                   <p className="text-[#475367]">DMCE</p>
                 </span>
               </div>
-              <div className="flex  flex-col justify-between">
+              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Tempo</p>
                   <p className="text-[#475367]">128 BPM</p>

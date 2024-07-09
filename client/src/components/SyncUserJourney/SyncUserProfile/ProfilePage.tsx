@@ -25,7 +25,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="lg:ml-[284px]">
+    <div className="mx-8 lg:mx-[284px]">
       <section>
         <div className="flex gap-2 md:gap-6 items-center">
           <img
@@ -78,7 +78,7 @@ const ProfilePage = () => {
             onClick={() => setActiveSecton('Plan & Billings')}
           >
             {' '}
-            Plan & Billings
+            Plan <span className='font-Utile-regular'>&</span>  Billings
           </li>
         </ul>
       </section>

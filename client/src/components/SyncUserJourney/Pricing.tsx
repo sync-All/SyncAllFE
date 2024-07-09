@@ -128,7 +128,7 @@ const Pricing = () => {
   ];
 
   return (
-    <div>
+    <div >
       <div className="my-[90px] text-center">
         <select name="" id="" className="w-fit">
           <option value="">Select Country</option>
@@ -148,14 +148,14 @@ const Pricing = () => {
         </p>
       </div>
       <div>
-        <span className="flex lg:justify-center w-full items-center gap-3 lg:gap-[36px] my-12 flex-wrap">
-          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-3 lg:px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
+        <span className="flex justify-center w-full items-center gap-3 lg:gap-[36px] my-12 flex-wrap">
+          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-3 lg:px-[26px] rounded-full text-[10px] lg:text-[18px] font-formular-medium tracking-6">
             Monthly
           </p>
-          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
+          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[10px] lg:text-[18px]  font-formular-medium tracking-6">
             Quarterly
           </p>
-          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[18px] font-formular-medium tracking-6">
+          <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-[26px] rounded-full text-[10px] lg:text-[18px]  font-formular-medium tracking-6">
             Bi-Annually
           </p>
         </span>
@@ -282,7 +282,7 @@ const Pricing = () => {
             </tbody>
           </table>
         </div>
-        <div className='flex flex-col gap-4 mt-[94px] p-6 ml-[56px] mb-[118px]'>
+        <div className="flex flex-col gap-4 mt-[94px] p-6 ml-[56px] mb-[118px]">
           <p className="text-[#1B2128] font-formular-bold text-[17px] leading-6 ">
             Enterprise
           </p>
