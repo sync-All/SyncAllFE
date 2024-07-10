@@ -102,6 +102,41 @@
     font-weight: 300;
 }
 
+.plus-jarkata-sans-light {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 300;
+}
+
+.plus-jarkata-sans-regular {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+}
+
+.plus-jarkata-sans-medium {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+}
+
+.plus-jarkata-sans-semibold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+}
+
+.plus-jarkata-sans-bold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+}
+
+.plus-jarkata-sans-extrabold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+}
+
+.plus-jarkata-sans-black {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+}
+
 .modal {
   position: absolute;
   top: 50%;

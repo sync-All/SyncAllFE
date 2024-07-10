@@ -25,7 +25,6 @@ const MinimumRecordingInfo: React.FC = () => {
   const closeIsrcErrorModal = () => setIsIsrcErrorModalOpen(false);
 
   const handleDispute = () => {
-    console.log('Dispute action');
     // Implement your dispute logic here
     closeIsrcErrorModal();
   };
@@ -41,7 +40,6 @@ const MinimumRecordingInfo: React.FC = () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/verifyTrackUploaded/${isrc}`;
-     console.log(` ${token} + ${apiUrl}`);
     const config = {
       headers: {
         Authorization: ` ${token}`,
@@ -57,7 +55,6 @@ const MinimumRecordingInfo: React.FC = () => {
         setIsIsrcErrorModalOpen(true); 
       }
     } catch (error) {
-      console.error('Error verifying ISRC:', error);
       setIsrcValidationMessage('Failed to verify ISRC.');
       
     }
@@ -118,7 +115,12 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="releaseTitle" className={applyLabelStyles}>
             Release Title
           </label>
-          <Field type="text" name="releaseTitle" className={applyInputStyles} />
+          <Field as="select" name="releaseTitle" className={applyInputStyles} >
+            <option value="">Select...</option>
+            <option value="Album">Album title</option>
+            <option value="Single">Single title</option>
+            <option value="EP">EP ttle</option>
+          </Field>
           <ErrorMessage
             name="releaseTitle"
             component="div"

@@ -14,9 +14,25 @@ interface Activity {
   description: string;
 }
 
+interface Earnings {
+  _id: string;
+  accName: string;
+  accNumber: string;
+  bankName: string;
+  bankAddress: string;
+  country: string;
+  code: string;
+  bicCode: string;
+  totalEarnings: number;
+  totalWithdrawals: number;
+  averageMonthlyEarnings: number;
+  availableBal: number;
+}
+
 interface DashboardDetails {
   _id: string;
   totalTracks: [];
+  earnings: Earnings;
   totalEarnings: number;
   countryReached: number;
   totalPlays: string;
@@ -37,12 +53,25 @@ interface ProfileInfo {
   bio: string;
   fullName: string;
   spotifyLink: string;
+  img: string;
+  createdAt: string;
+  phoneNumber: number;
+}
+
+interface transactions {
+  _id: string;
+  transactionId: string;
+  transactionType: string;
+  transactionStatus: string;
+  amount: string;
+  date: Date;
 }
 
 interface DashboardData {
   success: boolean;
   dashboardDetails: DashboardDetails;
   profileInfo: ProfileInfo;
+  transactions: transactions[];
 }
 
 interface DataContextType {
@@ -68,10 +97,9 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchDashboardData = useCallback(async () => {
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
-    if (!userId || !token) {
-      console.error('User ID or token is null or undefined');
-      return;
-    }
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/dashboardhome/${userId}`;
+    
 
     const config = {
       headers: {
@@ -90,19 +118,19 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      const response = await axios.get(
-        `https://syncallfe.onrender.com/api/v1/dashboardhome/${userId}`,
-        config
-      );
+      const response = await axios.get(apiUrl, config);
       // Cache the new data with a timestamp
       const dataToCache = {
         data: response.data,
         timestamp: Date.now(),
       };
-      sessionStorage.setItem(`dashboardData_${userId}`, JSON.stringify(dataToCache));
+      sessionStorage.setItem(
+        `dashboardData_${userId}`,
+        JSON.stringify(dataToCache)
+      );
       setDashboardData(response.data);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      
       // Implement retry logic or error handling as needed
     }
   }, []);

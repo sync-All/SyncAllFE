@@ -1,0 +1,70 @@
+import Visa from '../../../assets/images/visa.svg'
+
+const PlansBillings = () => {
+  return (
+    <div className="mb-[136px]">
+      <section className="mt-[53px]">
+        <p className="text-[#555C74] text-[16px] font-formular-regular leading-[22px] ">
+          You are currently subscribed to a monthly premium plan
+        </p>
+        <div className="p-8 mt-4 bg-[#F9FAFB] rounded-[20px] ">
+          <div className="flex items-center justify-between">
+            <span>
+              <p className="text-[#3e3e3e] text-[14px] font-formular-regular leading-[22px]">
+                Current plan
+              </p>
+              <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px]">
+                Premium
+              </h3>
+            </span>
+            <button className="py-2 px-4 text-[12px] font-formular-bold leading-[22px] text-white bg-black2">
+              Change plan
+            </button>
+          </div>
+          <div className="mt-4 text-[#010516] text-[16px] font-Utile-regular leading-6">
+            <p>Frequency : Monthly</p>
+            <p>Next billing date : July 22, 2024</p>
+            <p>Amount : $20</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-8 ">
+        <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px]">
+          Payment method
+        </h3>
+        <p className="text-[#555C74] text-[16px] font-formular-regular leading-[22px] ">
+          This card is currently being charged for your subscription
+        </p>
+        <div className=" flex items-center justify-between p-8 bg-[#F9FAFB] rounded-[20px] mt-4">
+          <span className="flex gap-[11px] items-center">
+            <img src={Visa} alt="" />
+            <p className="text-[#010516] text-[16px] font-Utile-medium leading-[24px] ">
+              **** **** **** 5632
+            </p>
+          </span>
+
+          <button className="py-2 px-4 text-[12px] font-formular-bold leading-[22px] text-white bg-black2 rounded-[8px]">
+            Update
+          </button>
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px]">
+          Cancel subcription
+        </h3>
+        <div className=" flex items-center justify-between p-8 bg-[#F9FAFB] rounded-[20px] mt-4">
+          <p className="text-[#555C74] text-[16px] font-formular-regular leading-[22px] ">
+            You can cancel your subscription at any time
+          </p>
+          <button className="py-2 px-4 text-[12px] font-formular-bold leading-[22px] text-white bg-[#DE1212] rounded-[8px]">
+            Cancel
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default PlansBillings;

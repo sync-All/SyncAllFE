@@ -1,38 +1,58 @@
 import { Formik, Form, ErrorMessage, Field } from 'formik';
 import { COUNTRIES } from '../../../constants/countries';
 import * as yup from 'yup';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import { useDataContext } from '../../../Context/DashboardDataProvider';
+import useLoading from '../../../constants/loading';
 
 interface FormData {
-  accountName: string;
-  accountNumber: string;
+  accName: string;
+  accNumber: string;
   bankName: string;
   bankAddress: string;
   country: string;
   code: string;
-  sortCode: number;
+  bicCode: string;
 }
 
-const initialValues: FormData = {
-  accountName: '',
-  accountNumber: '',
-  bankName: '',
-  bankAddress: '',
-  country: '',
-  code: '',
-  sortCode: 0,
-};
-
-const validateForm = yup.object().shape({
-  accountName: yup.string().required('Account name is required'),
-  accountNumber: yup.string().required('Account number is required'),
-  bankName: yup.string().required('Bank name is required'),
-  bankAddress: yup.string().required('Bank address is required'),
-  country: yup.string().required('Country is required'),
-  code: yup.string().required('Swift/BIC code is required'),
-  sortCode: yup.number().required('Sort code is required'),
-});
+interface ResponseData {
+  message?: string;
+}
 
 const PaymentInfo = () => {
+  const paymentInfo = useDataContext();
+const { loading, setLoading } = useLoading();
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+ const paymentDetails = Array.isArray(
+   paymentInfo.dashboardData?.dashboardDetails?.earnings
+ )
+   ? paymentInfo.dashboardData.dashboardDetails.earnings[0]
+   : {};
+
+  const initialValues: FormData = {
+    accName: paymentDetails.accName,
+    accNumber: paymentDetails.accNumber,
+    bankName: paymentDetails.bankName,
+    bankAddress: paymentDetails.bankAddress,
+    country: paymentDetails.country,
+    code: paymentDetails.sortCode,
+    bicCode: paymentDetails.bicCode,
+  };
+
+  const validateForm = yup.object().shape({
+    accName: yup.string().required('Account name is required'),
+    accNumber: yup.string().required('Account number is required'),
+    bankName: yup.string().required('Bank name is required'),
+    bankAddress: yup.string().required('Bank address is required'),
+    country: yup.string().required('Country is required'),
+    bicCode: yup.string().required('Swift/BIC code is required'),
+    code: yup.number().required('Sort code is required'),
+  });
+
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
   const applyLabelStyles =
@@ -54,39 +74,65 @@ const PaymentInfo = () => {
       <Formik
         validationSchema={validateForm}
         initialValues={initialValues}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={async (values) => {
+          setLoading(true)
+          const token = localStorage.getItem('token');
+          const urlVar = import.meta.env.VITE_APP_API_URL;
+          const apiUrl = `${urlVar}/updatepaymentinfo/`;
+          const config = {
+            headers: {
+              Authorization: `${token}`,
+            },
+          };
+          
+          try {
+            await delay(2000)
+            await axios.post(apiUrl, values, config);
+            toast.success('Payment Information Updated successful');
+          } catch (error: unknown) {
+            const axiosError = error as AxiosError<ResponseData>;
+            toast.error(
+              (axiosError.response && axiosError.response.data
+                ? axiosError.response.data.message || axiosError.response.data
+                : axiosError.message || 'An error occurred'
+              ).toString()
+            );
+           
+          }finally{
+            setLoading(false)
+          }
         }}
       >
         {() => (
           <Form>
             <div className={applyFormDiv}>
               <div className={input}>
-                <label htmlFor="accountName" className={applyLabelStyles}>
+                <label htmlFor="accName" className={applyLabelStyles}>
                   Account Name
                 </label>
                 <Field
                   type="text"
                   className={applyInputStyles}
-                  name="accountName"
+                  name="accName"
+                  placeholder={paymentDetails.accNumber}
                 />
                 <ErrorMessage
-                  name="accountName"
+                  name="accName"
                   component="span"
                   className={applyErrorStyles}
                 />
               </div>
               <div className={input}>
-                <label htmlFor="accountNumber" className={applyLabelStyles}>
+                <label htmlFor="accNumber" className={applyLabelStyles}>
                   Account Number
                 </label>
                 <Field
                   type="text"
-                  name="accountNumber"
+                  name="accNumber"
                   className={applyInputStyles}
                 />
                 <ErrorMessage
-                  name="accountNumber"
+                  name="accNumber"
                   component="span"
                   className={applyErrorStyles}
                 />
@@ -130,6 +176,7 @@ const PaymentInfo = () => {
                   Country
                 </label>
                 <Field name="country" as="select" className={applyInputStyles}>
+                  <option value="">Select country</option>
                   {COUNTRIES.map((country) => (
                     <option value={country} key={country}>
                       {country}
@@ -143,28 +190,28 @@ const PaymentInfo = () => {
                 />
               </div>
               <div className={input}>
-                <label htmlFor="code" className={applyLabelStyles}>
+                <label htmlFor="bicCode" className={applyLabelStyles}>
                   Swift/BIC Code
                 </label>
-                <Field type="text" name="code" className={applyInputStyles} />
+                <Field
+                  type="text"
+                  name="bicCode"
+                  className={applyInputStyles}
+                />
                 <ErrorMessage
-                  name="code"
+                  name="bicCode"
                   component="span"
                   className={applyErrorStyles}
                 />
               </div>
             </div>
             <div className={input}>
-              <label htmlFor="sortCode" className={applyLabelStyles}>
+              <label htmlFor="code" className={applyLabelStyles}>
                 Sort Code
               </label>
-              <Field
-                type="number"
-                name="sortCode"
-                className={applyInputStyles}
-              />
+              <Field type="number" name="code" className={applyInputStyles} />
               <ErrorMessage
-                name="sortCode"
+                name="code"
                 component="span"
                 className={applyErrorStyles}
               />
@@ -173,8 +220,10 @@ const PaymentInfo = () => {
               <button
                 type="submit"
                 className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px]"
+                disabled={loading}
               >
-                Update Payment Information
+                {loading ? 'Updating...' : 'Update Payment Information'}
+                
               </button>
             </div>
           </Form>

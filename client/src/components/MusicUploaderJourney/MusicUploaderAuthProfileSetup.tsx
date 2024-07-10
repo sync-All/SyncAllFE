@@ -8,6 +8,8 @@ import BadgeUncheck from '../../assets/images/unnamed.png';
 import InfoIcon from '../../assets/images/info-fill.svg';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import useLoading from '../../constants/loading';
+
 
 const validationSchema = Yup.object({
   fullName: Yup.string().required('Required'),
@@ -20,10 +22,17 @@ interface ResponseData {
 }
 
 const MusicUploaderAuthProfileSetup = () => {
+    const { loading, setLoading } = useLoading();
+
   const navigate = useNavigate();
   const handleNavigationTODashboard = () => {
     navigate('/dashboard');
   };
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
   return (
     <div className="bg-[#013131]">
       <div
@@ -56,35 +65,40 @@ const MusicUploaderAuthProfileSetup = () => {
           <Formik
             initialValues={{ fullName: '', spotifyLink: '', bio: '' }}
             validationSchema={validationSchema}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={async (values) => {
+              setLoading(true)
               const userId = localStorage.getItem('userId');
               const token = localStorage.getItem('token');
               const urlVar = import.meta.env.VITE_APP_API_URL;
-              const apiUrl = `${urlVar}/profilesetup/${userId}`;
-             
+              const apiUrl = `${urlVar}/profileUpdate/${userId}`;
+
               const config = {
                 headers: {
                   Authorization: `${token}`,
                 },
               };
               try {
+                await delay(2000);
                 await axios.post(apiUrl, values, config);
+                toast.success('Profile Saved');
                 handleNavigationTODashboard();
               } catch (error: unknown) {
                 const axiosError = error as AxiosError<ResponseData>;
 
                 toast.error(
-                  axiosError.response && axiosError.response.data
-                    ? axiosError.response.data.message
-                    : axiosError.message
+                  (axiosError.response && axiosError.response.data
+                    ? axiosError.response.data.message ||
+                      axiosError.response.data
+                    : axiosError.message || 'An error occurred'
+                  ).toString()
                 );
+              } finally {
+                setLoading(false);
               }
-              setTimeout(() => {
-                setSubmitting(false);
-              }, 400);
+             
             }}
           >
-            {({ isSubmitting }) => (
+            
               <Form className="flex flex-col gap-[32px] w-full">
                 <div className="flex flex-col gap-[8px]">
                   <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
@@ -144,13 +158,13 @@ const MusicUploaderAuthProfileSetup = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={loading}
                   className="py-4 px-5 w-full rounded-[8px] poppins-medium text-base bg-[#14181F] text-white"
                 >
-                  Save Changes
+                  {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </Form>
-            )}
+            
           </Formik>
         </div>
       </div>
