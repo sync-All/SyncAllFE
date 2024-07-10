@@ -16,7 +16,7 @@ cloudinary.config({
 })
 
 const dashboardcontrol = async (req,res,next)=>{
-        const userId = req.params.userId
+        const userId = req.user.id
         try {
             console.log('eee')
             if(req.user.role == "Music Uploader"){
@@ -59,11 +59,11 @@ const trackUpload = async(req,res,next)=>{
                 }else{
                     let songInfo = req.body
                     var artWork = await cloudinary.uploader.upload(req.file.path)
-                    songInfo = {...songInfo, artWork : artWork.secure_url, user : req.params.userId}
+                    songInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id}
                     const track = new Track(songInfo)
                     track.save()
                     .then(async (track)=>{
-                        await dashboard.findOneAndUpdate({user : req.params.userId},{ $push: { totalTracks: track._id } }).exec()
+                        await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id } }).exec()
                         fs.unlinkSync(req.file.path)
                         res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                     })
@@ -80,7 +80,7 @@ const trackUpload = async(req,res,next)=>{
 const passwordreset = async (req,res,next)=>{
     try {
         if(req.user.role == "Music Uploader"){
-        const userId = req.params.userId
+        const userId = req.user.id
         const {oldPassword, newPassword} = req.body
         const userInfo = await User.findById(userId).exec()
         const match = await bcrypt.compare(oldPassword, userInfo.password)
@@ -107,7 +107,7 @@ const fileDispute = async (req,res,next)=>{
         if(req.file){
             const fileBuffer = fs.readFileSync(req.file.path)
             let newDispute = new Dispute({
-                ...req.body, supportingDoc : fileBuffer, user : req.params.userId
+                ...req.body, supportingDoc : fileBuffer, user : req.user.id
             })
             newDispute.save()
                 .then((response)=>{
@@ -120,7 +120,7 @@ const fileDispute = async (req,res,next)=>{
                 })
         }else{
             let newDispute = new Dispute({
-                ...req.body, user : req.params.userId
+                ...req.body, user : req.user.id
             })
                 newDispute.save()
                 .then((response)=>{

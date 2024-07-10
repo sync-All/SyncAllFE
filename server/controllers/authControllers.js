@@ -156,9 +156,9 @@ const allUsers = async (req,res,next) =>{
 
 const profileUpdate = async (req,res,next)=>{
   try {
-    const userId = req.user.userId
+    const userId = req.user.id
+    console.log(userId)
     if(req.user.role == "Music Uploader"){
-
       if(req.file){
           var profilePicture = await cloudinary.uploader.upload(req.file.path)
           const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
@@ -166,6 +166,7 @@ const profileUpdate = async (req,res,next)=>{
           res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
       }else{
         const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+        console.log(profileUpdate)
           res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
       }
     }else if(req.user.role == "Sync User"){
@@ -174,10 +175,10 @@ const profileUpdate = async (req,res,next)=>{
         const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
         fs.unlinkSync(req.file.path)
         res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-    }else{
-      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
-        res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-    }
+      }else{
+        const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      }
     }else{
       res.status(401).send('Unauthorized')
     }    
