@@ -168,6 +168,16 @@ const profileUpdate = async (req,res,next)=>{
         const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
           res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
       }
+    }else if(req.user.role == "Sync User"){
+      if(req.file){
+        var profilePicture = await cloudinary.uploader.upload(req.file.path)
+        const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+        fs.unlinkSync(req.file.path)
+        res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+    }else{
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+        res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+    }
     }else{
       res.status(401).send('Unauthorized')
     }    
