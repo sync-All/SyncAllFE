@@ -69,13 +69,13 @@ const dashboardSchema = new Schema({
     activities : [
         {
             type : Schema.Types.ObjectId,
-            ref : "activity",
+            ref : "uploaderactivity",
             default : [0]
         }
     ],
     user : {
         type : Schema.Types.ObjectId,
-        ref : "user"
+        ref : "uploader"
     },
 })
 
@@ -241,7 +241,7 @@ const trackSchema = new Schema({
     },
     user : {
         type : Schema.Types.ObjectId,
-        ref : "user"
+        ref : "uploader"
     },
 },{timestamps : true})
 
@@ -267,7 +267,7 @@ const disputeSchema = new Schema({
 
     user : {
         type : Schema.Types.ObjectId,
-        ref : 'user'
+        ref : 'uploader'
     }
 
 

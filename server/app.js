@@ -9,7 +9,7 @@ const passport = require('passport');
 
 require('dotenv').config()
 
-var indexRouter = require('./routes/index');
+var trackRouter = require('./routes/track');
 var usersRouter = require('./routes/users')
 var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
@@ -57,7 +57,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/', waitlistRouter)
-app.use('/', indexRouter);
+app.use('/api/v1/', trackRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
 app.use('/', unauthorizedRouter);

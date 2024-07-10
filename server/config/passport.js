@@ -1,4 +1,5 @@
-const User = require('../models/usermodel')
+const User = require('../models/usermodel').uploader
+const SyncUser = require('../models/usermodel').syncUser
 const jwtStrategy = require('passport-jwt').Strategy
 const extractJwt = require('passport-jwt').ExtractJwt
 require("dotenv").config()
@@ -12,21 +13,16 @@ const options = {
 };
 
 
-const strategy = new jwtStrategy(options, (payload, done)=>{
-    console.log('here')
-    User.findOne({_id : payload.sub})
-    .then((user)=>{
-        if(user){
-            return done(null, user)
-        }else{
-            console.log('here i am')
-            return done(null, false)
-        }
-    })
-    .catch((err)=>{
-        console.log('here i am')
+const strategy = new jwtStrategy(options, async (payload, done)=>{
+    const uploader = await User.findOne({_id : payload.sub}).exec()
+    const syncUser = await SyncUser.findOne({_id : payload.sub})
+    const item = uploader || syncUser
+
+    if(item) {
+        return done(null, item)
+    }else {
         return done(null, false)
-    })
+    }
 })
 
 module.exports = (passport)=>{

@@ -13,28 +13,12 @@ var router = express.Router();
 router.post('/api/v1/signup', asynchandler(authcontroller.signup));
 
 router.post('/api/v1/signin', asynchandler(authcontroller.signin));
-router.post('/api/v1/googleauth', async(req,res,next)=>{
-    try {
-        const user = await User.findOne({email : req.body.email}).exec()
-        if (!user){
-            const user = new User({...req.body,authSource : 'googleAuth'})
-            await user.save()
-        }
-        const toBeIssuedJwt = issueJwt.issueJwtLogin(user)
-        const userDetails = await User.findOne({email : req.body.email}).select('-password').exec()
-        console.log(userDetails)
-        res.status(200).json({success : true, user : userDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-        
-    } catch (error) {
-        console.log(error)
-        res.status(401).json(error)
-    }
-})
+router.post('/api/v1/googleauth', )
 
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
-router.post('/api/v1/profilesetup/:userId', async (req, res, next) => {
+router.post('/api/v1/profilesetup', async (req, res, next) => {
   if (req.isAuthenticated) {
     const { fullName, spotifyLink, bio } = req.body;
     if (!fullName || !spotifyLink || !bio) {
@@ -45,7 +29,7 @@ router.post('/api/v1/profilesetup/:userId', async (req, res, next) => {
           message: 'Missing field please check and confirm',
         });
     } else {
-      const userId = req.params.userId;
+      const userId = req.user.userId;
       const profileUpdate = await User.findByIdAndUpdate(
         userId,
         { fullName, spotifyLink, bio },
@@ -91,7 +75,7 @@ router.get(
     }
   }
 );
-router.post('/api/v1/profileupdate/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
+router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 
