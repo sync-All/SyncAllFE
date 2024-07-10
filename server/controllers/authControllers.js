@@ -192,8 +192,14 @@ const verifyEmail =  async (req,res,next)=>{
       res.redirect('/AlreadyConfirmed')
   }
   else if(req.isAuthenticated()){
-      const user = await User.findOneAndUpdate({_id : req.user._id},{emailConfirmedStatus : true},{new : true})
+    if(req.user.role == "Music Uploader"){
+      await User.findOneAndUpdate({_id : req.user._id},{emailConfirmedStatus : true},{new : true})
       res.redirect('/confirmedEmail')
+    }else{
+      await SyncUser.findOneAndUpdate({_id : req.user._id},{emailConfirmedStatus : true},{new : true})
+      res.redirect('/confirmedEmail')
+    }
+      
   }else{
       res.redirect('/notConfirmed')
   }

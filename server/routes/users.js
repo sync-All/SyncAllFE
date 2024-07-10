@@ -54,27 +54,6 @@ router.post('/api/v1/profilesetup', async (req, res, next) => {
   }
 });
 
-router.get(
-  '/verifyEmail/',
-  passport.authenticate('jwt', {
-    session: false,
-    failureRedirect: '/notConfirmed',
-  }),
-  async (req, res, next) => {
-    if (req.user.emailConfirmedStatus) {
-      res.redirect('/AlreadyConfirmed');
-    } else if (req.isAuthenticated()) {
-      const user = await User.findOneAndUpdate(
-        { _id: req.user._id },
-        { emailConfirmedStatus: true },
-        { new: true }
-      );
-      res.redirect('/confirmedEmail');
-    } else {
-      res.redirect('/notConfirmed');
-    }
-  }
-);
 router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
