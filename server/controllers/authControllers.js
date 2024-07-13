@@ -37,7 +37,7 @@ const signup = async function(req, res) {
       if(getUploaderIdentity || getSyncUserIdentity){
         res.status(401).json({success: false, message : "Email Already in use"})
       }else{
-        if(req.role == "Music Uploader"){
+        if(role == "Music Uploader"){
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
             const users = new User({
               name,
