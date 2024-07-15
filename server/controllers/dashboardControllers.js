@@ -22,7 +22,6 @@ const dashboardcontrol = async (req,res,next)=>{
                 const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
                 const profileInfo = await User.findById(userId)
                 const transactions = await Transaction.find({user : userId})
-                console.log(transactions)
                 res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{
                 res.status(401).json('Unauthorized access')
