@@ -8,7 +8,7 @@ const passport = require('passport');
 const Dispute = require('../models/dashboard.model').dispute
 const router = express.Router()
 
-router.get('/api/v1/dashboardhome/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.dashboardcontrol))
+router.get('/api/v1/dashboardhome',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.dashboardcontrol))
 
 router.post('/api/v1/passwordreset/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.passwordreset))
 
