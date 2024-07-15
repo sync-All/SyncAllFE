@@ -25,7 +25,6 @@ const dashboardcontrol = async (req,res,next)=>{
                 console.log(transactions)
                 res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{
-                console.log(object)
                 res.status(401).json('Unauthorized access')
             }
         } catch (error) {

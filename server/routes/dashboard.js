@@ -10,15 +10,15 @@ const router = express.Router()
 
 router.get('/api/v1/dashboardhome',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.dashboardcontrol))
 
-router.post('/api/v1/passwordreset/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.passwordreset))
+router.post('/api/v1/passwordreset/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.passwordreset))
 
 router.get('/api/v1/verifyTrackUploaded/:isrc',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.verifyTrackUpload))
 
-router.post('/api/v1/trackUpload/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(dashbordControllers.trackUpload))
+router.post('/api/v1/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(dashbordControllers.trackUpload))
 
 router.get('/api/v1/alldispute',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),dashbordControllers.allDispute)
 
-router.post('/api/v1/dispute/:userId',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),disputeUpload,dashbordControllers.fileDispute)
+router.post('/api/v1/dispute/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),disputeUpload,dashbordControllers.fileDispute)
 
 router.post('/api/v1/updatepaymentinfo/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),dashbordControllers.updatePaymentInfo)
 
