@@ -2,7 +2,7 @@ const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/dashboard.model").track
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel").uploader
-const Transaction = require('../models/transactions.model').transaction
+const Transaction = require('../models/transactions.model').uploaderTransaction
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
 const fs = require("node:fs")
@@ -18,15 +18,14 @@ cloudinary.config({
 const dashboardcontrol = async (req,res,next)=>{
         const userId = req.user.id
         try {
-            console.log('eee')
             if(req.user.role == "Music Uploader"){
                 const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
-                console.log(userDashboardDetails)
                 const profileInfo = await User.findById(userId)
                 const transactions = await Transaction.find({user : userId})
-            res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
-            console.log(userDashboardDetails)
+                console.log(transactions)
+                res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{
+                console.log(object)
                 res.status(401).json('Unauthorized access')
             }
         } catch (error) {
