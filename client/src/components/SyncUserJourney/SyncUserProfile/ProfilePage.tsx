@@ -4,9 +4,14 @@ import AccountOverview from './AccountOverview';
 import MyLicensedTracks from './MyLicensedTracks';
 import AccountSetting from './AccountSetting';
 import PlansBillings from './Plans_Billings';
+import { useSyncUser } from '../../../Context/syncUserData';
+
 
 const ProfilePage = () => {
+  const { user } = useSyncUser();
   const [activeSection, setActiveSecton] = useState('Account Overview');
+  console.log(user);
+
   const liClass =
     'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
   const activeLiClass = 'border-b border-[#013131] text-[#013131]';
@@ -29,16 +34,16 @@ const ProfilePage = () => {
       <section>
         <div className="flex gap-2 md:gap-6 items-center">
           <img
-            src={UserImg}
+            src={user?.img || UserImg}
             alt="User"
             className="h-[145px] w-[145px] rounded-full "
           />
-          <span>
+          <span className='text-wrap'>
             <h1 className="poppins-semibold text-[24px] text-[#1D2739] ">
-              John Doe
+              {user?.name}
             </h1>
-            <p className="poppins-regular text-[16px] text-[#667185] opacity-60 ">
-              @talktoasuquo
+            <p className="poppins-regular text-[16px] text-[#667185] opacity-60 text-wrap ">
+              {user?.email}
             </p>
           </span>
         </div>

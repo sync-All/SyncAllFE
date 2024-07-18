@@ -18,6 +18,7 @@ import Pricing from './components/SyncUserJourney/Pricing';
 import TrackMetadata from './components/SyncUserJourney/TrackMetadata';
 import SyncUserLibrary from './components/SyncUserJourney/SyncUserLibrary';
 import ProfilePage from './components/SyncUserJourney/SyncUserProfile/ProfilePage';
+import { SyncUserProvider } from './Context/syncUserData';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -70,9 +71,11 @@ function App() {
               <ProtectedRoute
                 path="/home"
                 element={
-                  <SyncUserLayout>
-                    <SyncUserHome />
-                  </SyncUserLayout>
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <SyncUserHome />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
                 }
               />
             }
@@ -84,38 +87,49 @@ function App() {
               <ProtectedRoute
                 path="/pricing"
                 element={
-                  <SyncUserLayout>
-                    <Pricing />
-                  </SyncUserLayout>
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <Pricing />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
                 }
               />
             }
           />
 
           <Route
-            path="/metadata"
+            path="home/metadata/:id"
             element={
-              <SyncUserLayout>
-                <TrackMetadata />
-              </SyncUserLayout>
+              <SyncUserProvider>
+                {' '}
+                <SyncUserLayout>
+                  <TrackMetadata />
+                </SyncUserLayout>
+              </SyncUserProvider>
             }
           />
 
           <Route
             path="/mylibrary"
             element={
-              <SyncUserLayout>
-                <SyncUserLibrary />
-              </SyncUserLayout>
+              <SyncUserProvider>
+                {' '}
+                <SyncUserLayout>
+                  <SyncUserLibrary />
+                </SyncUserLayout>
+              </SyncUserProvider>
             }
           />
 
           <Route
             path="/myAccount"
             element={
-              <SyncUserLayout>
-                <ProfilePage />
-              </SyncUserLayout>
+              <SyncUserProvider>
+                {' '}
+                <SyncUserLayout>
+                  <ProfilePage />
+                </SyncUserLayout>
+              </SyncUserProvider>
             }
           />
         </Routes>

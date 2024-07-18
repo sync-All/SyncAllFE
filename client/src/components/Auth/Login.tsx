@@ -37,11 +37,14 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
 
   const handleNavigationTODashboard = () => {
     if (profileDetails) {
+      console.log('yeahhh');
       navigate('/dashboard');
     } else {
       navigate('/onboarding-details');
     }
   };
+
+
 
   const { setUserRole } = useContext(UserContext);
 
@@ -61,12 +64,20 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
       });
       if (response && response.data) {
         setToken(response.data.token);
-        setUserRole(response.data.user.role); // Set the user type here
+        setUserRole(response.data.user.role);
+        const user = response.data.user;
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userId', response.data.user._id);
+        localStorage.setItem('syncUserInfo', JSON.stringify(user));
+        console.log(response);
         toast.success('Login successful');
-        handleNavigationTODashboard();
+        if (response.data.user.role == 'Music Uploader') {
+          handleNavigationTODashboard();
+        } else {
+          navigate('/home');
+        }
+        
       } else {
         throw new Error('Response or response data is undefined');
       }
