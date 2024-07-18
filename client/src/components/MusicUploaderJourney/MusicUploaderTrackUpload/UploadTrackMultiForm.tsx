@@ -155,6 +155,7 @@ const UploadTrackMultiForm: React.FC = () => {
   const controlBtn =
     'btn bg-[#EFA705] py-3 px-4 border border-[#EFA705] rounded-[8px] font-formular-medium text-[14px] leading-5 text-black2';
 
+
   const renderSection = () => {
     switch (currentSection) {
       case 'Minimum Recording Information':
@@ -260,10 +261,10 @@ const UploadTrackMultiForm: React.FC = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { validateForm }) => {
             setLoading(true)
-            const userId = localStorage.getItem('userId');
             const token = localStorage.getItem('token');
+            console.log('token');
             const urlVar = import.meta.env.VITE_APP_API_URL;
-            const apiUrl = `${urlVar}/trackUpload/${userId}`;
+            const apiUrl = `${urlVar}/trackUpload/`;
             const config = {
               headers: {
                 Authorization: `${token}`,

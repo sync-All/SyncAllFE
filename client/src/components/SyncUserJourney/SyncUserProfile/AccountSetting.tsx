@@ -1,14 +1,16 @@
 import Attach from '../../../assets/images/attachimage.svg';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-// import axios, { AxiosError } from 'axios';
-// import { toast } from 'react-toastify';
-// import useLoading from '../../../constants/loading';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
 import { useState } from 'react';
+import { useSyncUser } from '../../../Context/syncUserData';
 
 const AccountSetting = () => {
+  const { user } = useSyncUser()
   const [fileName, setFileName] = useState('');
-    // const { loading, setLoading } = useLoading();
+    const { loading, setLoading } = useLoading();
 
     const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -19,57 +21,59 @@ const AccountSetting = () => {
   const input = 'w-[367px] flex flex-col gap-2 mb-4';
 
   const validationSchema = Yup.object({
-    username: Yup.string(),
-    fullName: Yup.string(),
+    firstName: Yup.string(),
+    lastName: Yup.string(),
     email: Yup.string().email('Invalid email address'),
     phoneNumber: Yup.string(),
-    socials: Yup.string(),
-    bio: Yup.string(),
   });
 
+ function delay(ms: number) {
+   return new Promise((resolve) => setTimeout(resolve, ms));
+ }
+
+  interface ResponseData {
+    message?: string;
+  }
+
   const initialValues = {
-    username: '',
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    socials:'',
-    bio: '',
-    img: '',
+    firstName: user?.name,
+    lastName: user?.name,
+    email: user?.email,
+    phoneNumber: user?.phoneNumber,
+    img: user?.img,
   };
   return (
-    <div className='mt-[49px]'>
+    <div className="mt-[49px]">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          console.log(values);
-          //   setLoading(true);
-          //   const userId = localStorage.getItem('userId');
-          //   const token = localStorage.getItem('token');
-          //   const urlVar = import.meta.env.VITE_APP_API_URL;
-          //   const apiUrl = `${urlVar}/profileUpdate/${userId}`;
-          //   const config = {
-          //     headers: {
-          //       Authorization: `${token}`,
-          //     },
-          //   };
+          setLoading(true);
+          const token = localStorage.getItem('token');
+          const urlVar = import.meta.env.VITE_APP_API_URL;
+          const apiUrl = `${urlVar}/profileUpdate/`;
+          const config = {
+            headers: {
+              Authorization: `${token}`,
+            },
+          };
 
-          //   try {
-          //     await delay(2000);
-          //     await axios.postForm(apiUrl, values, config);
-          //     toast.success('Profile Information Updated successful');
-          //   } catch (error: unknown) {
-          //     const axiosError = error as AxiosError<ResponseData>;
+          try {
+            await delay(2000);
+            await axios.postForm(apiUrl, values, config);
+            toast.success('Profile Information Updated successful');
+          } catch (error: unknown) {
+            const axiosError = error as AxiosError<ResponseData>;
 
-          //     toast.error(
-          //       (axiosError.response && axiosError.response.data
-          //         ? axiosError.response.data.message || axiosError.response.data
-          //         : axiosError.message || 'An error occurred'
-          //       ).toString()
-          //     );
-          //   } finally {
-          //     setLoading(false);
-          //   }
+            toast.error(
+              (axiosError.response && axiosError.response.data
+                ? axiosError.response.data.message || axiosError.response.data
+                : axiosError.message || 'An error occurred'
+              ).toString()
+            );
+          } finally {
+            setLoading(false);
+          }
         }}
       >
         {({ setFieldValue }) => (
@@ -85,7 +89,7 @@ const AccountSetting = () => {
                   className={applyInputStyles}
                 />
                 <ErrorMessage
-                  name="fullName"
+                  name="firstName"
                   component="div"
                   className="text-red-500"
                 />
@@ -98,7 +102,6 @@ const AccountSetting = () => {
                   type="text"
                   name="lastName"
                   className={applyInputStyles}
-               
                 />
                 <ErrorMessage
                   name="email"
@@ -107,7 +110,9 @@ const AccountSetting = () => {
                 />
               </div>
             </div>
-            <div className={applyFormDiv}> <div className={input}>
+            <div className={applyFormDiv}>
+              {' '}
+              <div className={input}>
                 <label htmlFor="phoneNumber" className={applyLabelStyles}>
                   Phone Number
                 </label>
@@ -126,18 +131,13 @@ const AccountSetting = () => {
                 <label htmlFor="email" className={applyLabelStyles}>
                   Email Address
                 </label>
-                <Field
-                  type="email"
-                  name="email"
-                  className={applyInputStyles}
-                />
+                <Field type="email" name="email" className={applyInputStyles} />
                 <ErrorMessage
                   name="email"
                   component="div"
                   className="text-red-500"
                 />
               </div>
-             
             </div>
             <div className={applyFormDiv}>
               <div className={`${input} relative `}>
@@ -193,14 +193,13 @@ const AccountSetting = () => {
                 />
                 <ErrorMessage component="span" name="img" />
               </div>
-          
             </div>
             <button
               type="submit"
               className="py-2.5 px-4 bg-yellow border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-[20px] mt-[40px] mb-[97px] disabled:cursor-not-allowed"
-              
+              disabled={loading}
             >
-             'Save Changes
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </Form>
         )}

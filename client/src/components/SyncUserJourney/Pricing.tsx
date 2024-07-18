@@ -1,6 +1,8 @@
 import Check from '../../assets/images/check.svg';
 import X from '../../assets/images/xOutline.svg';
 import { currencies } from '../../constants/currency';
+import Tooltip from '../../assets/images/tooltip-info.svg';
+import WhiteCheck from '../../assets/images/white-check.svg'
 
 const Pricing = () => {
   const pricingPlans = [
@@ -19,7 +21,7 @@ const Pricing = () => {
       name: 'Standard',
       dollar: '$',
       price: '20',
-      comparePlansPrice: '$19.99',
+
       bg: '#ECFDF5',
       btnBg: '#1B2128',
       btntext: '#FBFCFE',
@@ -38,7 +40,7 @@ const Pricing = () => {
       name: 'Premium',
       dollar: '$',
       price: '70',
-      comparePlansPrice: '$49.99',
+
       smallText: 'per month',
       buttonText: 'Get Premium',
       features: [
@@ -48,6 +50,23 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
+    },
+    {
+      name: 'Enterprise',
+      bg: '#013131',
+      pricebtntext: '#FBFCFE',
+      btntext: '#1B2128',
+      price: 'Custom',
+      textCol: '#fff',
+      check: WhiteCheck,
+      buttonText: 'Get Premium',
+
+      features: [
+        'Everything in Basic',
+        'Everything in Standard',
+        'Everything in Premium',
+        'Additional Benefits',
+      ],
       comparePlansPriceBorder: 'border-r-0',
     },
   ];
@@ -55,80 +74,110 @@ const Pricing = () => {
   const featureComparison = [
     {
       feature: 'Metadata access',
+      tooltip: 'Access to descriptive details and context of each song',
       basic: 'Limited',
       standard: 'Unlimited',
       premium: 'Unlimited',
+      enterprise: 'Unlimited',
     },
-    {
-      feature: 'Exclusive Content Review',
-      basic: 'Limited',
-      standard: 'Unlimited',
-      premium: 'Unlimited',
-    },
+    // {
+    //   feature: 'Exclusive Content Review',
+
+    //   basic: 'Limited',
+    //   standard: 'Unlimited',
+    //   premium: 'Unlimited',
+    // },
     {
       feature: 'Ability to search and browse metadata',
+      tooltip:
+        'Access to search and browse metadata using descriptive information resource',
+
       basic: true,
       standard: true,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Licensing quote request',
+      tooltip: 'Option to inquire about licensing terms',
+
       basic: true,
       standard: true,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Licensing to use royalty free background music',
+      tooltip:
+        'Access to use background music without the need to pay additional royalties or fees.',
       basic: false,
       standard: true,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Advanced Search Filter',
+      tooltip: 'Access to advanced search filters and curated playlists.',
+
       basic: false,
       standard: 'Limited',
       premium: 'Unlimited',
+      enterprise: 'Unlimited',
     },
     {
       feature: 'Discounted Licensing Rates',
+      tooltip: 'Discounted licensing rates for bulk licensing.',
       basic: false,
       standard: false,
       premium: false,
+      enterprise: true,
     },
     {
       feature: 'Priority Access',
+      tooltip: 'Priority access to new releases and exclusive content.',
       basic: false,
       standard: false,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Rights Share Auction',
+      tooltip: 'Ability to participate in rights share auctions.',
       basic: false,
       standard: false,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Personal Account Manager',
+      tooltip: 'Dedicated account manager for licensing and rights inquiries.',
       basic: false,
       standard: false,
       premium: true,
+      enterprise: true,
     },
     {
       feature: 'Soundtrack Commission',
+      tooltip:
+        'Exclusive commissioning of original music composition from our pool of composers.',
       basic: false,
       standard: false,
       premium: false,
+      enterprise: true,
     },
     {
       feature: 'Team Access',
+      tooltip:
+        'Ability for members of a team or group to have permission and privileges to a user account and access controls',
       basic: false,
       standard: false,
       premium: false,
+      enterprise: true,
     },
   ];
 
   return (
-    <div >
+    <div>
       <div className="my-[90px] text-center">
         <select name="" id="" className="w-fit">
           <option value="">Select Country</option>
@@ -166,12 +215,18 @@ const Pricing = () => {
           <div
             key={index}
             className="p-6 bg-[#F7F9FC] rounded-[16px] w-[400px] h-[412px]"
-            style={{ backgroundColor: plan.bg }}
+            style={{ backgroundColor: plan.bg, color: plan.textCol }}
           >
-            <p className="text-[#1B2128] font-formular-bold text-[17px] leading-6">
+            <p
+              className="text-[#1B2128] font-formular-bold text-[17px] leading-6"
+              style={{ color: plan.textCol }}
+            >
               {plan.name}
             </p>
-            <h2 className="text-[#1B2128] font-formular-bold text-[48px] leading-[52px] tracking-[-0.96px] mt-4">
+            <h2
+              className="text-[#1B2128] font-formular-bold text-[48px] leading-[52px] tracking-[-0.96px] mt-4"
+              style={{ color: plan.textCol }}
+            >
               <span className="font-Utile-bold">{plan.dollar}</span>{' '}
               {plan.price}{' '}
               <small className="text-[20px] font-formular-regular leading-6">
@@ -180,7 +235,7 @@ const Pricing = () => {
             </h2>
             <button
               className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
-              style={{ backgroundColor: plan.btnBg, color: plan.btntext }}
+              style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext }}
             >
               {plan.buttonText}
             </button>
@@ -188,7 +243,11 @@ const Pricing = () => {
             <ul className="mt-6">
               {plan.features.map((feature, featureIndex) => (
                 <li key={featureIndex} className="flex gap-2">
-                  <img src={Check} alt="" />
+                  <img
+                    src={plan.check || Check}
+                    alt=""
+                    className="text-white"
+                  />
                   {feature}
                 </li>
               ))}
@@ -218,7 +277,7 @@ const Pricing = () => {
                     </p>
                     <p className="text-[20px] plus-jarkata-sans-regular">
                       <b className="font-Utile-bold text-[28px] leading-8 tracking-[-0.56px] text-[#1B2128]">
-                        {plan.comparePlansPrice}
+                        {plan.dollar} {plan.price}
                       </b>{' '}
                       per month
                     </p>
@@ -239,10 +298,18 @@ const Pricing = () => {
               {featureComparison.map((feature, index) => (
                 <tr
                   key={index}
-                  className="border-l-0 border-r-0 border border-black"
+                  className="border-l-0 border-r-0 border border-black relative"
                 >
-                  <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border-l-0  border border-black">
-                    {feature.feature}
+                  <td className=" plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border-l-0  border border-black">
+                    {feature.feature}{' '}
+                    <span className="has-tooltip inline-flex ">
+                      <span className="tooltip font-Utile-regular text-[14px]  align-middles shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-9 px-3 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm dark:bg-gray-700">
+                        {feature.tooltip}
+                      </span>
+                      <span className="absolute z-50 py-4 px-2 left-[20%] top-[23%] ">
+                        <img src={Tooltip} alt="" />
+                      </span>
+                    </span>
                   </td>
                   <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border border-black">
                     {typeof feature.basic === 'boolean' ? (
@@ -266,7 +333,7 @@ const Pricing = () => {
                       feature.standard
                     )}
                   </td>
-                  <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128]">
+                  <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border border-black">
                     {typeof feature.premium === 'boolean' ? (
                       feature.premium ? (
                         <img src={Check} alt="Available" />
@@ -275,6 +342,17 @@ const Pricing = () => {
                       )
                     ) : (
                       feature.premium
+                    )}
+                  </td>
+                  <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128]">
+                    {typeof feature.enterprise === 'boolean' ? (
+                      feature.enterprise ? (
+                        <img src={Check} alt="Available" />
+                      ) : (
+                        <img src={X} alt="Not Available" />
+                      )
+                    ) : (
+                      feature.enterprise
                     )}
                   </td>
                 </tr>

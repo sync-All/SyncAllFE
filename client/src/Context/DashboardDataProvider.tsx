@@ -98,9 +98,8 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/dashboardhome/${userId}`;
+    const apiUrl = `${urlVar}/dashboardhome`;
     
-
     const config = {
       headers: {
         Authorization: ` ${token}`,

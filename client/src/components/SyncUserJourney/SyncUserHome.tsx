@@ -7,130 +7,127 @@ import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png'
 import MusicWave from '../../assets/images/musicwave.svg';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
+import Play from '../../assets/images/copy-link.svg';
+import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
 import MusicImg from '../../assets/images/3000x3000.jpg.png';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 const SyncUserHome = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  interface MusicDetail {
+    musicImg: string;
+    trackTitle: string;
+    _id: string;
+    trackLink: string;
+    mainArtist: string;
+    musicWaves: string[];
+    duration: string;
+    bpm: string;
+    genre: string;
+    mood: string;
+    actions: string[];
+  }
+
+  const [musicDetails, setMusicDetails] = useState<MusicDetail[]>([]);
+  const [currentTrackUrl, setCurrentTrackUrl] = useState<string | null>(null);
 
   const closeMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const navigate = useNavigate()
+  // const navigate = useNavigate();
 
-  const redirectMetadata = () => {
-    navigate('/metadata')
+  // const redirectMetadata = () => {
+  //   navigate('/metadata/');
+  // };
+  interface ResponseData {
+    message?: string;
   }
 
-  const musicDetails = [
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    {
-      musicImg: MusicImg,
-      title: 'ORIGINAL REMIX',
-      artist: 'GBASKY Feat. MOE...',
-      musicWaves: [MusicWave, MusicWave, MusicWave],
-      duration: '3:00',
-      bpm: '117 BPM',
-      genre: 'RnB',
-      mood: 'Calm, Uplifting',
-      actions: [Favorite, AddMusic, Copy],
-    },
-    // Add more items here as needed
-  ];
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+
+  // const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/allSongs`;
+      const config = {
+        headers: {
+          Authorization: `${token}`,
+        },
+      };
+
+      try {
+        const res = await axios.get(apiUrl, config);
+        setMusicDetails(res.data.allTracks);
+        console.log(res.data.allTracks);
+        // Do something with the response if needed
+      } catch (error: unknown) {
+        const axiosError = error as AxiosError<ResponseData>;
+
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      }
+    };
+    fetchData();
+  }, []);
+
+  const musicWaves = [MusicWave, MusicWave, MusicWave];
+  const actions = [Favorite, AddMusic, Copy];
+  // const handlePlayPause = (id: string, url: string) => {
+  //   try {
+  //     let audioElement = audioRefs.current.get(id);
+
+  //     if (audioElement) {
+  //       if (playingTrackId === id) {
+  //         audioElement.pause();
+  //         setPlayingTrackId(null);
+  //       } else {
+  //         if (playingTrackId) {
+  //           const currentPlayingAudio = audioRefs.current.get(playingTrackId);
+  //           currentPlayingAudio?.pause();
+  //         }
+  //         audioElement.play();
+  //         setPlayingTrackId(id);
+  //       }
+  //     } else {
+  //       audioElement = new Audio(url);
+  //       audioRefs.current.set(id, audioElement);
+  //       audioElement.play();
+  //       setPlayingTrackId(id);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handlePlayPause:', error);
+  //   }
+  // };
+  const handlePlayPause = (id: string, url: string) => {
+    try {
+      if (playingTrackId === id) {
+        setCurrentTrackUrl(null);
+        setPlayingTrackId(null);
+      } else {
+        setCurrentTrackUrl(url);
+        setPlayingTrackId(id);
+      }
+    } catch (error) {
+      console.error('Error in handlePlayPause:', error);
+    }
+  };
+
   return (
     <div className="relative">
       {' '}
@@ -191,23 +188,55 @@ const SyncUserHome = () => {
               <div
                 key={index}
                 className="flex items-center w-full justify-between"
-                onClick={redirectMetadata}
               >
-                <span className="flex gap-3">
-                  <img src={detail.musicImg} alt="" />
+                <Link to={`metadata/${detail?._id}`} className="flex gap-3">
+                  <img src={MusicImg} alt="" />
                   <span>
                     <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                      {detail.title}
+                      {detail.trackTitle}
                     </h4>
                     <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                      {detail.artist}
+                      {detail.mainArtist}
                     </p>
                   </span>
-                </span>
+                </Link>
                 <div className="items-center flex">
-                  {detail.musicWaves.map((wave, waveIndex) => (
+                  {musicWaves.map((wave, waveIndex) => (
                     <img key={waveIndex} src={wave} alt="" />
                   ))}
+                  {playingTrackId === detail._id ? (
+                    <img
+                      src={Pause}
+                      alt="Pause"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayPause(detail._id, detail.trackLink);
+                      }}
+                      className="cursor-pointer"
+                    />
+                  ) : (
+                    <img
+                      src={Play}
+                      alt="Play"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayPause(detail._id, detail.trackLink);
+                      }}
+                      className="cursor-pointer"
+                    />
+                  )}
+                  {currentTrackUrl && (
+                    <div className="mt-4">
+                      <iframe
+                        src={currentTrackUrl}
+                        width="300"
+                        height="380"
+                        frameBorder="0"
+                        allow="encrypted-media"
+                        className="w-full"
+                      ></iframe>
+                    </div>
+                  )}
                 </div>
                 <span className="flex gap-12">
                   <span>
@@ -228,14 +257,18 @@ const SyncUserHome = () => {
                   </span>
                 </span>
                 <span className="flex gap-6">
-                  {detail.actions.map((action, actionIndex) => (
+                  {actions.map((action, actionIndex) => (
                     <img key={actionIndex} src={action} alt="" />
                   ))}{' '}
                 </span>
+
                 <span className="gap-[12px] flex">
-                  <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    View More
-                  </button>
+                  <Link to={`metadata/${detail?._id}`}>
+                    <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      View More
+                    </button>
+                  </Link>
+
                   <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                     Get Quote
                   </button>
@@ -251,15 +284,18 @@ const SyncUserHome = () => {
                 className="flex items-center w-full justify-between  "
               >
                 <span className="flex gap-3">
-                  <img src={detail.musicImg} alt="" />
-                  <span>
-                    <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                      {detail.title}
-                    </h4>
-                    <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                      {detail.artist}
-                    </p>
-                  </span>
+                  <Link to={`metadata/${detail?._id}`}>
+                    {' '}
+                    <img src={detail.musicImg} alt="" />
+                    <span>
+                      <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
+                        {detail.trackTitle}
+                      </h4>
+                      <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
+                        {detail.mainArtist}
+                      </p>
+                    </span>
+                  </Link>
                 </span>
                 <span>
                   <img src={Menu} alt="" onClick={closeMenu} />
@@ -268,8 +304,8 @@ const SyncUserHome = () => {
             ))}
           </div>
 
-          {menuOpen && (
-            <>
+          {menuOpen && musicDetails.map((detail, index) => (
+            <div key={index}>
               <div
                 className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
                 onClick={closeMenu}
@@ -297,10 +333,11 @@ const SyncUserHome = () => {
                       <img src={Copy} alt="" />
                       Copy Track Link
                     </li>
-                    <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
+                    <Link to={`metadata/${detail?._id}`} ><li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
                       <img src={ViewMore} alt="" />
                       View More
-                    </li>
+                    </li></Link>
+                    
                     <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
                       <img src={getQuote} alt="" />
                       Get Qoute
@@ -308,8 +345,9 @@ const SyncUserHome = () => {
                   </ul>
                 </div>
               </div>
-            </>
-          )}
+            </div>
+           ))}
+          
         </section>
       </div>
     </div>
