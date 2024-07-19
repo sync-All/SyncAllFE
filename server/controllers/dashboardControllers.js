@@ -5,6 +5,7 @@ const User = require("../models/usermodel").uploader
 const Transaction = require('../models/transactions.model').uploaderTransaction
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
+const grabSpotifyPreview = require('../utils/grabSpotifyPreview')
 const fs = require("node:fs")
 require('dotenv').config()
 
@@ -55,8 +56,10 @@ const trackUpload = async(req,res,next)=>{
                     res.status(401).json('Track already exists')
                 }else{
                     let songInfo = req.body
+                    let previewLink = grabSpotifyPreview(res,songInfo.trackLink)
+                    console.log(previewLink)
                     var artWork = await cloudinary.uploader.upload(req.file.path)
-                    songInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id}
+                    songInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : previewLink}
                     const track = new Track(songInfo)
                     track.save()
                     .then(async (track)=>{

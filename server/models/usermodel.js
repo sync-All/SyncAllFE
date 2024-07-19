@@ -92,7 +92,7 @@ const syncUserSchema = new Schema({
     billing : {
         plan : {
             type : String,
-            enum : ['basic', 'standard', 'premium', 'enterprise'],
+            enum : ['basic', 'standard', 'premium', 'custom'],
             default : 'basic'
         },
         paymentMode : {
