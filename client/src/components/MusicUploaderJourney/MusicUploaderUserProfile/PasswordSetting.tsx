@@ -48,10 +48,9 @@ function delay(ms: number) {
 
   const handlePasswordChange = async (values: FormValues) => {
     setLoading(true)
-    const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/passwordreset/${userId}`;
+    const apiUrl = `${urlVar}/passwordreset/`;
 
     const config = {
       headers: {
