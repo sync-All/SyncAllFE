@@ -3,6 +3,7 @@ import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 import AddMusic from '../../assets/images/add-music.svg';
 import PlayButton from '../../assets/images/playbtn.svg';
+import pauseButton from "../../assets/pause.svg"
 import { useParams } from 'react-router-dom';
 import { useEffect, useRef,RefObject, useState } from 'react';
 import axios, { AxiosError } from 'axios';
@@ -15,9 +16,8 @@ const TrackMetadata = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const waveformRef:RefObject<HTMLDivElement> = useRef(null)
   const wavesurfer = useRef<WaveSurfer | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [volume, setVolume] = useState(0.5);
-  const [audio, setAudio] = useState('');
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState('');
 
   interface ResponseData {
@@ -83,7 +83,8 @@ const TrackMetadata = () => {
         const track = allTracks.find((track) => track._id === id);
         if (track) {
           setTrackDetails(track);
-          setAudio(track?.trackLink)
+          const newAudio = new Audio(track?.trackLink)
+          setAudio(newAudio)
         } else {
           toast.error('Track not found');
         }
@@ -138,7 +139,7 @@ const TrackMetadata = () => {
 
       wavesurfer.current.on('finish', () => {
         wavesurfer.current!.setTime(0)
-        setIsPlaying(i => !i);
+        setIsPlaying(false);
       });
       
     }
@@ -162,12 +163,6 @@ const TrackMetadata = () => {
   
   return (
     <div> 
-        <audio
-        src={audio}
-        ref={audioRef}
-        controls
-        className='hidden'
-        />
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">
         <div className="lg:w-[40%]">
           <img
@@ -198,16 +193,9 @@ const TrackMetadata = () => {
           </div>
 
           <div className=" flex items-center justify-between mt-20">
-            <img src={PlayButton} alt="" onClick={handlePlayPause} />
+            <img src={ isPlaying ? pauseButton : PlayButton} alt="" onClick={handlePlayPause} className='w-12 cursor-pointer' />
             <div id="waveform" ref={waveformRef} className='w-[60%]'></div>
-            {/* <span className="items-center flex">
-              <img src={MusicWave} alt="" />
-              <img src={MusicWave} alt="" />
-              <img src={MusicWave} alt="" className="hidden xl:block" />
-              <img src={MusicWave} alt="" className="hidden xl:block" />
-              <img src={MusicWave} alt="" className="hidden xl:block" />
-            </span> */}
-            <p className="font-Utile-medium text-[16px] leading-4 ">{currentTime}</p>
+            <p className="font-Utile-medium text-[16px] leading-4 ">{currentTime || '00:00'}</p>
           </div>
           <div className="mt-[93px] mb-[163px]">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
