@@ -7,8 +7,8 @@ import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png'
 import MusicWave from '../../assets/images/musicwave.svg';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
-import Play from '../../assets/images/copy-link.svg';
-import Pause from '../../assets/images/add-music.svg';
+// import Play from '../../assets/images/copy-link.svg';
+// import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
 import MusicImg from '../../assets/images/3000x3000.jpg.png';
 import Menu from '../../assets/menu-dot-square.svg';
@@ -19,9 +19,11 @@ import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import SpotifyPlayer from '../../constants/spotifyplayer' // Adjust the path as necessary
 
 const SyncUserHome = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+
   interface MusicDetail {
     musicImg: string;
     trackTitle: string;
@@ -37,24 +39,15 @@ const SyncUserHome = () => {
   }
 
   const [musicDetails, setMusicDetails] = useState<MusicDetail[]>([]);
-  const [currentTrackUrl, setCurrentTrackUrl] = useState<string | null>(null);
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
 
   const closeMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  // const navigate = useNavigate();
-
-  // const redirectMetadata = () => {
-  //   navigate('/metadata/');
-  // };
   interface ResponseData {
     message?: string;
   }
-
-  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
-
-  // const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,7 +64,8 @@ const SyncUserHome = () => {
         const res = await axios.get(apiUrl, config);
         setMusicDetails(res.data.allTracks);
         console.log(res.data.allTracks);
-        // Do something with the response if needed
+        console.log(res.data.allTracks?.trackLink);
+        
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
 
@@ -86,51 +80,44 @@ const SyncUserHome = () => {
     fetchData();
   }, []);
 
-  const musicWaves = [MusicWave, MusicWave, MusicWave];
+  // const musicWaves = [MusicWave, MusicWave, MusicWave];
   const actions = [Favorite, AddMusic, Copy];
-  // const handlePlayPause = (id: string, url: string) => {
-  //   try {
-  //     let audioElement = audioRefs.current.get(id);
 
-  //     if (audioElement) {
-  //       if (playingTrackId === id) {
-  //         audioElement.pause();
-  //         setPlayingTrackId(null);
-  //       } else {
-  //         if (playingTrackId) {
-  //           const currentPlayingAudio = audioRefs.current.get(playingTrackId);
-  //           currentPlayingAudio?.pause();
-  //         }
-  //         audioElement.play();
-  //         setPlayingTrackId(id);
-  //       }
-  //     } else {
-  //       audioElement = new Audio(url);
-  //       audioRefs.current.set(id, audioElement);
-  //       audioElement.play();
-  //       setPlayingTrackId(id);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handlePlayPause:', error);
-  //   }
-  // };
-  const handlePlayPause = (id: string, url: string) => {
+const handlePlayPause = async (id: string) => {
+  if (playingTrackId === id) {
+    setPlayingTrackId(null);
+    // setCurrentTrackUrl(null);
+  } else {
     try {
-      if (playingTrackId === id) {
-        setCurrentTrackUrl(null);
-        setPlayingTrackId(null);
-      } else {
-        setCurrentTrackUrl(url);
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const trackUrlApi = `${urlVar}/trackurl/${id}`;
+      const config = {
+        headers: {
+          Authorization: `${token}`,
+        },
+      };
+      const res = await axios.get(trackUrlApi, config);
+      const iframe = document.createElement('div');
+      iframe.innerHTML = res.data.trackUrl;
+      const src = iframe.querySelector('iframe')?.src;
+      if (src) {
+        // setCurrentTrackUrl(src);
         setPlayingTrackId(id);
+      } else {
+        throw new Error('Invalid track URL');
       }
-    } catch (error) {
-      console.error('Error in handlePlayPause:', error);
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(
+        axiosError.response?.data?.message || axiosError.message || 'An error occurred'
+      );
     }
-  };
+  }
+};
 
   return (
     <div className="relative">
-      {' '}
       <div
         className={`px-5 xl:px-20 mb-[331px] transition-all duration-300 ${
           menuOpen ? 'overflow-hidden' : ''
@@ -201,42 +188,13 @@ const SyncUserHome = () => {
                   </span>
                 </Link>
                 <div className="items-center flex">
-                  {musicWaves.map((wave, waveIndex) => (
-                    <img key={waveIndex} src={wave} alt="" />
-                  ))}
-                  {playingTrackId === detail._id ? (
-                    <img
-                      src={Pause}
-                      alt="Pause"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePlayPause(detail._id, detail.trackLink);
-                      }}
-                      className="cursor-pointer"
-                    />
-                  ) : (
-                    <img
-                      src={Play}
-                      alt="Play"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePlayPause(detail._id, detail.trackLink);
-                      }}
-                      className="cursor-pointer"
-                    />
-                  )}
-                  {currentTrackUrl && (
-                    <div className="mt-4">
-                      <iframe
-                        src={currentTrackUrl}
-                        width="300"
-                        height="380"
-                        frameBorder="0"
-                        allow="encrypted-media"
-                        className="w-full"
-                      ></iframe>
-                    </div>
-                  )}
+                  <SpotifyPlayer
+                    trackId={detail._id}
+                    waveImageUrl={MusicWave}
+                    trackUrl={detail.trackLink}
+                    isPlaying={playingTrackId === detail._id}
+                    onPlayPause={handlePlayPause}
+                  />
                 </div>
                 <span className="flex gap-12">
                   <span>
@@ -259,16 +217,14 @@ const SyncUserHome = () => {
                 <span className="flex gap-6">
                   {actions.map((action, actionIndex) => (
                     <img key={actionIndex} src={action} alt="" />
-                  ))}{' '}
+                  ))}
                 </span>
-
                 <span className="gap-[12px] flex">
                   <Link to={`metadata/${detail?._id}`}>
                     <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       View More
                     </button>
                   </Link>
-
                   <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                     Get Quote
                   </button>
@@ -276,16 +232,16 @@ const SyncUserHome = () => {
               </div>
             ))}
           </div>
+
           {/* Mobile */}
           <div className="lg:hidden flex flex-col gap-6">
             {musicDetails.map((detail, index) => (
               <div
                 key={index}
-                className="flex items-center w-full justify-between  "
+                className="flex items-center w-full justify-between"
               >
                 <span className="flex gap-3">
                   <Link to={`metadata/${detail?._id}`}>
-                    {' '}
                     <img src={detail.musicImg} alt="" />
                     <span>
                       <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
@@ -304,50 +260,49 @@ const SyncUserHome = () => {
             ))}
           </div>
 
-          {menuOpen && musicDetails.map((detail, index) => (
-            <div key={index}>
-              <div
-                className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
-                onClick={closeMenu}
-              ></div>
-
-              <div className=" h-full z-50">
-                <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-1/2 overflow-y-auto p-8">
-                  <span className="flex justify-between">
-                    <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6 ">
-                      Song Options
-                    </h4>
-                    <img src={Closemenu} alt="" onClick={closeMenu} />
-                  </span>
-                  <ul className="mt-8 flex flex-col gap-8 ">
-                    <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                      <img src={Favorite} alt="" />
-                      Favorite
-                    </li>
-                    <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                      {' '}
-                      <img src={AddMusic} alt="" />
-                      Add to Library
-                    </li>
-                    <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                      <img src={Copy} alt="" />
-                      Copy Track Link
-                    </li>
-                    <Link to={`metadata/${detail?._id}`} ><li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                      <img src={ViewMore} alt="" />
-                      View More
-                    </li></Link>
-                    
-                    <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4 ">
-                      <img src={getQuote} alt="" />
-                      Get Qoute
-                    </li>
-                  </ul>
+          {menuOpen &&
+            musicDetails.map((detail, index) => (
+              <div key={index}>
+                <div
+                  className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
+                  onClick={closeMenu}
+                ></div>
+                <div className="h-full z-50">
+                  <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-1/2 overflow-y-auto p-8">
+                    <span className="flex justify-between">
+                      <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6">
+                        Song Options
+                      </h4>
+                      <img src={Closemenu} alt="" onClick={closeMenu} />
+                    </span>
+                    <ul className="mt-8 flex flex-col gap-8">
+                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                        <img src={Favorite} alt="" />
+                        Favorite
+                      </li>
+                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                        <img src={AddMusic} alt="" />
+                        Add to Library
+                      </li>
+                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                        <img src={Copy} alt="" />
+                        Copy Track Link
+                      </li>
+                      <Link to={`metadata/${detail?._id}`}>
+                        <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                          <img src={ViewMore} alt="" />
+                          View More
+                        </li>
+                      </Link>
+                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                        <img src={getQuote} alt="" />
+                        Get Quote
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-           ))}
-          
+            ))}
         </section>
       </div>
     </div>

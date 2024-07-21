@@ -61,10 +61,10 @@ const FileDispute: React.FC = () => {
         validationSchema={validationSchema}
         onSubmit={async (values) => {
           setLoading(true)
-          const userId = localStorage.getItem('userId');
+          
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
-          const apiUrl = `${urlVar}/dispute/${userId}`;
+          const apiUrl = `${urlVar}/dispute/`;
           const config = {
             headers: {
               Authorization: `${token}`,
