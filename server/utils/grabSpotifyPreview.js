@@ -24,15 +24,17 @@ const SpotifyPreview = async(res, trackLink)=>{
                 'Authorization' : `Bearer ${token}`
             }
         })
+
+        if(!trackDetails.preview_url){
+            return res.status(422).send('No preview available for this track or Invalid Link, Please try again later')
+        }
+    
+        return trackDetails.preview_url
         
     } catch (error) {
         return res.status(422).send('Wrong track link, Please Try Again')
     }
-    if(!trackDetails.preview_url){
-        return res.status(422).send('No preview available for this track, Please try again later')
-    }
 
-    return trackDetails.preview_url
 }
 
 module.exports = SpotifyPreview
