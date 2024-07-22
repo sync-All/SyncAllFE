@@ -4,27 +4,41 @@ import Mood from '../../constants/mood';
 import Instrument from '../../constants/instrument';
 import Background from '../../assets/images/user-homepage-head.png';
 import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
-import MusicWave from '../../assets/images/musicwave.svg';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 // import Play from '../../assets/images/copy-link.svg';
 // import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
-import MusicImg from '../../assets/images/3000x3000.jpg.png';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
-import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import { useEffect, useRef, RefObject, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-import SpotifyPlayer from '../../constants/spotifyplayer' // Adjust the path as necessary
+// import SpotifyPlayer from '../../constants/spotifyplayer' // Adjust the path as necessary
+import WaveSurfer from 'wavesurfer.js';
+import PlayButton from '../../assets/images/playbtn.svg';
+import pauseButton from '../../assets/pause.svg';
+import Liked from '../../assets/images/liked.svg';
 
 const SyncUserHome = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const waveformRef: RefObject<HTMLDivElement> = useRef(null);
+  const wavesurfer = useRef<WaveSurfer | null>(null);
+  const [volume, setVolume] = useState(0.5);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [currentTime, setCurrentTime] = useState('');
+  const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
+  const [likedTrack, setLikedTrack] = useState<Set<string>>(new Set());
+  const { id } = useParams();
 
-  interface MusicDetail {
+  interface TrackDetails {
     musicImg: string;
     trackTitle: string;
     _id: string;
@@ -36,14 +50,33 @@ const SyncUserHome = () => {
     genre: string;
     mood: string;
     actions: string[];
+    artWork: string;
   }
-
-  const [musicDetails, setMusicDetails] = useState<MusicDetail[]>([]);
-  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
 
   const closeMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  const handleLike = (trackId: string) => {
+    const newLikedTracks = new Set(likedTrack);
+    if (newLikedTracks.has(trackId)) {
+      newLikedTracks.delete(trackId);
+    } else {
+      newLikedTracks.add(trackId);
+    }
+    setLikedTrack(newLikedTracks);
+    localStorage.setItem(
+      'likedTracks',
+      JSON.stringify(Array.from(newLikedTracks))
+    );
+  };
+
+  useEffect(() => {
+    const storedLikedTracks = localStorage.getItem('likedTracks');
+    if (storedLikedTracks) {
+      setLikedTrack(new Set(JSON.parse(storedLikedTracks)));
+    }
+  }, []);
 
   interface ResponseData {
     message?: string;
@@ -64,8 +97,18 @@ const SyncUserHome = () => {
         const res = await axios.get(apiUrl, config);
         setMusicDetails(res.data.allTracks);
         console.log(res.data.allTracks);
-        console.log(res.data.allTracks?.trackLink);
-        
+        const allTracks: TrackDetails[] = res.data.allTracks;
+        console.log(allTracks);
+        const trackLinks = allTracks.map((track) => track.trackLink);
+        console.log(trackLinks);
+        const track = allTracks.find((track) => track._id === id);
+        if (track) {
+          setTrackDetails(track);
+          const newAudio = new Audio(track?.trackLink);
+          setAudio(newAudio);
+        } else {
+          console.log('error');
+        }
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
 
@@ -78,43 +121,63 @@ const SyncUserHome = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
-  // const musicWaves = [MusicWave, MusicWave, MusicWave];
-  const actions = [Favorite, AddMusic, Copy];
+  const formWaveSurferOptions = (ref: HTMLElement | string) => ({
+    container: ref,
+    waveColor: '#98A2B3',
+    progressColor: '#013131',
+    cursorColor: '#013131',
+    barWidth: 2,
+    barRadius: 5,
+    responsive: true,
+    height: 40,
+    // If true, normalize by the maximum peak instead of 1.0.
+    normalize: true,
+    // Use the PeakCache to improve rendering speed of large waveforms.
+    partialRender: true,
+  });
 
-const handlePlayPause = async (id: string) => {
-  if (playingTrackId === id) {
-    setPlayingTrackId(null);
-    // setCurrentTrackUrl(null);
-  } else {
-    try {
-      const token = localStorage.getItem('token');
-      const urlVar = import.meta.env.VITE_APP_API_URL;
-      const trackUrlApi = `${urlVar}/trackurl/${id}`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
-      const res = await axios.get(trackUrlApi, config);
-      const iframe = document.createElement('div');
-      iframe.innerHTML = res.data.trackUrl;
-      const src = iframe.querySelector('iframe')?.src;
-      if (src) {
-        // setCurrentTrackUrl(src);
-        setPlayingTrackId(id);
-      } else {
-        throw new Error('Invalid track URL');
+  useEffect(() => {
+    if (waveformRef.current) {
+      const options = formWaveSurferOptions(waveformRef.current);
+      wavesurfer.current = WaveSurfer.create(options);
+      if (trackDetails?.trackLink) {
+        wavesurfer.current.load(trackDetails.trackLink);
       }
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      toast.error(
-        axiosError.response?.data?.message || axiosError.message || 'An error occurred'
-      );
+      wavesurfer.current.on('ready', function () {
+        if (wavesurfer.current) {
+          wavesurfer.current.setVolume(volume);
+          setVolume(volume);
+        }
+      });
+
+      wavesurfer.current.on('audioprocess', () => {
+        const minutes = Math.floor(wavesurfer.current!.getCurrentTime() / 60);
+        const seconds = Math.floor(
+          wavesurfer.current!.getCurrentTime() - minutes * 60
+        );
+        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(
+          seconds
+        ).padStart(2, '0')}`;
+        setCurrentTime(formattedTime);
+      });
+
+      wavesurfer.current.on('finish', () => {
+        wavesurfer.current!.setTime(0);
+        setIsPlaying(false);
+      });
     }
-  }
-};
+
+    return () => wavesurfer?.current?.destroy();
+  }, [trackDetails, volume]);
+
+  const handlePlayPause = () => {
+    if (audio) {
+      setIsPlaying(!isPlaying);
+      wavesurfer?.current?.playPause();
+    }
+  };
 
   return (
     <div className="relative">
@@ -177,7 +240,11 @@ const handlePlayPause = async (id: string) => {
                 className="flex items-center w-full justify-between"
               >
                 <Link to={`metadata/${detail?._id}`} className="flex gap-3">
-                  <img src={MusicImg} alt="" />
+                  <img
+                    src={detail?.artWork}
+                    alt=""
+                    className="h-[50px] w-[50px] object-cover"
+                  />
                   <span>
                     <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
                       {detail.trackTitle}
@@ -187,14 +254,21 @@ const handlePlayPause = async (id: string) => {
                     </p>
                   </span>
                 </Link>
-                <div className="items-center flex">
-                  <SpotifyPlayer
-                    trackId={detail._id}
-                    waveImageUrl={MusicWave}
-                    trackUrl={detail.trackLink}
-                    isPlaying={playingTrackId === detail._id}
-                    onPlayPause={handlePlayPause}
+                <div className=" flex items-center">
+                  <img
+                    src={isPlaying ? pauseButton : PlayButton}
+                    alt=""
+                    onClick={handlePlayPause}
+                    className="w-12 cursor-pointer"
                   />
+                  <div
+                    id="waveform"
+                    ref={waveformRef}
+                    className="w-[60%]"
+                  ></div>
+                  <p className="font-Utile-medium text-[16px] leading-4 ">
+                    {currentTime || '00:00'}
+                  </p>
                 </div>
                 <span className="flex gap-12">
                   <span>
@@ -215,9 +289,13 @@ const handlePlayPause = async (id: string) => {
                   </span>
                 </span>
                 <span className="flex gap-6">
-                  {actions.map((action, actionIndex) => (
-                    <img key={actionIndex} src={action} alt="" />
-                  ))}
+                  <img
+                    src={likedTrack.has(detail._id) ? Liked : Favorite}
+                    alt=""
+                    onClick={() => handleLike(detail._id)}
+                  />
+                  <img src={AddMusic} alt="" />
+                  <img src={Copy} alt="" />
                 </span>
                 <span className="gap-[12px] flex">
                   <Link to={`metadata/${detail?._id}`}>
@@ -225,9 +303,11 @@ const handlePlayPause = async (id: string) => {
                       View More
                     </button>
                   </Link>
-                  <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    Get Quote
-                  </button>
+                  <Link to="/pricing">
+                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      Get Quote
+                    </button>
+                  </Link>
                 </span>
               </div>
             ))}

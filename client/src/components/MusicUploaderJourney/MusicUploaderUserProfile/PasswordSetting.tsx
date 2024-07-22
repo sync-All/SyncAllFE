@@ -46,6 +46,10 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const refreshPage = () => {
+  window.location.reload();
+};
+
   const handlePasswordChange = async (values: FormValues) => {
     setLoading(true)
     const token = localStorage.getItem('token');
@@ -62,6 +66,7 @@ function delay(ms: number) {
       await delay(2000)
       await axios.post(apiUrl, values, config);
       toast.success('Password Updated Successfully');
+      refreshPage()
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
 

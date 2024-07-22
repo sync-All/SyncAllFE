@@ -27,6 +27,10 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const refreshPage = () => {
+  window.location.reload();
+};
+
  const paymentDetails = Array.isArray(
    paymentInfo.dashboardData?.dashboardDetails?.earnings
  )
@@ -89,6 +93,7 @@ function delay(ms: number) {
             await delay(2000)
             await axios.post(apiUrl, values, config);
             toast.success('Payment Information Updated successful');
+            refreshPage()
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
             toast.error(
