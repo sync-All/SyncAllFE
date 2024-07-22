@@ -132,7 +132,7 @@ const logout = () => {
               {profileDetails?.email}
             </p>
           </span>
-          <span className="ml-auto">
+          <span className="ml-auto cursor-pointer">
             <img src={LogoutIcon} alt="" onClick={logout} />
           </span>
         </div>

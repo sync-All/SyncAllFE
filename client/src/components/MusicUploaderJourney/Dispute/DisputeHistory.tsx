@@ -169,7 +169,7 @@ const DisputeHistory = () => {
               />
             </th>
             <th className={ThStyles}>
-              Dispute Status
+              Resolution
               <SortButton
                 sortConfig={sortConfig}
                 sortKey="disputeStatus"
