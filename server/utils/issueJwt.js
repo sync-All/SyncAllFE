@@ -39,5 +39,24 @@ function issueJwtLogin(user){
     }
 }
 
+function issueJwtForgotPassword(user){
+    const _id = user._id
+
+    const expiresIn = 5 * 60 * 1000
+
+    const payload = {
+        sub : _id,
+        iat : Date.now()
+    }
+
+    const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
+
+    return {
+        token : signedToken,
+        expires : expiresIn
+    }
+}
+
 module.exports.issueJwtConfirmEmail = issueJwtConfirmEmail
 module.exports.issueJwtLogin = issueJwtLogin
+module.exports.issueJwtForgotPassword = issueJwtForgotPassword

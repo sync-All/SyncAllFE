@@ -43,6 +43,18 @@ const userSchema = new Schema({
     spotifyLink : {
         type : String,
     },
+    facebookLink : {
+        type : String,
+    },
+    instagramLink : {
+        type : String,
+    },
+    twitterLink : {
+        type : String,
+    },
+    tiktokLink : {
+        type : String,
+    },
     bio: {
         type : String,
     },

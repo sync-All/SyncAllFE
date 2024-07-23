@@ -2,7 +2,11 @@ var express = require('express');
 const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
-const User = require('../models/usermodel');
+const User = require('../models/usermodel').uploader;
+const SyncUser = require('../models/usermodel').syncUser
+const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
+const requestForgotPassword = require('../utils/mailer').requestForgotPassword
+const bcrypt = require("bcrypt")
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -84,5 +88,48 @@ router.get('/AlreadyConfirmed', (req, res, next) => {
     message: 'Please proceed to login below',
   });
 });
+
+router.get('/api/v1/validateToken',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),(req,res,next)=>{
+  res.status(200).send('Valid Token')
+})
+
+router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : false}), async(req,res,next)=>{
+  const {password} = req.body
+ if(req.isAuthenticated()){
+  const userId = req.user._id
+  try {
+    if(req.role == "Music Uploader"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
+        User.updateOne({id : userId}, {password})
+        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      })
+    }else if(req.role == "Sync User"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
+        SyncUser.updateOne({id : userId}, {password})
+        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      })
+    }
+  } catch (error) {
+    res.status(422).send("Invalid Email Address")
+  }
+ }else{
+  res.status(400).send("Link Expired")
+ }
+})
+
+router.post('/api/v1/request/forgotPassword',async (req,res,next)=>{
+  const {email} = req.body
+
+    const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
+    console.log(user)
+
+    if(user){
+      const {token} = issueJwtForgotPassword(user)
+      requestForgotPassword(user, token)
+      res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
+    }else{
+      res.status(422).send("Invalid Emailee Address")
+    }
+})
 
 module.exports = router;

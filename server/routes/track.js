@@ -20,4 +20,22 @@ router.get('/getsongs/:genre', passport.authenticate('jwt',{session : false, fai
   }
 }));
 
+router.get('/getTrackByName/:name', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
+  try {
+    const allTracks = await Track.find({trackTitle : req.params.name}).exec()
+    res.json({allTracks})
+  } catch (error) {
+    res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
+  }
+}));
+
+router.get('/getTrackByMood/:mood', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
+  try {
+    const allTracks = await Track.find({mood : req.params.mood}).exec()
+    res.json({allTracks})
+  } catch (error) {
+    res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
+  }
+}));
+
 module.exports = router;
