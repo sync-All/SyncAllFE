@@ -1,41 +1,25 @@
 var express = require('express');
+const multer = require("multer")
+const upload = multer({dest: 'uploads/'}).single('artWork')
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 var router = express.Router();
-const Track = require('../models/dashboard.model').track
+const trackController = require('../controllers/trackController')
 
-/* GET home page. */
-router.get('/allsongs', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
-  const allTracks = await Track.find({}).exec()
-  res.json({allTracks})
-}));
 
-router.get('/getsongs/:genre', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
-  console.log(req.params.genre)
-  try {
-    const allTracks = await Track.find({genre : req.params.genre}).exec()
-    res.json({allTracks})
-  } catch (error) {
-    res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
-  }
-}));
+router.get('/api/v1/verifyTrackUploaded/:isrc',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
 
-router.get('/getTrackByName/:name', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
-  try {
-    const allTracks = await Track.find({trackTitle : req.params.name}).exec()
-    res.json({allTracks})
-  } catch (error) {
-    res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
-  }
-}));
+router.post('/api/v1/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(trackController.trackUpload))
 
-router.get('/getTrackByMood/:mood', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
-  try {
-    const allTracks = await Track.find({mood : req.params.mood}).exec()
-    res.json({allTracks})
-  } catch (error) {
-    res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
-  }
-}));
+
+router.get('/allsongs', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getAllSongs));
+
+router.get('/getTrackByGenre/:genre', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getTracksByGenre));
+
+router.get('/getTrackByInstrument/:instrument', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getTracksByInstrument));
+
+router.get('/getTrackByMood/:mood', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getTracksByMood));
+
+router.get('/querySongs/:queryText', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.querySongsByIndex));
 
 module.exports = router;

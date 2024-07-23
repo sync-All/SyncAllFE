@@ -80,8 +80,6 @@ const dashboardSchema = new Schema({
 })
 
 const trackSchema = new Schema({
-
-    
     mainArtist : {
         type : String,
         required : true
@@ -239,11 +237,19 @@ const trackSchema = new Schema({
         type : Number,
         default : 0
     },
+    likes : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "syncUser"
+        }
+    ],
     user : {
         type : Schema.Types.ObjectId,
-        ref : "uploader"
+        ref : "user"
     },
 },{timestamps : true})
+
+trackSchema.index({lyrics : 'text', mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const disputeSchema = new Schema({
     nameOfTrack  : {
