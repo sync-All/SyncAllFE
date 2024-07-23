@@ -14,7 +14,9 @@ const ProfileInformation = () => {
 
   const { loading, setLoading } = useLoading();
 
-
+const refreshPage = () => {
+  window.location.reload();
+};
   
   const dateCreated = userDetails?.createdAt
     ? new Date(userDetails.createdAt)
@@ -77,6 +79,7 @@ const ProfileInformation = () => {
             await delay(2000)
             await axios.postForm(apiUrl, values, config);
             toast.success('Profile Information Updated successful');
+            refreshPage()
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
 
@@ -175,7 +178,7 @@ const ProfileInformation = () => {
               </div>
               <div className={input}>
                 <label htmlFor="socials" className={applyLabelStyles}>
-                  Social Media Links
+                  Spotify Link
                 </label>
                 <Field
                   type="text"
