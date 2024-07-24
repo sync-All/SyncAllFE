@@ -30,7 +30,7 @@ const trackUpload = async(req,res,next)=>{
                 res.status(401).json('Track already exists')
             }else{
                 let songInfo = req.body
-                let previewLink = grabSpotifyPreview(res,songInfo.trackLink)
+                let previewLink = await grabSpotifyPreview(res,songInfo.trackLink)
                 console.log(previewLink)
                 var artWork = await cloudinary.uploader.upload(req.file.path)
                 songInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : previewLink}
