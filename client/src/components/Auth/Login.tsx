@@ -44,6 +44,14 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     }
   };
 
+  const handleNavigationTODashboard2 = (spotifyLink:string) => {
+    if(!spotifyLink){
+      navigate('/onboarding-details');
+    }else{
+      navigate('/dashboard');
+    }
+};
+
 
 
   const { setUserRole } = useContext(UserContext);
@@ -63,6 +71,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         password: values['password'],
       });
       if (response && response.data) {
+        const spotifyLink = response.data.user.spotifyLink
         setToken(response.data.token);
         setUserRole(response.data.user.role);
         const user = response.data.user;
@@ -73,7 +82,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         console.log(response);
         toast.success('Login successful');
         if (response.data.user.role == 'Music Uploader') {
-          handleNavigationTODashboard();
+          handleNavigationTODashboard2(spotifyLink);
         } else {
           navigate('/home');
         }
@@ -114,13 +123,14 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     await axios
       .post(apiUrl, values)
       .then((response) => {
+        const spotifyLink = response.data.user.spotifyLink
         setUserRole(response.data.user.role); // Set the user type here
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userId', response.data.user._id);
         toast.success('Login successful');
         if (response.data.user.role == 'Music Uploader') {
-          handleNavigationTODashboard();
+          handleNavigationTODashboard2(spotifyLink);
         } else {
           navigate('/home');
         }
