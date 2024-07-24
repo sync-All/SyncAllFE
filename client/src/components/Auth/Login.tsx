@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Context/UserRole';
 import { getAdditionalUserInfo } from 'firebase/auth';
 import { signInWithGooglePopup } from '../../../firebase';
-import { useDataContext } from '../../Context/DashboardDataProvider';
 import useLoading from '../../constants/loading';
 
 const SigninSchema = Yup.object().shape({
@@ -32,17 +31,7 @@ interface ResponseData {
 
 const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
-  const dashdata = useDataContext();
-  const profileDetails = dashdata.dashboardData?.profileInfo;
   const { loading, setLoading } = useLoading();
-
-  const handleNavigationTODashboard = () => {
-    if (profileDetails) {
-      navigate('/dashboard');
-    } else {
-      navigate('/onboarding-details');
-    }
-  };
 
   const handleNavigationTODashboard2 = (spotifyLink:string) => {
     if(!spotifyLink){
