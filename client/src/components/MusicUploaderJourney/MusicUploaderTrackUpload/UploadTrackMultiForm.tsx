@@ -262,7 +262,6 @@ const UploadTrackMultiForm: React.FC = () => {
           onSubmit={async (values, { validateForm }) => {
             setLoading(true)
             const token = localStorage.getItem('token');
-            console.log('token');
             const urlVar = import.meta.env.VITE_APP_API_URL;
             const apiUrl = `${urlVar}/trackUpload/`;
             const config = {
@@ -287,6 +286,7 @@ const UploadTrackMultiForm: React.FC = () => {
               await axios.postForm(apiUrl, values, config);
               toast.success('Track Uploaded Successfully');
             } catch (error: unknown) {
+              console.log(error)
               const axiosError = error as AxiosError<ResponseData>;
 
                toast.error(

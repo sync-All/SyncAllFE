@@ -99,13 +99,13 @@ router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : fal
   const userId = req.user._id
   try {
     if(req.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
-        User.updateOne({id : userId}, {password})
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+        await User.updateOne({id : userId}, {password}).exec()
         res.status(200).send({success : true, message : 'Password Successfully updated'})
       })
     }else if(req.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
-        SyncUser.updateOne({id : userId}, {password})
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+        await SyncUser.updateOne({id : userId}, {password}).exec()
         res.status(200).send({success : true, message : 'Password Successfully updated'})
       })
     }
