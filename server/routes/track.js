@@ -7,9 +7,9 @@ var router = express.Router();
 const trackController = require('../controllers/trackController')
 
 
-router.get('/api/v1/verifyTrackUploaded/:isrc',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
+router.get('/verifyTrackUploaded/:isrc',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
 
-router.post('/api/v1/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(trackController.trackUpload))
+router.post('/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(trackController.trackUpload))
 
 
 router.get('/allsongs', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getAllSongs));
