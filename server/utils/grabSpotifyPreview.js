@@ -16,6 +16,7 @@ const SpotifyPreview = async(res, trackLink)=>{
     })
 
     const token = result.access_token
+    console.log(token)
 
     try {
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
@@ -34,6 +35,8 @@ const SpotifyPreview = async(res, trackLink)=>{
         }
         
     } catch (error) {
+        console.log('here')
+        console.log(error)
         return res.status(422).send('Wrong track link, Please Try Again')
     }
 
