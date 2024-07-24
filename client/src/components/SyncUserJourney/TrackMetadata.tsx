@@ -82,6 +82,7 @@ const TrackMetadata = () => {
         const allTracks: TrackDetails[] = res.data.allTracks;
         const track = allTracks.find((track) => track._id === id);
         if (track) {
+          console.log(track)
           setTrackDetails(track);
           const newAudio = new Audio(track?.trackLink)
           setAudio(newAudio)

@@ -16,10 +16,11 @@ const SpotifyPreview = async(res, trackLink)=>{
                 'Authorization' : 'Basic ' + BasicToken
             }
         })
-    
+
         const token = result.data.access_token
+
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
-        
+    
             headers : {
                 'Authorization' : `Bearer ${token}`
             }
@@ -28,10 +29,11 @@ const SpotifyPreview = async(res, trackLink)=>{
         if(!trackDetails.data.preview_url){
             return res.status(422).send('No preview available for this track or Invalid Link, Please try again later')
         }
-        console.log(trackDetails.data.preview_url)
+        console.log(trackDetails.data)
         return trackDetails.data.preview_url
-        
+
     } catch (error) {
+        console.log(error)
         return res.status(422).send('Wrong track link, Please Try Again')
     }
 

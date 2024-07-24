@@ -283,7 +283,7 @@ const UploadTrackMultiForm: React.FC = () => {
             }
             try {
               await delay(2000)
-              await axios.postForm(apiUrl, values, config);
+              await axios.postForm('http://localhost:3000/api/v1/trackupload', values, config);
               toast.success('Track Uploaded Successfully');
             } catch (error: unknown) {
               console.log(error)
