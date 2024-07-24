@@ -113,36 +113,42 @@ const signup = async function(req, res) {
   }
 
   const googleAuth = async(req,res,next)=>{
-    try {
-        const user = await User.findOne({email : req.body.email}).exec() 
-        const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
-        const item = user || syncUser
-        if (!item){
-          if(req.body.role){
-            if(req.body.role == "Music Uploder"){
-              const user = new User({...req.body,authSource : 'googleAuth'})
-              await user.save()
+        try {
+          const user = await User.findOne({email : req.body.email}).exec() 
+          const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
+          let item = user || syncUser
+          if (!item){
+            if(req.body.role){
+              if(req.body.role == "Music Uploader"){
+                const user = new User({...req.body,authSource : 'googleAuth'})
+                var newUser = await user.save()
+                newUser = newUser.toObject()
+                delete newUser.password
+              }else{
+                const user = new SyncUser({...req.body,authSource : 'googleAuth'})
+                var newSyncUser = await user.save()
+                newSyncUser = newSyncUser.toObject()
+                delete newSyncUser.password
+              }
+              item = newUser || newSyncUser
+              let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+              res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
             }else{
-              const user = new SyncUser({...req.body,authSource : 'googleAuth'})
-              await user.save()
+              return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
             }
-          }else{
-            return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
-          }
             
+          }else{
+            let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+            res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+          }
+          
+        } catch (error) {
+          console.log(error)
+          res.status(401).send(error)
         }
-        const toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-        const userDetails = await User.findOne({email : req.body.email}).select('-password').exec()
-         const syncDetails = await SyncUser.findOne({email : req.body.email}).select('-password').exec()
-
-         const itemDetails = userDetails || syncDetails
-
-        res.status(200).json({success : true, user : itemDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
         
-    } catch (error) {
-        console.log(error)
-        res.status(401).json(error)
-    }
 }
 
 const allUsers = async (req,res,next) =>{
@@ -157,7 +163,6 @@ const allUsers = async (req,res,next) =>{
 const profileUpdate = async (req,res,next)=>{
   try {
     const userId = req.user.id
-    console.log(userId)
     if(req.user.role == "Music Uploader"){
       if(req.file){
           var profilePicture = await cloudinary.uploader.upload(req.file.path)

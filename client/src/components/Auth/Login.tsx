@@ -22,6 +22,7 @@ const SigninSchema = Yup.object().shape({
 
 interface LoginProps {
   setToken: (token: string) => void;
+  setGoogleAuthData: React.Dispatch<React.SetStateAction<object | null>>
 }
 
 interface ResponseData {
@@ -29,7 +30,7 @@ interface ResponseData {
   role?: { userType: string };
 }
 
-const Login: React.FC<LoginProps> = ({ setToken }) => {
+const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const dashdata = useDataContext();
   const profileDetails = dashdata.dashboardData?.profileInfo;
@@ -37,7 +38,6 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
 
   const handleNavigationTODashboard = () => {
     if (profileDetails) {
-      console.log('yeahhh');
       navigate('/dashboard');
     } else {
       navigate('/onboarding-details');
@@ -103,7 +103,12 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
     const userInfo = getAdditionalUserInfo(response);
     // COlate values and assign to their proper fields
     const values = {
-      email: userInfo?.profile?.email,
+      name: userInfo?.profile?.name,
+        email: userInfo?.profile?.email,
+        img: userInfo?.profile?.picture,
+        emailConfirmedStatus: userInfo?.profile?.verified_email,
+        userType: 'individual',
+        newUser: userInfo?.isNewUser,
     };
     // POst request to server to validate user
     await axios
@@ -114,7 +119,11 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userId', response.data.user._id);
         toast.success('Login successful');
-        handleNavigationTODashboard();
+        if (response.data.user.role == 'Music Uploader') {
+          handleNavigationTODashboard();
+        } else {
+          navigate('/home');
+        }
       })
       .catch((err) => {
         const axiosError = err as AxiosError<ResponseData>;
@@ -124,6 +133,12 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
             : axiosError.message || 'An error occurred'
           ).toString()
         );
+        setTimeout(()=>{
+          if(err.response.status == 302){
+            setGoogleAuthData(values)
+            return navigate('/selectRole')
+          }
+        }, 1500)
       });
   };
 

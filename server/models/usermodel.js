@@ -16,7 +16,6 @@ const userSchema = new Schema({
     role : {
         type : String,
         enum : ['Music Uploader'],
-        required : true
     },
     userType : {
         type : String,
@@ -77,7 +76,6 @@ const syncUserSchema = new Schema({
     role : {
         type : String,
         enum : ['Sync User'],
-        required : true
     },
     userType : {
         type : String,

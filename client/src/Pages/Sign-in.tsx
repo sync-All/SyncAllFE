@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import Login from "../components/Auth/Login";
 
-const SignIn: React.FC = () => {
+interface LoginProps {
+  setGoogleAuthData: React.Dispatch<React.SetStateAction<object | null>>;
+}
+
+const SignIn: React.FC<LoginProps> = ({ setGoogleAuthData }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
@@ -12,7 +16,7 @@ const SignIn: React.FC = () => {
 
   return (
     <div>
-      <Login setToken={setToken} />
+      <Login setToken={setToken} setGoogleAuthData={setGoogleAuthData}/>
     </div>
   );
 }
