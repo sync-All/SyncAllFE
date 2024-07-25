@@ -1,24 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../Context/UserRole';
-import MusicUploaderAuthProfileSetup from '../components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
-import SyncUserAuthProfileSetup from '../components/SyncUserJourney/SyncUserAuthProfileSetup';
+// import React, { useContext, useEffect, useState } from 'react';
+// import { UserContext } from '../Context/UserRole';
+// import MusicUploaderAuthProfileSetup from '../components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
+// import SyncUserAuthProfileSetup from '../components/SyncUserJourney/SyncUserAuthProfileSetup';
 
-const UserTypeOnboardingPage: React.FC = () => {
-  const { userRole: contextUserRole } = useContext(UserContext);
-  const [userRole, setUserRole] = useState<string | null>(contextUserRole)
+// const UserTypeOnboardingPage: React.FC = () => {
+//   const { userRole: contextUserRole } = useContext(UserContext);
+//   const [userRole, setUserRole] = useState<string | null>(contextUserRole)
 
-  useEffect(() => {
-    if(!userRole) {
-      const role = localStorage.getItem('userRole')
-      setUserRole(role)
-    }
-  },[userRole])
+//   useEffect(() => {
+//     if(!userRole) {
+//       const role = localStorage.getItem('userRole')
+//       setUserRole(role)
+//     }
+//   },[userRole])
 
-  if (userRole === 'Music Uploader') {
-    return <MusicUploaderAuthProfileSetup />;
-  } else if (userRole === 'Sync User') {
-    return <SyncUserAuthProfileSetup />;
-  }
-};
+//   if (userRole === 'Music Uploader') {
+//     return <MusicUploaderAuthProfileSetup />;
+//   } else if (userRole === 'Sync User') {
+//     return <SyncUserAuthProfileSetup />;
+//   }
+// };
 
-export default UserTypeOnboardingPage;
+// export default UserTypeOnboardingPage;

@@ -27,6 +27,9 @@ const MusicUploaderDashboard= () => {
   const dashboardActivities = dashboardDetails?.activities
   const profileDetails = dashdata.dashboardData?.profileInfo;
 
+  const token = localStorage.getItem('token') 
+  console.log(token);
+
   const data = [
     { name: '12', uv: 120 },
     { name: '13', uv: 150 },

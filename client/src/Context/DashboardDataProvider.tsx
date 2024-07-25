@@ -77,6 +77,7 @@ interface DashboardData {
 interface DataContextType {
   fetchDashboardData: () => void;
   dashboardData: DashboardData | null;
+  setToken: (token: string) => void;
 }
 
 // Create Context
@@ -84,7 +85,7 @@ const DashboardDataContext = createContext<DataContextType | undefined>(
   undefined
 );
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+// const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Dashboard Data Provider
 const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -94,53 +95,58 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     null
   );
 
+  const [token, setToken] = useState(localStorage.getItem('token'))
+
+  
+
+
   const fetchDashboardData = useCallback(async () => {
-    const userId = localStorage.getItem('userId');
+    // const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/dashboardhome`;
-    
+
     const config = {
       headers: {
         Authorization: ` ${token}`,
       },
     };
 
-    // Attempt to retrieve cached data from sessionStorage
-    const cachedData = sessionStorage.getItem(`dashboardData_${userId}`);
-    if (cachedData) {
-      const { data, timestamp } = JSON.parse(cachedData);
-      if (Date.now() - timestamp < CACHE_DURATION) {
-        setDashboardData(data);
-        return;
-      }
-    }
+    // // Attempt to retrieve cached data from sessionStorage
+    // const cachedData = sessionStorage.getItem(`dashboardData_${userId}`);
+    // if (cachedData) {
+    //   const { data, timestamp } = JSON.parse(cachedData);
+    //   if (Date.now() - timestamp < CACHE_DURATION) {
+    //     setDashboardData(data);
+    //     return;
+    //   }
+    // }
 
     try {
       const response = await axios.get(apiUrl, config);
-      // Cache the new data with a timestamp
-      const dataToCache = {
-        data: response.data,
-        timestamp: Date.now(),
-      };
-      sessionStorage.setItem(
-        `dashboardData_${userId}`,
-        JSON.stringify(dataToCache)
-      );
+      console.log('Hey bro, Im running');
+      // // Cache the new data with a timestamp
+      // const dataToCache = {
+      //   data: response.data,
+      //   timestamp: Date.now(),
+      // };
+      // sessionStorage.setItem(
+      //   `dashboardData_${userId}`,
+      //   JSON.stringify(dataToCache)
+      // );
       setDashboardData(response.data);
     } catch (error) {
-      
       // Implement retry logic or error handling as needed
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
   const contextValue = useMemo(
-    () => ({ fetchDashboardData, dashboardData }),
-    [fetchDashboardData, dashboardData]
+    () => ({ fetchDashboardData, dashboardData, setToken }),
+    [fetchDashboardData, dashboardData, setToken]
   );
 
   return (
