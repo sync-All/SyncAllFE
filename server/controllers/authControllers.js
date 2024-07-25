@@ -217,20 +217,21 @@ const verifyEmail =  async (req,res,next)=>{
 }
 
 const changePassword = async(req,res,next)=>{
-  const {password} = req.body
+  const {password, confirmPassword} = req.body
  if(req.isAuthenticated()){
-  const userId = req.user._id
+  if(password !== confirmPassword){
+    return res.status(422).send('Password Mismatch please try again')
+  }
   try {
     if(req.user.role == "Music Uploader"){
       bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
         await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-
         res.status(200).json({success : true, message : 'Password Successfully Updated'})
       })
     }else if(req.user.role == "Sync User"){
       bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
 
-        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+        await SyncUser.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
         res.status(200).json({success : true, message : 'Password Successfully Updated'})
       })
     }
