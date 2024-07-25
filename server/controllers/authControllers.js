@@ -218,15 +218,16 @@ const changePassword = async(req,res,next)=>{
   const userId = req.user._id
   try {
     if(req.user.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-        console.log('got here')
-        await User.updateOne({id : userId}, {password}).exec()
-        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+
+        res.status(200).json({success : true, message : 'Password Successfully Updated'})
       })
     }else if(req.user.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-        await SyncUser.updateOne({id : userId}, {password}).exec()
-        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+
+        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+        res.status(200).json({success : true, message : 'Password Successfully Updated'})
       })
     }
   } catch (error) {
