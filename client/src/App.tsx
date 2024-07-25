@@ -49,9 +49,7 @@ function App() {
           />
           <Route
             path="/login"
-            element={
-              <DashboardDataProvider>{<SignIn setGoogleAuthData={setGoogleAuthData}/>}</DashboardDataProvider >
-            }
+            element={<SignIn setGoogleAuthData={setGoogleAuthData}/>}
           />
           <Route path="/email-confirmation" element={<ConfirmEmail />} />
           <Route

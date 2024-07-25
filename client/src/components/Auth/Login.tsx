@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const { loading, setLoading } = useLoading();
 
-  const handleNavigationTODashboard2 = (spotifyLink:string) => {
+  const handleNavigationTODashboard = (spotifyLink:string) => {
     if(!spotifyLink){
       navigate('/onboarding-details');
     }else{
@@ -72,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         console.log(response);
         toast.success('Login successful');
         if (response.data.user.role == 'Music Uploader') {
-          handleNavigationTODashboard2(spotifyLink);
+          handleNavigationTODashboard(spotifyLink);
         } else {
           navigate('/home');
         }
@@ -119,7 +119,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         localStorage.setItem('userId', response.data.user._id);
         toast.success('Login successful');
         if (response.data.user.role == 'Music Uploader') {
-          handleNavigationTODashboard2(spotifyLink);
+          handleNavigationTODashboard(spotifyLink);
         } else {
           navigate('/home');
         }

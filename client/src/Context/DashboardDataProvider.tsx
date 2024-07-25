@@ -142,7 +142,7 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchDashboardData();
-  }, [fetchDashboardData]);
+  });
 
   const contextValue = useMemo(
     () => ({ fetchDashboardData, dashboardData, setToken }),
