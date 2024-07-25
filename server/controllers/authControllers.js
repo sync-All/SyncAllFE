@@ -49,14 +49,14 @@ const signup = async function(req, res) {
               userType,
             })
             users.save()
-            .then((users)=> {
+            .then(async (users)=> {
                   const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
                  const grabber = EmailDomain.grabEmailDomain(users)
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                  const dashboard = new Dashboard({
                   user : users._id
-                 })
-                 dashboard.save()
+                })
+                await dashboard.save()
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
             .catch(err = console.log(err))
@@ -124,6 +124,10 @@ const signup = async function(req, res) {
               if(req.body.role == "Music Uploader"){
                 const user = new User({...req.body,authSource : 'googleAuth'})
                 var newUser = await user.save()
+                const dashboard = new Dashboard({
+                  user : newUser._id
+                })
+                await dashboard.save()
                 newUser = newUser.toObject()
                 delete newUser.password
               }else{
