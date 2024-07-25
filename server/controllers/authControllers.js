@@ -210,6 +210,46 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail}
+const changePassword = async(req,res,next)=>{
+  const {password} = req.body
+ if(req.isAuthenticated()){
+  const userId = req.user._id
+  try {
+    if(req.user.role == "Music Uploader"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+        console.log('got here')
+        await User.updateOne({id : userId}, {password}).exec()
+        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      })
+    }else if(req.user.role == "Sync User"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+        await SyncUser.updateOne({id : userId}, {password}).exec()
+        res.status(200).send({success : true, message : 'Password Successfully updated'})
+      })
+    }
+  } catch (error) {
+    res.status(422).send("Invalid Email Address")
+  }
+ }else{
+  res.status(400).send("Link Expired")
+ }
+}
+
+const requestForgotPassword = async (req,res,next)=>{
+  const {email} = req.body
+
+    const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
+    console.log(user)
+
+    if(user){
+      const {token} = issueJwtForgotPassword(user)
+      requestForgotPassword(user, token)
+      res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
+    }else{
+      res.status(422).send("Invalid Emailee Address")
+    }
+}
+
+module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPassword}
 
   

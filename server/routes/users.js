@@ -93,43 +93,8 @@ router.get('/api/v1/validateToken',passport.authenticate('jwt',{session : false,
   res.status(200).send('Valid Token')
 })
 
-router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : false}), async(req,res,next)=>{
-  const {password} = req.body
- if(req.isAuthenticated()){
-  const userId = req.user._id
-  try {
-    if(req.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-        await User.updateOne({id : userId}, {password}).exec()
-        res.status(200).send({success : true, message : 'Password Successfully updated'})
-      })
-    }else if(req.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-        await SyncUser.updateOne({id : userId}, {password}).exec()
-        res.status(200).send({success : true, message : 'Password Successfully updated'})
-      })
-    }
-  } catch (error) {
-    res.status(422).send("Invalid Email Address")
-  }
- }else{
-  res.status(400).send("Link Expired")
- }
-})
+router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : false}), authcontroller.changePassword)
 
-router.post('/api/v1/request/forgotPassword',async (req,res,next)=>{
-  const {email} = req.body
-
-    const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
-    console.log(user)
-
-    if(user){
-      const {token} = issueJwtForgotPassword(user)
-      requestForgotPassword(user, token)
-      res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
-    }else{
-      res.status(422).send("Invalid Emailee Address")
-    }
-})
+router.post('/api/v1/request/forgotPassword', authcontroller.requestForgotPassword)
 
 module.exports = router;
