@@ -219,6 +219,7 @@ const verifyEmail =  async (req,res,next)=>{
 const changePassword = async(req,res,next)=>{
   const {password, confirmPassword} = req.body
  if(req.isAuthenticated()){
+  console.log(req.body)
   if(password !== confirmPassword){
     return res.status(422).send('Password Mismatch please try again')
   }
