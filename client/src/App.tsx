@@ -22,14 +22,16 @@ import { SyncUserProvider } from './Context/syncUserData';
 import ForgetPassword from './components/Auth/ForgetPassword';
 import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
+import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [googleAuthData, setGoogleAuthData] = useState<object | null >(null);
 
   return (
     <>
-      <UserContext.Provider value={{ userRole, setUserRole }}>
+      <UserContext.Provider value={{ userRole, setUserRole, googleAuthData, setGoogleAuthData}}>
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -38,13 +40,17 @@ function App() {
             element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
           />
           <Route
+            path="/selectRole"
+            element={<GoogleAuthUserRole googleAuthData={googleAuthData}/>}
+          />
+          <Route
             path="/register2"
-            element={<Registration selectedRole={selectedRole} />}
+            element={<Registration selectedRole={selectedRole} setGoogleAuthData={setGoogleAuthData} />}
           />
           <Route
             path="/login"
             element={
-              <DashboardDataProvider>{<SignIn />}</DashboardDataProvider>
+              <DashboardDataProvider>{<SignIn setGoogleAuthData={setGoogleAuthData}/>}</DashboardDataProvider >
             }
           />
           <Route path="/email-confirmation" element={<ConfirmEmail />} />

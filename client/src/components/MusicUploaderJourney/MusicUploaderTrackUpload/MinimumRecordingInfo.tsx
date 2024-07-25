@@ -48,7 +48,7 @@ const MinimumRecordingInfo: React.FC = () => {
     try {
       const response = await axios.get(apiUrl, config);
       // Assuming the API returns a JSON object with a boolean 'isValid' field
-      if (response.data.isValid) {
+      if (response.data.success) {
         setIsrcValidationMessage('ISRC is valid.');
       } else {
         setIsrcValidationMessage('ISRC is not valid.');

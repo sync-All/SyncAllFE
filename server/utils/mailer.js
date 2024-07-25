@@ -42,4 +42,42 @@ ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.c
 });
 }
 
+function requestForgotPassword(user, issuedJwt){
+  const transporter = nodemailer.createTransport({
+    service : "Gmail",
+  auth: {
+    user: 'info@syncallmusic.com',
+    pass: process.env.GMAIL_PASS,
+  },
+});
+
+const pathtofile = path.join(__dirname, '..', '/views/forgotPassword.ejs')
+
+console.log(pathtofile)
+ejs.renderFile(pathtofile,{ name: user.name, link :`https://sync-all-fe-1brn.vercel.app/requestforgotpw/?token=${issuedJwt}&email=${user.email}`}, (err, renderedHtml) => {
+  if (err) {
+    console.error('Error rendering EJS template:', err);
+    return;
+  }
+
+  // Compose email options
+  const mainOptions = {
+    from: '"Ezekiel"info@syncallmusic.com',
+    to: user.email,
+    subject: 'Forgot Password',
+    html: renderedHtml,
+  };
+
+  // Send the email
+  transporter.sendMail(mainOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent successfully!');
+    }
+  });
+});
+}
+
 module.exports.sendConfirmationMail = sendConfirmationMail
+module.exports.requestForgotPassword = requestForgotPassword

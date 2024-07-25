@@ -7,32 +7,36 @@ const SpotifyPreview = async(res, trackLink)=>{
     const clientS = process.env.SPOTIFY_CLIENT_S
     const BasicToken = new Buffer.from(clientId + ':' + clientS).toString('base64')
 
-    const result = await axios.post('https://accounts.spotify.com/api/token', {
-        grant_type : 'client_credentials'
-    },{
-        header : {
-            'Authorization' : 'Basic ' + BasicToken
-        }
-    })
-
-    const token = result.access_token
-
     try {
+        const result = await axios.post('https://accounts.spotify.com/api/token', {
+            grant_type : 'client_credentials'
+        },{
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization' : 'Basic ' + BasicToken
+            }
+        })
+
+        const token = result.data.access_token
+
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
-        
+    
             headers : {
                 'Authorization' : `Bearer ${token}`
             }
         })
-        
+
+        if(!trackDetails.data.preview_url){
+            return res.status(422).send('No preview available for this track or Invalid Link, Please try again later')
+        }
+        console.log(trackDetails.data)
+        return trackDetails.data.preview_url
+
     } catch (error) {
+        console.log(error)
         return res.status(422).send('Wrong track link, Please Try Again')
     }
-    if(!trackDetails.preview_url){
-        return res.status(422).send('No preview available for this track, Please try again later')
-    }
 
-    return trackDetails.preview_url
 }
 
 module.exports = SpotifyPreview

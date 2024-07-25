@@ -2,7 +2,7 @@ var express = require('express');
 const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
-const User = require('../models/usermodel');
+const User = require('../models/usermodel').uploader;
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -11,7 +11,7 @@ var router = express.Router();
 router.post('/api/v1/signup', asynchandler(authcontroller.signup));
 
 router.post('/api/v1/signin', asynchandler(authcontroller.signin));
-router.post('/api/v1/googleauth', )
+router.post('/api/v1/googleauth', asynchandler(authcontroller.googleAuth))
 
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
@@ -84,5 +84,13 @@ router.get('/AlreadyConfirmed', (req, res, next) => {
     message: 'Please proceed to login below',
   });
 });
+
+router.get('/api/v1/validateToken',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),(req,res,next)=>{
+  res.status(200).send('Valid Token')
+})
+
+router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : false}), authcontroller.changePassword)
+
+router.post('/api/v1/request/forgotPassword', authcontroller.requestForgotPw)
 
 module.exports = router;

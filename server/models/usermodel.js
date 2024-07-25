@@ -16,7 +16,6 @@ const userSchema = new Schema({
     role : {
         type : String,
         enum : ['Music Uploader'],
-        required : true
     },
     userType : {
         type : String,
@@ -43,6 +42,18 @@ const userSchema = new Schema({
     spotifyLink : {
         type : String,
     },
+    facebookLink : {
+        type : String,
+    },
+    instagramLink : {
+        type : String,
+    },
+    twitterLink : {
+        type : String,
+    },
+    tiktokLink : {
+        type : String,
+    },
     bio: {
         type : String,
     },
@@ -65,7 +76,6 @@ const syncUserSchema = new Schema({
     role : {
         type : String,
         enum : ['Sync User'],
-        required : true
     },
     userType : {
         type : String,

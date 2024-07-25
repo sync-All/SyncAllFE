@@ -41,6 +41,7 @@ interface ResponseData {
 
 interface RegisterProps {
   selectedRole: string | null;
+  setGoogleAuthData: React.Dispatch<React.SetStateAction<object | null>>;
 }
 interface FormValues {
   userType: string;
@@ -50,15 +51,22 @@ interface FormValues {
 }
 interface ResponseData {
   message?: string;
+  user ?: object
 }
 
-const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
+
+
+const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
     navigate('/email-confirmation', { state: { emailDomain } });
   };
-  const handleNavigationTODashboard = () => {
-    navigate('/onboarding-details');
+  const handleNavigationTODashboard = (spotifyLink:string) => {
+      if(!spotifyLink){
+        navigate('/onboarding-details');
+      }else{
+        navigate('/dashboard');
+      }
   };
   const { setUserRole } = useContext(UserContext);
   const { loading, setLoading } = useLoading();
@@ -71,13 +79,6 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/googleauth`;
 
-    // Check if user has filled first part of the form previously
-    if (!selectedRole) {
-      toast.error('Role has not Been Selected, Redirecting...');
-      setTimeout(() => {
-        navigate('/register1');
-      }, 1500);
-    } else {
       const response = await signInWithGooglePopup();
       // get concise information about logged in user
       const userInfo = getAdditionalUserInfo(response);
@@ -86,7 +87,6 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
         name: userInfo?.profile?.name,
         email: userInfo?.profile?.email,
         img: userInfo?.profile?.picture,
-        role: selectedRole,
         emailConfirmedStatus: userInfo?.profile?.verified_email,
         userType: 'individual',
         newUser: userInfo?.isNewUser,
@@ -95,14 +95,24 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
       await axios
         .post(apiUrl, values)
         .then((response) => {
+          const spotifyLink = response.data.user.spotifyLink
           setUserRole(response.data.user.role); // Set the user type here
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('userRole', response.data.user.role);
           localStorage.setItem('userId', response.data.user._id);
           toast.success('Login successful');
-          handleNavigationTODashboard();
+          if (response.data.user.role == 'Music Uploader') {
+            handleNavigationTODashboard(spotifyLink);
+          } else {
+            navigate('/home');
+          }
         })
         .catch((err) => {
+          console.log(values)
+          if(err.response.status == 302){
+            setGoogleAuthData({...values})
+            return navigate('/selectRole')
+          }
           const axiosError = err as AxiosError<ResponseData>;
           toast.error(
             (axiosError.response && axiosError.response.data
@@ -111,7 +121,6 @@ const Register: React.FC<RegisterProps> = ({ selectedRole }) => {
             ).toString()
           );
         });
-    }
   };
 
   const handleFormSubmit = async (values: FormValues) => {

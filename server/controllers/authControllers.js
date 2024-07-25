@@ -4,6 +4,8 @@ const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;
+const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
+const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
 const cloudinary = require("cloudinary").v2
 require('dotenv').config()
@@ -47,14 +49,14 @@ const signup = async function(req, res) {
               userType,
             })
             users.save()
-            .then((users)=> {
+            .then(async (users)=> {
                   const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
                  const grabber = EmailDomain.grabEmailDomain(users)
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                  const dashboard = new Dashboard({
                   user : users._id
-                 })
-                 dashboard.save()
+                })
+                await dashboard.save()
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
             .catch(err = console.log(err))
@@ -113,36 +115,46 @@ const signup = async function(req, res) {
   }
 
   const googleAuth = async(req,res,next)=>{
-    try {
-        const user = await User.findOne({email : req.body.email}).exec() 
-        const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
-        const item = user || syncUser
-        if (!item){
-          if(req.body.role){
-            if(req.body.role == "Music Uploder"){
-              const user = new User({...req.body,authSource : 'googleAuth'})
-              await user.save()
+        try {
+          const user = await User.findOne({email : req.body.email}).exec() 
+          const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
+          let item = user || syncUser
+          if (!item){
+            if(req.body.role){
+              if(req.body.role == "Music Uploader"){
+                const user = new User({...req.body,authSource : 'googleAuth'})
+                var newUser = await user.save()
+                const dashboard = new Dashboard({
+                  user : newUser._id
+                })
+                await dashboard.save()
+                newUser = newUser.toObject()
+                delete newUser.password
+              }else{
+                const user = new SyncUser({...req.body,authSource : 'googleAuth'})
+                var newSyncUser = await user.save()
+                newSyncUser = newSyncUser.toObject()
+                delete newSyncUser.password
+              }
+              item = newUser || newSyncUser
+              let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+              res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
             }else{
-              const user = new SyncUser({...req.body,authSource : 'googleAuth'})
-              await user.save()
+              return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
             }
-          }else{
-            return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
-          }
             
+          }else{
+            let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+            res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+          }
+          
+        } catch (error) {
+          console.log(error)
+          res.status(401).send(error)
         }
-        const toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-        const userDetails = await User.findOne({email : req.body.email}).select('-password').exec()
-         const syncDetails = await SyncUser.findOne({email : req.body.email}).select('-password').exec()
-
-         const itemDetails = userDetails || syncDetails
-
-        res.status(200).json({success : true, user : itemDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
         
-    } catch (error) {
-        console.log(error)
-        res.status(401).json(error)
-    }
 }
 
 const allUsers = async (req,res,next) =>{
@@ -157,7 +169,6 @@ const allUsers = async (req,res,next) =>{
 const profileUpdate = async (req,res,next)=>{
   try {
     const userId = req.user.id
-    console.log(userId)
     if(req.user.role == "Music Uploader"){
       if(req.file){
           var profilePicture = await cloudinary.uploader.upload(req.file.path)
@@ -205,6 +216,47 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail}
+const changePassword = async(req,res,next)=>{
+  const {password} = req.body
+ if(req.isAuthenticated()){
+  const userId = req.user._id
+  try {
+    if(req.user.role == "Music Uploader"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+
+        res.status(200).json({success : true, message : 'Password Successfully Updated'})
+      })
+    }else if(req.user.role == "Sync User"){
+      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+
+        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+        res.status(200).json({success : true, message : 'Password Successfully Updated'})
+      })
+    }
+  } catch (error) {
+    res.status(422).send("Invalid Email Address")
+  }
+ }else{
+  res.status(400).send("Link Expired")
+ }
+}
+
+const requestForgotPw = async (req,res,next)=>{
+  const {email} = req.body
+
+    const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
+    console.log(user)
+
+    if(user){
+      const {token} = issueJwtForgotPassword(user)
+      requestForgotPassword(user, token)
+      res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
+    }else{
+      res.status(422).send("Invalid Emailee Address")
+    }
+}
+
+module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw}
 
   
