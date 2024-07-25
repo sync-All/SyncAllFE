@@ -3,10 +3,6 @@ const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
 const User = require('../models/usermodel').uploader;
-const SyncUser = require('../models/usermodel').syncUser
-const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
-const requestForgotPassword = require('../utils/mailer').requestForgotPassword
-const bcrypt = require("bcrypt")
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -95,6 +91,6 @@ router.get('/api/v1/validateToken',passport.authenticate('jwt',{session : false,
 
 router.post('/api/v1/changePassword', passport.authenticate('jwt',{session : false}), authcontroller.changePassword)
 
-router.post('/api/v1/request/forgotPassword', authcontroller.requestForgotPassword)
+router.post('/api/v1/request/forgotPassword', authcontroller.requestForgotPw)
 
 module.exports = router;

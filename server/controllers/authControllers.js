@@ -4,6 +4,8 @@ const EmailDomain = require('../utils/grabUserEmailDomain')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;
+const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
+const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
 const cloudinary = require("cloudinary").v2
 require('dotenv').config()
@@ -235,7 +237,7 @@ const changePassword = async(req,res,next)=>{
  }
 }
 
-const requestForgotPassword = async (req,res,next)=>{
+const requestForgotPw = async (req,res,next)=>{
   const {email} = req.body
 
     const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
@@ -250,6 +252,6 @@ const requestForgotPassword = async (req,res,next)=>{
     }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPassword}
+module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw}
 
   
