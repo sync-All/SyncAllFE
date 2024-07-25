@@ -44,8 +44,6 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
     }
   };
 
-
-
   const { setUserRole } = useContext(UserContext);
 
   function delay(ms: number) {
@@ -63,12 +61,16 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
         password: values['password'],
       });
       if (response && response.data) {
+        // Clear existing session data
+        localStorage.clear();
+        sessionStorage.clear();
+
         setToken(response.data.token);
-        setUserRole(response.data.user.role);
+        // setUserRole(response.data.user.role);
         const user = response.data.user;
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userRole', response.data.user.role);
-        localStorage.setItem('userId', response.data.user._id);
+        // localStorage.setItem('userRole', response.data.user.role);
+        // localStorage.setItem('userId', response.data.user._id);
         localStorage.setItem('syncUserInfo', JSON.stringify(user));
         console.log(response);
         toast.success('Login successful');
@@ -77,7 +79,6 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
         } else {
           navigate('/home');
         }
-        
       } else {
         throw new Error('Response or response data is undefined');
       }
@@ -236,6 +237,10 @@ const Login: React.FC<LoginProps> = ({ setToken }) => {
                         <a href="/register1" className="poppins-bold">
                           Sign-Up
                         </a>
+                      </p>
+
+                      <p className="poppins-medium text-[16px] leading-[24px]">
+                        <a href="/forgotpassword">Forgot Password</a>
                       </p>
                     </div>
                   </Form>

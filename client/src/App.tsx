@@ -8,7 +8,7 @@ import RegisterUserRole from './Pages/RegisterUserRole';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserContext } from './Context/UserRole';
-import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
+// import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
 import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardDataProvider from './Context/DashboardDataProvider';
@@ -19,6 +19,9 @@ import TrackMetadata from './components/SyncUserJourney/TrackMetadata';
 import SyncUserLibrary from './components/SyncUserJourney/SyncUserLibrary';
 import ProfilePage from './components/SyncUserJourney/SyncUserProfile/ProfilePage';
 import { SyncUserProvider } from './Context/syncUserData';
+import ForgetPassword from './components/Auth/ForgetPassword';
+import SetNewPassword from './components/Auth/SetNewPassword';
+import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -50,10 +53,14 @@ function App() {
             element={
               <ProtectedRoute
                 path="/onboarding-details"
-                element={<UserTypeOnboardingPage />}
+                element={<MusicUploaderAuthProfileSetup />}
               />
             }
           ></Route>
+
+          <Route path="/forgotpassword" element={<ForgetPassword />} />
+
+          <Route path="/requestforgotpw" element={<SetNewPassword />} />
 
           {/* Wrap the DashboardDataProvider around the routes that require it */}
           <Route

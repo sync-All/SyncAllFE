@@ -3,9 +3,11 @@ import Logo from '../../assets/logo-black.png';
 import Placeholder from '../../assets/images/user-placeholder.svg';
 import ArrowDown from '../../assets/images/arrow-down.svg';
 import MenuIcon from '../../assets/images/menu-icon.svg'; // Assuming you have a menu icon
+import { useSyncUser } from '../../Context/syncUserData';
 
 const SyncUserNavbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useSyncUser()
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -43,9 +45,15 @@ const SyncUserNavbar: React.FC = () => {
         </ul>
         <a href="/myAccount">
           <span
-            className={`flex gap-2 items-center ${menuOpen ? 'hidden' : 'hidden'} md:flex`}
+            className={`flex gap-2 items-center ${
+              menuOpen ? 'hidden' : 'hidden'
+            } md:flex`}
           >
-            <img src={Placeholder} alt="User Placeholder" className="h-8 w-8" />
+            <img
+              src={user?.img || Placeholder}
+              alt="User Placeholder"
+              className="h-8 w-8 object-cover rounded-full"
+            />
             <p className="text-[#475367] font-formular-regular capitalize text-[16px]">
               My Account
             </p>
@@ -77,12 +85,12 @@ const SyncUserNavbar: React.FC = () => {
             </a>
           </ul>
           <span className="flex gap-2 mt-4 items-center">
-            
-              <img
-                src={Placeholder}
-                alt="User Placeholder"
-                className="h-8 w-8"
-              /><a href="/myAccount">
+            <img
+              src={user?.img || Placeholder}
+              alt="User Placeholder"
+              className="h-8 w-8 object-cover rounded-full"
+            />
+            <a href="/myAccount">
               <p className="text-[#475367] font-formular-regular capitalize text-[16px]">
                 My Account
               </p>
