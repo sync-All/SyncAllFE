@@ -100,7 +100,7 @@ const ReleaseInformation: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="lyrics" className={applyLabelStyles}>
-            Copyright Name
+            Lyrics
           </label>
           <Field
             name="lyrics"

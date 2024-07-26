@@ -67,7 +67,7 @@ const MusicUploaderDashboard= () => {
     {
       image: Earth,
       title: 'Countries Reached',
-      value: `${dashboardDetails?.countryReached || 'N/A'}`,
+      value: `${dashboardDetails?.countryReached}`,
       percentage: '16%',
       color: '#064e3b',
       bgColor: 'bg-green-300',
@@ -127,7 +127,7 @@ const MusicUploaderDashboard= () => {
                     {card.value.includes('totalTracksCount') &&
                     !dashboardDetails
                       ? 'Loading...'
-                      : card.value}
+                      : card.value }
                   </p>
                   <p
                     className={`text-[8px] font-Utile-medium text-[${card.color}] ${card.bgColor} lg:text-[14px]`}

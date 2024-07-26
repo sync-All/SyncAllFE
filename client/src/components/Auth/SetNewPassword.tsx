@@ -8,22 +8,22 @@ import useLoading from '../../constants/loading';
 import { useLocation } from 'react-router-dom';
 
 const validationSchema = Yup.object().shape({
-  newPassword: Yup.string()
+  password: Yup.string()
     .required('New password is required')
     .min(8, 'Password must be at least 8 characters'),
   confirmPassword: Yup.string().oneOf(
-    [Yup.ref('newPassword')],
+    [Yup.ref('password')],
     'Passwords must match'
   ),
 });
 
 interface FormValues {
-  newPassword: string;
+  password: string;
   confirmPassword: string;
 }
 
 const initialFormData: FormValues = {
-  newPassword: '',
+  password: '',
   confirmPassword: '',
 };
 
@@ -115,16 +115,16 @@ const SetNewPassword = () => {
               >
                 <Form>
                   <div className={input}>
-                    <label htmlFor="newPassword" className={applyLabelStyles}>
+                    <label htmlFor="password" className={applyLabelStyles}>
                       New password
                     </label>
                     <Field
                       type="password"
-                      name="newPassword"
+                      name="password"
                       className={applyInputStyles}
                     />
                     <ErrorMessage
-                      name="newPassword"
+                      name="password"
                       component="span"
                       className={applyErrorStyles}
                     ></ErrorMessage>

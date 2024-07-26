@@ -6,6 +6,7 @@ import Background from '../../assets/images/user-homepage-head.png';
 import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
+import musicWave from '../../assets/images/musicwave.svg'
 // import Play from '../../assets/images/copy-link.svg';
 // import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
@@ -235,11 +236,11 @@ const SyncUserHome = () => {
 
           <div className=" hidden flex-col gap-[56px] lg:flex">
             {musicDetails.map((detail, index) => (
-              <div
-                key={index}
-                className="flex items-center w-full justify-between"
-              >
-                <Link to={`metadata/${detail?._id}`} className="flex gap-3">
+              <div key={index} className="flex items-center w-full ">
+                <Link
+                  to={`metadata/${detail?._id}`}
+                  className="flex gap-3 w-[25%]"
+                >
                   <img
                     src={detail?.artWork}
                     alt=""
@@ -254,29 +255,27 @@ const SyncUserHome = () => {
                     </p>
                   </span>
                 </Link>
-                <div className=" flex items-center">
+                <div className=" flex items-center w-[15%] justify-center">
                   <img
                     src={isPlaying ? pauseButton : PlayButton}
                     alt=""
                     onClick={handlePlayPause}
-                    className="w-12 cursor-pointer"
+                    className=" cursor-pointer"
                   />
-                  <div
-                    id="waveform"
-                    ref={waveformRef}
-                    className="w-[60%]"
-                  ></div>
+                  <div id="waveform" ref={waveformRef} className="w-[60%]">
+                    <img src={musicWave} alt="" />
+                  </div>
                   <p className="font-Utile-medium text-[16px] leading-4 ">
                     {currentTime || '00:00'}
                   </p>
                 </div>
-                <span className="flex gap-12">
+                <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                   <span>
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                      {detail.duration}
+                      {detail.duration || '3 minutes, 33 seconds'}
                     </p>
                     <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.bpm}
+                      {detail.bpm || '124bpm'}
                     </p>
                   </span>
                   <span>
@@ -288,7 +287,7 @@ const SyncUserHome = () => {
                     </p>
                   </span>
                 </span>
-                <span className="flex gap-6">
+                <span className="flex gap-6 w-[10%] justify-center">
                   <img
                     src={likedTrack.has(detail._id) ? Liked : Favorite}
                     alt=""
@@ -297,7 +296,7 @@ const SyncUserHome = () => {
                   <img src={AddMusic} alt="" />
                   <img src={Copy} alt="" />
                 </span>
-                <span className="gap-[12px] flex">
+                <span className="gap-[12px] flex w-[25%] justify-center">
                   <Link to={`metadata/${detail?._id}`}>
                     <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       View More

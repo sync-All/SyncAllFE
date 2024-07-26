@@ -1,8 +1,11 @@
 import Check from '../../assets/images/check.svg';
 import X from '../../assets/images/xOutline.svg';
 import { currencies } from '../../constants/currency';
-import Tooltip from '../../assets/images/tooltip-info.svg';
+import TooltipImg from '../../assets/images/tooltip-info.svg';
 import WhiteCheck from '../../assets/images/white-check.svg'
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip } from 'react-tooltip';
+
 
 const Pricing = () => {
   const pricingPlans = [
@@ -25,6 +28,7 @@ const Pricing = () => {
       bg: '#ECFDF5',
       btnBg: '#1B2128',
       btntext: '#FBFCFE',
+      pricebtntext: '#FBFCFE',
       smallText: 'per month',
       buttonText: 'Start with Standard',
       features: [
@@ -262,8 +266,8 @@ const Pricing = () => {
         >
           Compare plans
         </p>
-        <div className="overflow-x-auto lg:mx-12">
-          <table className="mt-12 w-full mx-auto">
+        <div className="overflow-x-auto lg:overflow-hidden h-full lg:mx-12">
+          <table className="mt-12 w-full h-full mx-auto">
             <thead>
               <tr>
                 <th className="border-l-0 border-t-0 border border-black p-4 md:p-6 w-1/4]"></th>
@@ -302,13 +306,15 @@ const Pricing = () => {
                 >
                   <td className=" plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border-l-0  border border-black">
                     {feature.feature}{' '}
-                    <span className="has-tooltip inline-flex ">
-                      <span className="tooltip font-Utile-regular text-[14px]  align-middles shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-9 px-3 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm dark:bg-gray-700">
-                        {feature.tooltip}
-                      </span>
-                      <span className="absolute z-50 py-4 px-2 left-[20%] top-[23%] ">
-                        <img src={Tooltip} alt="" />
-                      </span>
+                    <span className="absolute z-50 py-4 px-2 left-[20%] top-[23%]">
+                      <a
+                        data-tooltip-id="my-tooltip"
+                        data-tooltip-content={feature.tooltip}
+                        data-tooltip-place="right"
+                      >
+                        <img src={TooltipImg} alt="" />
+                      </a>
+                      <Tooltip id="my-tooltip" style={{width: '200px'}} />
                     </span>
                   </td>
                   <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border border-black">
