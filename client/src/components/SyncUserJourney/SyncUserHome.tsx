@@ -1,12 +1,9 @@
-import Search from '../../assets/images/search-1.svg';
-import Genre from '../../constants/genre';
-import Mood from '../../constants/mood';
-import Instrument from '../../constants/instrument';
+
 import Background from '../../assets/images/user-homepage-head.png';
 import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
-import musicWave from '../../assets/images/musicwave.svg'
+import musicWave from '../../assets/images/musicwave.svg';
 // import Play from '../../assets/images/copy-link.svg';
 // import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
@@ -25,6 +22,7 @@ import WaveSurfer from 'wavesurfer.js';
 import PlayButton from '../../assets/images/playbtn.svg';
 import pauseButton from '../../assets/pause.svg';
 import Liked from '../../assets/images/liked.svg';
+import MusicSearch from './MusicSearch';
 
 const SyncUserHome = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +36,7 @@ const SyncUserHome = () => {
   const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
   const [likedTrack, setLikedTrack] = useState<Set<string>>(new Set());
   const { id } = useParams();
+ 
 
   interface TrackDetails {
     musicImg: string;
@@ -180,6 +179,10 @@ const SyncUserHome = () => {
     }
   };
 
+
+
+
+
   return (
     <div className="relative">
       <div
@@ -188,31 +191,7 @@ const SyncUserHome = () => {
         }`}
       >
         <section>
-          <div className="relative w-full my-24px">
-            <input
-              type="text"
-              placeholder="Search for music, genres, moods, keywords or lyrics"
-              className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
-            />
-            <img
-              src={Search}
-              alt="Search"
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
-            />
-          </div>
-          <div className="mt-[32px]">
-            <ul className="flex gap-[35px] items-center">
-              <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-                <Genre />
-              </li>
-              <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-                <Mood />
-              </li>
-              <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-                <Instrument />
-              </li>
-            </ul>
-          </div>
+          <MusicSearch />
           <div className="relative mt-[55px]">
             <span className="w-full">
               <img src={Background} alt="" className="hidden md:block w-full" />
