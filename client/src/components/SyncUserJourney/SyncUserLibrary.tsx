@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-
-// Import your assets and components here
-import Search from '../../assets/images/search-1.svg';
-import Genre from '../../constants/genre';
-import Mood from '../../constants/mood';
-import Instrument from '../../constants/instrument';
 import Background from '../../assets/images/bg-plain.png';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
@@ -18,6 +12,7 @@ import AddMusic from '../../assets/images/add-music.svg';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import Liked from '../../assets/images/liked.svg';
+import MusicSearch from './MusicSearch';
 
 interface TrackDetails {
   musicImg: string;
@@ -42,7 +37,7 @@ interface ResponseData {
 const SyncUserLibrary: React.FC = () => {
   const [trackDetails, setTrackDetails] = useState<TrackDetails[]>([]);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  // const [loading, setLoading] = useState<boolean>(true);
 
   const closeMenu = () => setMenuOpen(!menuOpen);
 
@@ -73,7 +68,7 @@ const SyncUserLibrary: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      // setLoading(true);
       const token = localStorage.getItem('token');
       const apiUrl = `${import.meta.env.VITE_APP_API_URL}/allSongs`;
 
@@ -107,7 +102,7 @@ const SyncUserLibrary: React.FC = () => {
           ).toString()
         );
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     fetchData();
@@ -116,39 +111,11 @@ const SyncUserLibrary: React.FC = () => {
   const likedTracks = trackDetails.filter((track) => track.liked);
   const musicWaves = [MusicWave, MusicWave, MusicWave];
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+ 
 
   return (
     <div className="px-5 xl:px-20 mb-[221px]">
-      <div>
-        <div className="relative w-full my-24px">
-          <input
-            type="text"
-            placeholder="Search for music, genres, moods, keywords or lyrics"
-            className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
-          />
-          <img
-            src={Search}
-            alt="Search"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
-          />
-        </div>
-        <div className="mt-[32px]">
-          <ul className="flex gap-[35px] items-center">
-            <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-              <Genre />
-            </li>
-            <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-              <Mood />
-            </li>
-            <li className="flex gap-[7px] items-center uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-              <Instrument />
-            </li>
-          </ul>
-        </div>
-      </div>
+     <MusicSearch />
       <div>
         <div className="relative mt-[55px]">
           <span className="w-full">

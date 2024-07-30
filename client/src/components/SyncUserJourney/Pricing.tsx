@@ -30,7 +30,7 @@ const Pricing = () => {
       btntext: '#FBFCFE',
       pricebtntext: '#FBFCFE',
       smallText: 'per month',
-      buttonText: 'Start with Standard',
+      buttonText: 'Get Standard',
       features: [
         'Unlimited Metadata access',
         'Unlimited Exclusive Content Review',
@@ -63,7 +63,7 @@ const Pricing = () => {
       price: 'Custom',
       textCol: '#fff',
       check: WhiteCheck,
-      buttonText: 'Get Premium',
+      buttonText: 'Contact us',
 
       features: [
         'Everything in Basic',
@@ -214,11 +214,11 @@ const Pricing = () => {
         </span>
       </div>
 
-      <section className="flex flex-col lg:flex-row items-center justify-center gap-6">
+      <section className="flex flex-col md:grid md:grid-cols-2 md:gap-1 md:mx-auto md:w-[824px]  items-center justify-center gap-6 min-h-full">
         {pricingPlans.map((plan, index) => (
           <div
             key={index}
-            className="p-6 bg-[#F7F9FC] rounded-[16px] w-[400px] h-[412px]"
+            className="p-6 bg-[#F7F9FC] rounded-[16px] h-[412px] w-[400px] "
             style={{ backgroundColor: plan.bg, color: plan.textCol }}
           >
             <p
@@ -314,7 +314,7 @@ const Pricing = () => {
                       >
                         <img src={TooltipImg} alt="" />
                       </a>
-                      <Tooltip id="my-tooltip" style={{width: '200px'}} />
+                      <Tooltip id="my-tooltip" style={{ width: '200px' }} />
                     </span>
                   </td>
                   <td className="plus-jarkata-sans-regular py-4 px-2 md:py-6 md:px-8 w-1/4 font-[20px] leading-6 text-[#1B2128] border border-black">
