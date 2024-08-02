@@ -17,7 +17,7 @@ const unauthorizedRouter = require('./routes/unauthorized')
 
 var app = express();
 
-var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app']
+var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header('Origin')) !== -1) {
