@@ -1,0 +1,139 @@
+@layer base {
+  @font-face {
+    font-family: 'Git-sans';
+    src: url(/font/gitSans/Git-Sans.ttf);
+  }
+  @font-face {
+    font-family: Utile-extralight;
+    font-weight: 200;
+    src: url(/font/Utile/Utile-Book.otf);
+  }
+  @font-face {
+    font-family: Utile-light;
+    font-weight: 300;
+    src: url(/font/Utile/Utile-Light.otf);
+  }
+  @font-face {
+    font-family: Utile-regular;
+    font-weight: 400;
+    src: url(/font/Utile/Utile-Regular.otf);
+  }
+  @font-face {
+    font-family: Utile-medium;
+    font-weight: 500;
+    src: url(/font/Utile/Utile-Medium.otf);
+  }
+
+  @font-face {
+    src: url(/font/Utile/Utile-Medium.otf) format('otf');
+    font-family: Utile-bold;
+    font-weight: 700;
+    src: url(/font/Utile/Utile-Bold.otf);
+  }
+
+  @font-face {
+    font-family: formular-extralight;
+    font-weight: 200;
+    src: url(/font/formular/formular-extralight-trial.woff);
+  }
+
+  @font-face {
+    font-family: formular-light;
+    font-weight: 300;
+    src: url(/font/formular/formular-light-trial.woff);
+  }
+  @font-face {
+    font-family: formular-regular;
+    font-weight: 400;
+    src: url(/font/formular/formular-regular-trial.woff);
+  }
+  @font-face {
+    font-family: formular-medium;
+    font-weight: 500;
+    src: url(/font/formular/formular-medium-trial.woff);
+  }
+
+  @font-face {
+    font-family: formular-bold;
+    font-weight: 700;
+    src: url(/font/formular/formular-bold-trial.woff);
+  }
+  @font-face {
+    font-family: formular-ultra;
+    font-weight: 900;
+    src: url(/font/formular/formular-ultra-trial.woff);
+  }
+
+
+  @font-face {
+    font-family: Bebasneue-regular;
+    font-weight: 400;
+    src: url(/font/bebasNeue/BebasNeue-Regular.otf);
+  }
+
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.poppins-bold {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+}
+
+.poppins-semibold {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+.poppins-medium {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.poppins-regular {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+}
+
+.poppins-light {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+}
+
+.plus-jarkata-sans-light {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 300;
+}
+
+.plus-jarkata-sans-regular {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+}
+
+.plus-jarkata-sans-medium {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+}
+
+.plus-jarkata-sans-semibold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+}
+
+.plus-jarkata-sans-bold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+}
+
+.plus-jarkata-sans-extrabold {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+}
+
+.plus-jarkata-sans-black {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+}
