@@ -55,9 +55,9 @@ const refreshPage = () => {
     message?: string;
   }
 
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
+  // function delay(ms: number) {
+  //   return new Promise((resolve) => setTimeout(resolve, ms));
+  // }
 
   return (
     <div className="lg:mx-8 ml-5 mt-12">
