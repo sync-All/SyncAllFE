@@ -14,9 +14,9 @@ const ProfileInformation = () => {
 
   const { loading, setLoading } = useLoading();
 
-const refreshPage = () => {
-  window.location.reload();
-};
+  const refreshPage = () => {
+    window.location.reload();
+  };
   
   const dateCreated = userDetails?.createdAt
     ? new Date(userDetails.createdAt)
@@ -25,7 +25,7 @@ const refreshPage = () => {
   const dateJoined = dateOnly;
 
   const applyInputStyles =
-    'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
+  'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
@@ -54,10 +54,6 @@ const refreshPage = () => {
   interface ResponseData {
     message?: string;
   }
-
-  // function delay(ms: number) {
-  //   return new Promise((resolve) => setTimeout(resolve, ms));
-  // }
 
   return (
     <div className="lg:mx-8 ml-5 mt-12">
