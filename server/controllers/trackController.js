@@ -29,6 +29,7 @@ const trackUpload = async(req,res,next)=>{
             if(confirmTrackUploaded){
                 res.status(401).json('Track already exists')
             }else{
+              console.log('track not avaiable please continue')
                 let songInfo = req.body
                 let trackLink = await grabSpotifyPreview(res, songInfo.trackLink)
                 var artWork = await cloudinary.uploader.upload(req.file.path)
@@ -36,13 +37,13 @@ const trackUpload = async(req,res,next)=>{
                 const track = new Track(adjustedsongInfo)
                 track.save()
                 .then(async (track)=>{
-                    await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id } }).exec()
+                    await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
                     fs.unlinkSync(req.file.path)
                     res.status(200).json({success : true, message : 'Music Information has been successfully added'})
                 })
                 .catch((err)=>{
                   console.log(err)
-                    res.status(401).json(err)
+                  res.status(401).json(err)
                 })
             }
     }else{

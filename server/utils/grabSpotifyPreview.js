@@ -1,8 +1,10 @@
 const axios = require('axios')
 require('dotenv').config()
+const spotifyError = require('./CustomError').spotifyError
+  
 
 const SpotifyPreview = async(res, trackLink)=>{
-    const trackId = trackLink.split('k/')[1].split('?')[0]
+    const trackId = trackLink.split('k/')[1]?.split('?')[0]
     const clientId = process.env.SPOTIFY_CLIENT_ID
     const clientS = process.env.SPOTIFY_CLIENT_S
     const BasicToken = new Buffer.from(clientId + ':' + clientS).toString('base64')
@@ -31,12 +33,11 @@ const SpotifyPreview = async(res, trackLink)=>{
         }
         console.log(trackDetails.data)
         return trackDetails.data.preview_url
-
+        
     } catch (error) {
-        console.log(error)
-        return res.status(422).send('Wrong track link, Please Try Again')
+        throw new spotifyError('Invalid Track Link')
     }
-
+    
 }
 
 module.exports = SpotifyPreview

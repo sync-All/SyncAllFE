@@ -15,6 +15,15 @@ var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
 const unauthorizedRouter = require('./routes/unauthorized')
 
+
+class CustomSpotifyError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 422;
+    this.name = "NotFoundError";
+  }
+}
+
 var app = express();
 
 var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app']
@@ -74,9 +83,7 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(err.statusCode || 500).send(err.message);
 });
 
 module.exports = app;

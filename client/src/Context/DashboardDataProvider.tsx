@@ -99,7 +99,7 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   
 
-
+  console.log(token)
   const fetchDashboardData = useCallback(async () => {
     // const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
@@ -138,11 +138,11 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       // Implement retry logic or error handling as needed
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
-  });
+  },[fetchDashboardData]);
 
   const contextValue = useMemo(
     () => ({ fetchDashboardData, dashboardData, setToken }),

@@ -68,7 +68,7 @@ const refreshPage = () => {
           setLoading(true);
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
-          const apiUrl = `${urlVar}/profileUpdate`;
+          const apiUrl = `${urlVar}/profileupdate`;
           const config = {
             headers: {
               Authorization: `${token}`,
@@ -76,13 +76,13 @@ const refreshPage = () => {
           };
 
           try {
-            await delay(2000)
             await axios.postForm(apiUrl, values, config);
             toast.success('Profile Information Updated successful');
-            refreshPage()
+            setTimeout(()=>{
+              refreshPage()
+            },1500)
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
-
             toast.error(
               (axiosError.response && axiosError.response.data
                 ? axiosError.response.data.message || axiosError.response.data

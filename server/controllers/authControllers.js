@@ -8,6 +8,7 @@ const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPasswo
 const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
 const cloudinary = require("cloudinary").v2
+const fs = require('node:fs')
 require('dotenv').config()
 
 
@@ -59,7 +60,7 @@ const signup = async function(req, res) {
                 await dashboard.save()
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err = console.log(err))
+            .catch(err => console.log(err))
           })
         }else {
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
@@ -77,7 +78,7 @@ const signup = async function(req, res) {
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err = console.log(err))
+            .catch(err => console.log(err))
           })
         }
         
@@ -167,35 +168,34 @@ const allUsers = async (req,res,next) =>{
 }
 
 const profileUpdate = async (req,res,next)=>{
-  try {
-    const userId = req.user.id
-    if(req.user.role == "Music Uploader"){
-      if(req.file){
-          var profilePicture = await cloudinary.uploader.upload(req.file.path)
-          const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
-          fs.unlinkSync(req.file.path)
-          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-      }else{
-        const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
-        console.log(profileUpdate)
-          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-      }
-    }else if(req.user.role == "Sync User"){
-      if(req.file){
-        var profilePicture = await cloudinary.uploader.upload(req.file.path)
-        const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
-        fs.unlinkSync(req.file.path)
-        res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-      }else{
-        const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
-          res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
-      }
+  const userId = req.user.id
+  if(req.user.role == "Music Uploader"){
+    if(req.file){
+      var profilePicture = await cloudinary.uploader.upload(req.file.path)
+      const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      fs.unlinkSync(req.file.path)
+      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }else{
-      res.status(401).send('Unauthorized')
-    }    
-  } catch (error) {
-    res.status(401).json(error)
+      const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+    }
   }
+  else if(req.user.role == "Sync User")
+  {
+    if(req.file){
+      var profilePicture = await cloudinary.uploader.upload(req.file.path)
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      fs.unlinkSync(req.file.path)
+      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+    }
+    else{
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+    }
+  }else{
+    
+    res.status(401).send('Unauthorized')
+  }    
 }
 
 const verifyEmail =  async (req,res,next)=>{
