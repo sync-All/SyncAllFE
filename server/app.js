@@ -16,14 +16,6 @@ var waitlistRouter = require('./routes/waitlist');
 const unauthorizedRouter = require('./routes/unauthorized')
 
 
-class CustomSpotifyError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 422;
-    this.name = "NotFoundError";
-  }
-}
-
 var app = express();
 
 var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app']
