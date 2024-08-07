@@ -7,7 +7,7 @@ var router = express.Router();
 const trackController = require('../controllers/trackController')
 
 
-router.get('/verifyTrackUploaded/:trackLink',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
+router.get('/verifyTrackUploaded/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
 
 router.post('/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(trackController.trackUpload))
 
