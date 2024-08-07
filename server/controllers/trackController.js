@@ -15,7 +15,7 @@ const verifyTrackUpload = async(req,res,next)=>{
         if(confirmTrackUploaded){
             res.status(401).json('Track already exists')
         }else{
-            res.status(200).json({success : true, message : 'Specific track with ISRC is not available'})
+            res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc})
         }
     }catch {
         res.status(404).json("Not found")
