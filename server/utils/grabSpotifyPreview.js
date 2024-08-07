@@ -31,8 +31,10 @@ const SpotifyPreview = async(res, trackLink)=>{
         if(!trackDetails.data.preview_url){
             return res.status(422).send('No preview available for this track or Invalid Link, Please try again later')
         }
-        console.log(trackDetails.data)
-        return trackDetails.data.preview_url
+        return {
+            preview_url : trackDetails.data.preview_url,
+            isrc : trackDetails.data.external_ids.isrc
+        }
         
     } catch (error) {
         throw new spotifyError('Invalid Track Link')

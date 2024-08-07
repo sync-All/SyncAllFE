@@ -9,9 +9,9 @@ require('dotenv').config()
 
 const verifyTrackUpload = async(req,res,next)=>{
     try{
-        const isrc = req.params.isrc
-        const confirmTrackUploaded = await Track.findOne({isrc : isrc}).exec()
-        console.log(confirmTrackUploaded)
+        const trackLink = req.params.trackLink
+        let response = await grabSpotifyPreview(res, trackLink)
+        const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
         if(confirmTrackUploaded){
             res.status(401).json('Track already exists')
         }else{
@@ -24,16 +24,16 @@ const verifyTrackUpload = async(req,res,next)=>{
 
 const trackUpload = async(req,res,next)=>{
     if(req.user.role == "Music Uploader"){
-            const {isrc} = req.body
-            const confirmTrackUploaded = await Track.findOne({isrc : isrc}).exec()
+            const {trackLink} = req.body
+            let response = await grabSpotifyPreview(res, trackLink)
+            const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
             if(confirmTrackUploaded){
                 res.status(401).json('Track already exists')
             }else{
               console.log('track not avaiable please continue')
                 let songInfo = req.body
-                let trackLink = await grabSpotifyPreview(res, songInfo.trackLink)
                 var artWork = await cloudinary.uploader.upload(req.file.path)
-                const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink}
+                const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : response.preview_url}
                 const track = new Track(adjustedsongInfo)
                 track.save()
                 .then(async (track)=>{
