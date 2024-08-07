@@ -2,13 +2,13 @@ import React, { useState, useMemo } from 'react';
 import Filter from '../../assets/images/Filter-lines.svg';
 import Download from '../../assets/images/download-cloud.svg';
 import Plus from '../../assets/images/plus.svg';
-import Duration from '../../assets/images/music-info.svg';
 import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/AddCircle.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 import { useNavigate } from 'react-router-dom';
+import MusicPlayer from '../MusicPlayer';
 
 interface Track {
   _id: string;
@@ -160,14 +160,14 @@ const MusicUploaderTracks: React.FC = () => {
         </thead>
         <tbody>
           {sortedData.map((track) => (
-            <tr key={track['_id']}>
+            <tr key={track['_id']} className='items-center'>
               <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
                 {track['trackTitle']}
               </td>
               <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                 {new Date(track['releaseDate']).toLocaleDateString()}
               </td>
-              <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
+              <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
                 <img src={Dot} alt="Dot" />
                 {track['uploadStatus']}
               </td>
@@ -175,7 +175,7 @@ const MusicUploaderTracks: React.FC = () => {
                 {track['earnings']}
               </td>
               <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                <img src={Duration} alt="Duration" />
+                <MusicPlayer trackLink={track['trackLink']} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]' />
               </td>
               <td className="py-4 px-4">
                 <span>

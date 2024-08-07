@@ -294,10 +294,10 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
                     </p>
                     <div
                       onClick={logGoogleUser}
-                      className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] "
+                      className="mt-[32px] flex justify-center items-center gap-[25px] mx-auto border border-[#CCCCCC] py-[11px] px-[33px] rounded-[10px] cursor-pointer hover:bg-[#CCCCCC]"
                     >
                       <img src={Google} alt="google icon" />
-                      <span className="text-[16px] poppins-medium leading-[24px] text-black ">
+                      <span className="text-[16px] poppins-medium leading-[24px] text-black">
                         Continue with Google
                       </span>
                     </div>

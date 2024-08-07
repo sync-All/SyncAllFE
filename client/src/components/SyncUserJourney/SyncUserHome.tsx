@@ -3,7 +3,6 @@ import Background from '../../assets/images/user-homepage-head.png';
 import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
-import musicWave from '../../assets/images/musicwave.svg';
 // import Play from '../../assets/images/copy-link.svg';
 // import Pause from '../../assets/images/add-music.svg';
 import AddMusic from '../../assets/images/add-music.svg';
@@ -12,27 +11,18 @@ import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
 import { useParams } from 'react-router-dom';
 
-import { useEffect, useRef, RefObject, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 // import SpotifyPlayer from '../../constants/spotifyplayer' // Adjust the path as necessary
-import WaveSurfer from 'wavesurfer.js';
-import PlayButton from '../../assets/images/playbtn.svg';
-import pauseButton from '../../assets/pause.svg';
 import Liked from '../../assets/images/liked.svg';
 import MusicSearch from './MusicSearch';
+import MusicPlayer from '../MusicPlayer';
 
 const SyncUserHome = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const waveformRef: RefObject<HTMLDivElement> = useRef(null);
-  const wavesurfer = useRef<WaveSurfer | null>(null);
-  const [volume, setVolume] = useState(0.5);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [currentTime, setCurrentTime] = useState('');
   const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
   const [likedTrack, setLikedTrack] = useState<Set<string>>(new Set());
   const { id } = useParams();
@@ -99,16 +89,7 @@ const SyncUserHome = () => {
         console.log(res.data.allTracks);
         const allTracks: TrackDetails[] = res.data.allTracks;
         console.log(allTracks);
-        const trackLinks = allTracks.map((track) => track.trackLink);
-        console.log(trackLinks);
-        const track = allTracks.find((track) => track._id === id);
-        if (track) {
-          setTrackDetails(track);
-          const newAudio = new Audio(track?.trackLink);
-          setAudio(newAudio);
-        } else {
-          console.log('error');
-        }
+
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
 
@@ -123,61 +104,7 @@ const SyncUserHome = () => {
     fetchData();
   }, [id]);
 
-  const formWaveSurferOptions = (ref: HTMLElement | string) => ({
-    container: ref,
-    waveColor: '#98A2B3',
-    progressColor: '#013131',
-    cursorColor: '#013131',
-    barWidth: 2,
-    barRadius: 5,
-    responsive: true,
-    height: 40,
-    // If true, normalize by the maximum peak instead of 1.0.
-    normalize: true,
-    // Use the PeakCache to improve rendering speed of large waveforms.
-    partialRender: true,
-  });
-
-  useEffect(() => {
-    if (waveformRef.current) {
-      const options = formWaveSurferOptions(waveformRef.current);
-      wavesurfer.current = WaveSurfer.create(options);
-      if (trackDetails?.trackLink) {
-        wavesurfer.current.load(trackDetails.trackLink);
-      }
-      wavesurfer.current.on('ready', function () {
-        if (wavesurfer.current) {
-          wavesurfer.current.setVolume(volume);
-          setVolume(volume);
-        }
-      });
-
-      wavesurfer.current.on('audioprocess', () => {
-        const minutes = Math.floor(wavesurfer.current!.getCurrentTime() / 60);
-        const seconds = Math.floor(
-          wavesurfer.current!.getCurrentTime() - minutes * 60
-        );
-        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(
-          seconds
-        ).padStart(2, '0')}`;
-        setCurrentTime(formattedTime);
-      });
-
-      wavesurfer.current.on('finish', () => {
-        wavesurfer.current!.setTime(0);
-        setIsPlaying(false);
-      });
-    }
-
-    return () => wavesurfer?.current?.destroy();
-  }, [trackDetails, volume]);
-
-  const handlePlayPause = () => {
-    if (audio) {
-      setIsPlaying(!isPlaying);
-      wavesurfer?.current?.playPause();
-    }
-  };
+  
 
 
 
@@ -234,20 +161,7 @@ const SyncUserHome = () => {
                     </p>
                   </span>
                 </Link>
-                <div className=" flex items-center w-[15%] justify-center">
-                  <img
-                    src={isPlaying ? pauseButton : PlayButton}
-                    alt=""
-                    onClick={handlePlayPause}
-                    className=" cursor-pointer"
-                  />
-                  <div id="waveform" ref={waveformRef} className="w-[60%]">
-                    <img src={musicWave} alt="" />
-                  </div>
-                  <p className="font-Utile-medium text-[16px] leading-4 ">
-                    {currentTime || '00:00'}
-                  </p>
-                </div>
+                <MusicPlayer trackLink={detail.trackLink} duration={10} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]'/>
                 <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                   <span>
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">

@@ -2,23 +2,15 @@ import Background from '../../assets/images/user-homepage-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 import AddMusic from '../../assets/images/add-music.svg';
-import PlayButton from '../../assets/images/playbtn.svg';
-import pauseButton from "../../assets/pause.svg"
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef,RefObject, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-import WaveSurfer from "wavesurfer.js";
+import MusicPlayer from '../MusicPlayer';
 
 const TrackMetadata = () => {
   const { id } = useParams();
   const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const waveformRef:RefObject<HTMLDivElement> = useRef(null)
-  const wavesurfer = useRef<WaveSurfer | null>(null);
-  const [volume, setVolume] = useState(0.5);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [currentTime, setCurrentTime] = useState('');
 
   interface ResponseData {
     message?: string;
@@ -84,8 +76,6 @@ const TrackMetadata = () => {
         if (track) {
           console.log(track)
           setTrackDetails(track);
-          const newAudio = new Audio(track?.trackLink)
-          setAudio(newAudio)
         } else {
           toast.error('Track not found');
         }
@@ -102,65 +92,6 @@ const TrackMetadata = () => {
     fetchTrackDetails();
   }, [id]);
 
-  const formWaveSurferOptions = (ref:HTMLElement | string) => ({
-    container: ref,
-    waveColor: "#98A2B3",
-    progressColor: "#013131",
-    cursorColor: "#013131",
-    barWidth: 2,
-    barRadius: 5,
-    responsive: true,
-    height: 40,
-    // If true, normalize by the maximum peak instead of 1.0.
-    normalize: true,
-    // Use the PeakCache to improve rendering speed of large waveforms.
-    partialRender: true
-  });
-
-  useEffect(() => {
-    if(waveformRef.current){
-      const options = formWaveSurferOptions(waveformRef.current);
-      wavesurfer.current = WaveSurfer.create(options);
-      if(trackDetails?.trackLink){
-        wavesurfer.current.load(trackDetails.trackLink);
-      }
-      wavesurfer.current.on("ready", function() {
-        if (wavesurfer.current) {
-          wavesurfer.current.setVolume(volume);
-          setVolume(volume);
-        }
-      })
-
-      wavesurfer.current.on('audioprocess', () => {
-        const minutes = Math.floor(wavesurfer.current!.getCurrentTime() / 60);
-        const seconds = Math.floor(wavesurfer.current!.getCurrentTime() - minutes * 60);
-        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        setCurrentTime(formattedTime);
-      });
-
-      wavesurfer.current.on('finish', () => {
-        wavesurfer.current!.setTime(0)
-        setIsPlaying(false);
-      });
-      
-    }
-
-    
-
-      return () => wavesurfer?.current?.destroy();
-    },[trackDetails,volume]);
-
-  const handlePlayPause = () => {
-    if (audio) {
-      setIsPlaying(!isPlaying);
-      wavesurfer?.current?.playPause();
-    }
-  };
-
-  
-  console.log(currentTime)
-  // console.log(wavesurfer.current?.getCurrentTime())
-
   
   return (
     <div> 
@@ -173,7 +104,7 @@ const TrackMetadata = () => {
           />
         </div>
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
-          <div className="flex justify-between flex-col md:flex-row">
+          <div className="flex justify-between flex-col  md:flex-row">
             <div className="flex flex-col gap-2 lg:gap-4 w-full">
               <p className="text-[#475367] text-[32px] lg:text-[56px] font-formular-bold ">
                 {trackDetails?.trackTitle || 'No Title Available'}
@@ -192,12 +123,7 @@ const TrackMetadata = () => {
               </button>
             </div>
           </div>
-
-          <div className=" flex items-center justify-between mt-20">
-            <img src={ isPlaying ? pauseButton : PlayButton} alt="" onClick={handlePlayPause} className='w-12 cursor-pointer' />
-            <div id="waveform" ref={waveformRef} className='w-[60%]'></div>
-            <p className="font-Utile-medium text-[16px] leading-4 ">{currentTime || '00:00'}</p>
-          </div>
+          <MusicPlayer trackLink={trackDetails?.trackLink}/>
           <div className="mt-[93px] mb-[163px]">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
               Track Details
