@@ -5,11 +5,7 @@ interface InstrumentProps {
   onSelect: (genre: string) => void;
 }
 
-const Genre: React.FC<InstrumentProps> = ({ onSelect }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const genres = [
+export const genres = [
     'African',
     'African Dancehall',
     'African Reggae',
@@ -98,6 +94,12 @@ const Genre: React.FC<InstrumentProps> = ({ onSelect }) => {
     'Waka',
     'World',
   ];
+  
+const Genre: React.FC<InstrumentProps> = ({ onSelect }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+ 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
