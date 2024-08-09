@@ -22,29 +22,29 @@ interface ResponseData {
 
 const PaymentInfo = () => {
   const paymentInfo = useDataContext();
-const { loading, setLoading } = useLoading();
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+  const { loading, setLoading } = useLoading();
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
-const refreshPage = () => {
-  window.location.reload();
-};
+  const refreshPage = () => {
+    window.location.reload();
+  };
 
- const paymentDetails = Array.isArray(
-   paymentInfo.dashboardData?.dashboardDetails?.earnings
- )
-   ? paymentInfo.dashboardData.dashboardDetails.earnings[0]
-   : {};
+  const paymentDetails = Array.isArray(
+    paymentInfo.dashboardData?.dashboardDetails?.earnings
+  )
+    ? paymentInfo.dashboardData.dashboardDetails.earnings[0]
+    : {};
 
   const initialValues: FormData = {
-    accName: paymentDetails.accName,
-    accNumber: paymentDetails.accNumber,
-    bankName: paymentDetails.bankName,
-    bankAddress: paymentDetails.bankAddress,
-    country: paymentDetails.country,
-    code: paymentDetails.sortCode,
-    bicCode: paymentDetails.bicCode,
+    accName: paymentDetails?.accName ?? '',
+    accNumber: paymentDetails?.accNumber ?? '',
+    bankName: paymentDetails?.bankName ?? '',
+    bankAddress: paymentDetails?.bankAddress ?? '',
+    country: paymentDetails?.country ?? '',
+    code: paymentDetails?.sortCode ?? '',
+    bicCode: paymentDetails?.bicCode ?? '',
   };
 
   const validateForm = yup.object().shape({
@@ -77,9 +77,9 @@ const refreshPage = () => {
       </div>
       <Formik
         validationSchema={validateForm}
-        initialValues={initialValues}
+        initialValues={initialValues || ''}
         onSubmit={async (values) => {
-          setLoading(true)
+          setLoading(true);
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
           const apiUrl = `${urlVar}/updatepaymentinfo/`;
@@ -88,12 +88,12 @@ const refreshPage = () => {
               Authorization: `${token}`,
             },
           };
-          
+
           try {
-            await delay(2000)
+            await delay(2000);
             await axios.post(apiUrl, values, config);
             toast.success('Payment Information Updated successful');
-            refreshPage()
+            refreshPage();
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
             toast.error(
@@ -102,9 +102,8 @@ const refreshPage = () => {
                 : axiosError.message || 'An error occurred'
               ).toString()
             );
-           
-          }finally{
-            setLoading(false)
+          } finally {
+            setLoading(false);
           }
         }}
       >
@@ -119,7 +118,6 @@ const refreshPage = () => {
                   type="text"
                   className={applyInputStyles}
                   name="accName"
-                  placeholder={paymentDetails.accNumber}
                 />
                 <ErrorMessage
                   name="accName"
@@ -228,7 +226,6 @@ const refreshPage = () => {
                 disabled={loading}
               >
                 {loading ? 'Updating...' : 'Update Payment Information'}
-                
               </button>
             </div>
           </Form>

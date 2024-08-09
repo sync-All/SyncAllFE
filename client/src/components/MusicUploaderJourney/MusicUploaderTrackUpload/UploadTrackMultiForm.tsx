@@ -197,8 +197,12 @@ const UploadTrackMultiForm: React.FC = () => {
     }
   };
 
+  const refreshPage = () => {
+    window.location.reload();
+  };
+
   return (
-    <div className="lg:mx-8 ml-5">
+    <div className="lg:mx-8 ml-5" >
       <div>
         <span className="flex gap-2">
           <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
@@ -258,6 +262,7 @@ const UploadTrackMultiForm: React.FC = () => {
         </nav>
         <Formik
           initialValues={initialFormData}
+          enableReinitialize
           validationSchema={validationSchema}
           onSubmit={async (values, { validateForm }) => {
             setLoading(true)
@@ -285,6 +290,7 @@ const UploadTrackMultiForm: React.FC = () => {
               await delay(2000)
               await axios.postForm(apiUrl, values, config);
               toast.success('Track Uploaded Successfully');
+              refreshPage()
             } catch (error: unknown) {
               console.log(error)
               const axiosError = error as AxiosError<ResponseData>;
@@ -305,6 +311,9 @@ const UploadTrackMultiForm: React.FC = () => {
            
           }}
         >
+
+
+          
           <Form>
             {renderSection()}
             <div className="buttons flex justify-between my-4 pr-2 ">
