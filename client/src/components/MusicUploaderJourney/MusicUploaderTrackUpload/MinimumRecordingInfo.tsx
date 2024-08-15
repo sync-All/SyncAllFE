@@ -5,7 +5,7 @@ import InputField from '../../InputField';
 import { useFormikContext } from 'formik';
 import axios from 'axios';
 import IsrcError from './IsrcError';
-// import { toast } from 'react-toastify';
+import { genres } from '../../../constants/genre';// import { toast } from 'react-toastify';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -13,8 +13,6 @@ const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
 const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
-
-
 
 const MinimumRecordingInfo: React.FC = () => {
   const { setFieldValue } = useFormikContext();
@@ -36,10 +34,10 @@ const MinimumRecordingInfo: React.FC = () => {
     }
   };
 
-  const verifyISRC = async (isrc: string) => {
+  const verifyTrackLink = async (trackLink: string) => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/verifyTrackUploaded/${isrc}`;
+    const apiUrl = `${urlVar}/verifyTrackUploaded/?trackLink="${trackLink}"`;
     const config = {
       headers: {
         Authorization: ` ${token}`,
@@ -47,25 +45,21 @@ const MinimumRecordingInfo: React.FC = () => {
     };
     try {
       const response = await axios.get(apiUrl, config);
-      // Assuming the API returns a JSON object with a boolean 'isValid' field
-      if (response.data.success) {
-        setIsrcValidationMessage('ISRC is valid.');
-      } else {
-        setIsrcValidationMessage('ISRC is not valid.');
-        setIsIsrcErrorModalOpen(true); 
-      }
+      setFieldValue('isrc', response.data.isrc);
+
+      setIsrcValidationMessage('');
     } catch (error) {
-      setIsrcValidationMessage('Failed to verify ISRC.');
-      
+      setIsrcValidationMessage('Failed to fetch ISRC, invalid track link');
+      setFieldValue('isrc', '');
     }
   };
 
-    const handleIsrcBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      const isrc = e.target.value;
-      if (isrc) {
-        verifyISRC(isrc);
-      }
-    };
+  const handleTrackLink = (e: React.FocusEvent<HTMLInputElement>) => {
+    const trackLink = e.target.value;
+    if (trackLink) {
+      verifyTrackLink(trackLink);
+    }
+  };
 
   return (
     <div className="flex flex-col mt-[60px]">
@@ -115,7 +109,7 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="releaseTitle" className={applyLabelStyles}>
             Release Title
           </label>
-          <Field as="select" name="releaseTitle" className={applyInputStyles} >
+          <Field as="select" name="releaseTitle" className={applyInputStyles}>
             <option value="">Select...</option>
             <option value="Album">Album title</option>
             <option value="Single">Single title</option>
@@ -144,7 +138,12 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="trackLink" className={applyLabelStyles}>
             Track Link
           </label>
-          <Field type="text" name="trackLink" className={applyInputStyles} />
+          <Field
+            type="text"
+            name="trackLink"
+            className={applyInputStyles}
+            onBlur={handleTrackLink}
+          />
           <ErrorMessage
             name="trackLink"
             component="div"
@@ -172,7 +171,7 @@ const MinimumRecordingInfo: React.FC = () => {
             type="text"
             name="isrc"
             className={applyInputStyles}
-            onBlur={handleIsrcBlur}
+            disabled
           />
           <ErrorMessage
             name="isrc"
@@ -189,7 +188,14 @@ const MinimumRecordingInfo: React.FC = () => {
           <label htmlFor="genre" className={applyLabelStyles}>
             Genre
           </label>
-          <Field type="text" name="genre" className={applyInputStyles} />
+          <Field as="select" name="genre" className={applyInputStyles}>
+            <option value="">Select a country</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </Field>
           <ErrorMessage
             name="genre"
             component="div"

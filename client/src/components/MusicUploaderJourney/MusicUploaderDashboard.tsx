@@ -15,11 +15,14 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useDataContext } from '../../Context/DashboardDataProvider';
+import { usePDF } from 'react-to-pdf';
 
 // interface Activity {
 //   title: string;
 //   description: string;
 // }
+
+
 
 const MusicUploaderDashboard= () => {
   const dashdata = useDataContext();
@@ -31,17 +34,17 @@ const MusicUploaderDashboard= () => {
   console.log(token);
 
   const data = [
-    { name: '12', uv: 120 },
-    { name: '13', uv: 150 },
-    { name: '14', uv: 140 },
-    { name: '15', uv: 50 },
-    { name: '16', uv: 20 },
-    { name: '17', uv: 80 },
-    { name: '18', uv: 65 },
-    { name: '19', uv: 100 },
-    { name: '20', uv: 10 },
-    { name: '21', uv: 110 },
-    { name: '22', uv: 100 },
+    { name: '19', uv: 120 },
+    { name: '20', uv: 0 },
+    { name: '21', uv: 0 },
+    { name: '22', uv: 0 },
+    { name: '23', uv: 0 },
+    { name: '24', uv: 0 },
+    { name: '25', uv: 0 },
+    { name: '26', uv: 0 },
+    { name: '27', uv: 0 },
+    { name: '28', uv: 0 },
+    { name: '29', uv: 0 },
   ];
 
   const totalTracksCount = dashboardDetails?.totalTracks.length || 0;
@@ -51,39 +54,32 @@ const MusicUploaderDashboard= () => {
       image: Uploaded,
       title: 'Total Tracks Uploaded',
       value: `${totalTracksCount}`,
-      percentage: '16%',
       color: '#064e3b',
-      bgColor: 'bg-green-300',
     },
     {
       image: Earning,
       title: 'Total Earnings',
       dollar: '$',
       value: `${dashboardDetails?.totalEarnings || 0}`,
-      percentage: '16%',
       color: '#f62c2c',
-      bgColor: 'bg-red-300',
     },
     {
       image: Earth,
       title: 'Countries Reached',
-      value: `${dashboardDetails?.countryReached}`,
-      percentage: '16%',
+      value: `${dashboardDetails?.countryReached || NaN}`,
       color: '#064e3b',
-      bgColor: 'bg-green-300',
     },
     {
       image: Stream,
       title: 'Total Plays',
       value: `${dashboardDetails?.totalPlays || 0}`,
-      percentage: '16%',
       color: '#064e3b',
-      bgColor: 'bg-green-300',
     },
   ];
+  const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
 
   return (
-    <div>
+    <div ref={targetRef}>
       <div className="ml-[20px] mr-[20px] lg:mx-8">
         <div className="flex mt-7 lg:mt-8">
           <span className="mr-auto">
@@ -93,19 +89,9 @@ const MusicUploaderDashboard= () => {
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
-            <select
-              name=""
-              id=""
-              className="border border-[#D7DCE0] p-3 rounded-[5px]"
-            >
-              <option value="">All</option>
-              <option value="">Yearly</option>
-              <option value="">Monthly</option>
-              <option value="">Weekly</option>
-            </select>
             <button className="flex bg-[#EFA705] p-[10px] gap-[8px] rounded-[5px]">
               <img src={Folder} alt=""></img>
-              <p>Download PDF</p>
+              <button onClick={() => toPDF()}>Download PDF</button>
             </button>
           </div>
         </div>
@@ -127,12 +113,7 @@ const MusicUploaderDashboard= () => {
                     {card.value.includes('totalTracksCount') &&
                     !dashboardDetails
                       ? 'Loading...'
-                      : card.value }
-                  </p>
-                  <p
-                    className={`text-[8px] font-Utile-medium text-[${card.color}] ${card.bgColor} lg:text-[14px]`}
-                  >
-                    {card.percentage}
+                      : card.value}
                   </p>
                 </div>
               </div>

@@ -100,13 +100,14 @@ const MusicUploaderEarnings: React.FC = () => {
             Your available balance:
           </p>
           <h2 className="font-Utile-bold text-[36px] tracking-[-1.44px] leading-[43.2px]">
-            {earningDetails?.availableBal}
+            {earningDetails?.availableBal || 0}
           </h2>
         </div>
-        <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 ">
+        <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 z-50 ">
           <p>
-            {earningDetails?.accNumber} <br />
-            {earningDetails?.accName}, {earningDetails?.bankName}
+            {earningDetails?.accNumber || 'Account number'} <br />
+            {earningDetails?.accName || 'Account name'},{' '}
+            {earningDetails?.bankName || 'Bank name'}
           </p>
           <span>
             <button
@@ -118,7 +119,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </button>
           </span>
         </div>
-        <span className="absolute left-[25%]">
+        <span className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2">
           <img src={Logo} alt="" />
         </span>
       </div>
@@ -131,7 +132,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h2 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.totalEarnings}
+              {earningDetails?.totalEarnings || 0}
             </h2>
           </div>
         </div>
@@ -143,7 +144,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.totalWithdrawals}
+              {earningDetails?.totalWithdrawals || 0}
             </h3>
           </div>
         </div>
@@ -155,7 +156,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.averageMonthlyEarnings}
+              {earningDetails?.averageMonthlyEarnings || 0}
             </h3>
           </div>
         </div>
