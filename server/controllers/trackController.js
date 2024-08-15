@@ -87,6 +87,22 @@ const querySongsByIndex = async(req,res,next)=>{
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
     }
-  }
+}
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex}
+const queryTrackInfo =async(req,res,next)=>{
+  const trackId = req.params.trackId
+  if(req.user.role == "Sync User"){
+      if(req.user.billing.plan == "basic"){
+          const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork").exec()
+          console.log(details)
+          res.json({details})
+      }else{
+          const details = await Track.findOne({_id : trackId}).exec()
+          res.json({details})
+      }
+      return;
+  }
+  res.status(400).send("Bad request")
+}
+
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo}

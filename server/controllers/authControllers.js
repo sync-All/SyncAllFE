@@ -108,7 +108,7 @@ const signup = async function(req, res) {
 
       const userDetails = await User.findOne({email : email}).select('-password').exec()
 
-      const syncUserDetails = await SyncUser.findOne({email : email}).select('-password').exec()
+      const syncUserDetails = await SyncUser.findOne({email : email}).populate('tracklist').select('-password').exec()
 
       res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
