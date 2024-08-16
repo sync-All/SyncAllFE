@@ -3,12 +3,15 @@ import pauseButton from "../assets/pause.svg"
 import { useEffect, useRef,RefObject, useState } from 'react';
 import WaveSurfer from "wavesurfer.js";
 
+
+
 interface PlayerProps {
     trackLink : string | undefined,
     containerStyle ?:  string | undefined,
     buttonStyle ?:  string | undefined,
     timerStyle ?:  string | undefined,
     waveStyle ?: string | undefined,
+    songId ?: string | undefined,
     duration ?: number | undefined
 }
 
@@ -17,15 +20,17 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
   const waveformRef:RefObject<HTMLDivElement> = useRef(null)
   const wavesurfer = useRef<WaveSurfer | null>(null);
   const [volume, setVolume] = useState(0.5);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState('');
-  
+
+
   const handlePlayPause = () => {
-    if (audio) {
-      setIsPlaying(!isPlaying);
-      wavesurfer?.current?.playPause();
-    }
+    
+    setIsPlaying( !isPlaying);
+    wavesurfer?.current?.playPause();
+      
   };
+
+  
 
   const formWaveSurferOptions = (ref:HTMLElement | string) => ({
     container: ref,
@@ -43,13 +48,13 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
   });
 
   useEffect(()=>{
-    if(trackLink){
-        const newAudio = new Audio(trackLink)
-        setAudio(newAudio)
-    }
+    // if(trackLink){
+    //   const newAudio = new Audio(trackLink)
+    //   setAudio(newAudio)
+    // }
 
     if(waveformRef.current){
-        const options = formWaveSurferOptions(waveformRef.current);
+      const options = formWaveSurferOptions(waveformRef.current)
         wavesurfer.current = WaveSurfer.create(options);
         if(trackLink){
           wavesurfer.current.load(trackLink);
@@ -87,14 +92,17 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
     }
     return () => wavesurfer?.current?.destroy();
     
-  },[trackLink,volume, duration])
+  },[trackLink,volume, duration ])
 
   return (
+    <>
     <div className={containerStyle || " flex items-center justify-between mt-20"}>
       <img src={ isPlaying ? pauseButton : PlayButton} alt="" onClick={handlePlayPause} className={buttonStyle ||'w-12 cursor-pointer'} />
       <div id="waveform" ref={waveformRef} className={waveStyle ||'w-[60%]'}></div>
       <p className={timerStyle || "font-Utile-medium text-[16px] leading-4 "}>{currentTime || '00:00'}</p>
     </div>
+
+    </>
   )
 }
 

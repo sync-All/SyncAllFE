@@ -161,7 +161,7 @@ const SyncUserHome = () => {
                     </p>
                   </span>
                 </Link>
-                <MusicPlayer trackLink={detail.trackLink} duration={10} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]'/>
+                <MusicPlayer trackLink={detail.trackLink} songId={index} duration={10} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]'/>
                 <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                   <span>
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
