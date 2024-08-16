@@ -22,7 +22,7 @@ interface TrackDetails {
   mainArtist: string;
   musicWaves: string[];
   duration: string;
-  bpm: string;
+  writers: string;
   genre: string;
   mood: string;
   actions: string[];
@@ -172,7 +172,7 @@ const SyncUserLibrary: React.FC = () => {
                       {detail.duration}
                     </p>
                     <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.bpm}
+                      {detail.writers}
                     </p>
                   </span>
                   <span>

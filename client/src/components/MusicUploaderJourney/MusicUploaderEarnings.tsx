@@ -11,6 +11,7 @@ import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
 import WithdrawalModal from './WithdrawalModal';
 import { useDataContext } from '../../Context/DashboardDataProvider';
+import NoTransaction from '../../assets/images/no_transaction.svg';
 
 interface TableData {
   transactionId: string;
@@ -100,10 +101,10 @@ const MusicUploaderEarnings: React.FC = () => {
             Your available balance:
           </p>
           <h2 className="font-Utile-bold text-[36px] tracking-[-1.44px] leading-[43.2px]">
-            {earningDetails?.availableBal || 0}
+            {earningDetails?.availableBal || 0.00}
           </h2>
         </div>
-        <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 z-50 ">
+        <div className="flex justify-between text-[16px] font-Utile-regular leading-[23.2px] mt-[25px] pb-10 z-20 ">
           <p>
             {earningDetails?.accNumber || 'Account number'} <br />
             {earningDetails?.accName || 'Account name'},{' '}
@@ -132,7 +133,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h2 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.totalEarnings || 0}
+              {earningDetails?.totalEarnings || 0.00}
             </h2>
           </div>
         </div>
@@ -144,7 +145,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.totalWithdrawals || 0}
+              {earningDetails?.totalWithdrawals || 0.00}
             </h3>
           </div>
         </div>
@@ -156,7 +157,7 @@ const MusicUploaderEarnings: React.FC = () => {
             </p>
             <h3 className="font-formular-regular text-[32px] text-[#1D2739]">
               <span className="font-Utile-regular">&#36;</span>{' '}
-              {earningDetails?.averageMonthlyEarnings || 0}
+              {earningDetails?.averageMonthlyEarnings || 0.00}
             </h3>
           </div>
         </div>
@@ -186,75 +187,89 @@ const MusicUploaderEarnings: React.FC = () => {
           </button>
         </div>
       </div>
-      <table className="w-full mt-5">
-        <thead>
-          <tr>
-            <th className={ThStyles}>
-              Transaction ID
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="transactionId"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Transaction Type{' '}
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="transactionType"
-                onSort={handleSort}
-              />
-            </th>
-            <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ">
-              Transaction Status
-            </th>
-            <th className={ThStyles}>
-              Amount{' '}
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="amount"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Date
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="date"
-                onSort={handleSort}
-              />
-            </th>
-            <th className="bg-grey-100 py-3 px-6"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((data, index) => (
-            <tr key={index}>
-              <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                {data.transactionId}
-              </td>
-              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                {data.transactionType}
-              </td>
-              <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
-                <img src={Dot} alt="" />
-                {data.transactionStatus}
-              </td>
-              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                {data.amount}
-              </td>
-              <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                {data.date.toLocaleDateString()}
-              </td>
-              <td className=" py-4 px-4">
-                <span>
-                  <img src={DotMenu} alt="" />
-                </span>
-              </td>
+
+      {transactionDetails.length > 0 ? (
+        <table className="w-full mt-5">
+          <thead>
+            <tr>
+              <th className={ThStyles}>
+                Transaction ID
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="transactionId"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Transaction Type{' '}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="transactionType"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ">
+                Transaction Status
+              </th>
+              <th className={ThStyles}>
+                Amount{' '}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="amount"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Date
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="date"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className="bg-grey-100 py-3 px-6"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedData.map((data, index) => (
+              <tr key={index}>
+                <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+                  {data.transactionId}
+                </td>
+                <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {data.transactionType}
+                </td>
+                <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
+                  <img src={Dot} alt="" />
+                  {data.transactionStatus}
+                </td>
+                <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {data.amount}
+                </td>
+                <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+                  {data.date.toLocaleDateString()}
+                </td>
+                <td className=" py-4 px-4">
+                  <span>
+                    <img src={DotMenu} alt="" />
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="flex flex-col justify-center items-center mx-auto mt-[67px]">
+          <img src={NoTransaction} alt="" />
+          <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
+            No Transaction
+          </p>
+          <p className="text-[#667085] text-[12px] font-formular-medium  leading-4">
+            No transaction has been recorded
+          </p>
+        </div>
+      )}
+
       <WithdrawalModal isOpen={modalIsOpen} onRequestClose={closeModal} />
     </div>
   );

@@ -5,7 +5,7 @@ import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 // import Play from '../../assets/images/copy-link.svg';
 // import Pause from '../../assets/images/add-music.svg';
-import AddMusic from '../../assets/images/add-music.svg';
+// import AddMusic from '../../assets/images/add-music.svg';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
@@ -36,7 +36,7 @@ const SyncUserHome = () => {
     mainArtist: string;
     musicWaves: string[];
     duration: string;
-    bpm: string;
+    writers: string;
     genre: string;
     mood: string;
     actions: string[];
@@ -168,7 +168,7 @@ const SyncUserHome = () => {
                       {detail.duration || '3 minutes, 33 seconds'}
                     </p>
                     <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.bpm || '124bpm'}
+                      {detail.writers || '124bpm'}
                     </p>
                   </span>
                   <span>
@@ -186,8 +186,8 @@ const SyncUserHome = () => {
                     alt=""
                     onClick={() => handleLike(detail._id)}
                   />
-                  <img src={AddMusic} alt="" />
-                  <img src={Copy} alt="" />
+                  {/* <img src={AddMusic} alt="" /> */}
+                  <img src={Copy} alt="" className='cursor-pointer' />
                 </span>
                 <span className="gap-[12px] flex w-[25%] justify-center">
                   <Link to={`metadata/${detail?._id}`}>
@@ -252,10 +252,10 @@ const SyncUserHome = () => {
                         <img src={Favorite} alt="" />
                         Favorite
                       </li>
-                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                      {/* <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
                         <img src={AddMusic} alt="" />
                         Add to Library
-                      </li>
+                      </li> */}
                       <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
                         <img src={Copy} alt="" />
                         Copy Track Link

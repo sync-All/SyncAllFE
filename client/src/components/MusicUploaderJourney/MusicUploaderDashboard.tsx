@@ -3,38 +3,29 @@ import Uploaded from '../../assets/images/Upload Track 2.svg';
 import Earning from '../../assets/images/Cash Out.svg';
 import Earth from '../../assets/images/Earth.svg';
 import Stream from '../../assets/images/Play Stream.svg';
+import NoEarning from '../../assets/images/no_earnings.svg'
 import {
-  // LineChart,
-  // Line,
   AreaChart,
   Area,
   XAxis,
   YAxis,
   Tooltip,
-  // Legend,
   ResponsiveContainer,
 } from 'recharts';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 import { usePDF } from 'react-to-pdf';
 
-// interface Activity {
-//   title: string;
-//   description: string;
-// }
-
-
-
-const MusicUploaderDashboard= () => {
+const MusicUploaderDashboard = () => {
   const dashdata = useDataContext();
   const dashboardDetails = dashdata?.dashboardData?.dashboardDetails;
-  const dashboardActivities = dashboardDetails?.activities
+  const dashboardActivities = dashboardDetails?.activities;
   const profileDetails = dashdata.dashboardData?.profileInfo;
 
-  const token = localStorage.getItem('token') 
+  const token = localStorage.getItem('token');
   console.log(token);
 
   const data = [
-    { name: '19', uv: 120 },
+    { name: '19', uv: 0 },
     { name: '20', uv: 0 },
     { name: '21', uv: 0 },
     { name: '22', uv: 0 },
@@ -66,7 +57,7 @@ const MusicUploaderDashboard= () => {
     {
       image: Earth,
       title: 'Countries Reached',
-      value: `${dashboardDetails?.countryReached || NaN}`,
+      value: `${dashboardDetails?.countryReached || 0}`,
       color: '#064e3b',
     },
     {
@@ -126,66 +117,85 @@ const MusicUploaderDashboard= () => {
             <h2 className="font-formular-regular text-[16px] text-[#667185]">
               Earnings Overview
             </h2>
-            <div className="border border-[#E4E7EC] pr-10 py-5 rounded-[11px] mt-6 relative">
-              <div className="flex gap-[18px] items-center justify-end absolute right-0">
-                <select
-                  name=""
-                  id=""
-                  className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
-                >
-                  <option value="" className="">
-                    Total Earning
-                  </option>
-                </select>
-                <select
-                  name=""
-                  id=""
-                  className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
-                >
-                  <option value="">Monthly</option>
-                </select>
+
+            {(dashboardDetails?.totalEarnings ?? 0) > 0 ? (
+              <div className="border border-[#E4E7EC] pr-10 py-5 rounded-[11px] mt-6 relative">
+                <div className="flex gap-[18px] items-center justify-end absolute right-0">
+                  <select
+                    name=""
+                    id=""
+                    className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
+                  >
+                    <option value="" className="">
+                      Total Earning
+                    </option>
+                  </select>
+                  <select
+                    name=""
+                    id=""
+                    className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
+                  >
+                    <option value="">Monthly</option>
+                  </select>
+                </div>
+                <ResponsiveContainer width="100%" height={400}>
+                  <AreaChart width={730} height={250} data={data}>
+                    <defs>
+                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="5%"
+                          stopColor="#064E3B1A"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#064E3B1A"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                      <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                        <stop
+                          offset="5%"
+                          stopColor="#064E3B"
+                          stopOpacity={0.8}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#064E3B"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="uv"
+                      stroke="#064E3B"
+                      fillOpacity={1}
+                      fill="url(#colorUv)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="pv"
+                      stroke="#064E3B"
+                      fillOpacity={1}
+                      fill="url(#colorPv)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-              <ResponsiveContainer width="100%" height={400}>
-                <AreaChart width={730} height={250} data={data}>
-                  <defs>
-                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                      <stop
-                        offset="5%"
-                        stopColor="#064E3B1A"
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="#064E3B1A"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                    <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#064E3B" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#064E3B" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="uv"
-                    stroke="#064E3B"
-                    fillOpacity={1}
-                    fill="url(#colorUv)"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="pv"
-                    stroke="#064E3B"
-                    fillOpacity={1}
-                    fill="url(#colorPv)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>{' '}
+            ) : (
+              <div className="text-center mt-9 text-[16px] leading-[20px] py-6">
+                <img src={NoEarning} alt="" className='mx-auto' />
+                <p className="font-Utile-medium mt-6 text-[16px] text-[#98A2B3]">
+                  You haven't earned any money yet. Upload your first track to
+                  start earning
+                </p>
+              </div>
+            )}
+          </div>
           <div>
             <h2 className="font-formular-regular text-[16px] text-[#667185]">
               Top Activities

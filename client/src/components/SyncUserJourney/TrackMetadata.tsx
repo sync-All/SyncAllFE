@@ -170,8 +170,8 @@ const TrackMetadata = () => {
               </div>
               <div className="flex  flex-col justify-between gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Tempo</p>
-                  <p className="text-[#475367]">128 BPM</p>
+                  <p>Writer</p>
+                  <p className="text-[#475367]">{trackDetails?.writers || 'N/A'}</p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Release date</p>
