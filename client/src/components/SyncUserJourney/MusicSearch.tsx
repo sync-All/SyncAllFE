@@ -39,7 +39,7 @@ const MusicSearch = () => {
       mainArtist: string;
       musicWaves: string[];
       duration: string;
-      bpm: string;
+      writers: string;
       genre: string;
       mood: string;
       actions: string[];
@@ -199,7 +199,7 @@ const MusicSearch = () => {
                         {result.duration || '3 minutes, 33 seconds'}
                       </p>
                       <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                        {result.bpm || '124bpm'}
+                        {result.writers || '124bpm'}
                       </p>
                     </span>
                     <span>

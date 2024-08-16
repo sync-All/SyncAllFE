@@ -50,8 +50,8 @@ const InputField: React.FC<InputFieldProps> = ({ label, name, placeholder }) => 
       >
         {label}
       </label>
-      <div className="relative max-h-12 mt-2">
-        <div className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-1.5 px-3 text-[#98A2B3] leading-4 focus:outline-none focus:shadow-outline flex flex-wrap gap-2 justify-between font-inter font-normal tracking-[0.4px] text-[16px] ">
+      <div className="relative min-h-12 mt-2 ">
+        <div className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-1.5 px-3 text-[#98A2B3] leading-4 focus:outline-none focus:shadow-outline flex flex-wrap gap-2 justify-between font-inter font-normal tracking-[0.4px] text-[16px] overflow-y-scroll">
           <div className="flex gap-2 flex-wrap">
             {(field.value || []).length > 0 ? (
               (field.value || []).map((item: string, index: number) => (
@@ -70,7 +70,7 @@ const InputField: React.FC<InputFieldProps> = ({ label, name, placeholder }) => 
             <button
               type="button"
               onClick={handleAddClick}
-              className="text-gray-500 ml-2"
+              className=" text-gray-500 ml-2"
             >
               <img src={AddCircle} alt="" />
             </button>
