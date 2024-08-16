@@ -113,9 +113,11 @@ const logout = () => {
             </span>
           </div>
 
-          <button className="mt-4 py-1 mr-3 mb-3 text-[14px] leading-5 font-formular-medium text-center bg-white w-full  rounded-md">
-            Contact Us
-          </button>
+          <a href="mailto:info@syncallmusic.com">
+            <button className="mt-4 py-1 mr-3 mb-3 text-[14px] leading-5 font-formular-medium text-center bg-white w-full  rounded-md">
+              Contact Us
+            </button>
+          </a>
         </div>
         <div className="flex items-center mx-3 mt-6 mb-9 ">
           <span>

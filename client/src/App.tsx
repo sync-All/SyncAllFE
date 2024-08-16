@@ -66,6 +66,8 @@ function App() {
 
           <Route path="/requestforgotpw" element={<SetNewPassword />} />
 
+          <Route path=""></Route>
+
           {/* Wrap the DashboardDataProvider around the routes that require it */}
           <Route
             path="/dashboard"

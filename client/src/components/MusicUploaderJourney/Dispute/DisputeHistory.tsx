@@ -5,6 +5,8 @@ import ArrowDown from '../../../assets/images/arrowdown.svg';
 import ArrowUp from '../../../assets/images/AddCircle.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import NoDispute from '../../../assets/images/no_dispute.svg';
+
 
 interface Dispute {
   _id: string;
@@ -133,80 +135,89 @@ const DisputeHistory = () => {
 
   return (
     <div className="">
-      <table className="w-full mt-5">
-        <thead>
-          <tr>
-            <th className={ThStyles}>
-              Dispute ID
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="disputeId"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Date Filed
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="createdAt"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Track Name
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="nameOfTrack"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Issue Type
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="issueType"
-                onSort={handleSort}
-              />
-            </th>
-            <th className={ThStyles}>
-              Resolution
-              <SortButton
-                sortConfig={sortConfig}
-                sortKey="disputeStatus"
-                onSort={handleSort}
-              />
-            </th>
-            <th className="bg-grey-100 py-3 px-6"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedData.map((dispute) => (
-            <tr key={dispute._id}>
-              <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                {dispute._id}
-              </td>
-              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                {new Date(dispute.createdAt).toLocaleDateString()}
-              </td>
-              <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                {dispute.nameOfTrack}
-              </td>
-              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                {dispute.issueType}
-              </td>
-              <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
-                <img src={Dot} alt="Dot" />
-                {dispute.disputeStatus}
-              </td>
-              <td className="py-4 px-4">
-                <span>
-                  <img src={DotMenu} alt="Dot Menu" />
-                </span>
-              </td>
+      {disputes.length > 0 ? (
+        <table className="w-full mt-5">
+          <thead>
+            <tr>
+              <th className={ThStyles}>
+                Dispute ID
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="disputeId"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Date Filed
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="createdAt"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Track Name
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="nameOfTrack"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Issue Type
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="issueType"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className={ThStyles}>
+                Resolution
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="disputeStatus"
+                  onSort={handleSort}
+                />
+              </th>
+              <th className="bg-grey-100 py-3 px-6"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedData.map((dispute) => (
+              <tr key={dispute._id}>
+                <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+                  {dispute._id}
+                </td>
+                <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {new Date(dispute.createdAt).toLocaleDateString()}
+                </td>
+                <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+                  {dispute.nameOfTrack}
+                </td>
+                <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {dispute.issueType}
+                </td>
+                <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
+                  <img src={Dot} alt="Dot" />
+                  {dispute.disputeStatus}
+                </td>
+                <td className="py-4 px-4">
+                  <span>
+                    <img src={DotMenu} alt="Dot Menu" />
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="text-center mt-[109px] text-[16px] leading-[20px] py-6 ">
+          <img src={NoDispute} alt="" className="mx-auto" />
+          <p className="font-Utile-medium mt-6 text-[16px] text-[#98A2B3]">
+            You have no ongoing dispute
+          </p>
+        </div>
+      )}
     </div>
   );
 };
