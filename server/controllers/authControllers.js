@@ -35,8 +35,8 @@ const signup = async function(req, res) {
         return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
       }
     }else{
-      const getUploaderIdentity = await User.findOne({ email : email}).exec()
-      const getSyncUserIdentity = await SyncUser.findOne({ email : email}).exec()
+      const getUploaderIdentity = await User.findOne({ email : email.toLowerCase()}).exec()
+      const getSyncUserIdentity = await SyncUser.findOne({ email : email.toLowerCase()}).exec()
       if(getUploaderIdentity || getSyncUserIdentity){
         res.status(401).json({success: false, message : "Email Already in use"})
       }else{
