@@ -2,8 +2,8 @@ import PlayButton from '../assets/images/playbtn.svg';
 import pauseButton from "../assets/pause.svg"
 import { useEffect, useRef,RefObject, useState } from 'react';
 import WaveSurfer from "wavesurfer.js";
-
-
+import { useContext } from 'react';
+import { MusicPlayerContext } from '../Context/MusicPlayerContext';
 
 interface PlayerProps {
     trackLink : string | undefined,
@@ -15,16 +15,23 @@ interface PlayerProps {
     duration ?: number | undefined
 }
 
-const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyle, timerStyle, waveStyle, duration}) => {
+const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyle, timerStyle, waveStyle, duration, songId}) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const waveformRef:RefObject<HTMLDivElement> = useRef(null)
   const wavesurfer = useRef<WaveSurfer | null>(null);
   const [volume, setVolume] = useState(0.5);
   const [currentTime, setCurrentTime] = useState('');
+  const values = useContext(MusicPlayerContext)
 
 
   const handlePlayPause = () => {
-    
+    if(wavesurfer?.current?.isPlaying()){
+        values?.setCurrentPlayingTrackId('')
+    }
+    else{
+      if(songId)
+      values?.setCurrentPlayingTrackId(songId)
+    }
     setIsPlaying( !isPlaying);
     wavesurfer?.current?.playPause();
       
@@ -93,6 +100,16 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
     return () => wavesurfer?.current?.destroy();
     
   },[trackLink,volume, duration ])
+
+  useEffect(()=>{
+    if(values?.currentPlayingTrackId == songId){
+      return
+    }
+    else{
+      setIsPlaying(false);
+      wavesurfer?.current?.pause();
+    }
+  },[songId, values?.currentPlayingTrackId])
 
   return (
     <>

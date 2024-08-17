@@ -214,6 +214,7 @@ const MusicUploaderTracks: React.FC = () => {
                       trackLink={track['trackLink']}
                       containerStyle="mt-0 flex items-center gap-3"
                       buttonStyle="w-4 cursor-pointer"
+                      songId={track._id}
                       waveStyle="w-[70px]"
                     />
                   </td>
