@@ -23,15 +23,18 @@ import ForgetPassword from './components/Auth/ForgetPassword';
 import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
+import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [googleAuthData, setGoogleAuthData] = useState<object | null >(null);
+  const [googleAuthData, setGoogleAuthData] = useState<object | null>(null);
 
   return (
     <>
-      <UserContext.Provider value={{ userRole, setUserRole, googleAuthData, setGoogleAuthData}}>
+      <UserContext.Provider
+        value={{ userRole, setUserRole, googleAuthData, setGoogleAuthData }}
+      >
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -41,15 +44,20 @@ function App() {
           />
           <Route
             path="/selectRole"
-            element={<GoogleAuthUserRole googleAuthData={googleAuthData}/>}
+            element={<GoogleAuthUserRole googleAuthData={googleAuthData} />}
           />
           <Route
             path="/register2"
-            element={<Registration selectedRole={selectedRole} setGoogleAuthData={setGoogleAuthData} />}
+            element={
+              <Registration
+                selectedRole={selectedRole}
+                setGoogleAuthData={setGoogleAuthData}
+              />
+            }
           />
           <Route
             path="/login"
-            element={<SignIn setGoogleAuthData={setGoogleAuthData}/>}
+            element={<SignIn setGoogleAuthData={setGoogleAuthData} />}
           />
           <Route path="/email-confirmation" element={<ConfirmEmail />} />
           <Route
@@ -66,7 +74,7 @@ function App() {
 
           <Route path="/requestforgotpw" element={<SetNewPassword />} />
 
-          <Route path=""></Route>
+          <Route path="/:username" element={<MusicUploaderPublicProfile />} />
 
           {/* Wrap the DashboardDataProvider around the routes that require it */}
           <Route
@@ -113,12 +121,16 @@ function App() {
           <Route
             path="home/metadata/:id"
             element={
-              <SyncUserProvider>
-                {' '}
-                <SyncUserLayout>
-                  <TrackMetadata />
-                </SyncUserLayout>
-              </SyncUserProvider>
+              <ProtectedRoute
+                path="home/metadata/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <TrackMetadata />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
             }
           />
 

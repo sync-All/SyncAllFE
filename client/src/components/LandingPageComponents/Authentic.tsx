@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react"
-import {PrimaryButton} from "../../components"
+// import {PrimaryButton} from "../../components"
 import ModalContext from "../../Context/ModatContext"
 
 const Authentic = () => {
@@ -16,7 +16,7 @@ const Authentic = () => {
       <h1 className="text-3xl md:text-7xl lg:text-[clamp(90px,8.225vw,120px)] text-grey-100 text-center font-gitSans lg:leading-[100%] pb-8 md:pb-11 lg:pb-16 font-normal ">
       Authentic african music,<br />effortless licensing.
       </h1>
-      <PrimaryButton text="Join the waitlist" onClick={values.openModal} />
+      {/* <PrimaryButton text="Join the waitlist" onClick={values.openModal} /> */}
     </div>
   )
 }

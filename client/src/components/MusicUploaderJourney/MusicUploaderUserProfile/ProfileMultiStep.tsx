@@ -1,12 +1,13 @@
 import ProfileBg from '../../../assets/images/profile-bg.png';
 import { useDataContext } from '../../../Context/DashboardDataProvider';
-import Placeholder from '../../../assets/images/placeholder.png'
+import Placeholder from '../../../assets/images/placeholder.png';
 import Share from '../../../assets/images/share.svg';
 import Eye from '../../../assets/images/eye.svg';
 import ProfileInformation from './ProfileInformation';
 import PasswordSetting from './PasswordSetting';
 import PaymentInformation from './PaymentInfo';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const ProfileMultiStep = () => {
   const userData = useDataContext();
@@ -28,6 +29,14 @@ const ProfileMultiStep = () => {
     }
   };
 
+  const handlePublicLink = () => {
+    const username = profileDetails?.name
+
+    const profilePublicLink = `${window.location.origin}/${username}`
+    navigator.clipboard.writeText(profilePublicLink).then(() => {
+      toast('Profile link copied to clipboard!');
+    })
+  };
   return (
     <div className="lg:mx-8 ml-5 mt-[29px]  block">
       <div className="flex relative mb-[200px] lg:mb-[140px]">
@@ -52,7 +61,7 @@ const ProfileMultiStep = () => {
             </span>
           </div>
           <div className="flex gap-[12px] items-center">
-            <button className="font-formular-regular text-[14px] leading-[20px] text-[#344054] py-2.5 px-4 gap-2 border border-[#D0D5DD] rounded-[8px] flex">
+            <button className="font-formular-regular text-[14px] leading-[20px] text-[#344054] py-2.5 px-4 gap-2 border border-[#D0D5DD] rounded-[8px] flex" onClick={handlePublicLink}>
               <img src={Share} alt="" />
               <p>Share Profile</p>
             </button>

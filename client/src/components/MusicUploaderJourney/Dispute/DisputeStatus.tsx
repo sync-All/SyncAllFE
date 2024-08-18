@@ -13,14 +13,14 @@ interface Dispute {
   createdAt: string;
   nameOfTrack: string;
   issueType: string;
-  disputeStatus: string;
+  status: string;
 }
 
 interface TableData {
   disputeId: string;
   nameOfTrack: string;
   issueType: string;
-  disputeStatus: string;
+  status: string;
   createdAt: string;
 }
 
@@ -77,6 +77,7 @@ const DisputeStatus = () => {
 
     try {
       const response = await axios.get<ResponseData>(apiUrl, config);
+      console.log(response);
       setDisputes(response.data.message);
       localStorage.setItem(CACHE_KEY, JSON.stringify(response.data.message));
       localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
@@ -174,7 +175,7 @@ const DisputeStatus = () => {
                 Dispute Status
                 <SortButton
                   sortConfig={sortConfig}
-                  sortKey="disputeStatus"
+                  sortKey="status"
                   onSort={handleSort}
                 />
               </th>
@@ -198,7 +199,7 @@ const DisputeStatus = () => {
                 </td>
                 <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
                   <img src={Dot} alt="Dot" />
-                  {dispute.disputeStatus}
+                  {dispute.status}
                 </td>
                 <td className="py-4 px-4">
                   <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
