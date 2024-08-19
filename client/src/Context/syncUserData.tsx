@@ -12,7 +12,7 @@ type User = {
   img: string;
   totalLicensedTracks: string[];
   billing: {
-    plan: string;
+  plan: string;
     amount: number;
   };
   recentActivity: string[]; 
