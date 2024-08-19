@@ -61,7 +61,6 @@ const userSchema = new Schema({
 }, {timestamps : true})
 
 const syncUserSchema = new Schema({
-
     name : {
         type : String,
         required : true
@@ -119,9 +118,8 @@ const syncUserSchema = new Schema({
     },
     tracklist : [
         {
-            type : Schema.Types.ObjectId,
+            type : mongoose.Schema.Types.ObjectId,
             ref : "track",
-            default : [0]
         }
     ], 
     totalLicensedTracks : [

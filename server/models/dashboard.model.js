@@ -270,7 +270,11 @@ const disputeSchema = new Schema({
     isrc : {
         type : String
     },
-
+    status : {
+        type : String,
+        enum : ['Pending', 'Approved', 'Rejected'],
+        default : 'Pending'
+    },
     user : {
         type : Schema.Types.ObjectId,
         ref : 'uploader'

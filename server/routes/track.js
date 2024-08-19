@@ -3,11 +3,12 @@ const multer = require("multer")
 const upload = multer({dest: 'uploads/'}).single('artWork')
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
+const SyncUser = require('../models/usermodel').syncUser;
 var router = express.Router();
 const trackController = require('../controllers/trackController')
 
 
-router.get('/verifyTrackUploaded/:isrc',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
+router.get('/verifyTrackUploaded/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(trackController.verifyTrackUpload))
 
 router.post('/trackUpload/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload,asyncHandler(trackController.trackUpload))
 
@@ -21,5 +22,42 @@ router.get('/getTrackByInstrument/:instrument', passport.authenticate('jwt',{ses
 router.get('/getTrackByMood/:mood', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.getTracksByMood));
 
 router.get('/querySongs/:queryText', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.querySongsByIndex));
+
+router.get('/queryTrackInfo/:trackId', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(trackController.queryTrackInfo));
+
+router.get('/liketrack/:trackId', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
+    const trackId = req.params.trackId
+    if(req.user.role == "Sync User"){
+        if(req.user.tracklist.indexOf(trackId) != -1){
+            res.status(202).send('Track already included in your library')
+            return;
+        }else{
+            await SyncUser.findByIdAndUpdate(req.user._id, {$push : {
+                'tracklist' : trackId
+            }}).exec()
+            res.status(200).send('Track Added to Your Library')
+            return;
+        }
+    }else{
+        res.status(400).send('Bad Request')
+    }
+}));
+
+router.get('/unliketrack/:trackId', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
+    const trackId = req.params.trackId
+    if(req.user.role == "Sync User"){
+        if(req.user.tracklist.indexOf(trackId) != -1){
+            await SyncUser.findByIdAndUpdate(req.user._id, {$pull : {
+                'tracklist' : trackId
+            }}).exec()
+            res.status(200).send('Track Successfully Removed From Library')
+            return;
+        }else{
+            res.status(400).send('Track doesnt exit in your library')
+        }
+    }else{
+        res.status(400).send('Bad Request')
+    }
+}));
 
 module.exports = router;

@@ -35,8 +35,8 @@ const signup = async function(req, res) {
         return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
       }
     }else{
-      const getUploaderIdentity = await User.findOne({ email : email}).exec()
-      const getSyncUserIdentity = await SyncUser.findOne({ email : email}).exec()
+      const getUploaderIdentity = await User.findOne({ email : email.toLowerCase()}).exec()
+      const getSyncUserIdentity = await SyncUser.findOne({ email : email.toLowerCase()}).exec()
       if(getUploaderIdentity || getSyncUserIdentity){
         res.status(401).json({success: false, message : "Email Already in use"})
       }else{
@@ -44,7 +44,7 @@ const signup = async function(req, res) {
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
             const users = new User({
               name,
-              email,
+              email : email.toLowerCase(),
               password,
               role,
               userType,
@@ -66,7 +66,7 @@ const signup = async function(req, res) {
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
             const users = new SyncUser({
               name,
-              email,
+              email : email.toLowerCase(),
               password,
               role,
               userType,
@@ -88,8 +88,8 @@ const signup = async function(req, res) {
 
   const signin = async(req,res,next)=> {
     const {email,password} = req.body
-    const user = await User.findOne({email : email}).exec()
-    const syncUser = await SyncUser.findOne(({email : email})).exec()
+    const user = await User.findOne({email : email.toLowerCase()}).exec()
+    const syncUser = await SyncUser.findOne(({email : email.toLowerCase()})).exec()
     let item = user || syncUser
     if(!item){
       return res.status(401).json({success : false, message : "User doesn't Exists"})
@@ -106,9 +106,9 @@ const signup = async function(req, res) {
 
       const toBeIssuedJwt = issueJwt.issueJwtLogin(user || syncUser)
 
-      const userDetails = await User.findOne({email : email}).select('-password').exec()
+      const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
-      const syncUserDetails = await SyncUser.findOne({email : email}).select('-password').exec()
+      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}).populate('tracklist').select('-password').exec()
 
       res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
@@ -117,8 +117,8 @@ const signup = async function(req, res) {
 
   const googleAuth = async(req,res,next)=>{
         try {
-          const user = await User.findOne({email : req.body.email}).exec() 
-          const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
+          const user = await User.findOne({email : req.body.email.toLowerCase()}).exec() 
+          const syncUser = await SyncUser.findOne({email : req.body.email.toLowerCase()}).exec()
           let item = user || syncUser
           if (!item){
             if(req.body.role){

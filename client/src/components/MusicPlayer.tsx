@@ -2,6 +2,8 @@ import PlayButton from '../assets/images/playbtn.svg';
 import pauseButton from "../assets/pause.svg"
 import { useEffect, useRef,RefObject, useState } from 'react';
 import WaveSurfer from "wavesurfer.js";
+import { useContext } from 'react';
+import { MusicPlayerContext } from '../Context/MusicPlayerContext';
 
 interface PlayerProps {
     trackLink : string | undefined,
@@ -9,23 +11,33 @@ interface PlayerProps {
     buttonStyle ?:  string | undefined,
     timerStyle ?:  string | undefined,
     waveStyle ?: string | undefined,
+    songId ?: string | undefined,
     duration ?: number | undefined
 }
 
-const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyle, timerStyle, waveStyle, duration}) => {
+const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyle, timerStyle, waveStyle, duration, songId}) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const waveformRef:RefObject<HTMLDivElement> = useRef(null)
   const wavesurfer = useRef<WaveSurfer | null>(null);
   const [volume, setVolume] = useState(0.5);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState('');
-  
+  const values = useContext(MusicPlayerContext)
+
+
   const handlePlayPause = () => {
-    if (audio) {
-      setIsPlaying(!isPlaying);
-      wavesurfer?.current?.playPause();
+    if(wavesurfer?.current?.isPlaying()){
+        values?.setCurrentPlayingTrackId('')
     }
+    else{
+      if(songId)
+      values?.setCurrentPlayingTrackId(songId)
+    }
+    setIsPlaying( !isPlaying);
+    wavesurfer?.current?.playPause();
+      
   };
+
+  
 
   const formWaveSurferOptions = (ref:HTMLElement | string) => ({
     container: ref,
@@ -43,13 +55,13 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
   });
 
   useEffect(()=>{
-    if(trackLink){
-        const newAudio = new Audio(trackLink)
-        setAudio(newAudio)
-    }
+    // if(trackLink){
+    //   const newAudio = new Audio(trackLink)
+    //   setAudio(newAudio)
+    // }
 
     if(waveformRef.current){
-        const options = formWaveSurferOptions(waveformRef.current);
+      const options = formWaveSurferOptions(waveformRef.current)
         wavesurfer.current = WaveSurfer.create(options);
         if(trackLink){
           wavesurfer.current.load(trackLink);
@@ -87,14 +99,27 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
     }
     return () => wavesurfer?.current?.destroy();
     
-  },[trackLink,volume, duration])
+  },[trackLink,volume, duration ])
+
+  useEffect(()=>{
+    if(values?.currentPlayingTrackId == songId){
+      return
+    }
+    else{
+      setIsPlaying(false);
+      wavesurfer?.current?.pause();
+    }
+  },[songId, values?.currentPlayingTrackId])
 
   return (
+    <>
     <div className={containerStyle || " flex items-center justify-between mt-20"}>
       <img src={ isPlaying ? pauseButton : PlayButton} alt="" onClick={handlePlayPause} className={buttonStyle ||'w-12 cursor-pointer'} />
       <div id="waveform" ref={waveformRef} className={waveStyle ||'w-[60%]'}></div>
       <p className={timerStyle || "font-Utile-medium text-[16px] leading-4 "}>{currentTime || '00:00'}</p>
     </div>
+
+    </>
   )
 }
 
