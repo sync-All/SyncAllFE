@@ -3,6 +3,7 @@ const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
 const User = require('../models/usermodel').uploader;
+const SyncUser = require('../models/usermodel').syncUser
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -16,6 +17,11 @@ router.post('/api/v1/googleauth', asynchandler(authcontroller.googleAuth))
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
+router.get('/api/v1/getsyncuserinfo',passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(async (req,res,next)=>{
+  const userId = req.user._id
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist').select('-password').exec()
+  res.send({user : details, success : true})
+}))
 router.post('/api/v1/profilesetup', async (req, res, next) => {
   if (req.isAuthenticated) {
     const { fullName, spotifyLink, bio } = req.body;

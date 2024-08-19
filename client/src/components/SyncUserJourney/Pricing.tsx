@@ -40,7 +40,7 @@ const Pricing = () => {
         'Licensing to use royalty free background music ',
         'Limited Advanced Search Filter',
       ],
-      testProdId : 'prod_QUeQtqvvQsy9X8'
+      testPriceId : 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB'
     },
     {
       name: 'Premium',
@@ -56,7 +56,7 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
-      testProdId : 'prod_QgrvvxGRYPiP7a'
+      testPriceId : 'price_1PpUBbG5Wy2cNC8Z47kwvxBB'
     },
     {
       name: 'Enterprise',
@@ -242,7 +242,7 @@ const Pricing = () => {
             <Link
               className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
               style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext }}
-              to={`/payment/products/${plan.testProdId}`}
+              to={`/payment/products/${plan.testPriceId}`}
             >
               {plan.buttonText}
             </Link>

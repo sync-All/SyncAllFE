@@ -159,10 +159,10 @@ function App() {
           />
 
         <Route
-            path="/payment/products/:prodId"
+            path="/payment/products/:priceId"
             element={
               <ProtectedRoute
-                path="/payment/products/:prodId"
+                path="/payment/products/:priceId"
                 element={<Payment/>}
               />
             }
