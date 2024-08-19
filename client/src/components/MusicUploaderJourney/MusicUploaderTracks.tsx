@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 // import Filter from '../../assets/images/Filter-lines.svg';
-import Download from '../../assets/images/download-cloud.svg';
+// import Download from '../../assets/images/download-cloud.svg';
 import Plus from '../../assets/images/plus.svg';
 import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
@@ -9,8 +9,13 @@ import ArrowUp from '../../assets/images/up-arrow.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 // import { useNavigate } from 'react-router-dom';
 import MusicPlayer from '../MusicPlayer';
-import { usePDF } from 'react-to-pdf';
+// import { usePDF } from 'react-to-pdf';
 import NoTrack from '../../assets/images/no_track.svg';
+
+// Define the prop types
+interface MusicUploaderTracksProps {
+  onTabChange: (tab: string) => void;
+}
 
 interface Track {
   _id: string;
@@ -55,7 +60,9 @@ const SortButton: React.FC<{
   </button>
 );
 
-const MusicUploaderTracks: React.FC = () => {
+const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
+  onTabChange,
+}) => {
   const [openDropdowns, setOpenDropdowns] = useState<{
     [key: string]: boolean;
   }>({});
@@ -109,18 +116,18 @@ const MusicUploaderTracks: React.FC = () => {
     setSortConfig({ key, direction });
   };
 
-  const { toPDF, targetRef } = usePDF({ filename: 'myTracks.pdf' });
+  // const { toPDF, targetRef } = usePDF({ filename: 'myTracks.pdf' });
 
-  const scrollToUploadMusic = () => {
-    const element = document.getElementById('uploadMusic');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-    return scrollToUploadMusic;
-  };
+  // const scrollToUploadMusic = () => {
+  //   const element = document.getElementById('uploadMusic');
+  //   if (element) {
+  //     element.scrollIntoView({ behavior: 'smooth' });
+  //   }
+  //   return scrollToUploadMusic;
+  // };
 
   return (
-    <div ref={targetRef}>
+    <div >
       {' '}
       <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
         <div className="flex justify-between">
@@ -138,7 +145,7 @@ const MusicUploaderTracks: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="border rounded-[8px] bg-transparent py-2.5 px-4 flex items-center gap-2">
+            {/* <button className="border rounded-[8px] bg-transparent py-2.5 px-4 flex items-center gap-2">
               <img src={Download} alt="Download" />
               <button
                 onClick={() => {
@@ -147,10 +154,10 @@ const MusicUploaderTracks: React.FC = () => {
               >
                 Download
               </button>
-            </button>
+            </button> */}
             <button
               className="border-none rounded-[8px] bg-yellow py-2.5 px-4 flex items-center gap-2"
-              onClick={scrollToUploadMusic}
+              onClick={() => onTabChange('Upload Track')}
             >
               <img src={Plus} alt="Plus" />
               <p>Upload New Track</p>

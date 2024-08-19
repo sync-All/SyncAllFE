@@ -24,6 +24,8 @@ const MusicUploaderDashboard = () => {
   const token = localStorage.getItem('token');
   console.log(token);
 
+  
+
   const data = [
     { name: '19', uv: 0 },
     { name: '20', uv: 0 },
@@ -86,6 +88,7 @@ const MusicUploaderDashboard = () => {
             </button>
           </div>
         </div>
+
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-[10px] lg:mt-6">
           {cardData.map((card, index) => (

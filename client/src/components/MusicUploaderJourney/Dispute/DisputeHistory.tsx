@@ -7,21 +7,20 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import NoDispute from '../../../assets/images/no_dispute.svg';
 
-
 interface Dispute {
   _id: string;
   disputeId: string;
   createdAt: string;
   nameOfTrack: string;
   issueType: string;
-  disputeStatus: string;
+  status: string;
 }
 
 interface TableData {
   disputeId: string;
   nameOfTrack: string;
   issueType: string;
-  disputeStatus: string;
+  status: string;
   createdAt: string;
 }
 
@@ -62,53 +61,42 @@ const DisputeHistory = () => {
     direction: 'ascending',
   });
 
-  const CACHE_KEY = 'cachedDisputes';
-  const CACHE_TIMESTAMP_KEY = 'cacheTimestamp';
-  const CACHE_DURATION = 60000; // 1 minute
-
-  const fetchDisputes = async () => {
-    const token = localStorage.getItem('token');
-    const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/alldispute`;
-    const config = {
-      headers: {
-        Authorization: ` ${token}`,
-      },
-    };
-
-    try {
-      const response = await axios.get<ResponseData>(apiUrl, config);
-      setDisputes(response.data.message);
-      localStorage.setItem(CACHE_KEY, JSON.stringify(response.data.message));
-      localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<ResponseData>;
-
-      toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message
-          : axiosError.message
-        ).toString()
-      );
-    }
-  };
-
-  const shouldFetchData = () => {
-    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    if (!cachedTimestamp) return true;
-    const age = Date.now() - parseInt(cachedTimestamp, 10);
-    return age > CACHE_DURATION;
-  };
 
   useEffect(() => {
-    const cachedData = localStorage.getItem(CACHE_KEY);
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/alldispute`;
+      const config = {
+        headers: {
+          Authorization: ` ${token}`,
+        },
+      };
 
-    if (cachedData && !shouldFetchData()) {
-      setDisputes(JSON.parse(cachedData));
-    } else {
-      fetchDisputes();
-    }
+      try {
+        const response = await axios.get<ResponseData>(apiUrl, config);
+        const allData = response.data.message;
+        const filteredData = allData.filter((item) => item.status !== 'Pending');
+
+        console.log(filteredData);
+        setDisputes(filteredData);
+      } catch (error: unknown) {
+        const axiosError = error as AxiosError<ResponseData>;
+
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      }
+    };
+
+    fetchData();
   }, []);
+  
+
+
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
@@ -175,7 +163,7 @@ const DisputeHistory = () => {
                 Resolution
                 <SortButton
                   sortConfig={sortConfig}
-                  sortKey="disputeStatus"
+                  sortKey="status"
                   onSort={handleSort}
                 />
               </th>
@@ -199,7 +187,7 @@ const DisputeHistory = () => {
                 </td>
                 <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-[11px] mx-6 rounded-2xl w-fit">
                   <img src={Dot} alt="Dot" />
-                  {dispute.disputeStatus}
+                  {dispute.status}
                 </td>
                 <td className="py-4 px-4">
                   <span>

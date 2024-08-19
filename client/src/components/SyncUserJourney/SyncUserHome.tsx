@@ -105,6 +105,12 @@ const SyncUserHome = () => {
   }, [id]);
 
   
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    }
+    return text;
+  };
 
 
 
@@ -161,14 +167,15 @@ const SyncUserHome = () => {
                     </p>
                   </span>
                 </Link>
+
                 <MusicPlayer trackLink={detail.trackLink} songId={detail._id} duration={10} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]'/>
                 <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                   <span>
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
                       {detail.duration || '3 minutes, 33 seconds'}
                     </p>
-                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.writers || '124bpm'}
+                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px] truncate max-w-16">
+                      {truncateText(detail.writers || 'N/A', 5)}
                     </p>
                   </span>
                   <span>
@@ -187,7 +194,7 @@ const SyncUserHome = () => {
                     onClick={() => handleLike(detail._id)}
                   />
                   {/* <img src={AddMusic} alt="" /> */}
-                  <img src={Copy} alt="" className='cursor-pointer' />
+                  <img src={Copy} alt="" className="cursor-pointer" />
                 </span>
                 <span className="gap-[12px] flex w-[25%] justify-center">
                   <Link to={`metadata/${detail?._id}`}>

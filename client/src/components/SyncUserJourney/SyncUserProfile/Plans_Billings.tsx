@@ -1,6 +1,13 @@
 import Visa from '../../../assets/images/visa.svg'
+import { useSyncUser } from '../../../Context/syncUserData';
+
 
 const PlansBillings = () => {
+    const { user } = useSyncUser();
+
+const paymentInfo = user?.billing
+
+
   return (
     <div className="mb-[136px]">
       <section className="mt-[53px]">
@@ -13,8 +20,8 @@ const PlansBillings = () => {
               <p className="text-[#3e3e3e] text-[14px] font-formular-regular leading-[22px]">
                 Current plan
               </p>
-              <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px]">
-                Premium
+              <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px] capitalize">
+                {paymentInfo?.plan}
               </h3>
             </span>
             <button className="py-2 px-4 text-[12px] font-formular-bold leading-[22px] text-white bg-black2">
@@ -22,9 +29,9 @@ const PlansBillings = () => {
             </button>
           </div>
           <div className="mt-4 text-[#010516] text-[16px] font-Utile-regular leading-6">
-            <p>Frequency : Monthly</p>
-            <p>Next billing date : July 22, 2024</p>
-            <p>Amount : $20</p>
+            <p>Frequency : N/A</p>
+            <p>Next billing date : N/A</p>
+            <p>Amount : N/A</p>
           </div>
         </div>
       </section>
@@ -40,7 +47,7 @@ const PlansBillings = () => {
           <span className="flex gap-[11px] items-center">
             <img src={Visa} alt="" />
             <p className="text-[#010516] text-[16px] font-Utile-medium leading-[24px] ">
-              **** **** **** 5632
+              N/A
             </p>
           </span>
 

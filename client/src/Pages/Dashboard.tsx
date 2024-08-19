@@ -38,7 +38,9 @@ const Dashboard = () => {
         <MusicUploaderNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         {activeTab === 'Dashboard' && <MusicUploaderDashboard />}
         {activeTab === 'Upload Track' && <UploadTrackMultiForm />}
-        {activeTab === 'My Tracks' && <MusicUploaderTracks />}
+        {activeTab === 'My Tracks' && (
+          <MusicUploaderTracks onTabChange={handleTabChange} />
+        )}
         {activeTab === 'Earnings' && <MusicUploaderEarnings />}
         {activeTab === 'User Profile' && <ProfileMultiStep />}
         {activeTab === 'Dispute' && <MusicUploaderDispute />}

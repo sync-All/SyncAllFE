@@ -1,7 +1,7 @@
 import Background from '../../assets/images/user-homepage-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
-import AddMusic from '../../assets/images/add-music.svg';
+// import AddMusic from '../../assets/images/add-music.svg';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
@@ -56,13 +56,14 @@ const TrackMetadata = () => {
     uploadStatus: string;
     user: string;
     writers: string[];
+    deatils: string[];
   }
 
   useEffect(() => {
     const fetchTrackDetails = async () => {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/allSongs`; // Endpoint to fetch all tracks
+      const apiUrl = `${urlVar}/queryTrackInfo/${id}`; // Endpoint to fetch all tracks
       const config = {
         headers: {
           Authorization: `${token}`,
@@ -71,14 +72,9 @@ const TrackMetadata = () => {
 
       try {
         const res = await axios.get(apiUrl, config);
-        const allTracks: TrackDetails[] = res.data.allTracks;
-        const track = allTracks.find((track) => track._id === id);
-        if (track) {
-          console.log(track)
-          setTrackDetails(track);
-        } else {
-          toast.error('Track not found');
-        }
+        console.log(res);
+       setTrackDetails(res.data.details) 
+   
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
@@ -94,7 +90,7 @@ const TrackMetadata = () => {
 
   
   return (
-    <div> 
+    <div>
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">
         <div className="lg:w-[40%]">
           <img
@@ -116,14 +112,14 @@ const TrackMetadata = () => {
 
             <div className="flex mt-[27px] gap-[25px] items-center lg:items-start ">
               <img src={Favorite} alt="" />
-              <img src={AddMusic} alt="" />
+              {/* <img src={AddMusic} alt="" /> */}
               <img src={Copy} alt="" />
               <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
                 Get Quote
               </button>
             </div>
           </div>
-          <MusicPlayer trackLink={trackDetails?.trackLink}/>
+          <MusicPlayer trackLink={trackDetails?.trackLink} />
           <div className="mt-[93px] mb-[163px]">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
               Track Details
@@ -140,7 +136,9 @@ const TrackMetadata = () => {
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Composed by</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.composers.join(', ') || 'N/A'}
+                    {Array.isArray(trackDetails?.composers)
+                      ? trackDetails.composers.join(', ')
+                      : 'Subscribe to see this info'}
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
@@ -158,7 +156,9 @@ const TrackMetadata = () => {
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Produced by</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.producers.join(', ') || 'N/A'}
+                    {Array.isArray(trackDetails?.producers)
+                      ? trackDetails.producers.join(', ')
+                      : ''}
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
@@ -171,18 +171,24 @@ const TrackMetadata = () => {
               <div className="flex  flex-col justify-between gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Writer</p>
-                  <p className="text-[#475367]">{trackDetails?.writers || 'N/A'}</p>
+                  <p className="text-[#475367]">
+                    {trackDetails?.writers || 'N/A'}
+                  </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Release date</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.releaseDate || 'N/A'}
+                    {new Date(
+                      trackDetails?.releaseDate ?? ''
+                    ).toLocaleDateString() || 'N/A'}
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Featured Instrument</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.featuredInstrument.join(', ') || 'N/A'}
+                    {Array.isArray(trackDetails?.featuredInstrument)
+                      ? trackDetails.featuredInstrument.join(', ')
+                      : 'Subscribe to see this info'}
                   </p>
                 </span>
               </div>
