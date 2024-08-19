@@ -51,7 +51,7 @@ const signup = async function(req, res) {
             })
             users.save()
             .then(async (users)=> {
-                  const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
+                const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
                  const grabber = EmailDomain.grabEmailDomain(users)
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                  const dashboard = new Dashboard({

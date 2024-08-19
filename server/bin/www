@@ -9,7 +9,6 @@ var debug = require('debug')('server:server');
 var http = require('http');
 const https = require('https');
 const cron = require('node-cron')
-const schedule = '0,5,10,15,20,30,35,40,50,55 * * * *'
 /**
  * Get port from environment and store in Express.
  */
@@ -32,13 +31,6 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 
-cron.schedule('*/14 * * * *', () => {
-  https.get('https://syncallfe.onrender.com', (res) => {
-    console.log(`Pinged server with status code syncall: ${res.statusCode}`);
-  }).on('error', (e) => {
-    console.error(`Got error: ${e.message}`);
-  });
-});
 
 cron.schedule('*/10 * * * *', () => {
   https.get('https://enoverlab.com', (res) => {

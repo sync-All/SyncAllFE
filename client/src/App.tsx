@@ -24,6 +24,7 @@ import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
+import Payment from './Pages/Payment';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -101,7 +102,6 @@ function App() {
               />
             }
           />
-
           <Route
             path="/pricing"
             element={
@@ -157,6 +157,16 @@ function App() {
               </SyncUserProvider>
             }
           />
+
+        <Route
+            path="/payment/products/:prodId"
+            element={
+              <ProtectedRoute
+                path="/payment/products/:prodId"
+                element={<Payment/>}
+              />
+            }
+          ></Route>
         </Routes>
       </UserContext.Provider>
     </>

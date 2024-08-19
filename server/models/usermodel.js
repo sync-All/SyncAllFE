@@ -51,6 +51,9 @@ const userSchema = new Schema({
     twitterLink : {
         type : String,
     },
+    stripeCusId : {
+        type : String
+    },
     tiktokLink : {
         type : String,
     },
@@ -112,6 +115,9 @@ const syncUserSchema = new Schema({
             type : Number,
             default : 0
         }
+    },
+    stripeCusId : {
+        type : String
     },
     paymentInfo : {
         type : Number,

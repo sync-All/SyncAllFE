@@ -93,7 +93,7 @@ const queryTrackInfo =async(req,res,next)=>{
   const trackId = req.params.trackId
   if(req.user.role == "Sync User"){
       if(req.user.billing.plan == "basic"){
-          const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink").exec()
+          const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist").exec()
           console.log(details)
           res.json({details})
       }else{
