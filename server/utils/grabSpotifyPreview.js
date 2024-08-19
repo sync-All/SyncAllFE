@@ -31,9 +31,14 @@ const SpotifyPreview = async(res, trackLink)=>{
         if(!trackDetails.data.preview_url){
             return res.status(422).send('No preview available for this track or Invalid Link, Please try again later')
         }
+        const minutes = Math.floor(trackDetails.data.duration_ms / 60);
+        const seconds = Math.floor(trackDetails.data.duration_ms - minutes * 60);
+        const trackDuration = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         return {
             preview_url : trackDetails.data.preview_url,
-            isrc : trackDetails.data.external_ids.isrc
+            isrc : trackDetails.data.external_ids.isrc,
+            spotifyLink : trackDetails.data.external_urls.spotify,
+            duration : trackDuration
         }
         
     } catch (error) {

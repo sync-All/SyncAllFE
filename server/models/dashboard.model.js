@@ -243,6 +243,13 @@ const trackSchema = new Schema({
             ref : "syncUser"
         }
     ],
+    spotifyLink : {
+        type : String,
+        required : true
+    },
+    duration : {
+        type : String,
+    },
     user : {
         type : Schema.Types.ObjectId,
         ref : "user"
