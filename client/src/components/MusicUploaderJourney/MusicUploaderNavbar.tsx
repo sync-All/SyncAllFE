@@ -3,7 +3,8 @@ import ArrowDown from '../../assets/images/select-input-arrow.svg';
 import Hamburger from '../../assets/images/Hambuger.svg';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 import Placeholder from '../../assets/images/placeholder.png';
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import MusicUploaderNotification from './MusicUploaderNotification';
 
 interface MusicUploaderNavbarProp {
   activeItem: string;
@@ -15,27 +16,67 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
   activeItem,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const logout = () => {
+  const toggleNotification = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation(); // Prevents closing the notification dropdown when clicked
+    setIsNotificationOpen(!isNotificationOpen);
+  };
+
+  const logout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent the dropdown from closing before the click is processed
+    console.log('Logout triggered');
     localStorage.clear();
     window.location.href = '/';
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    // Close dropdown if clicked outside
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setIsDropdownOpen(false);
+    }
+
+    // Close notification if clicked outside
+    if (
+      notificationRef.current &&
+      !notificationRef.current.contains(event.target as Node)
+    ) {
+      setIsNotificationOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isDropdownOpen || isNotificationOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen, isNotificationOpen]);
 
   const profileInfo = useDataContext();
   const profileDetails = profileInfo.dashboardData?.profileInfo;
 
   return (
     <div>
-      <nav className="lg:mx-8 flex items-center mt-6 gap-3 mb-9 ">
-        <button onClick={toggleMenu} className="lg:hidden ml-[18px] h-[20px] ">
+      <nav className="lg:mx-8 flex items-center mt-6 gap-3 mb-9">
+        <button onClick={toggleMenu} className="lg:hidden ml-[18px] h-[20px]">
           <img src={Hamburger} alt="" />
         </button>
-        <div className="flex justify-between items-center w-full ">
+        <div className="flex justify-between items-center w-full">
           <div className="mr-auto">
             <h1 className="text-[#667185] text-[14px] lg:text-[24px] font-formular-light leading-normal mr-auto">
               {activeItem}
@@ -43,10 +84,20 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
           </div>
 
           <div className="flex gap-[17px] items-center">
-            <img src={Notification} alt="" className="self-start mt-2" />
+            <img
+              src={Notification}
+              alt=""
+              className="self-start mt-2 cursor-pointer"
+              onClick={toggleNotification}
+            />
+            {isNotificationOpen && (
+              <div  className="absolute right-7 top-[7%]">
+                <MusicUploaderNotification />
+              </div>
+            )}
             <div>
-              <div className="flex items-center lg:mx-3" ref={dropdownRef}>
-                <span className="">
+              <div className="flex items-center lg:mx-3" >
+                <span>
                   <img
                     src={profileDetails?.img || Placeholder}
                     alt=""
@@ -66,13 +117,15 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
                   <img
                     src={ArrowDown}
                     alt=""
-                    className="hidden lg:block cursor-pointer"
+                    className={`hidden lg:block cursor-pointer ${
+                      isDropdownOpen ? 'rotate-180' : ''
+                    }`}
                     onClick={toggleDropdown}
                   />
                 </div>
               </div>
               {isDropdownOpen && (
-                <div className="mt-2">
+                <div className="mt-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     className="z-30 w-full bg-red-600 py-2.5 px-6 rounded-[8px] font-formular-light leading-normal text-[#ffff] text-[14px]"
                     onClick={logout}
