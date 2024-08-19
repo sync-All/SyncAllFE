@@ -29,7 +29,7 @@ const trackUpload = async(req,res,next)=>{
       console.log('track not avaiable please continue')
       let songInfo = req.body
       var artWork = await cloudinary.uploader.upload(req.file.path)
-      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : response.preview_url, spotifyLink : response.spotifyLink, duration : response.trackDuration}
+      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : response.preview_url, spotifyLink : response.spotifyLink, duration : response.duration}
       const track = new Track(adjustedsongInfo)
       track.save()
       .then(async (track)=>{
