@@ -17,46 +17,8 @@ router.post('/api/v1/googleauth', asynchandler(authcontroller.googleAuth))
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
-router.get('/api/v1/getsyncuserinfo',passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(async (req,res,next)=>{
-  const userId = req.user._id
-  const details = await SyncUser.findOne({_id : userId}).populate('tracklist').select('-password').exec()
-  res.send({user : details, success : true})
-}))
-router.post('/api/v1/profilesetup', async (req, res, next) => {
-  if (req.isAuthenticated) {
-    const { fullName, spotifyLink, bio } = req.body;
-    if (!fullName || !spotifyLink || !bio) {
-      res
-        .status(401)
-        .json({
-          success: false,
-          message: 'Missing field please check and confirm',
-        });
-    } else {
-      const userId = req.user.userId;
-      const profileUpdate = await User.findByIdAndUpdate(
-        userId,
-        { fullName, spotifyLink, bio },
-        { new: true }
-      );
-
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: 'Profile update successful',
-          profileUpdate,
-        });
-    }
-  } else {
-    res
-      .status(401)
-      .json({
-        success: false,
-        message: 'Unauthorized, Please proceed to login',
-      });
-  }
-});
+router.get('/api/v1/getsyncuserinfo',passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(authcontroller.getsyncuserinfo))
+router.post('/api/v1/profilesetup', asynchandler(authcontroller.profilesetup));
 
 router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
 

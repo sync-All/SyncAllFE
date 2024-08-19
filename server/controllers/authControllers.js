@@ -167,6 +167,44 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
+const getsyncuserinfo = async (req,res,next)=>{
+  const userId = req.user._id
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist').select('-password').exec()
+  res.send({user : details, success : true})
+}
+
+const profilesetup = async (req, res, next) => {
+  if (req.isAuthenticated) {
+    const { fullName, spotifyLink, bio } = req.body;
+    if (!fullName || !spotifyLink || !bio) {
+      res
+        .status(401)
+        .json({
+          success: false,
+          message: 'Missing field please check and confirm',
+        });
+    } else {
+      const userId = req.user.userId;
+      const profileUpdate = await User.findByIdAndUpdate(
+        userId,
+        { fullName, spotifyLink, bio },
+        { new: true }
+      );
+
+      res.status(200).json({
+          success: true,
+          message: 'Profile update successful',
+          profileUpdate,
+        });
+    }
+  } else {
+    res.status(401).json({
+        success: false,
+        message: 'Unauthorized, Please proceed to login',
+      });
+  }
+}
+
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
   if(req.user.role == "Music Uploader"){
@@ -259,6 +297,6 @@ const requestForgotPw = async (req,res,next)=>{
     }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw}
+module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
 
   
