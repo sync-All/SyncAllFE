@@ -256,7 +256,7 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
-trackSchema.index({lyrics : 'text', mood : 'text', genre : 'text', featuredInstrument : 'text'})
+trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const disputeSchema = new Schema({
     nameOfTrack  : {
