@@ -231,7 +231,6 @@ const profileUpdate = async (req,res,next)=>{
       res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }
   }else{
-    
     res.status(401).send('Unauthorized')
   }    
 }
