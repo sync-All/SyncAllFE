@@ -48,13 +48,13 @@ const trackUpload = async(req,res,next)=>{
 }
 
 const getAllSongs = async(req,res,next)=>{
-    const allTracks = await Track.find({}).exec()
+    const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
     res.json({allTracks})
 }
 
 const getTracksByGenre = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({genre : req.params.genre}).exec()
+      const allTracks = await Track.find({genre : req.params.genre}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -63,7 +63,7 @@ const getTracksByGenre = async(req,res,next)=>{
 
 const getTracksByInstrument = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({featuredInstrument : req.params.instrument}).exec()
+      const allTracks = await Track.find({featuredInstrument : req.params.instrument}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -72,7 +72,7 @@ const getTracksByInstrument = async(req,res,next)=>{
 
 const getTracksByMood = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({mood : req.params.mood}).exec()
+      const allTracks = await Track.find({mood : req.params.mood}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -82,7 +82,7 @@ const getTracksByMood = async(req,res,next)=>{
 const querySongsByIndex = async(req,res,next)=>{
     const query = req.params.queryText
     try {
-      const allTracks = await Track.find({$text : {$search : query}}).exec()
+      const allTracks = await Track.find({$text : {$search : query}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
