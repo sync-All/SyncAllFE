@@ -222,12 +222,18 @@ const profileUpdate = async (req,res,next)=>{
   {
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
-      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      if(req.body.firstName  && req.body.lastName){
+        var fullName = req.body.firstName + " " + req.body.lastName
+      }
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url, name : fullName}, {new : true}).exec()
       fs.unlinkSync(req.file.path)
       res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }
     else{
-      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      if(req.body.firstName  && req.body.lastName){
+        var fullName = req.body.firstName + " " + req.body.lastName
+      }
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, name : fullName},{new : true}).exec()
       res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }
   }else{
