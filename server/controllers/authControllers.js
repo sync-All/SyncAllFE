@@ -108,7 +108,7 @@ const signup = async function(req, res) {
 
       const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
-      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}).populate('tracklist').select('-password').exec()
+      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood").select('-password').exec()
 
       res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
@@ -169,7 +169,7 @@ const allUsers = async (req,res,next) =>{
 
 const getsyncuserinfo = async (req,res,next)=>{
   const userId = req.user._id
-  const details = await SyncUser.findOne({_id : userId}).populate('tracklist').select('-password').exec()
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood").select('-password').exec()
   res.send({user : details, success : true})
 }
 
