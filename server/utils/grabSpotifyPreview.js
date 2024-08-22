@@ -33,7 +33,7 @@ const SpotifyPreview = async(res, trackLink)=>{
         }
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
-        const trackDuration = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        const trackDuration = `${String(minutes)} minutes ${String(seconds)} seconds`;
         return {
             preview_url : trackDetails.data.preview_url,
             isrc : trackDetails.data.external_ids.isrc,
