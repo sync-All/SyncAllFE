@@ -30,10 +30,10 @@ router.post('/request/sampling-interpolation', passport.authenticate('jwt',{sess
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
-            BadRequestError('Invalid Request, try again later')
+            throw new BadRequestError('Invalid Request, try again later')
         }
     }else{
-        BadRequestError('Invalid Request, try again later')
+        throw new BadRequestError('Invalid Request, try again later')
     }
 }))
 
