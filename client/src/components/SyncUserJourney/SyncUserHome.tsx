@@ -11,20 +11,21 @@ import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
 import { useParams } from 'react-router-dom';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-// import SpotifyPlayer from '../../constants/spotifyplayer' // Adjust the path as necessary
 import Liked from '../../assets/images/liked.svg';
 import MusicSearch from './MusicSearch';
 import MusicPlayer from '../MusicPlayer';
-
+import { useSyncUser } from '../../Context/syncUserData';
 const SyncUserHome = () => {
+    const track = useSyncUser();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
-  const [likedTrack, setLikedTrack] = useState<Set<string>>(new Set());
+const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
   const { id } = useParams();
  
 
@@ -47,26 +48,55 @@ const SyncUserHome = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const handleLike = (trackId: string) => {
-    const newLikedTracks = new Set(likedTrack);
-    if (newLikedTracks.has(trackId)) {
-      newLikedTracks.delete(trackId);
-    } else {
-      newLikedTracks.add(trackId);
-    }
-    setLikedTrack(newLikedTracks);
-    localStorage.setItem(
-      'likedTracks',
-      JSON.stringify(Array.from(newLikedTracks))
-    );
-  };
+  
 
-  useEffect(() => {
-    const storedLikedTracks = localStorage.getItem('likedTracks');
-    if (storedLikedTracks) {
-      setLikedTrack(new Set(JSON.parse(storedLikedTracks)));
-    }
-  }, []);
+ const handleLikes = async (trackId: string) => {
+   const token = localStorage.getItem('token');
+   const urlVar = import.meta.env.VITE_APP_API_URL;
+   const apiUrl = `${urlVar}/liketrack/${trackId}`;
+   const config = {
+     headers: {
+       Authorization: `${token}`,
+     },
+   };
+
+   try {
+     const res = await axios.get(apiUrl, config);
+     toast.success(res.data);
+     setLikedTrack((prevState) => ({
+       ...prevState,
+       [trackId]: true, 
+     }));
+   } catch (error) {
+     const axiosError = error as AxiosError<ResponseData>;
+
+     toast.error(
+       (axiosError.response && axiosError.response.data
+         ? axiosError.response.data.message || axiosError.response.data
+         : axiosError.message || 'An error occurred'
+       ).toString()
+     );
+   }
+ };
+
+useEffect(() => {
+  const trackAdded = track.user?.user.tracklist || [];
+
+  // Create a map of track IDs to their liked status
+  const likedTracksFromApi = trackAdded.reduce(
+    (acc: { [key: string]: boolean }, trackItem) => {
+      acc[trackItem._id] = true; // Mark each track as liked
+      return acc;
+    },
+    {}
+  );
+
+  setLikedTrack(likedTracksFromApi);
+}, [id, track]);
+
+
+
+ 
 
   interface ResponseData {
     message?: string;
@@ -168,7 +198,14 @@ const SyncUserHome = () => {
                   </span>
                 </Link>
 
-                <MusicPlayer trackLink={detail.trackLink} songId={detail._id} duration={10} containerStyle='mt-0 flex items-center gap-3' buttonStyle='w-4 cursor-pointer' waveStyle='w-[70px]'/>
+                <MusicPlayer
+                  trackLink={detail.trackLink}
+                  songId={detail._id}
+                  duration={10}
+                  containerStyle="mt-0 flex items-center gap-3"
+                  buttonStyle="w-4 cursor-pointer"
+                  waveStyle="w-[70px]"
+                />
                 <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                   <span>
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
@@ -189,9 +226,9 @@ const SyncUserHome = () => {
                 </span>
                 <span className="flex gap-6 w-[10%] justify-center">
                   <img
-                    src={likedTrack.has(detail._id) ? Liked : Favorite}
+                    src={likedTrack[detail._id] ? Liked : Favorite}
                     alt=""
-                    onClick={() => handleLike(detail._id)}
+                    onClick={() => handleLikes(detail._id)}
                   />
                   {/* <img src={AddMusic} alt="" /> */}
                   <img src={Copy} alt="" className="cursor-pointer" />
@@ -202,7 +239,7 @@ const SyncUserHome = () => {
                       View More
                     </button>
                   </Link>
-                  <Link to="/pricing">
+                  <Link to={`/home/quote/${detail._id}`}>
                     <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       Get Quote
                     </button>
@@ -211,6 +248,7 @@ const SyncUserHome = () => {
               </div>
             ))}
           </div>
+
 
           {/* Mobile */}
           <div className="lg:hidden flex flex-col gap-6">
@@ -239,15 +277,17 @@ const SyncUserHome = () => {
             ))}
           </div>
 
+
+
           {menuOpen &&
             musicDetails.map((detail, index) => (
-              <div key={index}>
+              <React.Fragment key={index}>
                 <div
-                  className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
+                  className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-10"
                   onClick={closeMenu}
                 ></div>
                 <div className="h-full z-50">
-                  <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-1/2 overflow-y-auto p-8">
+                  <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-[40%] overflow-y-auto p-8">
                     <span className="flex justify-between">
                       <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6">
                         Song Options
@@ -280,7 +320,7 @@ const SyncUserHome = () => {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </React.Fragment>
             ))}
         </section>
       </div>

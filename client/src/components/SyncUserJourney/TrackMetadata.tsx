@@ -1,5 +1,7 @@
 import Background from '../../assets/images/user-homepage-head.png';
 import Favorite from '../../assets/images/favorite.svg';
+import Liked from '../../assets/images/liked.svg';
+
 import Copy from '../../assets/images/copy-link.svg';
 // import AddMusic from '../../assets/images/add-music.svg';
 import { useParams } from 'react-router-dom';
@@ -7,11 +9,14 @@ import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import MusicPlayer from '../MusicPlayer';
+import { useSyncUser } from '../../Context/syncUserData';
 
 const TrackMetadata = () => {
+  const track = useSyncUser();
   const { id } = useParams();
   const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
 
+  const [liked, isLiked] = useState(false);
   interface ResponseData {
     message?: string;
   }
@@ -56,14 +61,14 @@ const TrackMetadata = () => {
     uploadStatus: string;
     user: string;
     writers: string[];
-    deatils: string[];
+    duration: string[];
   }
 
   useEffect(() => {
     const fetchTrackDetails = async () => {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/queryTrackInfo/${id}`; // Endpoint to fetch all tracks
+      const apiUrl = `${urlVar}/queryTrackInfo/${id}`;
       const config = {
         headers: {
           Authorization: `${token}`,
@@ -73,8 +78,7 @@ const TrackMetadata = () => {
       try {
         const res = await axios.get(apiUrl, config);
         console.log(res);
-       setTrackDetails(res.data.details) 
-   
+        setTrackDetails(res.data.details);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
@@ -89,6 +93,40 @@ const TrackMetadata = () => {
   }, [id]);
 
   
+  useEffect(() => {
+    const trackAdded = track.user?.user.tracklist || [];
+    const isIdPresent = trackAdded.some((track) => track._id === id);
+
+    if (isIdPresent) {
+      isLiked(true);
+    }
+  }, [id, track]);
+
+  const handleLikes = async () => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/liketrack/${id}`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
+
+    try {
+      const res = await axios.get(apiUrl, config);
+      toast.success(res.data);
+      isLiked(true);
+    } catch (error) {
+      const axiosError = error as AxiosError<ResponseData>;
+
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">
@@ -109,14 +147,20 @@ const TrackMetadata = () => {
                 {trackDetails?.mainArtist}
               </p>
             </div>
-
             <div className="flex mt-[27px] gap-[25px] items-center lg:items-start ">
-              <img src={Favorite} alt="" />
+              <img
+                src={liked ? Liked : Favorite}
+                alt=""
+                className="cursor-pointer"
+                onClick={handleLikes}
+              />
               {/* <img src={AddMusic} alt="" /> */}
-              <img src={Copy} alt="" />
-              <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
-                Get Quote
-              </button>
+              <img src={Copy} alt="" className="cursor-pointer" />
+              <a href="/pricing">
+                <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
+                  Get Quote
+                </button>
+              </a>
             </div>
           </div>
           <MusicPlayer trackLink={trackDetails?.trackLink} />
@@ -134,16 +178,16 @@ const TrackMetadata = () => {
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                  <p>Duration</p>
+                  <p className="text-[#475367]">{trackDetails?.duration}</p>
+                </span>{' '}
+                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Composed by</p>
                   <p className="text-[#475367]">
                     {Array.isArray(trackDetails?.composers)
                       ? trackDetails.composers.join(', ')
                       : 'Subscribe to see this info'}
                   </p>
-                </span>
-                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Duration</p>
-                  <p className="text-[#475367]">3 minutes, 33 seconds</p>
                 </span>
               </div>
               <div className="flex flex-col justify-between gap-8 lg:gap-6">
@@ -154,6 +198,22 @@ const TrackMetadata = () => {
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                  <p>Release date</p>
+                  <p className="text-[#475367]">
+                    {new Date(
+                      trackDetails?.releaseDate ?? ''
+                    ).toLocaleDateString() || 'N/A'}
+                  </p>
+                </span>
+                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                  <p>Release Label</p>
+                  <p className="text-[#475367]">
+                    {trackDetails?.releaseLabel || 'Subscribe to see this info'}
+                  </p>
+                </span>
+              </div>
+              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
+                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Produced by</p>
                   <p className="text-[#475367]">
                     {Array.isArray(trackDetails?.producers)
@@ -161,26 +221,11 @@ const TrackMetadata = () => {
                       : ''}
                   </p>
                 </span>
-                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Release Label</p>
-                  <p className="text-[#475367]">
-                    {trackDetails?.releaseLabel || 'N/A'}
-                  </p>
-                </span>
-              </div>
-              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
+
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Writer</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.writers || 'N/A'}
-                  </p>
-                </span>
-                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Release date</p>
-                  <p className="text-[#475367]">
-                    {new Date(
-                      trackDetails?.releaseDate ?? ''
-                    ).toLocaleDateString() || 'N/A'}
+                    {trackDetails?.writers || 'Subscribe to see this info'}
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">

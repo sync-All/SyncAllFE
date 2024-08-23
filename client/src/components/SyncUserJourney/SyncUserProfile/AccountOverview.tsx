@@ -7,8 +7,8 @@ import { useSyncUser } from '../../../Context/syncUserData';
 const AccountOverview = () => {
   const { user } = useSyncUser();
   // const licensedTracks = ;
-  const licensedTracksNo = user?.totalLicensedTracks.length;
-  const recentActivity = user?.recentActivity;
+const licensedTracksNo = user?.user.totalLicensedTracks?.length || 0;
+  const recentActivity = user?.user.recentActivity;
 
   return (
     <div className="mt-[50px]">
@@ -53,7 +53,7 @@ const AccountOverview = () => {
               Upcoming Renewals
             </p>
             <h3 className="mt-2 font-formular-regular text-[32px] text-[#1D2739] text-center ">
-              {user?.upcomingRenewals}{' '}
+              {user?.user.upcomingRenewals}{' '}
             </h3>
           </div>
         </div>

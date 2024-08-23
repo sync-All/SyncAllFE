@@ -24,6 +24,8 @@ import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
+import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
+// import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -157,6 +159,38 @@ function App() {
               </SyncUserProvider>
             }
           />
+
+          <Route
+            path="home/quote/:id"
+            element={
+              <ProtectedRoute
+                path="home/quote/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <QouteType />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          {/* <Route
+            path="home/quote/synclicense"
+            element={
+              <ProtectedRoute
+                path="home/quote/synclicense"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <SyncLicense />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          /> */}
         </Routes>
       </UserContext.Provider>
     </>

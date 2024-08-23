@@ -8,11 +8,13 @@ import { useState } from 'react';
 import { useSyncUser } from '../../../Context/syncUserData';
 
 const AccountSetting = () => {
-  const { user } = useSyncUser()
+  const { user } = useSyncUser();
   const [fileName, setFileName] = useState('');
-    const { loading, setLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
 
-    const applyInputStyles =
+  const userDetails = user?.user;
+
+  const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 
   const applyLabelStyles =
@@ -23,24 +25,26 @@ const AccountSetting = () => {
   const validationSchema = Yup.object({
     firstName: Yup.string(),
     lastName: Yup.string(),
-    email: Yup.string().email('Invalid email address'),
     phoneNumber: Yup.string(),
   });
 
- function delay(ms: number) {
-   return new Promise((resolve) => setTimeout(resolve, ms));
- }
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   interface ResponseData {
     message?: string;
   }
 
+  const splitName = userDetails?.name.split(' ');
+  const firstName = splitName ? splitName[0] : '';
+  const lastName = splitName ? splitName[1] : '';
+
   const initialValues = {
-    firstName: user?.name,
-    lastName: user?.name,
-    email: user?.email,
-    phoneNumber: user?.phoneNumber,
-    img: user?.img,
+    firstName: firstName,
+    lastName: lastName,
+    phoneNumber: userDetails?.phoneNumber,
+    img: userDetails?.img,
   };
   return (
     <div className="mt-[49px]">
@@ -61,7 +65,7 @@ const AccountSetting = () => {
           try {
             await delay(2000);
             await axios.postForm(apiUrl, values, config);
-            toast.success('Profile Information Updated successful');
+            toast.success('Profile information updated successful');
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
 
@@ -80,7 +84,7 @@ const AccountSetting = () => {
           <Form>
             <div className={applyFormDiv}>
               <div className={input}>
-                <label htmlFor="firstName" className={applyLabelStyles}>
+                <label htmlFor="name" className={applyLabelStyles}>
                   First Name
                 </label>
                 <Field
@@ -89,7 +93,7 @@ const AccountSetting = () => {
                   className={applyInputStyles}
                 />
                 <ErrorMessage
-                  name="firstName"
+                  name="name"
                   component="div"
                   className="text-red-500"
                 />
@@ -104,7 +108,7 @@ const AccountSetting = () => {
                   className={applyInputStyles}
                 />
                 <ErrorMessage
-                  name="email"
+                  name="las"
                   component="div"
                   className="text-red-500"
                 />
@@ -131,7 +135,13 @@ const AccountSetting = () => {
                 <label htmlFor="email" className={applyLabelStyles}>
                   Email Address
                 </label>
-                <Field type="email" name="email" className={applyInputStyles} />
+                <Field
+                  type="email"
+                  name="email"
+                  Placeholder={userDetails?.email}
+                  className={applyInputStyles}
+                  disabled
+                />
                 <ErrorMessage
                   name="email"
                   component="div"
@@ -206,6 +216,6 @@ const AccountSetting = () => {
       </Formik>
     </div>
   );
-}
+};
 
 export default AccountSetting;
