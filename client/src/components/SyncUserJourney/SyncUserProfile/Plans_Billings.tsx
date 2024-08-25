@@ -5,7 +5,7 @@ import { useSyncUser } from '../../../Context/syncUserData';
 const PlansBillings = () => {
     const { user } = useSyncUser();
 
-const paymentInfo = user?.billing
+const paymentInfo = user?.user?.billing
 
 
   return (

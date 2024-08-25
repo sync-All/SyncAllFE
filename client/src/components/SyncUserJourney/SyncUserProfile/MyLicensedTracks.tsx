@@ -26,7 +26,7 @@ const MyLicensedTracks = () => {
     navigate('/metadata');
   };
 
-  const licensedTracks = user?.totalLicensedTracks;
+  const licensedTracks = user?.user?.totalLicensedTracks;
 
   const musicWaves = [MusicWave, MusicWave, MusicWave];
   const actions = [Favorite, Copy];

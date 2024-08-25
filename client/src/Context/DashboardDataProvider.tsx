@@ -112,28 +112,12 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     };
 
-    // // Attempt to retrieve cached data from sessionStorage
-    // const cachedData = sessionStorage.getItem(`dashboardData_${userId}`);
-    // if (cachedData) {
-    //   const { data, timestamp } = JSON.parse(cachedData);
-    //   if (Date.now() - timestamp < CACHE_DURATION) {
-    //     setDashboardData(data);
-    //     return;
-    //   }
-    // }
+  
 
     try {
       const response = await axios.get(apiUrl, config);
       console.log('Hey bro, Im running');
-      // // Cache the new data with a timestamp
-      // const dataToCache = {
-      //   data: response.data,
-      //   timestamp: Date.now(),
-      // };
-      // sessionStorage.setItem(
-      //   `dashboardData_${userId}`,
-      //   JSON.stringify(dataToCache)
-      // );
+      
       setDashboardData(response.data);
     } catch (error) {
       // Implement retry logic or error handling as needed
