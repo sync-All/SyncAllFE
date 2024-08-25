@@ -7,10 +7,10 @@ import { MusicPlayerProvider } from './Context/MusicPlayerContext.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <MusicPlayerProvider>
       <Router>
-        <MusicPlayerProvider>
-          <App />
-        </MusicPlayerProvider>
+        <App />
       </Router>
+    </MusicPlayerProvider>
   </React.StrictMode>,
 )

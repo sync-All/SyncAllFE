@@ -6,6 +6,14 @@ const spotifyError = class CustomSpotifyError extends Error {
     }
 }
 
-module.exports = {spotifyError}
+const BadRequestError = class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+    this.name = "BadRequestError";
+  }
+}
+
+module.exports = {spotifyError, BadRequestError}
 
   

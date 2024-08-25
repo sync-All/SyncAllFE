@@ -26,15 +26,16 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
 
   const handlePlayPause = () => {
     if(wavesurfer?.current?.isPlaying()){
-        values?.setCurrentPlayingTrackId('')
+      values?.setCurrentPlayingTrackId('')
     }
     else{
-      if(songId)
-      values?.setCurrentPlayingTrackId(songId)
+      if(songId){
+        values?.setCurrentPlayingTrackId(songId)
+        console.log('a song wasnt playing and your song is playing now')
+      }
     }
     setIsPlaying( !isPlaying);
-    wavesurfer?.current?.playPause();
-      
+    wavesurfer?.current?.playPause(); 
   };
 
   
@@ -55,11 +56,7 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
   });
 
   useEffect(()=>{
-    // if(trackLink){
-    //   const newAudio = new Audio(trackLink)
-    //   setAudio(newAudio)
-    // }
-
+    console.log(trackLink)
     if(waveformRef.current){
       const options = formWaveSurferOptions(waveformRef.current)
         wavesurfer.current = WaveSurfer.create(options);
