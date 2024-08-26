@@ -29,7 +29,7 @@ router.get('/liketrack/:trackId', passport.authenticate('jwt',{session : false, 
     const trackId = req.params.trackId
     if(req.user.role == "Sync User"){
         if(req.user.tracklist.indexOf(trackId) != -1){
-            res.status(202).send('Track already included in your library, to unlike kindly proceed to your library')
+            res.status(202).send('Track already added to your library, to undo action kindly proceed to your library')
             return;
         }else{
             await SyncUser.findByIdAndUpdate(req.user._id, {$push : {
