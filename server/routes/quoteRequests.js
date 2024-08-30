@@ -2,6 +2,7 @@ const router = require('express').Router()
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 const { BadRequestError } = require('../utils/CustomError')
+const { informQuoteRequest } = require('../utils/mailer')
 const fmtRequest = require('../models/quote.model').fmtRequest
 const tvaRequest = require('../models/quote.model').tvaRequest
 const videoGamesRequest = require('../models/quote.model').videoGamesRequest
@@ -96,8 +97,9 @@ router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false,
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         try {
-            const request = new crbtRequest({...req.body, user_info : userId})
-            await request.save()
+            informQuoteRequest('deemajor230600@gmail.com')
+            // const request = new crbtRequest({...req.body, user_info : userId})
+            // await request.save()
             .then(()=>{
                 res.send('Request Sent Successfully')
             })

@@ -56,6 +56,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/',(req,res,next)=>{
+  res.render('quoteRequest', {title : "Your Quote request", user : {name : "tunes"}})
+})
 
 app.use('/', waitlistRouter)
 app.use('/api/v1/', trackRouter);
