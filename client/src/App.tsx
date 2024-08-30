@@ -25,6 +25,10 @@ import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/Mus
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
 import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
+import FilmMoviesTv from './components/SyncUserJourney/SyncUserQoutes/Film_Movies_Tv';
+import TvCommercialAds from './components/SyncUserJourney/SyncUserQoutes/Tv_Commercial&Ads';
+import ScrollToTop from './constants/scroll-to-top';
+import VideoGames from './components/SyncUserJourney/SyncUserQoutes/Video_Games';
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 
 function App() {
@@ -37,6 +41,7 @@ function App() {
       <UserContext.Provider
         value={{ userRole, setUserRole, googleAuthData, setGoogleAuthData }}
       >
+        <ScrollToTop />
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -161,7 +166,7 @@ function App() {
           />
 
           <Route
-            path="home/quote/:id"
+            path="/quote/:id"
             element={
               <ProtectedRoute
                 path="home/quote/:id"
@@ -176,21 +181,53 @@ function App() {
             }
           />
 
-          {/* <Route
-            path="home/quote/synclicense"
+          <Route
+            path="/quote/filmMovieTVSeries/:id"
             element={
               <ProtectedRoute
-                path="home/quote/synclicense"
+                path="/quote/filmMovieTVSeries/:id"
                 element={
                   <SyncUserProvider>
                     <SyncUserLayout>
-                      <SyncLicense />
+                      <FilmMoviesTv />
                     </SyncUserLayout>
                   </SyncUserProvider>
                 }
               />
             }
-          /> */}
+          />
+
+          <Route
+            path="/quote/tvCommercialAds/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/tvCommercialAds/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <TvCommercialAds />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/quote/videoGames/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/videoGames/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <VideoGames />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
         </Routes>
       </UserContext.Provider>
     </>

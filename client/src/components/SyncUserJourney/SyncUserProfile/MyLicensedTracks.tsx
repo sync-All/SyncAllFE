@@ -1,8 +1,7 @@
-// import MusicImg from '../../../assets/images/3000x3000.jpg.png';
+import MusicImg from '../../../assets/images/3000x3000.jpg.png';
 import Menu from '../../../assets/menu-dot-square.svg';
 import ViewMore from '../../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../../assets/images/document-add.svg';
-import MusicWave from '../../../assets/images/musicwave.svg';
 import Favorite from '../../../assets/images/favorite.svg';
 import Copy from '../../../assets/images/copy-link.svg';
 import AddMusic from '../../../assets/images/add-music.svg';
@@ -10,6 +9,7 @@ import Closemenu from '../../../assets/images/close-circle.svg';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useSyncUser } from '../../../Context/syncUserData';
+import MusicPlayer from '../../MusicPlayer';
 
 const MyLicensedTracks = () => {
   const { user } = useSyncUser();
@@ -28,7 +28,6 @@ const MyLicensedTracks = () => {
 
   const licensedTracks = user?.user?.totalLicensedTracks;
 
-  const musicWaves = [MusicWave, MusicWave, MusicWave];
   const actions = [Favorite, Copy];
 
   return (
@@ -42,36 +41,34 @@ const MyLicensedTracks = () => {
               onClick={redirectMetadata}
             >
               <span className="flex gap-3">
-                {/* <img src={detail?.length} alt="" /> */}
+                <img src={detail?.artWork || MusicImg} alt="" />
                 <span>
                   <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                    {detail?.length}
+                    {detail?.trackTitle}
                   </h4>
                   <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                    {detail?.length}
+                    {detail?.mainArtist}
                   </p>
                 </span>
               </span>
               <div className="items-center flex">
-                {musicWaves.map((wave, waveIndex) => (
-                  <img key={waveIndex} src={wave} alt="" />
-                ))}
+                <MusicPlayer trackLink={detail?.trackLink} />
               </div>
               <span className="flex gap-12">
                 <span>
                   <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                    {detail?.length}
+                    {detail?.duration || 'N/A'}
                   </p>
                   <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail?.length}
+                    {detail?.producers || 'N/A'}
                   </p>
                 </span>
                 <span>
                   <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                    {detail?.length}
+                    {detail?.genre || 'N/A'}
                   </p>
                   <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail?.length}
+                    {detail?.mood || 'N/A'}
                   </p>
                 </span>
               </span>
@@ -107,13 +104,13 @@ const MyLicensedTracks = () => {
               className="flex items-center w-full justify-between  "
             >
               <span className="flex gap-3">
-                {/* <img src={detail.musicImg} alt="" /> */}
+                <img src={detail?.artWork || MusicImg} alt="" />
                 <span>
                   <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                    {detail.length}
+                    {detail.trackTitle}
                   </h4>
                   <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                    {detail.length}
+                    {detail.mainArtist}
                   </p>
                 </span>
               </span>
