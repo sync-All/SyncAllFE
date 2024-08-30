@@ -526,6 +526,10 @@ const smcSchema = new Schema({
         type : String,
         required : true
     },
+    attachments : {
+        type : String,
+        required : true
+    },
     role_type : {
         type : String,
         enum : ['Social Media Content'],
