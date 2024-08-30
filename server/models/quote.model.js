@@ -1,126 +1,565 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
-const syncLicenseSchema = new Schema({
-    nameOfProductionCompany : {
+const fmtSchema = new Schema({
+    project_title : {
         type : String,
         required : true
     },
-    titleOfProduction :{
+    genre:[
+        {
+        type : String,
+        required : true
+        }
+    ],
+    project_director : {
         type : String,
         required : true
     },
-    director : {
+    project_producer : {
         type : String,
         required : true
     },
-    producer : {
+    project_cast : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    production_budject : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    production_synopsis : {
         type : String,
         required : true
     },
-    country : {
+    scene_synopsis : {
         type : String,
         required : true
     },
-    typeOfMedia : {
+    distributor : {
         type : String,
         required : true
     },
-    nameOfDistributor : {
+    distribution : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    usage : {
         type : String,
         required : true
     },
-    territoryOfUse : {
+    length : {
         type : String,
         required : true
     },
-    term : {
+    territories : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    license : {
         type : String,
         required : true
     },
-    durationOfMusicUsage : {
+    media : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    attachments :
+    {
+        type : String,
+    },
+    license_duration :  { 
         type : String,
         required : true
     },
-    typeOfMusicUsage : {
+    additional_info : {
         type : String,
-        enum : ['Background Instrumental', 'Background Vocal', 'Visual Instrumental', 'Visual Vocal', 'Main Title Theme', 'End Title Theme'],
+    },
+    role_type : {
+        type : String,
+        enum : ['Film/Movie/TV Series'],
         required : true
     },
-    sceneSynopsis : {
-        type : String,
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
         required : true
     },
-    productionSynopsis : {
-        type : String,
-        required : true
-    },
-    adviseBudget : {
-        type : String,
-        required : true
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser"
     }
 },{timestamps: true})
 
-const samplingSchema = new Schema({
-    titleOfNewWork : {
+const tvaSchema = new Schema({
+    product : {
         type : String,
         required : true,
     },
-    newArtist : {
+    theme : {
         type : String,
         required : true,
     },
-    containOthers : [
+    length :
         {
             type : String,
             required : true,
         }
+    ,
+    production_budget : {
+        type : String,
+        required : true,
+    },
+    air_date : {
+        type : String,
+        required : true,
+    },
+    networks : {
+        type : String,
+        required : true,
+    },
+    duration_of_music_usage : {
+        type : String,
+        required : true,
+    },
+    intended_usage : {
+        type : String,
+        required : true,
+    },
+    territories : {
+        type : String,
+        required : true,
+    },
+    license_duration :  { 
+        type : String,
+        required : true
+    },
+    media : {
+        type : String,
+        required : true,
+    },
+    attachments : {
+        type : String,
+    },
+    additional_info : {
+        type : String,
+        required : true,
+    },
+    role_type : {
+        type : String,
+        enum : ['TV Commercial/Ads'],
+        required : true
+    },
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
+}, {timestamps : true})
+
+const videosGamesSchema = new Schema({
+    game_title : { 
+        type : String,
+        required : true
+    },
+    genre : [
+        { 
+            type : String,
+            required : true
+        }
     ],
-    proposedShare : {
+    platform :  { 
+        type : String,
+        required : true
+    },
+    release_date :  { 
+        type : String,
+        required : true
+    },
+    target_audience :  { 
+        type : String,
+        required : true
+    },
+    length :  { 
+        type : String,
+        required : true
+    },
+    development_stage :  { 
+        type : String,
+        required : true
+    },
+    territories :  { 
+        type : String,
+        required : true
+    },
+    usage :  { 
+        type : String,
+        required : true
+    },
+    media_format :  { 
+        type : String,
+        required : true
+    },
+    license_duration :  { 
+        type : String,
+        required : true
+    },
+    attachments : {
+        type : String,
+    },
+    additional_info : {
         type : String,
         required : true,
     },
-    label : {
+    role_type : {
         type : String,
-        required : true,
+        enum : ['Video Games'],
+        required : true
     },
-    distributor : {
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
+}, {timestamps : true})
+
+const samplingSchema = new Schema({
+    project_title :  { 
         type : String,
-        required : true,
+        required : true
     },
-    country : {
+    genre :  { 
         type : String,
-        required : true,
+        required : true
     },
-    format : {
+    artists_or_group : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    release_date :  { 
         type : String,
-        required : true,
+        required : true
     },
-    proposedReleaseDate : {
+    distribution_channels : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    original_song :  { 
         type : String,
-        required : true,
+        required : true
     },
-    territoryOfRelease : {
+    artist_name : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    portion_to_be_sampled :  { 
         type : String,
-        required : true,
+        required : true
     },
-    additionalInfo : {
+    intended_usage : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    territories : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    license_duration : { 
         type : String,
-        required : true,
+        enum : ['Yearly'],
+        required : true
     },
-    listeningLink : {
+    media_formats : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    samples_of_other_songs : { 
         type : String,
-        required : true,
+        required : true
     },
-    notes : {
+    additional_info : { 
         type : String,
-        required : true,
     },
+    attachments : {
+        type : String,
+    },
+    role_type : {
+        type : String,
+        enum : ['Sampling'],
+        required : true
+    },
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
+}, {timestamps : true})
+
+const interpolationSchema = new Schema({
+    project_title :  { 
+        type : String,
+        required : true
+    },
+    genre :  { 
+        type : String,
+        required : true
+    },
+    artists_or_group : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    release_date :  { 
+        type : String,
+        required : true
+    },
+    distribution_channels : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    original_song :  { 
+        type : String,
+        required : true
+    },
+    artist_name : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    portion_to_be_sampled :  { 
+        type : String,
+        required : true
+    },
+    intended_usage : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    territories : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    license_duration : { 
+        type : String,
+        enum : ['Yearly'],
+        required : true
+    },
+    media_formats : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
+    samples_of_other_songs : { 
+        type : String,
+        required : true
+    },
+    additional_info : { 
+        type : String,
+    },
+    attachments : {
+        type : String,
+    },
+    role_type : {
+        type : String,
+        enum : ['Sampling'],
+        required : true
+    },
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
+})
+
+const crbtSchema = new Schema({
+    carrier : {
+        type : String,
+        required : true
+    },
+    target_audience : {
+        type : String,
+        required : true
+    },
+    theme : {
+        type : String,
+        required : true
+    },
+    duration : {
+        type : String,
+        required : true
+    },
+    distribution : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    territories : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    license_duration : {
+        type : String,
+        enum : ['Yearly'],
+        required : true
+    },
+    media : {
+        type : String,
+        required : true
+    },
+    additional_info : {
+        type : String,
+        required : true
+    },
+    role_type : {
+        type : String,
+        enum : ['CRBT'],
+        required : true
+    },
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
+}, {timestamps :  true})
+
+const smcSchema = new Schema({
+    platform : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    content_type : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    theme : {
+        type : String,
+        required : true
+    },
+    distribution : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    length : {
+        type : String,
+        required : true
+    },
+    territories : [
+        {
+            type : String,
+            required : true
+        }
+    ],
+    license_duration : {
+        type : String,
+        enum : ['Yearly'],
+        required : true
+    },
+    media : {
+        type : String,
+        required : true
+    },
+    additional_info : {
+        type : String,
+        required : true
+    },
+    role_type : {
+        type : String,
+        enum : ['Social Media Content'],
+        required : true
+    },
+    track_info : {
+        type : Schema.Types.ObjectId,
+        ref : "track",
+        required : true
+    },
+    user_info : {
+        type : Schema.Types.ObjectId,
+        ref : "syncUser",
+        required : true
+    }
 }, {timestamps : true})
 
 
-const samplingRequest = mongoose.model('sampling-request',samplingSchema)
 
-const syncLicenseRequest = mongoose.model('sync-license-request',syncLicenseSchema)
+const tvaRequest = mongoose.model('tva-license-request',tvaSchema)
 
-module.exports = {samplingRequest, syncLicenseRequest}
+const fmtRequest = mongoose.model('fmt-license-request',fmtSchema)
+
+const videoGamesRequest = mongoose.model('videogames-license-request',videosGamesSchema)
+
+const samplingRequest = mongoose.model('sampling-license-request', samplingSchema)
+
+const interpolationRequest = mongoose.model('interpolation-license-request', interpolationSchema)
+
+const crbtRequest = mongoose.model('crbt-license-request', crbtSchema)
+
+const smcRequest = mongoose.model('smc-license-request', smcSchema)
+
+
+
+
+module.exports = {tvaRequest, fmtRequest, videoGamesRequest, samplingRequest,interpolationRequest, crbtRequest, smcRequest}

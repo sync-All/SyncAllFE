@@ -149,9 +149,31 @@ const syncUserSchema = new Schema({
     },
 })
 
+const syncAdminSchema = new Schema({
+    name : {
+        required : true,
+        type : String
+    },
+    email : {
+        required : true,
+        type : String
+    },
+    password : {
+        required : true,
+        type : String
+    },
+    role : {
+        required : true,
+        type : String,
+        default : "Admin"
+    }
+}, {timestamps : true})
+
+const admin = mongoose.model('admin',syncAdminSchema)
+
 const uploader = mongoose.model('user',userSchema)
 
 const syncUser = mongoose.model('syncUser',syncUserSchema)
 
-module.exports = {uploader, syncUser}
+module.exports = {uploader, syncUser, admin}
 
