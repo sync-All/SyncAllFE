@@ -20,10 +20,11 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
-            BadRequestError('Invalid Request, try again later')
+            console.log(error)
+            throw new BadRequestError('Invalid Request, try again later')
         }
     }else {
-        BadRequestError('Invalid Request, try again later')
+        throw new BadRequestError('Invalid Request, try again later')
     }
 }))
 
@@ -36,10 +37,11 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
-            BadRequestError('Invalid Request, try again later')
+            console.log(error)
+            throw new BadRequestError('Invalid Request, try again later')
         }
     }else {
-        BadRequestError('Invalid Request, try again later')
+        throw new BadRequestError('Invalid Request, try again later')
     }
 }))
 
@@ -52,10 +54,11 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
-            BadRequestError('Invalid Request, try again later')
+            console.log(error)
+            throw new BadRequestError('Invalid Request, try again later')
         }
     }else {
-        BadRequestError('Invalid Request, try again later')
+        throw new BadRequestError('Invalid Request, try again later')
     }
 }))
 
