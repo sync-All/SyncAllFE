@@ -136,10 +136,12 @@ const tvaSchema = new Schema({
         type : String,
         required : true,
     },
-    territories : {
-        type : String,
-        required : true,
-    },
+    territories :[
+        {
+            type : String,
+            required : true,
+        }
+    ],
     license_duration :  { 
         type : String,
         required : true
@@ -203,10 +205,12 @@ const videosGamesSchema = new Schema({
         type : String,
         required : true
     },
-    territories :  { 
-        type : String,
-        required : true
-    },
+    territories : [
+        { 
+            type : String,
+            required : true
+        }
+    ],
     usage :  { 
         type : String,
         required : true
