@@ -32,6 +32,7 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
 router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
+        console.log(req.body)
         try {
             const request = new fmtRequest({...req.body, user_info : userId})
             await request.save()
@@ -50,6 +51,7 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
 router.post('/quote-request/video_game', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
+        console.log(req.body)
         try {
             const request = new videoGamesRequest({...req.body, user_info : userId})
             await request.save()
@@ -68,6 +70,7 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
 router.post('/quote-request/sampling', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
+        console.log(req.body)
         try {
             const request = new samplingRequest({...req.body, user_info : userId})
             await request.save()
@@ -85,6 +88,7 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
 router.post('/quote-request/interpolation', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
+        console.log(req.body)
         try {
             const request = new interpolationRequest({...req.body, user_info : userId})
             await request.save()
@@ -102,6 +106,7 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
 router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
+        console.log(req.body)
         try {
             // informQuoteRequest('deemajor230600@gmail.com')
             const request = new crbtRequest({...req.body, user_info : userId})
