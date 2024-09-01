@@ -74,10 +74,11 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    attachments :
-    {
-        type : String,
-    },
+    attachments :[
+        {
+            type : String,
+        },
+    ],
     license_duration :  { 
         type : String,
         required : true
@@ -150,9 +151,11 @@ const tvaSchema = new Schema({
         type : String,
         required : true,
     },
-    attachments : {
-        type : String,
-    },
+    attachments : [
+        {
+            type : String,
+        },
+    ],
     additional_info : {
         type : String,
         required : true,
@@ -221,11 +224,14 @@ const videosGamesSchema = new Schema({
     },
     license_duration :  { 
         type : String,
+        enum : ['Yearly'],
         required : true
     },
-    attachments : {
-        type : String,
-    },
+    attachments : [
+        {
+            type : String,
+        },
+    ],
     additional_info : {
         type : String,
         required : true,
@@ -252,10 +258,12 @@ const samplingSchema = new Schema({
         type : String,
         required : true
     },
-    genre :  { 
-        type : String,
-        required : true
-    },
+    genre : [
+        { 
+            type : String,
+            required : true
+        },
+    ],
     artists_or_group : [
         { 
             type : String,
@@ -276,12 +284,12 @@ const samplingSchema = new Schema({
         type : String,
         required : true
     },
-    artist_name : [
+    artist_name :
         { 
             type : String,
             required : true
         }
-    ],
+    ,
     portion_to_be_sampled :  { 
         type : String,
         required : true
@@ -316,9 +324,11 @@ const samplingSchema = new Schema({
     additional_info : { 
         type : String,
     },
-    attachments : {
-        type : String,
-    },
+    attachments : [
+        {
+            type : String,
+        },
+    ],
     role_type : {
         type : String,
         enum : ['Sampling'],
@@ -405,9 +415,11 @@ const interpolationSchema = new Schema({
     additional_info : { 
         type : String,
     },
-    attachments : {
-        type : String,
-    },
+    attachments : [
+        {
+            type : String,
+        },
+    ],
     role_type : {
         type : String,
         enum : ['Sampling'],
@@ -530,10 +542,11 @@ const smcSchema = new Schema({
         type : String,
         required : true
     },
-    attachments : {
-        type : String,
-        required : true
-    },
+    attachments : [
+        {
+            type : String,
+        },
+    ],
     role_type : {
         type : String,
         enum : ['Social Media Content'],

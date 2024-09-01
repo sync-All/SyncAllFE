@@ -5,7 +5,7 @@ require('dotenv').config()
 
 // Create a transporter
 
-function sendConfirmationMail(user, issuedJwt){
+async function sendConfirmationMail(user, issuedJwt){
   const transporter = nodemailer.createTransport({
     service : "Gmail",
   auth: {
@@ -16,8 +16,7 @@ function sendConfirmationMail(user, issuedJwt){
 
 const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
 
-console.log(pathtofile)
-ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, (err, renderedHtml) => {
+await ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
   if (err) {
     console.error('Error rendering EJS template:', err);
     return;
@@ -32,11 +31,9 @@ ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.c
   };
 
   // Send the email
-  transporter.sendMail(mainOptions, (error, info) => {
+transporter.sendMail(mainOptions,(error, info) => {
     if (error) {
-      console.error('Error sending email:', error);
-    } else {
-      console.log('Email sent successfully!');
+       console.error('Error sending email:', error);
     }
   });
 });

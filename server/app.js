@@ -37,13 +37,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 const mongoString = process.env.MONGO_CONNECT_STRING
+const mongoTestString = process.env.MONGO_TEST_CONNECT_STRING
 
-main()
-.then(()=> console.log('Connected to Database'))
-.catch((err)=> console.log(err))
+try {
+  main()
+} catch (error) {
+  console.log(err)
+}
 
 async function main(){
-  await mongoose.connect(mongoString)
+  await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+  return
 }
 
 require('./config/passport')(passport);
