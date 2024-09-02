@@ -1,10 +1,10 @@
 import {useStripe, useElements, PaymentElement} from '@stripe/react-stripe-js';
 import { FormEvent } from 'react';
+import { toast } from 'react-toastify';
 
 const CheckoutForm = () => {
     const stripe = useStripe();
     const elements = useElements();
-
     const handleSubmit = async (event: FormEvent) => {
         // We don't want to let default form submission happen here,
         // which would refresh the page.
@@ -27,6 +27,7 @@ const CheckoutForm = () => {
         if (result.error) {
           // Show error to your customer (for example, payment details incomplete)
           console.log(result.error.message);
+          toast.error(result.error.message)
         } else {
           // Your customer will be redirected to your `return_url`. For some payment
           // methods like iDEAL, your customer will be redirected to an intermediate
@@ -38,7 +39,8 @@ const CheckoutForm = () => {
         <form className='w-[90%] max-w-[650px] ' onSubmit={handleSubmit}>
             <PaymentElement />
             <div className='flex items-center justify-center'>
-            {stripe && elements && <button disabled={!stripe}>Submit</button>}
+              
+            {stripe && elements && <button className='my-6' disabled={!stripe}>Submit</button>}
             </div>
         </form>
     </div>
