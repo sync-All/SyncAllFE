@@ -26,7 +26,7 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    production_budject :
+    production_budget :
     {
             type : String,
             required : true
@@ -127,10 +127,12 @@ const tvaSchema = new Schema({
         type : String,
         required : true,
     },
-    networks : {
-        type : String,
-        required : true,
-    },
+    networks : [
+        {
+            type : String,
+            required : true,
+        }
+    ],
     duration_of_music_usage : {
         type : String,
         required : true,
@@ -357,10 +359,12 @@ const interpolationSchema = new Schema({
         type : String,
         required : true
     },
-    genre :  { 
-        type : String,
-        required : true
-    },
+    genre :  [
+        { 
+            type : String,
+            required : true
+        }
+    ],
     artists_or_group : [
         { 
             type : String,
@@ -381,12 +385,12 @@ const interpolationSchema = new Schema({
         type : String,
         required : true
     },
-    artist_name : [
-        { 
-            type : String,
-            required : true
-        }
-    ],
+    artist_name :
+    { 
+        type : String,
+        required : true
+    }
+    ,
     portion_to_be_sampled :  { 
         type : String,
         required : true

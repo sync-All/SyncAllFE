@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users')
 let requestRouter = require('./routes/quoteRequests')
 var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
+var stripWebhookRouter = require('./webhooks/stripe')
 const unauthorizedRouter = require('./routes/unauthorized')
 const paymentRouter = require('./routes/payment')
 var app = express();
@@ -68,6 +69,7 @@ app.use('/', waitlistRouter)
 app.use('/api/v1/', trackRouter);
 app.use('/api/v1/', paymentRouter);
 app.use('/api/v1/', requestRouter);
+app.use('/', stripWebhookRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
 app.use('/', unauthorizedRouter);

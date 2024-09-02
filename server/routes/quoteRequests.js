@@ -21,6 +21,7 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
+        console.log(req.body)
         try {
             const verifyTrack = await Track.findOne({_id : trackId}).exec()
             if(!verifyTrack){
@@ -143,6 +144,10 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
+        console.log(req.body)
+        if(req.files){
+            console.log(req.files)
+        }
         try {
             const  verifyTrack = await Track.findOne({_id : trackId}).exec()
             if(!verifyTrack){
@@ -162,6 +167,7 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                     res.send('Request Sent Successfully')
                 })
             }else {
+                // informQuoteRequest('deemajor230600@gmail.com')
                 const request = new samplingRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(()=>{
