@@ -20,7 +20,7 @@ const CheckoutForm = () => {
           //`Elements` instance that was used to create the Payment Element
           elements,
           confirmParams: {
-            return_url: "https://example.com/order/123/complete",
+            return_url: "http://localhost:5173/payment/status",
           },
         });
     
@@ -38,7 +38,7 @@ const CheckoutForm = () => {
         <form className='w-[90%] max-w-[650px] ' onSubmit={handleSubmit}>
             <PaymentElement />
             <div className='flex items-center justify-center'>
-            <button disabled={!stripe}>Submit</button>
+            {stripe && elements && <button disabled={!stripe}>Submit</button>}
             </div>
         </form>
     </div>

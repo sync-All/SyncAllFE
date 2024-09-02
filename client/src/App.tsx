@@ -28,6 +28,12 @@ import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicU
 import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 import Payment from './Pages/Payment';
+import PaymentStatus from './Pages/PaymentStatus';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPEPK_TEST_KEY);
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+} from "@stripe/react-stripe-js";
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -194,14 +200,31 @@ function App() {
           /> */}
 
         <Route
-            path="/payment/products/:priceId"
-            element={
-              <ProtectedRoute
-                path="/payment/products/:priceId"
-                element={<Payment/>}
-              />
+          path="/payment/products/:priceId"
+          element={
+            <ProtectedRoute
+              path="/payment/products/:priceId"
+              element={
+                <Payment/>
             }
-          ></Route>
+            />
+          }
+        ></Route>
+        <Route
+          path="/payment/status/"
+          element={
+            <ProtectedRoute
+              path="/payment/status/"
+              element={
+               <SyncUserProvider>
+                <Elements stripe={stripePromise}>
+                <PaymentStatus/>
+                </Elements>
+               </SyncUserProvider>
+              }
+            />
+          }
+        ></Route>
         </Routes>
       </UserContext.Provider>
     </>
