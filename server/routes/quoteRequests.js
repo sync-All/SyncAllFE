@@ -165,14 +165,15 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                 const request = new samplingRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(()=>{
-                    res.status(210).send('Request Sent Successfully')
+                    res.send('Request Sent Successfully')
                 })
             }
         } catch (error) {
+            console.log(error)
             throw new BadRequestError('Invalid Request, try again later')
         }
     }else {
-        throw new BadRequestError('Invalid Request, try again later')
+         throw new BadRequestError('Invalid Request, try again later')
     }
 }))
 

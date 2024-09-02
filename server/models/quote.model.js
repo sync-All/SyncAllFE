@@ -26,12 +26,12 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    production_budject : [
-        {
+    production_budject :
+    {
             type : String,
             required : true
-        }
-    ],
+    }
+    ,
     production_synopsis : {
         type : String,
         required : true
@@ -50,10 +50,12 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    usage : {
-        type : String,
-        required : true
-    },
+    usage : [
+        {
+            type : String,
+            required : true
+        }
+    ],
     length : {
         type : String,
         required : true
@@ -133,10 +135,12 @@ const tvaSchema = new Schema({
         type : String,
         required : true,
     },
-    intended_usage : {
-        type : String,
-        required : true,
-    },
+    intended_usage : [
+        {
+            type : String,
+            required : true,
+        }
+    ],
     territories :[
         {
             type : String,
@@ -214,10 +218,12 @@ const videosGamesSchema = new Schema({
             required : true
         }
     ],
-    usage :  { 
-        type : String,
-        required : true
-    },
+    usage :  [
+        { 
+            type : String,
+            required : true
+        }
+    ],
     media_format :  { 
         type : String,
         required : true
