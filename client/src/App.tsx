@@ -304,34 +304,31 @@ function App() {
             }
           />
 
-          
-
-        <Route
-          path="/payment/products/:priceId"
-          element={
-            <ProtectedRoute
-              path="/payment/products/:priceId"
-              element={
-                <Payment/>
+          <Route
+            path="/payment/products/:priceId"
+            element={
+              <ProtectedRoute
+                path="/payment/products/:priceId"
+                element={<Payment />}
+              />
             }
           />
-              
-        <Route
-          path="/payment/status/"
-          element={
-            <ProtectedRoute
-              path="/payment/status/"
-              element={
-               <SyncUserProvider>
-                <Elements stripe={stripePromise}>
-                <PaymentStatus/>
-                </Elements>
-               </SyncUserProvider>
-              }
-            />
-          }
-        ></Route>
 
+          <Route
+            path="/payment/status/"
+            element={
+              <ProtectedRoute
+                path="/payment/status/"
+                element={
+                  <SyncUserProvider>
+                    <Elements stripe={stripePromise}>
+                      <PaymentStatus />
+                    </Elements>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
         </Routes>
       </UserContext.Provider>
     </>
