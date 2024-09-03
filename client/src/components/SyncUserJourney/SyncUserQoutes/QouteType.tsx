@@ -83,25 +83,25 @@ const QouteType = () => {
       id: 'sampling',
       value: 'sampling',
       label: 'Sampling',
-      route: '/quote/sampling',
+      route: `/quote/sampling/${id}`,
     },
     {
       id: 'interpolation',
       value: 'interpolation',
       label: 'Interpolation',
-      route: '/quote/interpolation',
+      route: `/quote/interpolation/${id}`,
     },
     {
       id: 'crbt',
       value: 'crbt',
       label: 'CRBT',
-      route: '/quote/crbt',
+      route: `/quote/crbt/${id}`,
     },
     {
       id: 'socialMediaContent',
       value: 'socialMediaContent',
       label: 'Social Media Content',
-      route: '/quote/socialMediaContent',
+      route: `/quote/smc/${id}`,
     },
   ];
 

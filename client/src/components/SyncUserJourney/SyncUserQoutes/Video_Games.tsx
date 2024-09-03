@@ -70,7 +70,7 @@ const initialValues: FormData = {
   license_duration: '',
   attachments: null,
   additional_info: '',
-  role_type: 'video_game_request',
+  role_type: 'Video Games',
   track_info: id || '',
 };
 
@@ -88,7 +88,7 @@ interface FormData {
   license_duration: string;
   attachments: File | null;
   additional_info: string;
-  role_type: 'video_game_request';
+  role_type: 'Video Games';
   track_info: string;
 }
 
@@ -156,8 +156,9 @@ const handleFileChange = (
                       Authorization: `${token}`,
                     },
                   };
+                  console.log(value);
 
-                  const res = await axios.postForm(apiUrl, value, config);
+                  const res = await axios.post(apiUrl, value, config);
                   console.log('API response:', res.data);
                   setIdValid(true);
                 } catch (error: unknown) {
@@ -437,7 +438,7 @@ const handleFileChange = (
                       />
                     </div>
                   </div>
-                  <div className="flex gap-6 justify-end items-center">
+                  <div className="flex gap-6 justify-end items-center mt-12">
                     <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5">
                       Back
                     </button>

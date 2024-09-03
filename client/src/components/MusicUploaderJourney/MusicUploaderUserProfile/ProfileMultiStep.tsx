@@ -34,7 +34,7 @@ const ProfileMultiStep = () => {
 
     const profilePublicLink = `${window.location.origin}/${username}`
     navigator.clipboard.writeText(profilePublicLink).then(() => {
-      toast('Profile link copied to clipboard!');
+      toast.success('Profile link copied to clipboard!');
     })
   };
   return (

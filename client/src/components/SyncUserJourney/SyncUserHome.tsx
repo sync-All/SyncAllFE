@@ -52,6 +52,11 @@ const SyncUserHome = () => {
      setMenuOpen(true);
    };
 
+   const handleCopyLink = (id: string) => {
+      navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+      toast.success('Link copied to clipboard');
+   }
+
   const handleLikes = async (trackId: string) => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -224,7 +229,12 @@ const SyncUserHome = () => {
                     className="cursor-pointer"
                   />
                   {/* <img src={AddMusic} alt="" /> */}
-                  <img src={Copy} alt="" className="cursor-pointer" />
+                  <img
+                    src={Copy}
+                    onClick={() => handleCopyLink(detail._id)}
+                    alt=""
+                    className="cursor-pointer"
+                  />
                 </span>
                 <span className="gap-[12px] flex w-[25%] justify-center">
                   <Link to={`metadata/${detail?._id}`}>
@@ -232,7 +242,7 @@ const SyncUserHome = () => {
                       View More
                     </button>
                   </Link>
-                  <Link to={`/home/quote/${detail._id}`}>
+                  <Link to={`/quote/${detail._id}`}>
                     <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       Get Quote
                     </button>

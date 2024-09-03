@@ -521,9 +521,11 @@ const FilmMoviesTv = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex gap-6 justify-end items-center">
-                    <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
-                    onClick={handleBackBtn}>
+                  <div className="flex gap-6 justify-end items-center mt-12">
+                    <button
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                      onClick={handleBackBtn}
+                    >
                       Back
                     </button>
                     <button
