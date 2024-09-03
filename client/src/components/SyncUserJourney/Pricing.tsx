@@ -8,6 +8,7 @@ import { Tooltip } from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { useSyncUser } from '../../Context/syncUserData';
 import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 
 const Pricing = () => {
@@ -29,7 +30,7 @@ const Pricing = () => {
 
     }
   },[user,paymentInfo])
-  
+
   const pricingPlans = [
     {
       name: 'Basic',
@@ -262,11 +263,11 @@ const Pricing = () => {
             </h2>
             {
               plan.name !== "Basic" && <Link
-              className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
-              style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext }}
+              className={clsx("w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6", userPlan == plan.name && paymentInfo?.subscription_status == "active" && "inactive" )}
+              style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext}}
               to={`/payment/products/${plan.testPriceId}`}
             >
-              {plan.buttonText}
+              {userPlan == plan.name && paymentInfo?.subscription_status == "active" ? "Active Plan" : plan.buttonText}
             </Link>
             }
             <hr />

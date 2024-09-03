@@ -157,7 +157,7 @@ const SyncUserHome = () => {
               <img src={Background} alt="" className="hidden md:block w-full" />
               <img src={BackgroundMobile} alt="" className="w-full md:hidden" />
             </span>
-            <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16">
+            <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16 bg-">
               <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
                 Explore Our <br /> Music Library
               </h2>
@@ -177,7 +177,7 @@ const SyncUserHome = () => {
             {musicDetails.map((detail, index) => (
               <div key={index} className="flex items-center w-full ">
                 <Link
-                  to={`metadata/${detail?._id}`}
+                  to={`/metadata/${detail?._id}`}
                   className="flex gap-3 w-[25%]"
                 >
                   <img
@@ -260,7 +260,7 @@ const SyncUserHome = () => {
                 className="flex items-center w-full justify-between"
               >
                 <span className="flex gap-3">
-                  <Link to={`metadata/${detail?._id}`} className="flex gap-4">
+                  <Link to={`/metadata/${detail?._id}`} className="flex gap-4">
                     <img
                       src={detail.artWork}
                       alt=""
@@ -315,7 +315,7 @@ const SyncUserHome = () => {
                         <img src={Copy} alt="" />
                         Copy Track Link
                       </li>
-                      <Link to={`metadata/${detail?._id}`}>
+                      <Link to={`/metadata/${detail?._id}`}>
                         <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
                           <img src={ViewMore} alt="" />
                           View More

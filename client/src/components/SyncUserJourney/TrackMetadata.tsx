@@ -156,7 +156,7 @@ const TrackMetadata = () => {
               />
               {/* <img src={AddMusic} alt="" /> */}
               <img src={Copy} alt="" className="cursor-pointer" />
-              <a href="/pricing">
+              <a href="/quote/">
                 <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
                   Get Quote
                 </button>
