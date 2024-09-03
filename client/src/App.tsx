@@ -24,6 +24,7 @@ import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
+
 import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
 import FilmMoviesTv from './components/SyncUserJourney/SyncUserQoutes/Film_Movies_Tv';
 import TvCommercialAds from './components/SyncUserJourney/SyncUserQoutes/Tv_Commercial&Ads';
@@ -34,6 +35,7 @@ import Interpolation from './components/SyncUserJourney/SyncUserQoutes/Interpola
 import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
 import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
+import Payment from './Pages/Payment';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -112,7 +114,6 @@ function App() {
               />
             }
           />
-
           <Route
             path="/pricing"
             element={
@@ -296,6 +297,19 @@ function App() {
               />
             }
           />
+
+          
+
+        <Route
+            path="/payment/products/:priceId"
+            element={
+              <ProtectedRoute
+                path="/payment/products/:priceId"
+                element={<Payment/>}
+              />
+            }
+          ></Route>
+
         </Routes>
       </UserContext.Provider>
     </>

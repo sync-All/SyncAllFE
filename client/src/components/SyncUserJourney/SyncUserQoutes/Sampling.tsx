@@ -3,16 +3,16 @@ import { useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import InputField from '../../InputField';
-import { useState } from 'react';
+// import { useState } from 'react';
 import Attach from '../../../assets/images/attachimage.svg';
-import axios, { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
+// import axios, { AxiosError } from 'axios';
+// import { toast } from 'react-toastify';
 
 const Sampling = () => {
   const { id } = useParams<{ id: string }>();
   const idValid = id ? VerifyId(id) : false;
-  const [fileName, setFileName] = useState('Click to upload jpeg or png');
-  const [files, setFiles] = useState<FileData[]>([]);
+  // const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  // const [files, setFiles] = useState<FileData[]>([]);
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -21,10 +21,10 @@ const Sampling = () => {
   const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
   const applyErrorStyles = 'italic text-red-600';
 
-  interface FileData {
-    name: string;
-    file: File;
-  }
+  // interface FileData {
+  //   name: string;
+  //   file: File;
+  // }
 
   const validationSchema = Yup.object().shape({
     project_title: Yup.string().required('Project title is required'),
@@ -124,21 +124,21 @@ const Sampling = () => {
     track_info: string;
   }
 
-  interface ResponseData {
-    message?: string;
-  }
+  // interface ResponseData {
+  //   message?: string;
+  // }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = event.target.files;
-    if (fileList) {
-      const newFiles = Array.from(fileList).map((file) => ({
-        name: file.name,
-        file: file,
-      }));
-      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-      setFileName(newFiles.map((file) => file.name).join(', '));
-    }
-  };
+  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const fileList = event.target.files;
+  //   if (fileList) {
+  //     const newFiles = Array.from(fileList).map((file) => ({
+  //       name: file.name,
+  //       file: file,
+  //     }));
+  //     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  //     setFileName(newFiles.map((file) => file.name).join(', '));
+  //   }
+  // };
 
   // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   console.log('File change event triggered');
@@ -196,58 +196,61 @@ const Sampling = () => {
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (values: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-
-                // Create a new object that will include file references
-                const submissionValues: Record<string, unknown> = { ...values };
-
-                // Create an array to hold file references
-                submissionValues.attachments = files.map(
-                  (file, index) => `file${index}`
-                );
-
-                console.log('Submission values:', submissionValues);
-
-                const formData = new FormData();
-
-                // Append the values object as a JSON string
-                formData.append('values', JSON.stringify(submissionValues));
-
-                try {
-                  console.log('Preparing API request');
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/sampling`;
-
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                      'Content-Type': 'multipart/form-data',
-                    },
-                  };
-
-                  console.log('Sending API request');
-                  const res = await axios.post(apiUrl, formData, config);
-                  console.log('API response received:', res.data);
-
-                  toast.success('Sampling quote sent successfully');
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  const errorMessage = (
-                    axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                  ).toString();
-                  console.error('Error message:', errorMessage);
-                  toast.error(errorMessage);
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
+              onSubmit={(value) => {
+console.log(value);
               }}
+              // onSubmit={async (values: FormData, { setSubmitting }) => {
+              //   console.log('Form submission started');
+
+              //   // Create a new object that will include file references
+              //   const submissionValues: Record<string, unknown> = { ...values };
+
+              //   // Create an array to hold file references
+              //   submissionValues.attachments = files.map(
+              //     (file, index) => `file${index}`
+              //   );
+
+              //   console.log('Submission values:', submissionValues);
+
+              //   const formData = new FormData();
+
+              //   // Append the values object as a JSON string
+              //   formData.append('values', JSON.stringify(submissionValues));
+
+              //   try {
+              //     console.log('Preparing API request');
+              //     const token = localStorage.getItem('token');
+              //     const urlVar = import.meta.env.VITE_APP_API_URL;
+              //     const apiUrl = `${urlVar}/quote-request/sampling`;
+
+              //     const config = {
+              //       headers: {
+              //         Authorization: `${token}`,
+              //         'Content-Type': 'multipart/form-data',
+              //       },
+              //     };
+
+              //     console.log('Sending API request');
+              //     const res = await axios.post(apiUrl, formData, config);
+              //     console.log('API response received:', res.data);
+
+              //     toast.success('Sampling quote sent successfully');
+              //   } catch (error: unknown) {
+              //     console.error('Error during form submission:', error);
+              //     const axiosError = error as AxiosError<ResponseData>;
+              //     const errorMessage = (
+              //       axiosError.response && axiosError.response.data
+              //         ? axiosError.response.data.message ||
+              //           axiosError.response.data
+              //         : axiosError.message || 'An error occurred'
+              //     ).toString();
+              //     console.error('Error message:', errorMessage);
+              //     toast.error(errorMessage);
+              //   } finally {
+              //     setSubmitting(false);
+              //     console.log('Form submission ended');
+              //   }
+              // }}
             >
               <Form className="mt-[60px]">
                 <div className="flex flex-col">
@@ -504,7 +507,7 @@ const Sampling = () => {
                           htmlFor="attachments"
                           className="cursor-pointer shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 text-[#98A2B3] leading-4 focus:outline-none focus:shadow-outline font-inter flex justify-between items-center"
                         >
-                          <span>{fileName}</span>
+                          {/* <span>{fileName}</span> */}
                           <img src={Attach} alt="Upload Icon" />
                           <input
                             type="file"
@@ -513,10 +516,10 @@ const Sampling = () => {
                             className="hidden"
                             accept=".jpeg, .jpg, .png"
                             multiple
-                            onChange={(e) => {
-                              console.log('File input change detected');
-                              handleFileChange(e);
-                            }}
+                            // onChange={(e) => {
+                            //   console.log('File input change detected');
+                            //   // handleFileChange(e);
+                            // }}
                           />
                         </label>
                       </div>

@@ -3,6 +3,7 @@ const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
 const User = require('../models/usermodel').uploader;
+const SyncUser = require('../models/usermodel').syncUser
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -16,43 +17,10 @@ router.post('/api/v1/googleauth', asynchandler(authcontroller.googleAuth))
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
-router.post('/api/v1/profilesetup', async (req, res, next) => {
-  if (req.isAuthenticated) {
-    const { fullName, spotifyLink, bio } = req.body;
-    if (!fullName || !spotifyLink || !bio) {
-      res
-        .status(401)
-        .json({
-          success: false,
-          message: 'Missing field please check and confirm',
-        });
-    } else {
-      const userId = req.user.userId;
-      const profileUpdate = await User.findByIdAndUpdate(
-        userId,
-        { fullName, spotifyLink, bio },
-        { new: true }
-      );
+router.get('/api/v1/getsyncuserinfo',passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(authcontroller.getsyncuserinfo))
+router.post('/api/v1/profilesetup', asynchandler(authcontroller.profilesetup));
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: 'Profile update successful',
-          profileUpdate,
-        });
-    }
-  } else {
-    res
-      .status(401)
-      .json({
-        success: false,
-        message: 'Unauthorized, Please proceed to login',
-      });
-  }
-});
-
-router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),uploadProfileImg,asynchandler(authcontroller.profileUpdate) )
+router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), uploadProfileImg , asynchandler(authcontroller.profileUpdate) )
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 

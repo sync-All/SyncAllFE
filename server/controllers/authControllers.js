@@ -51,7 +51,7 @@ const signup = async function(req, res) {
             })
             users.save()
             .then(async (users)=> {
-                  const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
+                const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
                  const grabber = EmailDomain.grabEmailDomain(users)
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                  const dashboard = new Dashboard({
@@ -108,7 +108,7 @@ const signup = async function(req, res) {
 
       const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
-      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}).populate('tracklist').select('-password').exec()
+      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').exec()
 
       res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
     }
@@ -167,8 +167,49 @@ const allUsers = async (req,res,next) =>{
   }
 }
 
+const getsyncuserinfo = async (req,res,next)=>{
+  const userId = req.user._id
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").select('-password').exec()
+  res.send({user : details, success : true})
+}
+
+const profilesetup = async (req, res, next) => {
+  if (req.isAuthenticated) {
+    const { fullName, spotifyLink, bio } = req.body;
+    if (!fullName || !spotifyLink || !bio) {
+      res
+        .status(401)
+        .json({
+          success: false,
+          message: 'Missing field please check and confirm',
+        });
+    } else {
+      const userId = req.user.userId;
+      const profileUpdate = await User.findByIdAndUpdate(
+        userId,
+        { fullName, spotifyLink, bio },
+        { new: true }
+      );
+
+      res.status(200).json({
+          success: true,
+          message: 'Profile update successful',
+          profileUpdate,
+        });
+    }
+  } else {
+    res.status(401).json({
+        success: false,
+        message: 'Unauthorized, Please proceed to login',
+      });
+  }
+}
+
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
+  if(req.body.email){
+    return res.status(401).send('unauthorized buddy, unable to make change')
+  }
   if(req.user.role == "Music Uploader"){
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
@@ -184,16 +225,21 @@ const profileUpdate = async (req,res,next)=>{
   {
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
-      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      if(req.body.firstName  && req.body.lastName){
+        var fullName = req.body.firstName + " " + req.body.lastName
+      }
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url, name : fullName}, {new : true}).exec()
       fs.unlinkSync(req.file.path)
       res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }
     else{
-      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      if(req.body.firstName  && req.body.lastName){
+        var fullName = req.body.firstName + " " + req.body.lastName
+      }
+      const profileUpdate = await SyncUser.findByIdAndUpdate(userId,{...req.body, name : fullName},{new : true}).exec()
       res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
     }
   }else{
-    
     res.status(401).send('Unauthorized')
   }    
 }
@@ -259,6 +305,6 @@ const requestForgotPw = async (req,res,next)=>{
     }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw}
+module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
 
   

@@ -163,7 +163,7 @@ const TrackMetadata = () => {
               </a>
             </div>
           </div>
-          <MusicPlayer trackLink={trackDetails?.trackLink} />
+          <MusicPlayer trackLink={trackDetails?.trackLink} songId={trackDetails?._id} />
           <div className="mt-[93px] mb-[163px]">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
               Track Details

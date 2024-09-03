@@ -5,6 +5,7 @@ import TooltipImg from '../../assets/images/tooltip-info.svg';
 import WhiteCheck from '../../assets/images/white-check.svg'
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
+import { Link } from 'react-router-dom';
 
 
 const Pricing = () => {
@@ -39,6 +40,7 @@ const Pricing = () => {
         'Licensing to use royalty free background music ',
         'Limited Advanced Search Filter',
       ],
+      testPriceId : 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB'
     },
     {
       name: 'Premium',
@@ -54,6 +56,7 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
+      testPriceId : 'price_1PpUBbG5Wy2cNC8Z47kwvxBB'
     },
     {
       name: 'Enterprise',
@@ -64,7 +67,6 @@ const Pricing = () => {
       textCol: '#fff',
       check: WhiteCheck,
       buttonText: 'Contact us',
-
       features: [
         'Everything in Basic',
         'Everything in Standard',
@@ -237,12 +239,13 @@ const Pricing = () => {
                 {plan.smallText}
               </small>
             </h2>
-            <button
+            <Link
               className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
               style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext }}
+              to={`/payment/products/${plan.testPriceId}`}
             >
               {plan.buttonText}
-            </button>
+            </Link>
             <hr />
             <ul className="mt-6">
               {plan.features.map((feature, featureIndex) => (
