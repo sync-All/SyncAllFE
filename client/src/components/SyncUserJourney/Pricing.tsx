@@ -237,7 +237,7 @@ const Pricing = () => {
         </span>
       </div>
 
-      <section className="flex flex-col md:grid md:grid-cols-2 md:gap-1 md:mx-auto md:w-[824px]  items-center justify-center gap-6 min-h-full">
+      <section className="flex flex-col md:grid md:grid-cols-2 md:gap-3 md:mx-auto md:w-[824px]  items-center justify-center gap-6 min-h-full">
         {pricingPlans.map((plan, index) => (
           <div
             key={index}

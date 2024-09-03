@@ -26,6 +26,14 @@ import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRol
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
 
 import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
+import FilmMoviesTv from './components/SyncUserJourney/SyncUserQoutes/Film_Movies_Tv';
+import TvCommercialAds from './components/SyncUserJourney/SyncUserQoutes/Tv_Commercial&Ads';
+import ScrollToTop from './constants/scroll-to-top';
+import VideoGames from './components/SyncUserJourney/SyncUserQoutes/Video_Games';
+import Sampling from './components/SyncUserJourney/SyncUserQoutes/Sampling';
+import Interpolation from './components/SyncUserJourney/SyncUserQoutes/Interpolation';
+import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
+import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 import Payment from './Pages/Payment';
 import PaymentStatus from './Pages/PaymentStatus';
@@ -45,6 +53,7 @@ function App() {
       <UserContext.Provider
         value={{ userRole, setUserRole, googleAuthData, setGoogleAuthData }}
       >
+        <ScrollToTop />
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -128,10 +137,10 @@ function App() {
           />
 
           <Route
-            path="home/metadata/:id"
+            path="/metadata/:id"
             element={
               <ProtectedRoute
-                path="home/metadata/:id"
+                path="/metadata/:id"
                 element={
                   <SyncUserProvider>
                     <SyncUserLayout>
@@ -168,7 +177,7 @@ function App() {
           />
 
           <Route
-            path="home/quote/:id"
+            path="/quote/:id"
             element={
               <ProtectedRoute
                 path="home/quote/:id"
@@ -183,48 +192,143 @@ function App() {
             }
           />
 
-          {/* <Route
-            path="home/quote/synclicense"
+          <Route
+            path="/quote/filmMovieTVSeries/:id"
             element={
               <ProtectedRoute
-                path="home/quote/synclicense"
+                path="/quote/filmMovieTVSeries/:id"
                 element={
                   <SyncUserProvider>
                     <SyncUserLayout>
-                      <SyncLicense />
+                      <FilmMoviesTv />
                     </SyncUserLayout>
                   </SyncUserProvider>
                 }
               />
             }
-          /> */}
+          />
 
-        <Route
-          path="/payment/products/:priceId"
-          element={
-            <ProtectedRoute
-              path="/payment/products/:priceId"
-              element={
-                <Payment/>
+          <Route
+            path="/quote/tvCommercialAds/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/tvCommercialAds/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <TvCommercialAds />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
             }
-            />
-          }
-        ></Route>
-        <Route
-          path="/payment/status/"
-          element={
-            <ProtectedRoute
-              path="/payment/status/"
-              element={
-               <SyncUserProvider>
-                <Elements stripe={stripePromise}>
-                <PaymentStatus/>
-                </Elements>
-               </SyncUserProvider>
-              }
-            />
-          }
-        ></Route>
+          />
+
+          <Route
+            path="/quote/videoGames/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/videoGames/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <VideoGames />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/quote/sampling/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/sampling/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <Sampling />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/quote/interpolation/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/interpolation/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <Interpolation />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/quote/crbt/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/crbt/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <Crbt />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/quote/smc/:id"
+            element={
+              <ProtectedRoute
+                path="/quote/smc/:id"
+                element={
+                  <SyncUserProvider>
+                    <SyncUserLayout>
+                      <SocialMediaContent />
+                    </SyncUserLayout>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/payment/products/:priceId"
+            element={
+              <ProtectedRoute
+                path="/payment/products/:priceId"
+                element={<Payment />}
+              />
+            }
+          />
+
+          <Route
+            path="/payment/status/"
+            element={
+              <ProtectedRoute
+                path="/payment/status/"
+                element={
+                  <SyncUserProvider>
+                    <Elements stripe={stripePromise}>
+                      <PaymentStatus />
+                    </Elements>
+                  </SyncUserProvider>
+                }
+              />
+            }
+          />
         </Routes>
       </UserContext.Provider>
     </>

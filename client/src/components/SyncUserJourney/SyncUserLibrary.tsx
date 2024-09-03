@@ -104,11 +104,11 @@ const refresh = () => {
         <div className="hidden flex-col gap-[56px] lg:flex">
           {trackAdded.length > 0 ? (
             trackAdded.map((detail, index) => (
-              <div
-                key={index}
-                className="flex items-center w-full justify-between"
-              >
-                <Link to={`metadata/${detail?._id}`} className="flex gap-3">
+              <div key={index} className="flex items-center w-full ">
+                <Link
+                  to={`metadata/${detail?._id}`}
+                  className="flex gap-3 w-[25%]"
+                >
                   <img
                     src={detail.artWork}
                     alt=""
@@ -123,26 +123,25 @@ const refresh = () => {
                     </p>
                   </span>
                 </Link>
-                <div className="items-center flex">
-                  <MusicPlayer
-                    trackLink={detail.trackLink}
-                    songId={detail._id}
-                    duration={30}
-                    containerStyle="mt-0 flex items-center gap-3"
-                    buttonStyle="w-4 cursor-pointer"
-                    waveStyle="w-[500px]"
-                  />
-                </div>
-                <span className="flex gap-12">
-                  <span>
+                <MusicPlayer
+                  trackLink={detail.trackLink}
+                  songId={detail._id}
+                  duration={30}
+                  containerStyle="mt-0 flex items-center gap-3"
+                  buttonStyle="w-4 cursor-pointer"
+                  waveStyle="w-[300px]"
+                />
+
+                <span className="flex gap-12 w-[25%] items-start ml-[5%]">
+                  <span className="w-[50%]">
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                      {detail.duration}
+                      {detail.duration || 'N/A'}
                     </p>
                     <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.writers}
+                      {detail.producers || 'N/A'}
                     </p>
                   </span>
-                  <span>
+                  <span className="w-[50%]">
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
                       {detail.genre}
                     </p>
@@ -151,19 +150,26 @@ const refresh = () => {
                     </p>
                   </span>
                 </span>
-                <span className="flex gap-6">
-                  <button onClick={() => unlike(detail._id)}>
+                <span className="flex gap-6 w-[10%] justify-center">
+                  <button
+                    onClick={() => unlike(detail._id)}
+                    className="cursor-pointer"
+                  >
                     <img src={Liked} alt="Like" />
                   </button>
-                  <img src={Copy} alt="" />
+                  <img src={Copy} alt="" className="cursor-pointer" />
                 </span>
-                <span className="gap-[12px] flex">
-                  <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    View More
-                  </button>
-                  <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    License
-                  </button>
+                <span className="gap-[12px] flex w-[25%] justify-center">
+                  <Link to={`metadata/${detail?._id}`}>
+                    <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      View More
+                    </button>
+                  </Link>
+                  <Link to={`/home/quote/${detail._id}`}>
+                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      License
+                    </button>
+                  </Link>
                 </span>
               </div>
             ))
@@ -184,14 +190,21 @@ const refresh = () => {
                 className="flex items-center w-full justify-between"
               >
                 <span className="flex gap-3">
-                  <span>
-                    <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                      {detail.trackTitle}
-                    </h4>
-                    <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                      {detail.mainArtist}
-                    </p>
-                  </span>
+                  <Link to={`metadata/${detail?._id}`} className="flex gap-4">
+                    <img
+                      src={detail.artWork}
+                      alt=""
+                      className="h-12 w-12 object-cover"
+                    />
+                    <span>
+                      <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
+                        {detail.trackTitle}
+                      </h4>
+                      <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
+                        {detail.mainArtist}
+                      </p>
+                    </span>
+                  </Link>
                 </span>
                 <span>
                   <img src={Menu} alt="" onClick={() => openMenu(detail._id)} />
