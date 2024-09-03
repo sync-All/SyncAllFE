@@ -5,6 +5,7 @@ import MyLicensedTracks from './MyLicensedTracks';
 import AccountSetting from './AccountSetting';
 import PlansBillings from './Plans_Billings';
 import { useSyncUser } from '../../../Context/syncUserData';
+import PendingLicense from './PendingLicense';
 
 const ProfilePage = () => {
   const { user } = useSyncUser();
@@ -23,6 +24,8 @@ const ProfilePage = () => {
         return <AccountOverview />;
       case 'My Licensed Tracks':
         return <MyLicensedTracks />;
+      case 'Pending License':
+        return <PendingLicense />;
       case 'Account Settings':
         return <AccountSetting />;
       case 'Plan & Billings':
@@ -69,6 +72,14 @@ const ProfilePage = () => {
             onClick={() => setActiveSection('My Licensed Tracks')}
           >
             My Licensed Tracks
+          </li>
+          <li
+            className={`${liClass} ${
+              activeSection === 'Pending License' ? activeLiClass : ''
+            }`}
+            onClick={() => setActiveSection('Pending License')}
+          >
+            Pending License
           </li>
           <li
             className={`${liClass} ${

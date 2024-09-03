@@ -1,4 +1,3 @@
-
 import Background from '../../assets/images/user-homepage-head.png';
 import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
 import Favorite from '../../assets/images/favorite.svg';
@@ -21,13 +20,14 @@ import MusicSearch from './MusicSearch';
 import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
 const SyncUserHome = () => {
-    const track = useSyncUser();
+  const track = useSyncUser();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
-const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
+  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
+    const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const { id } = useParams();
- 
+
 
   interface TrackDetails {
     musicImg: string;
@@ -44,59 +44,62 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
     artWork: string;
   }
 
-  const closeMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+    const closeMenu = () => setMenuOpen(!menuOpen);
 
-  
 
- const handleLikes = async (trackId: string) => {
-   const token = localStorage.getItem('token');
-   const urlVar = import.meta.env.VITE_APP_API_URL;
-   const apiUrl = `${urlVar}/liketrack/${trackId}`;
-   const config = {
-     headers: {
-       Authorization: `${token}`,
-     },
+   const openMenu = (trackId: string) => {
+     setSelectedTrackId(trackId);
+     setMenuOpen(true);
    };
 
-   try {
-     const res = await axios.get(apiUrl, config);
-     toast.success(res.data);
-     setLikedTrack((prevState) => ({
-       ...prevState,
-       [trackId]: true, 
-     }));
-   } catch (error) {
-     const axiosError = error as AxiosError<ResponseData>;
-
-     toast.error(
-       (axiosError.response && axiosError.response.data
-         ? axiosError.response.data.message || axiosError.response.data
-         : axiosError.message || 'An error occurred'
-       ).toString()
-     );
+   const handleCopyLink = (id: string) => {
+      navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+      toast.success('Link copied to clipboard');
    }
- };
 
-useEffect(() => {
-  const trackAdded = track.user?.user.tracklist || [];
+  const handleLikes = async (trackId: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/liketrack/${trackId}`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
 
-  // Create a map of track IDs to their liked status
-  const likedTracksFromApi = trackAdded.reduce(
-    (acc: { [key: string]: boolean }, trackItem) => {
-      acc[trackItem._id] = true; // Mark each track as liked
-      return acc;
-    },
-    {}
-  );
+    try {
+      const res = await axios.get(apiUrl, config);
+      toast.success(res.data);
+      setLikedTrack((prevState) => ({
+        ...prevState,
+        [trackId]: true,
+      }));
+    } catch (error) {
+      const axiosError = error as AxiosError<ResponseData>;
 
-  setLikedTrack(likedTracksFromApi);
-}, [id, track]);
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
 
+  useEffect(() => {
+    const trackAdded = track.user?.user.tracklist || [];
 
+    // Create a map of track IDs to their liked status
+    const likedTracksFromApi = trackAdded.reduce(
+      (acc: { [key: string]: boolean }, trackItem) => {
+        acc[trackItem._id] = true; // Mark each track as liked
+        return acc;
+      },
+      {}
+    );
 
- 
+    setLikedTrack(likedTracksFromApi);
+  }, [id, track]);
 
   interface ResponseData {
     message?: string;
@@ -119,7 +122,6 @@ useEffect(() => {
         console.log(res.data.allTracks);
         const allTracks: TrackDetails[] = res.data.allTracks;
         console.log(allTracks);
-
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
 
@@ -134,17 +136,12 @@ useEffect(() => {
     fetchData();
   }, [id]);
 
-  
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
       return text.substring(0, maxLength) + '...';
     }
     return text;
   };
-
-
-
-
 
   return (
     <div className="relative">
@@ -161,7 +158,7 @@ useEffect(() => {
               <img src={BackgroundMobile} alt="" className="w-full md:hidden" />
             </span>
             <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16">
-              <h2 className="text-[40px] lg:text-[64px] leading-[45px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
+              <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
                 Explore Our <br /> Music Library
               </h2>
               <p className="font-formular-regular text-[16px] xl:text-[24px] leading-[24px] xl:leading-[32px] md:max-w-[550px] text-grey-300 max-w-[242px] ">
@@ -204,10 +201,10 @@ useEffect(() => {
                   duration={10}
                   containerStyle="mt-0 flex items-center gap-3"
                   buttonStyle="w-4 cursor-pointer"
-                  waveStyle="w-[70px]"
+                  waveStyle="w-[300px]"
                 />
                 <span className="flex gap-12 w-[25%] items-start ml-[5%]">
-                  <span>
+                  <span className="w-[50%]">
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
                       {detail.duration || '3 minutes, 33 seconds'}
                     </p>
@@ -215,7 +212,7 @@ useEffect(() => {
                       {truncateText(detail.writers || 'N/A', 5)}
                     </p>
                   </span>
-                  <span>
+                  <span className="w-[50%]">
                     <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
                       {detail.genre}
                     </p>
@@ -229,9 +226,15 @@ useEffect(() => {
                     src={likedTrack[detail._id] ? Liked : Favorite}
                     alt=""
                     onClick={() => handleLikes(detail._id)}
+                    className="cursor-pointer"
                   />
                   {/* <img src={AddMusic} alt="" /> */}
-                  <img src={Copy} alt="" className="cursor-pointer" />
+                  <img
+                    src={Copy}
+                    onClick={() => handleCopyLink(detail._id)}
+                    alt=""
+                    className="cursor-pointer"
+                  />
                 </span>
                 <span className="gap-[12px] flex w-[25%] justify-center">
                   <Link to={`metadata/${detail?._id}`}>
@@ -239,7 +242,7 @@ useEffect(() => {
                       View More
                     </button>
                   </Link>
-                  <Link to={`/home/quote/${detail._id}`}>
+                  <Link to={`/quote/${detail._id}`}>
                     <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       Get Quote
                     </button>
@@ -249,7 +252,6 @@ useEffect(() => {
             ))}
           </div>
 
-
           {/* Mobile */}
           <div className="lg:hidden flex flex-col gap-6">
             {musicDetails.map((detail, index) => (
@@ -258,8 +260,12 @@ useEffect(() => {
                 className="flex items-center w-full justify-between"
               >
                 <span className="flex gap-3">
-                  <Link to={`metadata/${detail?._id}`}>
-                    <img src={detail.musicImg} alt="" />
+                  <Link to={`metadata/${detail?._id}`} className="flex gap-4">
+                    <img
+                      src={detail.artWork}
+                      alt=""
+                      className="h-12 w-12 object-cover"
+                    />
                     <span>
                       <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
                         {detail.trackTitle}
@@ -271,15 +277,14 @@ useEffect(() => {
                   </Link>
                 </span>
                 <span>
-                  <img src={Menu} alt="" onClick={closeMenu} />
+                  <img src={Menu} alt="" onClick={() => openMenu(detail._id)} />
                 </span>
               </div>
             ))}
           </div>
 
-
-
           {menuOpen &&
+            selectedTrackId &&
             musicDetails.map((detail, index) => (
               <React.Fragment key={index}>
                 <div
@@ -295,7 +300,10 @@ useEffect(() => {
                       <img src={Closemenu} alt="" onClick={closeMenu} />
                     </span>
                     <ul className="mt-8 flex flex-col gap-8">
-                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+                      <li
+                        className="text-black font-formular-light text-[24px] leading-6 flex gap-4"
+                        onClick={() => handleLikes(selectedTrackId)}
+                      >
                         <img src={Favorite} alt="" />
                         Favorite
                       </li>

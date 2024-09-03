@@ -57,7 +57,7 @@ const MinimumRecordingInfo: React.FC = () => {
   const handleTrackLink = (e: React.FocusEvent<HTMLInputElement>) => {
     const trackLink = e.target.value;
     if (trackLink) {
-      verifyTrackLink(trackLink);
+      verifyTrackLink(trackLink)
     }
   };
 

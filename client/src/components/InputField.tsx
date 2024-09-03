@@ -13,7 +13,7 @@ const InputField: React.FC<InputFieldProps> = ({ label, name, placeholder }) => 
   const [showSecondaryInput, setShowSecondaryInput] = useState(false);
   const [secondaryInputValue, setSecondaryInputValue] = useState('');
   const { setFieldValue } = useFormikContext<InputFieldProps>();
-  const [field, meta] = useField(name);
+  const [field] = useField(name);
 
   const handleAddClick = () => {
     setShowSecondaryInput(true);
@@ -86,9 +86,7 @@ const InputField: React.FC<InputFieldProps> = ({ label, name, placeholder }) => 
           className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline  focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline"
         />
       )}
-      {meta.touched && meta.error ? (
-        <div className="text-red-500 text-sm">{meta.error}</div>
-      ) : null}
+      
     </div>
   );
 };

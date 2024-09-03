@@ -8,7 +8,7 @@ import React, {
   useMemo,
 } from 'react';
 
-  interface TracklistDetails {
+ export interface TracklistDetails {
     _id: string;
     trackTitle: string;
     mainArtist: string;
@@ -49,7 +49,12 @@ import React, {
     user: string;
     writers: string[];
     duration: string;
+    date: Date;
+    status: string;
+    amount: number;
   }
+
+  
 
 
 type UserDetails = {
@@ -62,7 +67,7 @@ type UserDetails = {
   authSource: string;
   phoneNumber: string;
   img: string;
-  totalLicensedTracks: string[];
+  totalLicensedTracks: TracklistDetails[];
   billing: {
     plan: string;
     amount: number;
