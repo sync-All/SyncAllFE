@@ -102,18 +102,29 @@ const syncUserSchema = new Schema({
         type : String,
     },
     billing : {
-        plan : {
+        prod_id : {
             type : String,
-            enum : ['basic', 'standard', 'premium', 'custom'],
-            default : 'basic'
         },
-        paymentMode : {
-            type : String,
-            enum : ['monthly', 'quarterly', 'annually', ]
+        subscription_id : {
+            type : String
+        },
+        subscription_status : {
+            type : String
+        },
+        frequency : {
+            type : String
+        },
+        next_billing_date : {
+            type : String
         },
         amount : {
-            type : Number,
-            default : 0
+            type : Number
+        },
+        last4card_digits : {
+            type : String
+        },
+        card_brand : {
+            type : String
         }
     },
     stripeCusId : {

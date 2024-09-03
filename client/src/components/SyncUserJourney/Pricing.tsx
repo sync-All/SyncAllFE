@@ -6,9 +6,30 @@ import WhiteCheck from '../../assets/images/white-check.svg'
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 import { Link } from 'react-router-dom';
+import { useSyncUser } from '../../Context/syncUserData';
+import { useEffect, useState } from 'react';
 
 
 const Pricing = () => {
+  const { user } = useSyncUser();
+  const paymentInfo = user?.user?.billing
+  const [userPlan, setUserPlan] = useState('')
+
+  useEffect(()=>{
+    console.log(user)
+    switch(paymentInfo?.prod_id){
+      case "prod_QgrvvxGRYPiP7a":
+        setUserPlan("Premium")
+        break;
+      case "prod_QUeQtqvvQsy9X8":
+        setUserPlan('Standard')
+        break;
+      default:
+        setUserPlan('Basic')
+
+    }
+  },[user,paymentInfo])
+  
   const pricingPlans = [
     {
       name: 'Basic',

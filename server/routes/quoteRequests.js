@@ -144,10 +144,6 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
-        console.log(req.body)
-        if(req.files){
-            console.log(req.files)
-        }
         try {
             const  verifyTrack = await Track.findOne({_id : trackId}).exec()
             if(!verifyTrack){
