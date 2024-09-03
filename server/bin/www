@@ -32,13 +32,15 @@ server.on('listening', onListening);
 
 
 
-cron.schedule('*/10 * * * *', () => {
-  https.get('https://enoverlab.com', (res) => {
-    console.log(`Pinged server with status code: ${res.statusCode}`);
-  }).on('error', (e) => {
-    console.error(`Got error enover: ${e.message}`);
-  });
-});
+// cron.schedule('*/10 * * * *', () => {
+//   https.get('https://enoverlab.com',async (res) => {
+//     await console.log(`Pinged server with status code: ${res.statusCode}`);
+//     return
+//   }).on('error', async(e) => {
+//     await console.error(`Got error enover: ${e.message}`);
+//     return
+//   });
+// });
 
 /**
  * Normalize a port into a number, string, or false.

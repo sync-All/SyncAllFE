@@ -24,34 +24,42 @@ router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false
 
 router.get('/verifyEmail/', passport.authenticate('jwt',{session : false, failureRedirect : '/notConfirmed'}),authcontroller.verifyEmail)
 
-router.get('/confirmedEmail', (req, res, next) => {
-  res.render('emailConfirmed', {
-    title: 'Email Verified',
-    icon: '/images/verifiedIcon.png',
-    heading: 'Email Verified',
-    message:
-      'Your email address has been successfully verified. Click below to proceed.',
-  });
+const confirmationEmailPaths = ['/notConfirmed','/AlreadyConfirmed', '/confirmedEmail']
+
+router.get(confirmationEmailPaths, (req, res, next) => {
+  switch(req.path){
+    case '/confirmedEmail':
+      res.render('emailConfirmed', {
+        title: 'Email Verified',
+        icon: '/images/verifiedIcon.png',
+        heading: 'Email Verified',
+        message:
+        'Your email address has been successfully verified. Click below to proceed.',
+      })
+    break;
+
+    case '/notConfirmed':
+      res.render('emailConfirmed', {
+        title: 'Not Verified',
+        icon: '/images/notverified.png',
+        heading: 'Email Not Verified',
+        message:
+        'Looks like the link has expired, kindly proceed to Login to get another link sent',
+      });
+    break;
+    case '/AlreadyConfirmed':
+      res.render('emailConfirmed', {
+        title: 'Already Confirmed',
+        icon: '/images/verifiedIcon.png',
+        heading: 'Email Already Been Setup',
+        message: 'Please proceed to login below',
+      })
+    break;
+  }
+  
 });
 
-router.get('/notConfirmed', (req, res, next) => {
-  res.render('emailConfirmed', {
-    title: 'Not Verified',
-    icon: '/images/notverified.png',
-    heading: 'Email Not Verified',
-    message:
-      'Looks like the link has expired, kindly proceed to Login to get another link sent',
-  });
-});
 
-router.get('/AlreadyConfirmed', (req, res, next) => {
-  res.render('emailConfirmed', {
-    title: 'Already Confirmed',
-    icon: '/images/verifiedIcon.png',
-    heading: 'Email Already Been Setup',
-    message: 'Please proceed to login below',
-  });
-});
 
 router.get('/api/v1/validateToken',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),(req,res,next)=>{
   res.status(200).send('Valid Token')

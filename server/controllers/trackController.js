@@ -1,6 +1,7 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/dashboard.model").track
 const cloudinary = require("cloudinary").v2
+const { BadRequestError } = require("../utils/CustomError")
 const grabSpotifyPreview = require('../utils/grabSpotifyPreview')
 const fs = require("node:fs")
 require('dotenv').config()
@@ -28,7 +29,7 @@ const trackUpload = async(req,res,next)=>{
     }else{
       console.log('track not avaiable please continue')
       let songInfo = req.body
-      var artWork = await cloudinary.uploader.upload(req.file.path)
+      var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
       const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : response.preview_url, spotifyLink : response.spotifyLink, duration : response.duration}
       const track = new Track(adjustedsongInfo)
       track.save()
@@ -92,15 +93,18 @@ const querySongsByIndex = async(req,res,next)=>{
 const queryTrackInfo =async(req,res,next)=>{
   const trackId = req.params.trackId
   if(req.user.role == "Sync User"){
+    try {
       if(req.user.billing.plan == "basic"){
-          const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration").exec()
-          console.log(details)
-          res.json({details})
+        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration").exec()
+        console.log(details)
+        return res.json({details})
       }else{
           const details = await Track.findOne({_id : trackId}).exec()
-          res.json({details})
+          return res.json({details})
       }
-      return;
+    } catch (error) {
+      throw new BadRequestError('Invalid Request')
+    }
   }
   res.status(400).send("Bad request")
 }

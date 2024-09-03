@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users')
 let requestRouter = require('./routes/quoteRequests')
 var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
+var stripWebhookRouter = require('./webhooks/stripe')
 const unauthorizedRouter = require('./routes/unauthorized')
 const paymentRouter = require('./routes/payment')
 var app = express();
@@ -37,13 +38,17 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 const mongoString = process.env.MONGO_CONNECT_STRING
+const mongoTestString = process.env.MONGO_TEST_CONNECT_STRING
 
-main()
-.then(()=> console.log('Connected to Database'))
-.catch((err)=> console.log(err))
+try {
+  main()
+} catch (error) {
+  console.log(err)
+}
 
 async function main(){
-  await mongoose.connect(mongoString)
+  await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+  return
 }
 
 require('./config/passport')(passport);
@@ -56,11 +61,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/',(req,res,next)=>{
+  res.render('quoteRequest', {title : "Your Quote request", user : {name : "tunes"}})
+})
 
 app.use('/', waitlistRouter)
 app.use('/api/v1/', trackRouter);
 app.use('/api/v1/', paymentRouter);
 app.use('/api/v1/', requestRouter);
+app.use('/', stripWebhookRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
 app.use('/', unauthorizedRouter);

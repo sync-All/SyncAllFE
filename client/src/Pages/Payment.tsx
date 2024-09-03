@@ -6,6 +6,7 @@ import {loadStripe} from '@stripe/stripe-js';
 import CheckoutForm from "../components/Stripe/CheckoutForm";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPEPK_TEST_KEY);
 
+
 const Payment = () => {
     const {priceId} = useParams()
     const token = localStorage.getItem('token')
@@ -20,10 +21,11 @@ const Payment = () => {
         setClientSec(stripeRes.data.subscription.latest_invoice.payment_intent.client_secret)
       }
       fetchInitialStripeInfo()
-
     },[priceId,token])
     const options = {
       clientSecret: clientSec,
+      theme : 'stripe'
+      
     };
     console.log(options)
   return (

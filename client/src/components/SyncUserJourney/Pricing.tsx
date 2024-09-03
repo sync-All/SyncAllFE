@@ -239,13 +239,15 @@ const Pricing = () => {
                 {plan.smallText}
               </small>
             </h2>
-            <Link
+            {
+              plan.name !== "Basic" && <Link
               className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
               style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext }}
               to={`/payment/products/${plan.testPriceId}`}
             >
               {plan.buttonText}
             </Link>
+            }
             <hr />
             <ul className="mt-6">
               {plan.features.map((feature, featureIndex) => (
