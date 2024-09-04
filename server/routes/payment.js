@@ -10,7 +10,7 @@ router.post('/create-subscription',passport.authenticate('jwt',{session : false,
     const userInfo = req.user
     try {
         const customerId = await stripeApi.createNewStripeCus(userInfo)
-        const subscription = await stripe.subscriptions.create({
+        await stripe.subscriptions.create({
             customer : customerId,
             items : [
                 {

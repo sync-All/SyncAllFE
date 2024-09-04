@@ -29,7 +29,6 @@ const Payment = () => {
     const options = {
       clientSecret: clientSec,
       theme : 'stripe'
-      
     };
     console.log(options)
   return (
