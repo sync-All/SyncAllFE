@@ -19,19 +19,19 @@ router.post('/stripe/webhook',async (req,res,next)=>{
             const subscription_updated = event.data.object
             console.log({subscription_updated})
             const syncuserDetails = await SyncUser.findOne({stripeCusId : subscription_updated.customer})
-            if(syncuserDetails.billing.subscription_status == "active" && syncuserDetails.billing.prod_id == subscription_updated.plan.prod_id){
-                return;
+            if(!syncuserDetails.billing || syncuserDetails.billing.subscription_id == subscription_updated.id || syncuserDetails.billing.prod_id != subscription_updated.plan.product){
+                await SyncUser.findOneAndUpdate({stripeCusId : subscription_updated.customer}, {'$set' : {
+                    'billing' : {
+                        prod_id : subscription_updated.plan.product,
+                        subscription_id : subscription_updated.id,
+                        subscription_status : subscription_updated.status,
+                        frequency : subscription_updated.plan.interval,
+                        amount :  (subscription_updated.plan.amount / 100),
+                        next_billing_date : new Date(subscription_updated.current_period_end * 1000).toLocaleString('en-US')
+                    }
+                }})
             }
-            await SyncUser.findOneAndUpdate({stripeCusId : subscription_updated.customer}, {'$set' : {
-                'billing' : {
-                    prod_id : subscription_updated.plan.product,
-                    subscription_id : subscription_updated.id,
-                    subscription_status : subscription_updated.status,
-                    frequency : subscription_updated.plan.interval,
-                    amount :  (subscription_updated.plan.amount / 100),
-                    next_billing_date : new Date(subscription_updated.current_period_end * 1000).toLocaleString('en-US')
-                }
-            }})
+            
             break;
         case 'customer.subscription.deleted':
             const subscription_deleted = event.data.object
