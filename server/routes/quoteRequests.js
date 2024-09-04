@@ -7,7 +7,6 @@ const multer = require('multer')
 const upload = multer({dest: 'uploads/'}).array('attachments', 5)
 const cloudinary = require("cloudinary").v2
 const fs = require("node:fs")
-const { EventEmitterAsyncResource } = require('supertest/lib/test')
 const Track = require('../models/dashboard.model').track
 const fmtRequest = require('../models/quote.model').fmtRequest
 const tvaRequest = require('../models/quote.model').tvaRequest
@@ -17,7 +16,7 @@ const interpolationRequest = require('../models/quote.model').interpolationReque
 const crbtRequest = require('../models/quote.model').crbtRequest
 const smcRequest = require('../models/quote.model').smcRequest
 
-router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
+router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),upload, asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
@@ -144,10 +143,6 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
-        console.log(req.body)
-        if(req.files){
-            console.log(req.files)
-        }
         try {
             const  verifyTrack = await Track.findOne({_id : trackId}).exec()
             if(!verifyTrack){

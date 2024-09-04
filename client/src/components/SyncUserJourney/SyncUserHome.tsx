@@ -174,7 +174,7 @@ const SyncUserHome = () => {
               <img src={Background} alt="" className="hidden md:block w-full" />
               <img src={BackgroundMobile} alt="" className="w-full md:hidden" />
             </span>
-            <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16">
+            <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16 bg-">
               <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
                 Explore Our <br /> Music Library
               </h2>
