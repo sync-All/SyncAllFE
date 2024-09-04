@@ -3,7 +3,7 @@ import Uploaded from '../../assets/images/Upload Track 2.svg';
 import Earning from '../../assets/images/Cash Out.svg';
 import Earth from '../../assets/images/Earth.svg';
 import Stream from '../../assets/images/Play Stream.svg';
-import NoEarning from '../../assets/images/no_earnings.svg'
+import NoEarning from '../../assets/images/no_earnings.svg';
 import {
   AreaChart,
   Area,
@@ -14,17 +14,19 @@ import {
 } from 'recharts';
 import { useDataContext } from '../../Context/DashboardDataProvider';
 import { usePDF } from 'react-to-pdf';
+import LoadingAnimation from '../../constants/loading-animation';
 
 const MusicUploaderDashboard = () => {
-  const dashdata = useDataContext();
-  const dashboardDetails = dashdata?.dashboardData?.dashboardDetails;
+  const { dashboardData, loading } = useDataContext();
+
+  const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
+
+  const dashboardDetails = dashboardData?.dashboardDetails;
   const dashboardActivities = dashboardDetails?.activities;
-  const profileDetails = dashdata.dashboardData?.profileInfo;
+  const profileDetails = dashboardData?.profileInfo;
 
   const token = localStorage.getItem('token');
   console.log(token);
-
-  
 
   const data = [
     { name: '19', uv: 0 },
@@ -69,7 +71,10 @@ const MusicUploaderDashboard = () => {
       color: '#064e3b',
     },
   ];
-  const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div ref={targetRef}>
@@ -88,7 +93,6 @@ const MusicUploaderDashboard = () => {
             </button>
           </div>
         </div>
-
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-[10px] lg:mt-6">
           {cardData.map((card, index) => (
@@ -191,7 +195,7 @@ const MusicUploaderDashboard = () => {
               </div>
             ) : (
               <div className="text-center mt-9 text-[16px] leading-[20px] py-6">
-                <img src={NoEarning} alt="" className='mx-auto' />
+                <img src={NoEarning} alt="" className="mx-auto" />
                 <p className="font-Utile-medium mt-6 text-[16px] text-[#98A2B3]">
                   You haven't earned any money yet. Upload your first track to
                   start earning

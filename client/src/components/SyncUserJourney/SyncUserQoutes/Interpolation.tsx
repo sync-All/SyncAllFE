@@ -1,5 +1,5 @@
 import VerifyId from '../../../constants/verifyId';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import InputField from '../../InputField';
@@ -7,11 +7,17 @@ import { useState } from 'react';
 import Attach from '../../../assets/images/attachimage.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 const Interpolation = () => {
   const { id } = useParams<{ id: string }>();
   const idValid = id ? VerifyId(id) : false;
   const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  const { loading, setLoading } = useLoading();
+  const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_attachments, setAttachments] = useState<File[]>([]);
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -20,83 +26,72 @@ const Interpolation = () => {
   const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
   const applyErrorStyles = 'italic text-red-600';
 
-   const validationSchema = Yup.object().shape({
-     project_title: Yup.string().required('Project title is required'),
-     genre: Yup.array()
-       .of(Yup.string().required('Genre is required'))
-       .required('At least one genre or group is required')
-       .min(1, 'At least one genre or group is required'),
-     artists_or_group: Yup.array()
-       .of(Yup.string().required('Artist or group is required'))
-       .required('At least one artist or group is required')
-       .min(1, 'At least one artist or group is required'),
-     release_date: Yup.string()
-       .required('Release date is required')
-       .matches(
-         /^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
-         'Date must be in DD/MM/YYYY format'
-       ),
-     distribution_channels: Yup.array()
-       .of(Yup.string().required('Distribution channel is required'))
-       .required('At least one distribution channel is required')
-       .min(1, 'At least one distribution channel or group is required'),
-     original_song: Yup.string().required('Original song title is required'),
-     artist_name: Yup.string().required('Artist name is required'),
-     portion_to_be_sampled: Yup.string().required(
-       'Portion to be sampled is required'
-     ),
-     intended_usage: Yup.array()
-       .of(Yup.string().required('Intended usage is required'))
-       .required('At least one intended usage is required')
-       .min(1, 'At least one intended usage or group is required'),
-     territories: Yup.array()
-       .of(Yup.string().required('Territory is required'))
-       .required('At least one territory is required')
-       .min(1, 'At least one territory or more is required'),
-     license_duration: Yup.string().required('License duration is required'),
-     media_formats: Yup.array()
-       .of(Yup.string().required('Media format is required'))
-       .required('At least one media format is required')
-       .min(1, 'At least one media or more is required'),
-     samples_of_other_songs: Yup.string().required(
-       'Samples of other songs is required'
-     ),
-     additional_info: Yup.string(),
-     attachments: Yup.array()
-       .of(
-         Yup.mixed().nullable()
-         // .test('fileType', 'Unsupported file format', (value) => {
-         //   if (value === null) return true;
-         //   if (value instanceof File) {
-         //     return ['image/jpeg', 'image/png'].includes(value.type);
-         //   }
-         //   return false;
-         // })
-       )
-       .nullable(),
-     role_type: Yup.string().required('Role type is required'),
-     track_info: Yup.string().required('Track info is required'),
-   });
+  const validationSchema = Yup.object().shape({
+    project_title: Yup.string().required('Project title is required'),
+    genre: Yup.array()
+      .of(Yup.string().required('Genre is required'))
+      .required('At least one genre or group is required')
+      .min(1, 'At least one genre or group is required'),
+    artists_or_group: Yup.array()
+      .of(Yup.string().required('Artist or group is required'))
+      .required('At least one artist or group is required')
+      .min(1, 'At least one artist or group is required'),
+    release_date: Yup.string()
+      .required('Release date is required')
+      .matches(
+        /^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
+        'Date must be in DD/MM/YYYY format'
+      ),
+    distribution_channels: Yup.array()
+      .of(Yup.string().required('Distribution channel is required'))
+      .required('At least one distribution channel is required')
+      .min(1, 'At least one distribution channel or group is required'),
+    original_song: Yup.string().required('Original song title is required'),
+    artist_name: Yup.string().required('Artist name is required'),
+    portion_to_be_sampled: Yup.string().required(
+      'Portion to be sampled is required'
+    ),
+    intended_usage: Yup.array()
+      .of(Yup.string().required('Intended usage is required'))
+      .required('At least one intended usage is required')
+      .min(1, 'At least one intended usage or group is required'),
+    territories: Yup.array()
+      .of(Yup.string().required('Territory is required'))
+      .required('At least one territory is required')
+      .min(1, 'At least one territory or more is required'),
+    license_duration: Yup.string().required('License duration is required'),
+    media_formats: Yup.array()
+      .of(Yup.string().required('Media format is required'))
+      .required('At least one media format is required')
+      .min(1, 'At least one media or more is required'),
+    samples_of_other_songs: Yup.string().required(
+      'Samples of other songs is required'
+    ),
+    additional_info: Yup.string(),
+    attachments: Yup.mixed().nullable(),
+    role_type: Yup.string().required('Role type is required'),
+    track_info: Yup.string().required('Track info is required'),
+  });
 
-   const initialValues: FormData = {
-     project_title: '',
-     genre: [],
-     artists_or_group: [],
-     release_date: new Date(),
-     distribution_channels: [],
-     original_song: '',
-     artist_name: '',
-     portion_to_be_sampled: '',
-     intended_usage: [],
-     territories: [],
-     license_duration: 'Yearly',
-     media_formats: [],
-     samples_of_other_songs: '',
-     additional_info: '',
-     attachments: null as File[] | null,
-     role_type: 'Interpolation',
-     track_info: id || '',
-   };
+  const initialValues: FormData = {
+    project_title: '',
+    genre: [],
+    artists_or_group: [],
+    release_date: new Date(),
+    distribution_channels: [],
+    original_song: '',
+    artist_name: '',
+    portion_to_be_sampled: '',
+    intended_usage: [],
+    territories: [],
+    license_duration: 'Yearly',
+    media_formats: [],
+    samples_of_other_songs: '',
+    additional_info: '',
+    attachments: null as File[] | null,
+    role_type: 'Interpolation',
+    track_info: id || '',
+  };
 
   interface FormData {
     project_title: string;
@@ -122,17 +117,84 @@ const Interpolation = () => {
     message?: string;
   }
 
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: File | null) => void
-  ) => {
-    const file = event.currentTarget.files?.[0];
+ const handleFileChange = (
+   event: React.ChangeEvent<HTMLInputElement>,
+   setFieldValue: (field: string, value: File[] | null) => void
+ ) => {
+   const files = event.currentTarget.files;
+   if (files) {
+     const fileArray = Array.from(files);
+     setFileName(fileArray.map((file) => file.name).join(', '));
+     setAttachments(fileArray);
+     setFieldValue('attachments', fileArray);
+   } else {
+     setFileName('Click to upload jpeg or png');
+     setAttachments([]);
+     setFieldValue('attachments', null);
+   }
+ };
 
-    if (file) {
-      setFileName(file.name);
-      setFieldValue('attachments', file);
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const handleNavigateBack = () => {
+  navigate(-1);
+};
+
+const handleSubmission = async (
+  values: FormData,
+  { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+) => {
+  setLoading(true);
+  const formData = new FormData();
+
+  Object.entries(values).forEach(([key, val]) => {
+    if (val !== null) {
+      if (key === 'attachments' && Array.isArray(val)) {
+        val.forEach((file) => formData.append('attachments', file));
+      } else {
+        formData.append(
+          key,
+          typeof val === 'object' ? JSON.stringify(val) : (val as string)
+        );
+      }
     }
+  });
+
+  const token = localStorage.getItem('token');
+  const urlVar = import.meta.env.VITE_APP_API_URL;
+  const apiUrl = `${urlVar}/quote-request/interpolation`;
+
+  const config = {
+    headers: {
+      Authorization: `${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
   };
+
+  try {
+    await delay(2000);
+    await axios.post(apiUrl, formData, config);
+    toast.success('Interpolation quote sent successfully');
+    await delay(5000);
+    handleNavigateBack();
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError<ResponseData>;
+    const errorMessage = (
+      axiosError.response && axiosError.response.data
+        ? axiosError.response.data.message || axiosError.response.data
+        : axiosError.message || 'An error occurred'
+    ).toString();
+
+    toast.error(errorMessage);
+  } finally {
+    setLoading(false);
+    setSubmitting(false);
+  }
+};
+
+
   return (
     <>
       {idValid ? (
@@ -150,38 +212,7 @@ const Interpolation = () => {
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (value: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-                try {
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/interpolation`;
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                    },
-                  };
-                  console.log(value);
-
-                  const res = await axios.post(apiUrl, value, config);
-
-                  toast.success('Interpolation quote sent successfully');
-                  console.log('API response:', res.data);
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  toast.error(
-                    (axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                    ).toString()
-                  );
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
-              }}
+              onSubmit={handleSubmission}
             >
               {({ setFieldValue }) => (
                 <Form className="mt-[60px]">
@@ -349,6 +380,7 @@ const Interpolation = () => {
                         <Field
                           name="license_duration"
                           type="text"
+                          disabled
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />
@@ -359,20 +391,14 @@ const Interpolation = () => {
                         />
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="media_format"
-                          className={applyLabelStyles}
-                        >
-                          Media Formats:
-                        </label>
-                        <Field
-                          name="media_format"
-                          type="text"
+                        <InputField
+                          label="Media Formats:"
+                          name="media_formats"
                           placeholder="e.g., Video Game, Digital"
-                          className={applyInputStyles}
                         />
+
                         <ErrorMessage
-                          name="media_format"
+                          name="media_formats"
                           component="span"
                           className={applyErrorStyles}
                         />
@@ -419,9 +445,16 @@ const Interpolation = () => {
                     <span className={applyFormDiv}>
                       {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <InputField
-                          label="Atist Name: "
+                        <label
+                          htmlFor="artist_name"
+                          className={applyLabelStyles}
+                        >
+                          Artist Name:
+                        </label>
+                        <Field
+                          className={applyInputStyles}
                           name="artist_name"
+                          type="text"
                           placeholder="Artist names"
                         />
 
@@ -450,7 +483,7 @@ const Interpolation = () => {
                               id="attachments"
                               name="attachments"
                               className="hidden"
-                              accept=".jpeg, .jpg, .png"
+                              multiple
                               onChange={(event) =>
                                 handleFileChange(event, setFieldValue)
                               }
@@ -465,15 +498,19 @@ const Interpolation = () => {
                       </div>
                     </span>
                   </div>
-                  <div className="flex gap-6 justify-end items-center mt-12">
-                    <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5">
+                  <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
+                    <button
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                      onClick={handleNavigateBack}
+                    >
                       Back
                     </button>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
+                      disabled={loading}
                     >
-                      Proceed
+                      {loading ? 'Submitting...' : 'Proceed'}
                     </button>
                   </div>
                 </Form>
@@ -482,11 +519,7 @@ const Interpolation = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );

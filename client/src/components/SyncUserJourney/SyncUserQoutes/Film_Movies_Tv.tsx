@@ -1,23 +1,35 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import * as Yup from 'yup';
 import InputField from '../../InputField';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Attach from '../../../assets/images/attachimage.svg';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import VerifyId from '../../../constants/verifyId';
+import useLoading from '../../../constants/loading';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 const FilmMoviesTv = () => {
   const [fileName, setFileName] = useState('Click to upload jpeg or png');
-  const [idValid, setIdValid] = useState(false);
   const { id } = useParams<{ id: string }>();
+  const idValid = id ? VerifyId(id) : false;
+  const { loading, setLoading } = useLoading();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_attachments, setAttachments] = useState<File[]>([]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleBackBtn = () => {
-    navigate(-1)
-  } 
+    navigate(-1);
+  };
 
+  const applyInputStyles =
+    'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
+  const applyLabelStyles =
+    'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] ';
+  const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
+  const applyErrorStyles = 'italic text-red-600';
 
   interface ResponseData {
     message?: string;
@@ -43,7 +55,9 @@ const FilmMoviesTv = () => {
       .of(Yup.string())
       .min(1, 'At least one distribution channel is required'),
 
-    usage: Yup.string().required('Usage of the music is required'),
+    usage: Yup.array()
+      .of(Yup.string())
+      .min(1, 'At least one usage of the music is required'),
     length: Yup.string().required('Length of the project is required'),
     territories: Yup.array()
       .of(Yup.string())
@@ -53,16 +67,8 @@ const FilmMoviesTv = () => {
       .of(Yup.string())
       .min(1, 'At least one media medium is required'),
     license_duration: Yup.string().required('License duration is required'),
-    attachments: Yup.mixed()
-      .nullable()
-      .test('fileType', 'Unsupported file format', (value) => {
-        if (value === null || value === '') return true;
-        if (value instanceof File) {
-          return ['image/jpeg', 'image/png'].includes(value.type);
-        }
-        return false;
-      }),
-    additional_info: Yup.string(), // Optional
+    attachments: Yup.mixed().nullable(),
+    additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track info is required'),
   });
@@ -78,17 +84,16 @@ const FilmMoviesTv = () => {
     scene_synopsis: '',
     distributor: '',
     distribution: [],
-    usage: '',
+    usage: [],
     length: '',
     territories: [],
     media: [],
-    license_duration: '',
-    attachments: null,
+    license_duration: 'Yearly',
+    attachments: null as FileList | null,
     additional_info: '',
-    role_type: 'film/movie_request',
+    role_type: 'Film/Movie/TV Series',
     track_info: id || '',
   };
-
 
   interface FormData {
     project_title: string;
@@ -101,65 +106,94 @@ const FilmMoviesTv = () => {
     scene_synopsis: string;
     distributor: string;
     distribution: string[];
-    usage: string;
+    usage: string[];
     length: string;
     territories: string[];
-
     media: string[];
     license_duration: string;
-    attachments: File | null;
+    attachments: FileList | null;
     additional_info: string;
-    role_type: 'film/movie_request';
+    role_type: string;
     track_info: string;
   }
 
-  useEffect(() => {
-    const fetchTrackDetails = async () => {
-      const token = localStorage.getItem('token');
-      const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/queryTrackInfo/${id}`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
-
-      try {
-        const res = await axios.get(apiUrl, config);
-        console.log(res);
-        setIdValid(true);
-      } catch (error: unknown) {
-        setIdValid(false);
-      }
-    };
-    fetchTrackDetails();
-  }, [id]);
-
-  
-
-  const applyInputStyles =
-    'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
-  const applyLabelStyles =
-    'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] ';
-  const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
-  const applyErrorStyles = 'italic text-red-600';
-
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: File | null) => void
+    setFieldValue: (field: string, value: File[] | null) => void
   ) => {
-    const file = event.currentTarget.files?.[0];
+    const files = event.currentTarget.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setFileName(fileArray.map((file) => file.name).join(', '));
+      setAttachments(fileArray);
+      setFieldValue('attachments', fileArray);
+    } else {
+      setFileName('Click to upload jpeg or png');
+      setAttachments([]);
+      setFieldValue('attachments', null);
+    }
+  };
 
-    if (file) {
-      setFileName(file.name);
-      setFieldValue('attachments', file);
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  const handleSubmission = async (
+    values: FormData,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setLoading(true);
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (val !== null) {
+        if (key === 'attachments' && Array.isArray(val)) {
+          val.forEach((file) => formData.append('attachments', file));
+        } else {
+          formData.append(
+            key,
+            typeof val === 'object' ? JSON.stringify(val) : (val as string)
+          );
+        }
+      }
+    });
+
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/quote-request/fmt`;
+
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    try {
+      await delay(2000);
+      await axios.post(apiUrl, formData, config);
+      toast.success('Sampling quote sent successfully');
+      await delay(5000);
+      handleBackBtn();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      const errorMessage = (
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+      ).toString();
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
     <>
       {idValid ? (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
+        <div className="flex items-center justify-center flex-col mx-2.5 mt-[80px] mb-[130px]">
           <div>
             <div className="flex gap-[17px] flex-col">
               {' '}
@@ -174,36 +208,7 @@ const FilmMoviesTv = () => {
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (value: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-                try {
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/fmt`;
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                    },
-                  };
-
-                  const res = await axios.postForm(apiUrl, value, config);
-                  console.log('API response:', res.data);
-                  setIdValid(true);
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  toast.error(
-                    (axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                    ).toString()
-                  );
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
-              }}
+              onSubmit={handleSubmission}
             >
               {({ setFieldValue }) => (
                 <Form className="mt-[60px]">
@@ -316,43 +321,46 @@ const FilmMoviesTv = () => {
                         />
                       </span>
                     </span>
-                    <div className="flex flex-col gap-2 mb-8">
-                      <label
-                        htmlFor="production_synopsis"
-                        className={applyLabelStyles}
-                      >
-                        Production Synopsis:
-                      </label>
-                      <Field
-                        name="production_synopsis"
-                        as="textarea"
-                        className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
-                        placeholder="ie. Brief synopsis of the production."
-                      />
-                      <ErrorMessage
-                        name="production_synopsis"
-                        component="span"
-                        className={applyErrorStyles}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2 mb-8">
-                      <label
-                        htmlFor="scene_synopsis"
-                        className={applyLabelStyles}
-                      >
-                        Scene Synopsis:
-                      </label>
-                      <Field
-                        name="scene_synopsis"
-                        as="textarea"
-                        className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
-                        placeholder="I.e Brief synopsis of the scene that the Master Recording will be used in. Ensure any references to drugs & alcohol are also listed here."
-                      />
-                      <ErrorMessage
-                        name="scene_synopsis"
-                        component="span"
-                        className={applyErrorStyles}
-                      />
+                    <div className="flex flex-col justify-center items-center">
+                      {' '}
+                      <div className="flex flex-col gap-2 mb-8 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
+                        <label
+                          htmlFor="production_synopsis"
+                          className={applyLabelStyles}
+                        >
+                          Production Synopsis:
+                        </label>
+                        <Field
+                          name="production_synopsis"
+                          as="textarea"
+                          className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
+                          placeholder="ie. Brief synopsis of the production."
+                        />
+                        <ErrorMessage
+                          name="production_synopsis"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2 mb-8 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
+                        <label
+                          htmlFor="scene_synopsis"
+                          className={applyLabelStyles}
+                        >
+                          Scene Synopsis:
+                        </label>
+                        <Field
+                          name="scene_synopsis"
+                          as="textarea"
+                          className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
+                          placeholder="I.e Brief synopsis of the scene that the Master Recording will be used in. Ensure any references to drugs & alcohol are also listed here."
+                        />
+                        <ErrorMessage
+                          name="scene_synopsis"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </div>
                     </div>
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
@@ -390,15 +398,12 @@ const FilmMoviesTv = () => {
                     </span>
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label htmlFor="usage" className={applyLabelStyles}>
-                          Usage:
-                        </label>
-                        <Field
+                        <InputField
                           name="usage"
-                          type="text"
-                          placeholder="Main Theme, Background Music, End Credits"
-                          className={applyInputStyles}
+                          label="Usage:"
+                          placeholder="Main Theme, Background Music"
                         />
+
                         <ErrorMessage
                           name="usage"
                           component="span"
@@ -445,6 +450,7 @@ const FilmMoviesTv = () => {
                         <Field
                           name="license_duration"
                           type="text"
+                          disabled
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />
@@ -487,7 +493,7 @@ const FilmMoviesTv = () => {
                               id="attachments"
                               name="attachments"
                               className="hidden"
-                              accept=".jpeg, .jpg, .png"
+                              multiple
                               onChange={(event) =>
                                 handleFileChange(event, setFieldValue)
                               }
@@ -501,27 +507,29 @@ const FilmMoviesTv = () => {
                         />
                       </div>
                     </span>
-                    <div className="flex flex-col gap-2 mb-16">
-                      <label
-                        htmlFor="additional_info"
-                        className={applyLabelStyles}
-                      >
-                        Additional Information:
-                      </label>
-                      <Field
-                        name="additional_info"
-                        as="textarea"
-                        className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
-                        placeholder="If any..."
-                      />
-                      <ErrorMessage
-                        name="additional_info"
-                        component="span"
-                        className={applyErrorStyles}
-                      />
+                    <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-col gap-2 mb-16 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
+                        <label
+                          htmlFor="additional_info"
+                          className={applyLabelStyles}
+                        >
+                          Additional Information:
+                        </label>
+                        <Field
+                          name="additional_info"
+                          as="textarea"
+                          className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
+                          placeholder="If any..."
+                        />
+                        <ErrorMessage
+                          name="additional_info"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-6 justify-end items-center mt-12">
+                  <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
                     <button
                       className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
                       onClick={handleBackBtn}
@@ -531,8 +539,9 @@ const FilmMoviesTv = () => {
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
+                      disabled={loading}
                     >
-                      Proceed
+                      {loading ? 'Submitting...' : 'Proceed'}
                     </button>
                   </div>
                 </Form>
@@ -541,11 +550,7 @@ const FilmMoviesTv = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );

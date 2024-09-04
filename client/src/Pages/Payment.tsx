@@ -13,11 +13,15 @@ const Payment = () => {
     const [clientSec, setClientSec] = useState('')
     useEffect(()=>{
       const fetchInitialStripeInfo = async()=>{
-        const stripeRes = await axios.post(`http://localhost:3000/api/v1/create-subcription/`,{priceId},{
-          headers : {
-            Authorization : token
+        const stripeRes = await axios.post(
+          `https://syncallfe.onrender.com/api/v1/create-subcription/`,
+          { priceId },
+          {
+            headers: {
+              Authorization: token,
+            },
           }
-        })
+        );
         setClientSec(stripeRes.data.subscription.latest_invoice.payment_intent.client_secret)
       }
       fetchInitialStripeInfo()

@@ -2,14 +2,13 @@ import Check from '../../assets/images/check.svg';
 import X from '../../assets/images/xOutline.svg';
 import { currencies } from '../../constants/currency';
 import TooltipImg from '../../assets/images/tooltip-info.svg';
-import WhiteCheck from '../../assets/images/white-check.svg'
+import WhiteCheck from '../../assets/images/white-check.svg';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { useSyncUser } from '../../Context/syncUserData';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
-
 
 const Pricing = () => {
   const { user } = useSyncUser();
@@ -62,7 +61,7 @@ const Pricing = () => {
         'Licensing to use royalty free background music ',
         'Limited Advanced Search Filter',
       ],
-      testPriceId : 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB'
+      testPriceId: 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB',
     },
     {
       name: 'Premium',
@@ -78,7 +77,7 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
-      testPriceId : 'price_1PpUBbG5Wy2cNC8Z47kwvxBB'
+      testPriceId: 'price_1PpUBbG5Wy2cNC8Z47kwvxBB',
     },
     {
       name: 'Enterprise',
@@ -262,6 +261,18 @@ const Pricing = () => {
               </small>
             </h2>
             {
+                plan.name === 'Enterprise' ? (
+                <a className="min-w-full" href="mailto:info@syncallmusic.com">
+                  <div
+                    className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
+                    style={{
+                      backgroundColor: plan.btnBg,
+                      color: plan.pricebtntext,
+                    }}
+                  >
+                    {plan.buttonText}
+                  </div>
+                </a>) :
               plan.name !== "Basic" && <Link
               className={clsx("w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6", userPlan == plan.name && paymentInfo?.subscription_status == "active" && "inactive" )}
               style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext}}
@@ -270,6 +281,7 @@ const Pricing = () => {
               {userPlan == plan.name && paymentInfo?.subscription_status == "active" ? "Active Plan" : plan.buttonText}
             </Link>
             }
+
             <hr />
             <ul className="mt-6">
               {plan.features.map((feature, featureIndex) => (
@@ -312,15 +324,36 @@ const Pricing = () => {
                       </b>{' '}
                       per month
                     </p>
-                    <button
-                      className="w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6"
-                      style={{
-                        backgroundColor: plan.btnBg,
-                        color: plan.btntext,
-                      }}
-                    >
-                      {plan.buttonText}
-                    </button>
+                    <div className="w-full my-6 flex justify-center items-center">
+                      {plan.name !== 'Basic' && plan.name !== 'Enterprise' && (
+                        <Link
+                          className="min-w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] text-center "
+                          style={{
+                            backgroundColor: plan.btnBg,
+                            color: plan.pricebtntext,
+                          }}
+                          to={`/payment/products/${plan.testPriceId}`}
+                        >
+                          {plan.buttonText}
+                        </Link>
+                      )}
+                      {plan.name === 'Enterprise' && (
+                        <a
+                          className="min-w-full"
+                          href="mailto:info@syncallmusic.com"
+                        >
+                          <div
+                            className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
+                            style={{
+                              backgroundColor: plan.btnBg,
+                              color: plan.btntext,
+                            }}
+                          >
+                            {plan.buttonText}
+                          </div>
+                        </a>
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>

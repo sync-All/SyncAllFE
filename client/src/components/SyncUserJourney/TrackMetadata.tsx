@@ -10,11 +10,16 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
+import useLoading from '../../constants/loading';
+import LoadingAnimation from '../../constants/loading-animation';
 
 const TrackMetadata = () => {
+  
   const track = useSyncUser();
   const { id } = useParams();
   const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
+    const { loading, setLoading } = useLoading();
+
 
   const [liked, isLiked] = useState(false);
   interface ResponseData {
@@ -76,8 +81,8 @@ const TrackMetadata = () => {
       };
 
       try {
+        setLoading(true)
         const res = await axios.get(apiUrl, config);
-        console.log(res);
         setTrackDetails(res.data.details);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
@@ -87,10 +92,12 @@ const TrackMetadata = () => {
             : axiosError.message || 'An error occurred'
           ).toString()
         );
+      } finally {
+        setLoading(false)
       }
     };
     fetchTrackDetails();
-  }, [id]);
+  }, [id, setLoading]);
 
   
   useEffect(() => {
@@ -127,6 +134,12 @@ const TrackMetadata = () => {
       );
     }
   };
+
+if(loading) {
+  return <LoadingAnimation/>;
+}
+
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">

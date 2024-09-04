@@ -19,15 +19,18 @@ import Liked from '../../assets/images/liked.svg';
 import MusicSearch from './MusicSearch';
 import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
+import LoadingAnimation from '../../constants/loading-animation';
 const SyncUserHome = () => {
-  const track = useSyncUser();
+  const { user, loading } = useSyncUser();
+
+  const track = user;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
   const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
-    const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const { id } = useParams();
-
+  const [tracksLoading, setTracksLoading] = useState<boolean>(false);
 
   interface TrackDetails {
     musicImg: string;
@@ -44,18 +47,17 @@ const SyncUserHome = () => {
     artWork: string;
   }
 
-    const closeMenu = () => setMenuOpen(!menuOpen);
+  const closeMenu = () => setMenuOpen(!menuOpen);
 
+  const openMenu = (trackId: string) => {
+    setSelectedTrackId(trackId);
+    setMenuOpen(true);
+  };
 
-   const openMenu = (trackId: string) => {
-     setSelectedTrackId(trackId);
-     setMenuOpen(true);
-   };
-
-   const handleCopyLink = (id: string) => {
-      navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
-      toast.success('Link copied to clipboard');
-   }
+  const handleCopyLink = (id: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+    toast.success('Link copied to clipboard');
+  };
 
   const handleLikes = async (trackId: string) => {
     const token = localStorage.getItem('token');
@@ -87,7 +89,7 @@ const SyncUserHome = () => {
   };
 
   useEffect(() => {
-    const trackAdded = track.user?.user.tracklist || [];
+    const trackAdded = track?.user.tracklist || [];
 
     // Create a map of track IDs to their liked status
     const likedTracksFromApi = trackAdded.reduce(
@@ -117,6 +119,7 @@ const SyncUserHome = () => {
       };
 
       try {
+        setTracksLoading(true);
         const res = await axios.get(apiUrl, config);
         setMusicDetails(res.data.allTracks);
         console.log(res.data.allTracks);
@@ -131,10 +134,24 @@ const SyncUserHome = () => {
             : axiosError.message || 'An error occurred'
           ).toString()
         );
+      } finally {
+        setTracksLoading(false);
       }
     };
     fetchData();
-  }, [id]);
+  }, [id, setTracksLoading]);
+
+  if (tracksLoading) {
+    return <LoadingAnimation />;
+  }
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
+
+  if (!musicDetails || musicDetails.length === 0) {
+    return <p>No Track available.</p>;
+  }
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -237,7 +254,7 @@ const SyncUserHome = () => {
                   />
                 </span>
                 <span className="gap-[12px] flex w-[25%] justify-center">
-                  <Link to={`metadata/${detail?._id}`}>
+                  <Link to={`/metadata/${detail?._id}`}>
                     <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                       View More
                     </button>
@@ -283,53 +300,57 @@ const SyncUserHome = () => {
             ))}
           </div>
 
-          {menuOpen &&
-            selectedTrackId &&
-            musicDetails.map((detail, index) => (
-              <React.Fragment key={index}>
-                <div
-                  className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-10"
-                  onClick={closeMenu}
-                ></div>
-                <div className="h-full z-50">
-                  <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-[40%] overflow-y-auto p-8">
-                    <span className="flex justify-between">
-                      <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6">
-                        Song Options
-                      </h4>
-                      <img src={Closemenu} alt="" onClick={closeMenu} />
-                    </span>
-                    <ul className="mt-8 flex flex-col gap-8">
-                      <li
-                        className="text-black font-formular-light text-[24px] leading-6 flex gap-4"
-                        onClick={() => handleLikes(selectedTrackId)}
-                      >
-                        <img src={Favorite} alt="" />
-                        Favorite
-                      </li>
-                      {/* <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
+          {menuOpen && selectedTrackId && (
+            <React.Fragment>
+              <div
+                className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-10"
+                onClick={closeMenu}
+              ></div>
+              <div className="h-full z-50">
+                <div className="fixed bottom-0 left-0 right-0 bg-white z-70 h-[40%] overflow-y-auto p-8">
+                  <span className="flex justify-between">
+                    <h4 className="text-[#81909D] text-[16px] font-formular-regular leading-6">
+                      Song Options
+                    </h4>
+                    <img src={Closemenu} alt="" onClick={closeMenu} />
+                  </span>
+                  <ul className="mt-8 flex flex-col gap-8">
+                    <li
+                      className="text-black font-formular-light text-[24px] leading-6 flex gap-4"
+                      onClick={() => handleLikes(selectedTrackId)}
+                    >
+                      <img src={Favorite} alt="" />
+                      Favorite
+                    </li>
+                    {/* <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
                         <img src={AddMusic} alt="" />
                         Add to Library
                       </li> */}
+                    <li
+                      className="text-black font-formular-light text-[24px] leading-6 flex gap-4"
+                      onClick={() => handleCopyLink(selectedTrackId)}
+                    >
+                      <img src={Copy} alt="" />
+                      Copy Track Link
+                    </li>
+                    <Link to={`/metadata/${selectedTrackId}`}>
                       <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
-                        <img src={Copy} alt="" />
-                        Copy Track Link
+                        <img src={ViewMore} alt="" />
+                        View More
                       </li>
-                      <Link to={`/metadata/${detail?._id}`}>
-                        <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
-                          <img src={ViewMore} alt="" />
-                          View More
-                        </li>
-                      </Link>
-                      <li className="text-black font-formular-light text-[24px] leading-6 flex gap-4">
-                        <img src={getQuote} alt="" />
-                        Get Quote
-                      </li>
-                    </ul>
-                  </div>
+                    </Link>
+                    <Link
+                      to={`/quote/${selectedTrackId}`}
+                      className="text-black font-formular-light text-[24px] leading-6 flex gap-4"
+                    >
+                      <img src={getQuote} alt="" />
+                      Get Quote
+                    </Link>
+                  </ul>
                 </div>
-              </React.Fragment>
-            ))}
+              </div>
+            </React.Fragment>
+          )}
         </section>
       </div>
     </div>

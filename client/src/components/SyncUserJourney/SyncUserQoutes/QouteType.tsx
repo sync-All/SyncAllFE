@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 const QouteType = () => {
   const { id } = useParams();
@@ -163,11 +164,7 @@ const QouteType = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );

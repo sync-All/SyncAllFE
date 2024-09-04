@@ -54,7 +54,8 @@ export default {
         'Utile-bold' : ['Utile-bold']
       },
       backgroundImage : {
-        syncbg : "url('/src/assets/syncbg.png')"
+        syncbg : "url('/src/assets/syncbg.png')",
+        syncUserBg: ''
       }
     },
   },
