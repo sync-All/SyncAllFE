@@ -6,18 +6,22 @@ router.post('/stripe/webhook',async (req,res,next)=>{
         case 'customer.subscription.created':
             const subscription_created = event.data.object
             console.log({subscription_created})
-            await SyncUser.findOneAndUpdate({stripeCusId : subscription_created.customer}, {'$set' : {
-                'billing' : {
-                    prod_id : subscription_created.plan.product,
-                    subscription_id : subscription_created.id,
-                    subscription_status : subscription_created.status,
-                    frequency : subscription_created.plan.interval,
-                }
-            }})
+            // await SyncUser.findOneAndUpdate({stripeCusId : subscription_created.customer}, {'$set' : {
+            //     'billing' : {
+            //         prod_id : subscription_created.plan.product,
+            //         subscription_id : subscription_created.id,
+            //         subscription_status : subscription_created.status,
+            //         frequency : subscription_created.plan.interval,
+            //     }
+            // }})
             break;
         case 'customer.subscription.updated':
             const subscription_updated = event.data.object
             console.log({subscription_updated})
+            const syncuserDetails = await SyncUser.findOne({stripeCusId : subscription_updated.customer})
+            if(syncuserDetails.billing.subscription_status == "active" && syncuserDetails.billing.prod_id == subscription_updated.plan.prod_id){
+                return;
+            }
             await SyncUser.findOneAndUpdate({stripeCusId : subscription_updated.customer}, {'$set' : {
                 'billing' : {
                     prod_id : subscription_updated.plan.product,
