@@ -162,7 +162,7 @@ const MusicSearch = () => {
               {results.map((result, index) => (
                 <div key={index} className="flex items-center w-full ">
                   <Link
-                    to={`metadata/${result?._id}`}
+                    to={`/metadata/${result?._id}`}
                     className="flex gap-3 w-[25%]"
                   >
                     <img
@@ -221,7 +221,7 @@ const MusicSearch = () => {
                     <img src={Copy} alt="" />
                   </span>
                   <span className="gap-[12px] flex w-[25%] justify-center">
-                    <Link to={`metadata/${result?._id}`}>
+                    <Link to={`/metadata/${result?._id}`}>
                       <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                         View More
                       </button>

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import React, {
   useEffect,
   useState,
@@ -7,6 +7,8 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+import { toast } from 'react-toastify';
+
 
 // Interfaces
 interface Activity {
@@ -78,7 +80,14 @@ interface DataContextType {
   fetchDashboardData: () => void;
   dashboardData: DashboardData | null;
   setToken: (token: string) => void;
+  loading: boolean;
 }
+
+interface ResponseData {
+  message?: string;
+}
+
+
 
 // Create Context
 const DashboardDataContext = createContext<DataContextType | undefined>(
@@ -94,12 +103,10 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
+ const [loading, setLoading] = useState<boolean>(true);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
-  const [token, setToken] = useState(localStorage.getItem('token'))
-
-  
-
-  console.log(token)
+  console.log(token);
   const fetchDashboardData = useCallback(async () => {
     // const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
@@ -112,25 +119,33 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     };
 
-  
-
     try {
+      setLoading(true)
       const response = await axios.get(apiUrl, config);
-      console.log('Hey bro, Im running');
-      
+
       setDashboardData(response.data);
-    } catch (error) {
-      // Implement retry logic or error handling as needed
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    } finally {
+      setLoading(false);
     }
   }, []);
 
+ 
+
   useEffect(() => {
     fetchDashboardData();
-  },[fetchDashboardData]);
+  }, [fetchDashboardData]);
 
   const contextValue = useMemo(
-    () => ({ fetchDashboardData, dashboardData, setToken }),
-    [fetchDashboardData, dashboardData, setToken]
+    () => ({ fetchDashboardData, dashboardData, setToken, loading }),
+    [fetchDashboardData, dashboardData, setToken, loading]
   );
 
   return (
@@ -139,6 +154,8 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     </DashboardDataContext.Provider>
   );
 };
+
+
 
 export const useDataContext = () => {
   const context = useContext(DashboardDataContext);

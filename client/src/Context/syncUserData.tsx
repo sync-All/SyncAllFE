@@ -86,6 +86,7 @@ type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   fetchSyncData: () => void;
+  loading: boolean
 };
 
 const SyncUserContext = createContext<UserContextType | undefined>(undefined);
@@ -94,6 +95,7 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchSyncData = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -107,10 +109,13 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     try {
+       
       const response = await axios.get(apiUrl, config);
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching sync data:', error);
+    } finally{
+      setLoading(false);
     }
   }, []);
 
@@ -119,8 +124,8 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [fetchSyncData]);
 
   const contextValue = useMemo(
-    () => ({ fetchSyncData, user, setUser }),
-    [fetchSyncData, user]
+    () => ({ fetchSyncData, user, setUser, loading }),
+    [fetchSyncData, user, loading]
   );
 
   return (

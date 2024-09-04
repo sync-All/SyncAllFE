@@ -1,16 +1,24 @@
 import axios, { AxiosError } from 'axios';
 import { ErrorMessage, Form, Field, Formik } from 'formik';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 // import InputField from '../../InputField';
 import * as Yup from 'yup';
 import Attach from '../../../assets/images/attachimage.svg';
 import { toast } from 'react-toastify';
+import VerifyId from '../../../constants/verifyId';
+import useLoading from '../../../constants/loading';
+import InputField from '../../InputField';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 const TvCommercialAds = () => {
-  const [idValid, setIdValid] = useState(false);
   const { id } = useParams<{ id: string }>();
+  const idValid = id ? VerifyId(id) : false;
   const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  const { loading, setLoading } = useLoading();
+  const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_attachments, setAttachments] = useState<File[]>([]);
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -24,48 +32,54 @@ const TvCommercialAds = () => {
     theme: Yup.string().required('Theme is required'),
     length: Yup.string().required('Length is required'),
     production_budget: Yup.string().required('Production budget is required'),
-    air_date: Yup.string().required('Air date is required'),
-    networks: Yup.string().required('Networks are required'),
+    air_date: Yup.string()
+      .required('Air date is required')
+      .matches(
+        /^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
+        'Date must be in DD/MM/YYYY format'
+      ),
+    networks: Yup.array()
+      .of(Yup.string().required('Network is required'))
+      .required('At least one network is required')
+      .min(1, 'At least one network or more is required'),
     duration_of_music_usage: Yup.string().required(
       'Duration of music usage is required'
     ),
-    intended_usage: Yup.string().required('Intended usage is required'),
-    territories: Yup.string().required('Territories are required'),
+    intended_usage: Yup.array()
+      .of(Yup.string().required('Intended usage is required'))
+      .required('At least one intended usage is required')
+      .min(1, 'At least one intended usage or more is required'),
+    territories: Yup.array()
+      .of(Yup.string().required('Territory is required'))
+      .required('At least one territory is required')
+      .min(1, 'At least one territory or more is required'),
     license_duration: Yup.string().required('License duration is required'),
     media: Yup.string().required('Media format is required'),
-    attachments: Yup.mixed()
-      .nullable()
-      .test('fileType', 'Unsupported file format', (value) => {
-        if (value === null || value === '') return true;
-        if (value instanceof File) {
-          return ['image/jpeg', 'image/png'].includes(value.type);
-        }
-        return false;
-      }),
+    attachments: Yup.mixed().nullable(),
     additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track information is required'),
   });
 
-   interface ResponseData {
-     message?: string;
-   }
+  interface ResponseData {
+    message?: string;
+  }
 
   const initialValues: FormData = {
     product: '',
     theme: '',
     length: '',
     production_budget: '',
-    air_date: '',
-    networks: '',
+    air_date: new Date(),
+    networks: [],
     duration_of_music_usage: '',
-    intended_usage: '',
-    territories: '',
-    license_duration: '',
+    intended_usage: [],
+    territories: [],
+    license_duration: 'Yearly',
     media: '',
-    attachments: null,
+    attachments: null as FileList | null,
     additional_info: '',
-    role_type: 'Tva_request',
+    role_type: 'TV Commercial/Ads',
     track_info: id || '',
   };
 
@@ -74,50 +88,93 @@ const TvCommercialAds = () => {
     theme: string;
     length: string;
     production_budget: string;
-    air_date: string;
-    networks: string;
+    air_date: Date;
+    networks: string[];
     duration_of_music_usage: string;
-    intended_usage: string;
-    territories: string;
+    intended_usage: string[];
+    territories: string[];
     license_duration: string;
     media: string;
-    attachments: File | null; 
+    attachments: FileList | null;
     additional_info: string;
-    role_type: 'Tva_request';
+    role_type: string;
     track_info: string;
   }
 
-  useEffect(() => {
-    const fetchTrackDetails = async () => {
-      const token = localStorage.getItem('token');
-      const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/queryTrackInfo/${id}`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
-
-      try {
-        const res = await axios.get(apiUrl, config);
-        console.log(res);
-        setIdValid(true);
-      } catch (error: unknown) {
-        setIdValid(false);
-      }
-    };
-    fetchTrackDetails();
-  }, [id]);
-
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: File | null) => void
+    setFieldValue: (field: string, value: File[] | null) => void
   ) => {
-    const file = event.currentTarget.files?.[0];
+    const files = event.currentTarget.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setFileName(fileArray.map((file) => file.name).join(', '));
+      setAttachments(fileArray);
+      setFieldValue('attachments', fileArray);
+    } else {
+      setFileName('Click to upload jpeg or png');
+      setAttachments([]);
+      setFieldValue('attachments', null);
+    }
+  };
 
-    if (file) {
-      setFileName(file.name);
-      setFieldValue('attachments', file);
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  const handleNavigateBack = () => {
+    navigate(-1);
+  };
+
+  const handleSubmission = async (
+    values: FormData,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setLoading(true);
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (val !== null) {
+        if (key === 'attachments' && Array.isArray(val)) {
+          val.forEach((file) => formData.append('attachments', file));
+        } else {
+          formData.append(
+            key,
+            typeof val === 'object' ? JSON.stringify(val) : (val as string)
+          );
+        }
+      }
+    });
+
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/quote-request/tva`;
+
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    try {
+      await delay(2000);
+      await axios.post(apiUrl, formData, config);
+      toast.success('Tv commercial/ Ads quote sent successfully');
+      await delay(5000);
+      handleNavigateBack();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      const errorMessage = (
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+      ).toString();
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -138,36 +195,7 @@ const TvCommercialAds = () => {
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (value: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-                try {
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/tva`;
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                    },
-                  };
-
-                  const res = await axios.postForm(apiUrl, value, config);
-                  console.log('API response:', res.data);
-                  setIdValid(true);
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  toast.error(
-                    (axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                    ).toString()
-                  );
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
-              }}
+              onSubmit={handleSubmission}
             >
               {({ setFieldValue }) => (
                 <Form className="mt-[60px]">
@@ -251,7 +279,7 @@ const TvCommercialAds = () => {
                         </label>
                         <Field
                           name="air_date"
-                          type="text"
+                          type="date"
                           placeholder="Planned air date"
                           className={applyInputStyles}
                         />
@@ -262,14 +290,10 @@ const TvCommercialAds = () => {
                         />
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label htmlFor="networks" className={applyLabelStyles}>
-                          Networks:
-                        </label>
-                        <Field
+                        <InputField
+                          label=" Networks:"
                           name="networks"
-                          type="text"
                           placeholder="Targeted Networks or Channels"
-                          className={applyInputStyles}
                         />
                         <ErrorMessage
                           name="networks"
@@ -299,18 +323,12 @@ const TvCommercialAds = () => {
                         />
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="intended_usage"
-                          className={applyLabelStyles}
-                        >
-                          Intended Usage:
-                        </label>
-                        <Field
+                        <InputField
+                          label="Intended Usage:"
                           name="intended_usage"
-                          type="text"
                           placeholder="e.g., Background Music, Jingle"
-                          className={applyInputStyles}
                         />
+
                         <ErrorMessage
                           name="intended_usage"
                           component="span"
@@ -320,18 +338,12 @@ const TvCommercialAds = () => {
                     </span>
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="territories"
-                          className={applyLabelStyles}
-                        >
-                          Territories:
-                        </label>
-                        <Field
+                        <InputField
+                          label=" Territories:"
                           name="territories"
-                          type="text"
                           placeholder="Where will the Commercial Will Be Aired"
-                          className={applyInputStyles}
                         />
+
                         <ErrorMessage
                           name="territories"
                           component="span"
@@ -347,6 +359,7 @@ const TvCommercialAds = () => {
                         </label>
                         <Field
                           name="license_duration"
+                          disabled
                           type="text"
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
@@ -394,7 +407,7 @@ const TvCommercialAds = () => {
                               id="attachments"
                               name="attachments"
                               className="hidden"
-                              accept=".jpeg, .jpg, .png"
+                              multiple
                               onChange={(event) =>
                                 handleFileChange(event, setFieldValue)
                               }
@@ -408,35 +421,41 @@ const TvCommercialAds = () => {
                         />
                       </div>
                     </span>
-                    <div className="flex flex-col gap-2 mb-16">
-                      <label
-                        htmlFor="additional_info"
-                        className={applyLabelStyles}
-                      >
-                        Additional Information:
-                      </label>
-                      <Field
-                        name="additional_info"
-                        as="textarea"
-                        className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
-                        placeholder="If any..."
-                      />
-                      <ErrorMessage
-                        name="additional_info"
-                        component="span"
-                        className={applyErrorStyles}
-                      />
+                    <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-col gap-2 mb-16 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
+                        <label
+                          htmlFor="additional_info"
+                          className={applyLabelStyles}
+                        >
+                          Additional Information:
+                        </label>
+                        <Field
+                          name="additional_info"
+                          as="textarea"
+                          className="shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px] h-[134px]"
+                          placeholder="If any..."
+                        />
+                        <ErrorMessage
+                          name="additional_info"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-6 justify-end items-center mt-12">
-                    <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5">
+                  <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
+                    <button
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                      onClick={handleNavigateBack}
+                    >
                       Back
                     </button>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
+                      disabled={loading}
                     >
-                      Proceed
+                      {loading ? 'Submitting...' : 'Proceed'}
                     </button>
                   </div>
                 </Form>
@@ -445,11 +464,7 @@ const TvCommercialAds = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );

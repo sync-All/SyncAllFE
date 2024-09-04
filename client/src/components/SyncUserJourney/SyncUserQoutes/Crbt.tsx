@@ -1,14 +1,18 @@
 import VerifyId from '../../../constants/verifyId';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import InputField from '../../InputField';
 
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import useLoading from '../../../constants/loading';
+import LoadingAnimation from '../../../constants/loading-animation';
 const Crbt = () => {
   const { id } = useParams<{ id: string }>();
   const idValid = id ? VerifyId(id) : false;
+  const { loading, setLoading } = useLoading();
+  const navigate = useNavigate();
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
   const applyLabelStyles =
@@ -31,7 +35,7 @@ const Crbt = () => {
       .required('Territories are required'),
     license_duration: Yup.string().required('License duration is required'),
     media: Yup.string().required('Media file is required'),
-    additional_info: Yup.string().required('Additional info is required'),
+    additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track info is required'),
   });
@@ -67,6 +71,47 @@ const Crbt = () => {
     track_info: string;
   }
 
+  const handleNavigateBack = () => {
+    navigate(-1);
+  };
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  const handleSubmission = async (
+    value: FormData,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/quote-request/crbt`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
+    try {
+      await delay(2000);
+      await axios.post(apiUrl, value, config);
+      toast.success('CRBT quote sent successfully');
+      await delay(5000);
+      handleNavigateBack();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    } finally {
+      setSubmitting(false);
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {idValid ? (
@@ -85,47 +130,13 @@ const Crbt = () => {
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (value: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-                try {
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/crbt`;
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                    },
-                  };
-                  console.log(value);
-
-                  const res = await axios.post(apiUrl, value, config);
-
-                  toast.success('CRBT quote sent successfully');
-                  console.log('API response:', res.data);
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  toast.error(
-                    (axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                    ).toString()
-                  );
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
-              }}
+              onSubmit={handleSubmission}
             >
               <Form className="mt-[60px]">
                 <div className="flex flex-col">
                   <span className={applyFormDiv}>
                     <span className="w-[367px] flex flex-col gap-2 mb-4">
-                      <label
-                        htmlFor="carrier"
-                        className={applyLabelStyles}
-                      >
+                      <label htmlFor="carrier" className={applyLabelStyles}>
                         Carrier:
                       </label>
                       <Field
@@ -249,10 +260,7 @@ const Crbt = () => {
                       />
                     </span>
                     <span className="w-[367px] flex flex-col gap-2 mb-4">
-                      <label
-                        htmlFor="media"
-                        className={applyLabelStyles}
-                      >
+                      <label htmlFor="media" className={applyLabelStyles}>
                         Media:
                       </label>
                       <Field
@@ -288,15 +296,19 @@ const Crbt = () => {
                     />
                   </div>
                 </div>{' '}
-                <div className="flex gap-6 justify-end items-center mt-12">
-                  <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5">
+                <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
+                  <button
+                    className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                    onClick={handleNavigateBack}
+                  >
                     Back
                   </button>
                   <button
                     type="submit"
                     className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
+                    disabled={loading}
                   >
-                    Proceed
+                    {loading ? 'Submitting...' : 'Proceed'}
                   </button>
                 </div>
               </Form>
@@ -304,11 +316,7 @@ const Crbt = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );

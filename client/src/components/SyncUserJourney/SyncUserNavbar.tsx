@@ -17,7 +17,7 @@ const SyncUserNavbar: React.FC = () => {
   };
 
   const logout = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // Prevent the dropdown from closing before the click is processed
+    e.stopPropagation();
     console.log('Logout triggered');
     localStorage.clear();
     window.location.href = '/';
@@ -84,7 +84,7 @@ const SyncUserNavbar: React.FC = () => {
             menuOpen ? 'hidden' : 'hidden'
           } md:flex`}
         >
-          <span className='flex items-center'>
+          <span className="flex items-center">
             <a href="/myAccount">
               <span className="flex items-center gap-2">
                 <img
@@ -111,7 +111,7 @@ const SyncUserNavbar: React.FC = () => {
           {isDropdownOpen && (
             <div className="" onClick={(e) => e.stopPropagation()}>
               <button
-                className="z-30 w-full bg-red-600 py-2.5 px-6 rounded-[8px] font-formular-light leading-normal text-[#ffff] text-[14px]"
+                className="z-30 w-[150px] bg-red-600 py-2.5 px-6 rounded-[4px] font-formular-light leading-normal text-[#ffff] text-[14px]"
                 onClick={logout}
               >
                 Logout
@@ -156,6 +156,14 @@ const SyncUserNavbar: React.FC = () => {
               </p>
             </a>
           </span>
+          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="z-30 w-full bg-red-600 py-2.5 px-6 rounded-[8px] font-formular-light leading-normal text-[#ffff] text-[14px]"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       )}
     </div>

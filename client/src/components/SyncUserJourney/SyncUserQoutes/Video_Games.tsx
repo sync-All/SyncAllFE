@@ -1,18 +1,23 @@
 import axios, { AxiosError } from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ErrorMessage, Form, Field, Formik } from 'formik';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
-
+import VerifyId from '../../../constants/verifyId';
+import useLoading from '../../../constants/loading';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 const VideoGames = () => {
-  const [idValid, setIdValid] = useState(false);
   const { id } = useParams<{ id: string }>();
-   const [fileName, setFileName] = useState('Click to upload jpeg or png');
-
+  const idValid = id ? VerifyId(id) : false;
+  const [fileName, setFileName] = useState('Click to upload jpeg or png');
+  const { loading, setLoading } = useLoading();
+  const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_attachments, setAttachments] = useState<File[]>([]);
 
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -21,112 +26,154 @@ const VideoGames = () => {
   const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
   const applyErrorStyles = 'italic text-red-600';
 
+  const validationSchema = Yup.object({
+    game_title: Yup.string().required('Game title is required'),
+    genre: Yup.array()
+      .of(Yup.string())
+      .required('Genre is required')
+      .min(1, 'At least one genre is required'),
+    platform: Yup.string().required('Platform is required'),
+    release_date: Yup.string()
+      .required('Release date is required')
+      .matches(
+        /^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/,
+        'Date must be in DD/MM/YYYY format'
+      ),
+    target_audience: Yup.string().required('Target audience is required'),
+    length: Yup.string().required('Length is required'),
+    development_stage: Yup.string().required('Development stage is required'),
+    territories: Yup.array()
+      .of(Yup.string())
+      .required('Territory is required')
+      .min(1, 'At least one territory is required'),
+    usage: Yup.array()
+      .of(Yup.string())
+      .required('Usage is required')
+      .min(1, 'At least one usage is required'),
+    media_format: Yup.string().required('Media format is required'),
+    license_duration: Yup.string().required('License duration is required'),
+    attachments: Yup.mixed().nullable(),
+    additional_info: Yup.string(),
+    role_type: Yup.string().required('Role type is required'),
+    track_info: Yup.string().required('Track information is required'),
+  });
 
-const validationSchema = Yup.object({
-  game_title: Yup.string().required('Game title is required'),
-  genre: Yup.array()
-    .of(Yup.string())
-    .required('Genre is required')
-    .min(1, 'At least one genre is required'),
-  platform: Yup.string().required('Platform is required'),
-  release_date: Yup.string().required('Release date is required'),
-  target_audience: Yup.string().required('Target audience is required'),
-  length: Yup.string().required('Length is required'),
-  development_stage: Yup.string().required('Development stage is required'),
-  territories: Yup.string().required('Territories are required'),
-  usage: Yup.string().required('Usage is required'),
-  media_format: Yup.string().required('Media format is required'),
-  license_duration: Yup.string().required('License duration is required'),
-  attachments: Yup.mixed()
-    .nullable()
-    .test('fileType', 'Unsupported file format', (value) => {
-      if (value === null || value === '') return true;
-      if (value instanceof File) {
-        return ['image/jpeg', 'image/png'].includes(value.type);
+  interface ResponseData {
+    message?: string;
+  }
+
+  const initialValues: FormData = {
+    game_title: '',
+    genre: [],
+    platform: '',
+    release_date: new Date(),
+    target_audience: '',
+    length: '',
+    development_stage: '',
+    territories: [],
+    usage: [],
+    media_format: '',
+    license_duration: 'Yearly',
+    attachments: null,
+    additional_info: '',
+    role_type: 'Video Games',
+    track_info: id || '',
+  };
+
+  interface FormData {
+    game_title: string;
+    genre: string[];
+    platform: string;
+    release_date: Date;
+    target_audience: string;
+    length: string;
+    development_stage: string;
+    territories: string[];
+    usage: string[];
+    media_format: string;
+    license_duration: string;
+    attachments: File | null;
+    additional_info: string;
+    role_type: string;
+    track_info: string;
+  }
+
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, value: File[] | null) => void
+  ) => {
+    const files = event.currentTarget.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setFileName(fileArray.map((file) => file.name).join(', '));
+      setAttachments(fileArray);
+      setFieldValue('attachments', fileArray);
+    } else {
+      setFileName('Click to upload jpeg or png');
+      setAttachments([]);
+      setFieldValue('attachments', null);
+    }
+  };
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  const handleNavigateBack = () => {
+    navigate(-1);
+  };
+
+  const handleSubmission = async (
+    values: FormData,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setLoading(true);
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (val !== null) {
+        if (key === 'attachments' && Array.isArray(val)) {
+          val.forEach((file) => formData.append('attachments', file));
+        } else {
+          formData.append(
+            key,
+            typeof val === 'object' ? JSON.stringify(val) : (val as string)
+          );
+        }
       }
-      return false;
-    }),
-  additional_info: Yup.string(),
-  role_type: Yup.string().required('Role type is required'),
-  track_info: Yup.string().required('Track information is required'),
-});
+    });
 
- interface ResponseData {
-   message?: string;
- }
-
-
-const initialValues: FormData = {
-  game_title: '',
-  genre: [],
-  platform: '',
-  release_date: new Date(),
-  target_audience: '',
-  length: '',
-  development_stage: '',
-  territories: '',
-  usage: '',
-  media_format: '',
-  license_duration: '',
-  attachments: null,
-  additional_info: '',
-  role_type: 'Video Games',
-  track_info: id || '',
-};
-
-interface FormData {
-  game_title: string;
-  genre: string[];
-  platform: string;
-  release_date: Date;
-  target_audience: string;
-  length: string;
-  development_stage: string;
-  territories: string;
-  usage: string;
-  media_format: string;
-  license_duration: string;
-  attachments: File | null;
-  additional_info: string;
-  role_type: 'Video Games';
-  track_info: string;
-}
-
-
-useEffect(() => {
-  const fetchTrackDetails = async () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/queryTrackInfo/${id}`;
+    const apiUrl = `${urlVar}/quote-request/video_game`;
+
     const config = {
       headers: {
         Authorization: `${token}`,
+        'Content-Type': 'multipart/form-data',
       },
     };
 
     try {
-      const res = await axios.get(apiUrl, config);
-      console.log(res);
-      setIdValid(true);
+      await delay(2000);
+      await axios.post(apiUrl, formData, config);
+      toast.success('Video game quote sent successfully');
+      await delay(5000);
+      handleNavigateBack();
     } catch (error: unknown) {
-      setIdValid(false);
+      const axiosError = error as AxiosError<ResponseData>;
+      const errorMessage = (
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+      ).toString();
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
     }
   };
-  fetchTrackDetails();
-}, [id]);
-
-const handleFileChange = (
-  event: React.ChangeEvent<HTMLInputElement>,
-  setFieldValue: (field: string, value: File | null) => void
-) => {
-  const file = event.currentTarget.files?.[0];
-
-  if (file) {
-    setFileName(file.name);
-    setFieldValue('attachments', file);
-  }
-};
-
 
   return (
     <>
@@ -145,37 +192,7 @@ const handleFileChange = (
             <Formik
               validationSchema={validationSchema}
               initialValues={initialValues}
-              onSubmit={async (value: FormData, { setSubmitting }) => {
-                console.log('Form submission started');
-                try {
-                  const token = localStorage.getItem('token');
-                  const urlVar = import.meta.env.VITE_APP_API_URL;
-                  const apiUrl = `${urlVar}/quote-request/video_game`;
-                  const config = {
-                    headers: {
-                      Authorization: `${token}`,
-                    },
-                  };
-                  console.log(value);
-
-                  const res = await axios.post(apiUrl, value, config);
-                  console.log('API response:', res.data);
-                  setIdValid(true);
-                } catch (error: unknown) {
-                  console.error('Error during form submission:', error);
-                  const axiosError = error as AxiosError<ResponseData>;
-                  toast.error(
-                    (axiosError.response && axiosError.response.data
-                      ? axiosError.response.data.message ||
-                        axiosError.response.data
-                      : axiosError.message || 'An error occurred'
-                    ).toString()
-                  );
-                } finally {
-                  setSubmitting(false);
-                  console.log('Form submission ended');
-                }
-              }}
+              onSubmit={handleSubmission}
             >
               {({ setFieldValue }) => (
                 <Form className="mt-[60px]">
@@ -309,18 +326,12 @@ const handleFileChange = (
                         />
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="territories"
-                          className={applyLabelStyles}
-                        >
-                          Territories:{' '}
-                        </label>
-                        <Field
+                        <InputField
+                          label="Territories:"
                           name="territories"
-                          type="text"
                           placeholder="Where will the Game Will Be Distributed"
-                          className={applyInputStyles}
                         />
+
                         <ErrorMessage
                           name="territories"
                           component="span"
@@ -330,14 +341,10 @@ const handleFileChange = (
                     </span>
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label htmlFor="usage" className={applyLabelStyles}>
-                          Usage:
-                        </label>
-                        <Field
+                        <InputField
                           name="usage"
-                          type="text"
-                          placeholder="e.g., Main Theme, Background Music, In-..."
-                          className={applyInputStyles}
+                          label="Usage:"
+                          placeholder="Main Theme, Background Music"
                         />
                         <ErrorMessage
                           name="usage"
@@ -376,6 +383,7 @@ const handleFileChange = (
                         <Field
                           name="license_duration"
                           type="text"
+                          disabled
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />
@@ -404,7 +412,7 @@ const handleFileChange = (
                               id="attachments"
                               name="attachments"
                               className="hidden"
-                              accept=".jpeg, .jpg, .png"
+                              multiple
                               onChange={(event) =>
                                 handleFileChange(event, setFieldValue)
                               }
@@ -438,15 +446,19 @@ const handleFileChange = (
                       />
                     </div>
                   </div>
-                  <div className="flex gap-6 justify-end items-center mt-12">
-                    <button className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5">
+                  <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
+                    <button
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                      onClick={handleNavigateBack}
+                    >
                       Back
                     </button>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
+                      disabled={loading}
                     >
-                      Proceed
+                      {loading ? 'Submitting...' : 'Proceed'}
                     </button>
                   </div>
                 </Form>
@@ -455,14 +467,10 @@ const handleFileChange = (
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center flex-col mt-[80px] mb-[130px]">
-          <h1 className="text-black2 font-formular-bold text-[56px] tracking-[-2.24px] leading-[100%] ">
-            Invalid ID
-          </h1>
-        </div>
+        <LoadingAnimation />
       )}
     </>
   );
-}
+};
 
 export default VideoGames;
