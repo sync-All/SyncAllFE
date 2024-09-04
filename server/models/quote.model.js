@@ -66,10 +66,6 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    license : {
-        type : String,
-        required : true
-    },
     media : [
         {
             type : String,
