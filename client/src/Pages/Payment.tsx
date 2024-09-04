@@ -14,7 +14,7 @@ const Payment = () => {
     useEffect(()=>{
       const fetchInitialStripeInfo = async()=>{
         const stripeRes = await axios.post(
-          `https://syncallfe.onrender.com/api/v1/create-subcription/`,
+          `https://syncallfe.onrender.com/api/v1/create-subscription/`,
           { priceId },
           {
             headers: {
