@@ -428,7 +428,7 @@ const interpolationSchema = new Schema({
     ],
     role_type : {
         type : String,
-        enum : ['Sampling'],
+        enum : ['Interpolation'],
         required : true
     },
     track_info : {
