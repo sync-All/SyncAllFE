@@ -21,10 +21,10 @@ router.post('/create-subscription',passport.authenticate('jwt',{session : false,
             payment_settings: { save_default_payment_method: 'on_subscription' },
             expand: ['latest_invoice.payment_intent'],
         })
+        res.send({priceId, customerId, subscription})
     } catch (error) {
         console.log(error)
     }
-        res.send({priceId, customerId, subscription})
 }))
 
 module.exports = router
