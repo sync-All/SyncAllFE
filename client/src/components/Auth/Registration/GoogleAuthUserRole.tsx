@@ -25,7 +25,7 @@ const GoogleAuthUserRole = ({googleAuthData}:gauthProps) => {
     const colatedValues = {...googleAuthData, role}
     console.log(colatedValues)
     await axios
-        .post('http://localhost:3000/api/v1/googleauth', {...googleAuthData, role})
+        .post('https://syncallfe.onrender.com/api/v1/googleauth', {...googleAuthData, role})
         .then((response) => {
           const spotifyLink = response.data.user.spotifyLink
           localStorage.setItem('token', response.data.token);
