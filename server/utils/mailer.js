@@ -36,7 +36,7 @@ transporter.sendMail(mainOptions,(error, info) => {
        console.error('Error sending email:', error);
     }
     else{
-      console.error('Mail Sent Successfully', error);
+      console.error('Mail Sent Successfully');
     }
   });
 });
