@@ -15,19 +15,18 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
   toggleMenu,
   activeItem,
 }) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const notificationRef = useRef<HTMLDivElement>(null);
+
+  const toggleModal = () => {
+    setModalIsOpen((prevState) => !prevState);
+    console.log(modalIsOpen);
+  };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const toggleNotification = (e: React.MouseEvent<HTMLImageElement>) => {
-    e.stopPropagation(); // Prevents closing the notification dropdown when clicked
-    setIsNotificationOpen(!isNotificationOpen);
   };
 
   const logout = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,27 +44,13 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
     ) {
       setIsDropdownOpen(false);
     }
-
-    // Close notification if clicked outside
-    if (
-      notificationRef.current &&
-      !notificationRef.current.contains(event.target as Node)
-    ) {
-      setIsNotificationOpen(false);
-    }
   };
 
   useEffect(() => {
-    if (isDropdownOpen || isNotificationOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isDropdownOpen, isNotificationOpen]);
+  }, [isDropdownOpen]);
 
   const profileInfo = useDataContext();
   const profileDetails = profileInfo.dashboardData?.profileInfo;
@@ -88,15 +73,16 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
               src={Notification}
               alt=""
               className="self-start mt-2 cursor-pointer"
-              onClick={toggleNotification}
+              onClick={toggleModal}
             />
-            {isNotificationOpen && (
-              <div  className="absolute right-7 top-[7%]">
-                <MusicUploaderNotification />
-              </div>
-            )}
+
+            <MusicUploaderNotification
+              isOpen={modalIsOpen}
+              onRequestClose={toggleModal}
+            />
+
             <div>
-              <div className="flex items-center lg:mx-3" >
+              <div className="flex items-center lg:mx-3">
                 <span>
                   <img
                     src={profileDetails?.img || Placeholder}
