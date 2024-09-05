@@ -103,6 +103,7 @@ const queryTrackInfo =async(req,res,next)=>{
           return res.json({details})
       }
     } catch (error) {
+      console.log(error)
       throw new BadRequestError('Invalid Request')
     }
   }
