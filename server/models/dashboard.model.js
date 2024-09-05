@@ -256,6 +256,45 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
+const trackLicenseSchema = new Schema({
+    track_name : {
+        type : String,
+        required : true
+    },
+    license_status : {
+        type : String,
+        enum : ['pending, approved, expired, rejected'],
+        default : 'pending',
+        required : true
+    },
+    amount : {
+        type : String,
+        required : true
+    },
+    trackLink : {
+        type : String,
+        required : true
+    },
+    quote_id : {
+        type : Schema.Types.ObjectId,
+        required : true,
+    },
+    quote_type : {
+        type : String,
+        required : true
+    },
+    sync_user_info : {
+        type : Schema.Types.ObjectId,
+        required : true,
+        ref : "syncUser",
+    },
+    music_uploader_info : {
+        type : Schema.Types.ObjectId,
+        ref : "uploader"
+    },
+
+},{timestamps : true})
+
 trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const disputeSchema = new Schema({
@@ -291,9 +330,8 @@ const disputeSchema = new Schema({
 },{timestamps : true})
 
 const track = mongoose.model('track', trackSchema)
+const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 const dashboard = mongoose.model('dashboard',dashboardSchema)
 const dispute = mongoose.model('dispute',disputeSchema)
 
-module.exports.dashboard = dashboard
-module.exports.track = track
-module.exports.dispute = dispute
+module.exports = {dashboard, track, dispute, trackLicense}

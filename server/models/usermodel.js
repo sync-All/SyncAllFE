@@ -144,7 +144,7 @@ const syncUserSchema = new Schema({
     totalLicensedTracks : [
         {
             type : Schema.Types.ObjectId,
-            ref : "track",
+            ref : "track_license",
             default : [0]
         }
     ],

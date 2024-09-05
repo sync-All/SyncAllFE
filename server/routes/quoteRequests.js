@@ -7,6 +7,8 @@ const multer = require('multer')
 const upload = multer({dest: 'uploads/'}).array('attachments', 5)
 const cloudinary = require("cloudinary").v2
 const fs = require("node:fs")
+const { syncUser } = require('../models/usermodel')
+const { trackLicense } = require('../models/dashboard.model')
 const Track = require('../models/dashboard.model').track
 const fmtRequest = require('../models/quote.model').fmtRequest
 const tvaRequest = require('../models/quote.model').tvaRequest
@@ -22,8 +24,8 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
         const trackId = req.body.track_info
         console.log(req.body)
         try {
-            const verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
@@ -36,14 +38,35 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
                 })
                 const request = new tvaRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
-                    
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'tvaRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
                 const request = new tvaRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async (uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'tvaRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -61,8 +84,8 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
@@ -75,13 +98,35 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
                 })
                 const request = new fmtRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
+                .then(async (uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'fmtRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
                 const request = new fmtRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async (uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'fmtRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -99,8 +144,8 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
@@ -121,13 +166,35 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
                 })
                 const request = new videoGamesRequest({...req.body, user_info : userId,attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
+                .then(async (uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'videoGamesRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else{
                 const request = new videoGamesRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'videoGamesRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -145,8 +212,8 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const  verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const  trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track not found')
             }
             if(req.files){
@@ -159,14 +226,36 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                 })
                 const request = new samplingRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'samplingRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
                 // informQuoteRequest('deemajor230600@gmail.com')
                 const request = new samplingRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'samplingRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -185,8 +274,8 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
         console.log(req.body)
         const trackId = req.body.track_info
         try {
-            const verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
@@ -199,13 +288,35 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
                 })
                 const request = new interpolationRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'interpolationRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
                 const request = new interpolationRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'interpolationRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -221,11 +332,26 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
 router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async (req,res,next)=>{
     if(req.user.role == "Sync User"){
         const userId = req.user._id
-        console.log(req.body)
+        const trackId = req.body.track_info
         try {
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
+                throw new BadRequestError('Track does not exists')
+            }
             const request = new crbtRequest({...req.body, user_info : userId})
             await request.save()
-            .then(()=>{
+            .then(async(uploadResponse)=>{
+                const license = new trackLicense({
+                    track_name : trackDetails.trackTitle,
+                    amount : 'N/A',
+                    trackLink : trackDetails.trackLink,
+                    quote_id : uploadResponse._id,
+                    quote_type : 'crbtRequest',
+                    sync_user_info : userId,
+                    music_uploader_info : trackDetails.user
+                })
+                const newGeneratedLicense = await license.save()
+                await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
@@ -241,8 +367,8 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const verifyTrack = await Track.findOne({_id : trackId}).exec()
-            if(!verifyTrack){
+            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
@@ -255,13 +381,35 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
                 })
                 const request = new smcRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'smcRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
                 const request = new smcRequest({...req.body, user_info : userId})
                 await request.save()
-                .then(()=>{
+                .then(async(uploadResponse)=>{
+                    const license = new trackLicense({
+                        track_name : trackDetails.trackTitle,
+                        amount : 'N/A',
+                        trackLink : trackDetails.trackLink,
+                        quote_id : uploadResponse._id,
+                        quote_type : 'smcRequest',
+                        sync_user_info : userId,
+                        music_uploader_info : trackDetails.user
+                    })
+                    const newGeneratedLicense = await license.save()
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
