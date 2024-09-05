@@ -5,6 +5,16 @@ require('dotenv').config()
 
 // Create a transporter
 
+const pathtofile = path.join(__dirname, '..', '/views/quoteRequest.ejs')
+const pathtoheaderLogo = path.join(__dirname, '..', '/public/images/headerLogo.png')
+const pathtofooterLogo = path.join(__dirname, '..', '/public/images/footerLogo.png')
+const pathtoFbLogo = path.join(__dirname, '..', '/public/images/fb.png')
+const pathtoLnLogo = path.join(__dirname, '..', '/public/images/ln.png')
+const pathtoXLogo = path.join(__dirname, '..', '/public/images/twitter.png')
+const pathtoMessageIcon = path.join(__dirname, '..', '/public/images/message.png')
+const pathtoLinkIcon = path.join(__dirname, '..', '/public/images/link.png')
+const pathtoCallIcon = path.join(__dirname, '..', '/public/images/call.png')
+
 async function sendConfirmationMail(user, issuedJwt){
   const transporter = nodemailer.createTransport({
     service : "Gmail",
@@ -28,6 +38,47 @@ await ejs.renderFile(pathtofile,{ link :`https://syncallfe.onrender.com/verifyEm
     to: user.email,
     subject: 'Hello, Sync USer',
     html: renderedHtml,
+    attachments: [{
+      filename: 'headerLogo.png',
+      path: pathtoheaderLogo,
+      cid: 'headerLogo' //same cid value as in the html img src
+    },
+    {
+      filename: 'footerLogo.png',
+      path: pathtofooterLogo,
+      cid: 'footerLogo' //same cid value as in the html img src
+    },
+    {
+      filename: 'fb.png',
+      path: pathtoFbLogo,
+      cid: 'fb' //same cid value as in the html img src
+    },
+    {
+      filename: 'ln.png',
+      path: pathtoLnLogo,
+      cid: 'ln' //same cid value as in the html img src
+    },
+    {
+      filename: 'twitter.png',
+      path: pathtoXLogo,
+      cid: 'twitter' //same cid value as in the html img src
+    },
+    {
+      filename: 'message.png',
+      path: pathtoMessageIcon,
+      cid: 'message' //same cid value as in the html img src
+    },
+    {
+      filename: 'link.png',
+      path: pathtoLinkIcon,
+      cid: 'link' //same cid value as in the html img src
+    },
+    {
+      filename: 'call.png',
+      path: pathtoCallIcon,
+      cid: 'call' //same cid value as in the html img src
+    },
+    ]
   };
 
   // Send the email
@@ -88,15 +139,7 @@ function informQuoteRequest(email){
   },
 });
 
-const pathtofile = path.join(__dirname, '..', '/views/quoteRequest.ejs')
-const pathtoheaderLogo = path.join(__dirname, '..', '/public/images/headerLogo.png')
-const pathtofooterLogo = path.join(__dirname, '..', '/public/images/footerLogo.png')
-const pathtoFbLogo = path.join(__dirname, '..', '/public/images/fb.png')
-const pathtoLnLogo = path.join(__dirname, '..', '/public/images/ln.png')
-const pathtoXLogo = path.join(__dirname, '..', '/public/images/twitter.png')
-const pathtoMessageIcon = path.join(__dirname, '..', '/public/images/message.png')
-const pathtoLinkIcon = path.join(__dirname, '..', '/public/images/link.png')
-const pathtoCallIcon = path.join(__dirname, '..', '/public/images/call.png')
+
 
 ejs.renderFile(pathtofile,{ title : "Your Quote request", user : {name : "tunes"}}, (err, renderedHtml) => {
   if (err) {
@@ -150,7 +193,7 @@ ejs.renderFile(pathtofile,{ title : "Your Quote request", user : {name : "tunes"
       path: pathtoCallIcon,
       cid: 'call' //same cid value as in the html img src
     },
-  ]
+    ]
   };
 
   // Send the email
