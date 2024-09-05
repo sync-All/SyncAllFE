@@ -16,7 +16,7 @@ async function sendConfirmationMail(user, issuedJwt){
 
 const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
 
-await ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
+await ejs.renderFile(pathtofile,{ link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
   if (err) {
     console.error('Error rendering EJS template:', err);
     return;
@@ -34,6 +34,9 @@ await ejs.renderFile(pathtofile,{ name: user.name, link :`https://syncallfe.onre
 transporter.sendMail(mainOptions,(error, info) => {
     if (error) {
        console.error('Error sending email:', error);
+    }
+    else{
+      console.error('Mail Sent Successfully', error);
     }
   });
 });
