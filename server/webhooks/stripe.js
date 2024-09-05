@@ -1,35 +1,49 @@
 const router = require('express').Router()
-
-router.post('/stripe/webhook',(req,res,next)=>{
+const SyncUser = require('../models/usermodel').syncUser
+router.post('/stripe/webhook',async (req,res,next)=>{
     const event = req.body
     switch (event.type) {
-        case 'invoice.created':
-            const created = event.data.object
-            console.log({created})
+        case 'customer.subscription.created':
+            const subscription_created = event.data.object
+            console.log({subscription_created})
+            // await SyncUser.findOneAndUpdate({stripeCusId : subscription_created.customer}, {'$set' : {
+            //     'billing' : {
+            //         prod_id : subscription_created.plan.product,
+            //         subscription_id : subscription_created.id,
+            //         subscription_status : subscription_created.status,
+            //         frequency : subscription_created.plan.interval,
+            //     }
+            // }})
             break;
-        case 'payment_intent.succeeded':
-          const paymentIntent = event.data.object;
-          console.log({paymentIntent})
-          // Then define and call a method to handle the successful payment intent.
-          // handlePaymentIntentSucceeded(paymentIntent);
-          break;
+        case 'customer.subscription.updated':
+            const subscription_updated = event.data.object
+            console.log({subscription_updated})
+            const syncuserDetails = await SyncUser.findOne({stripeCusId : subscription_updated.customer})
+            if(!syncuserDetails.billing || syncuserDetails.billing.subscription_id == subscription_updated.id || syncuserDetails.billing.prod_id != subscription_updated.plan.product){
+                await SyncUser.findOneAndUpdate({stripeCusId : subscription_updated.customer}, {'$set' : {
+                    'billing' : {
+                        prod_id : subscription_updated.plan.product,
+                        subscription_id : subscription_updated.id,
+                        subscription_status : subscription_updated.status,
+                        frequency : subscription_updated.plan.interval,
+                        amount :  (subscription_updated.plan.amount / 100),
+                        next_billing_date : new Date(subscription_updated.current_period_end * 1000).toLocaleString('en-US')
+                    }
+                }})
+            }
+            
+            break;
+        case 'customer.subscription.deleted':
+            const subscription_deleted = event.data.object
+            console.log({subscription_deleted})
+            break;
         case 'payment_method.attached':
           const paymentMethod = event.data.object;
+          console.log('payeer')
           console.log({paymentMethod})
           // Then define and call a method to handle the successful attachment of a PaymentMethod.
           // handlePaymentMethodAttached(paymentMethod);
           break;
-        case 'invoice.payment_succeeded':
-            const succeeded = event.data.object
-            console.log({succeeded})
-            break;
-        case 'invoice.finalized':
-                const finalized = event.data.object
-                console.log({finalized})
-                break;
-        default:
-            console.log(event.data.object)
-          console.log(`Unhandled event type ${event.type}`);
       }
     
       // Return a response to acknowledge receipt of the event
