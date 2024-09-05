@@ -19,7 +19,7 @@ router.post('/stripe/webhook',async (req,res,next)=>{
             const subscription_updated = event.data.object
             console.log({subscription_updated})
             const syncuserDetails = await SyncUser.findOne({stripeCusId : subscription_updated.customer})
-            if(!syncuserDetails.billing || syncuserDetails.billing.subscription_id == subscription_updated.id || syncuserDetails.billing.prod_id != subscription_updated.plan.product){
+            if(!syncuserDetails.billing || syncuserDetails.billing.subscription_id == subscription_updated.id || (syncuserDetails.billing.prod_id != subscription_updated.plan.product && subscription_updated.status == "active")){
                 await SyncUser.findOneAndUpdate({stripeCusId : subscription_updated.customer}, {'$set' : {
                     'billing' : {
                         prod_id : subscription_updated.plan.product,
