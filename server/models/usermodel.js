@@ -104,6 +104,8 @@ const syncUserSchema = new Schema({
     billing : {
         prod_id : {
             type : String,
+            enum : ['prod_QnB1PkDeRHAGSx', 'prod_QgrvvxGRYPiP7a', 'prod_QUeQtqvvQsy9X8'],
+            default : 'prod_QnB1PkDeRHAGSx'
         },
         subscription_id : {
             type : String
