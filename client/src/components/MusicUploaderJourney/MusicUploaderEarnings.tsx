@@ -57,12 +57,8 @@ const MusicUploaderEarnings: React.FC = () => {
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
+  const toggleModal = () => {
+    setModalIsOpen(prevState => !prevState);
   };
 
   const earningInfo = useDataContext();
@@ -113,7 +109,7 @@ const MusicUploaderEarnings: React.FC = () => {
           <span>
             <button
               className="py-2.5 px-4 flex items-center gap-2 text-black2 font-Utile-medium text-[14px] leading-[20px] bg-yellow border border-yellow rounded-lg"
-              onClick={openModal}
+              onClick={toggleModal}
             >
               <img src={Withdraw} alt="" />
               <p>Withdraw Money</p>
@@ -270,7 +266,7 @@ const MusicUploaderEarnings: React.FC = () => {
         </div>
       )}
 
-      <WithdrawalModal isOpen={modalIsOpen} onRequestClose={closeModal} />
+      <WithdrawalModal isOpen={modalIsOpen} onRequestClose={toggleModal} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import Background from '../../assets/images/user-homepage-head.png';
-import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
+// import Background from '../../assets/images/user-homepage-head.png';
+// import BackgroundMobile from '../../assets/images/user-homepage-mobile-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 // import Play from '../../assets/images/copy-link.svg';
@@ -9,7 +9,6 @@ import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
 import { useParams } from 'react-router-dom';
-
 import React, { useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
@@ -170,11 +169,7 @@ const SyncUserHome = () => {
         <section>
           <MusicSearch />
           <div className="relative mt-[55px]">
-            <span className="w-full">
-              <img src={Background} alt="" className="hidden md:block w-full" />
-              <img src={BackgroundMobile} alt="" className="w-full md:hidden" />
-            </span>
-            <div className="flex gap-2 top-0 mt-6 md:top-[35%] flex-col absolute lg:top-[43%] md:transform md:-translate-y-1/2 ml-6 md:ml-16 bg-">
+            <div className="flex gap-2 w-full py-6 pl-6 bg-cover min-h-[371px] md:min-h-full lg:pl-16 lg:py-[56px] bg-no-repeat flex-col bg-syncUserBg md:bg-desktopSyncUserBg border rounded-[10px]">
               <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
                 Explore Our <br /> Music Library
               </h2>

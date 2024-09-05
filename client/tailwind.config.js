@@ -36,27 +36,28 @@ export default {
         'Utile-regular': ['Utile-regular'],
         'Utile-medium': ['Utile-medium'],
         'Utile-bold': ['Utile-bold'],
-        poppins: ['Poppins']
+        poppins: ['Poppins'],
       },
-      fontFamily : {
-        'inter': ['Inter', 'sans-serif'],
-        'formular-extraLight' : ['formular-extralight'],
-        'formular-light' : ['formular-light'],
-        'formular-regular' : ['formular-regular'],
-        'formular-medium' : ['formular-medium'],
-        'formular-bold' : ['formular-bold'],
-        'formular-ultra' : ['formular-ultra'],
-        'gitSans' : ['Git-sans', "sans-serif"],
-        'Utile-extralight' : ['Utile-extralight'],
-        'Utile-light' : ['Utile-light'],
-        'Utile-regular' : ['Utile-regular'],
-        'Utile-medium' : ['Utile-medium'],
-        'Utile-bold' : ['Utile-bold']
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+        'formular-extraLight': ['formular-extralight'],
+        'formular-light': ['formular-light'],
+        'formular-regular': ['formular-regular'],
+        'formular-medium': ['formular-medium'],
+        'formular-bold': ['formular-bold'],
+        'formular-ultra': ['formular-ultra'],
+        gitSans: ['Git-sans', 'sans-serif'],
+        'Utile-extralight': ['Utile-extralight'],
+        'Utile-light': ['Utile-light'],
+        'Utile-regular': ['Utile-regular'],
+        'Utile-medium': ['Utile-medium'],
+        'Utile-bold': ['Utile-bold'],
       },
-      backgroundImage : {
-        syncbg : "url('/src/assets/syncbg.png')",
-        syncUserBg: ''
-      }
+      backgroundImage: {
+        syncbg: "url('/src/assets/syncbg.png')",
+        syncUserBg: "url('/src/assets/images/user-homepage-mobile-head.png')",
+        desktopSyncUserBg: "url('/src/assets/images/user-homepage-head.png')",
+      },
     },
   },
   plugins: [],
