@@ -110,7 +110,7 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
 
   return (
     <>
-    <div className={containerStyle || " flex items-center justify-between mt-20"}>
+    <div className={containerStyle || " flex items-center justify-between "}>
       <img src={ isPlaying ? pauseButton : PlayButton} alt="" onClick={handlePlayPause} className={buttonStyle ||'w-12 cursor-pointer'} />
       <div id="waveform" ref={waveformRef} className={waveStyle ||'w-[60%]'}></div>
       <p className={timerStyle || "font-Utile-medium text-[16px] leading-4 "}>{currentTime || '00:00'}</p>
