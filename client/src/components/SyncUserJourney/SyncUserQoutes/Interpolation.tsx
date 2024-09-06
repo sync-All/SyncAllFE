@@ -117,83 +117,82 @@ const Interpolation = () => {
     message?: string;
   }
 
- const handleFileChange = (
-   event: React.ChangeEvent<HTMLInputElement>,
-   setFieldValue: (field: string, value: File[] | null) => void
- ) => {
-   const files = event.currentTarget.files;
-   if (files) {
-     const fileArray = Array.from(files);
-     setFileName(fileArray.map((file) => file.name).join(', '));
-     setAttachments(fileArray);
-     setFieldValue('attachments', fileArray);
-   } else {
-     setFileName('Click to upload jpeg or png');
-     setAttachments([]);
-     setFieldValue('attachments', null);
-   }
- };
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-const handleNavigateBack = () => {
-  navigate(-1);
-};
-
-const handleSubmission = async (
-  values: FormData,
-  { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
-) => {
-  setLoading(true);
-  const formData = new FormData();
-
-  Object.entries(values).forEach(([key, val]) => {
-    if (val !== null) {
-      if (key === 'attachments' && Array.isArray(val)) {
-        val.forEach((file) => formData.append('attachments', file));
-      } else {
-        formData.append(
-          key,
-          typeof val === 'object' ? JSON.stringify(val) : (val as string)
-        );
-      }
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, value: File[] | null) => void
+  ) => {
+    const files = event.currentTarget.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setFileName(fileArray.map((file) => file.name).join(', '));
+      setAttachments(fileArray);
+      setFieldValue('attachments', fileArray);
+    } else {
+      setFileName('Click to upload jpeg or png');
+      setAttachments([]);
+      setFieldValue('attachments', null);
     }
-  });
-
-  const token = localStorage.getItem('token');
-  const urlVar = import.meta.env.VITE_APP_API_URL;
-  const apiUrl = `${urlVar}/quote-request/interpolation`;
-
-  const config = {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'multipart/form-data',
-    },
   };
 
-  try {
-    await delay(2000);
-    await axios.post(apiUrl, formData, config);
-    toast.success('Interpolation quote sent successfully');
-    await delay(5000);
-    handleNavigateBack();
-  } catch (error: unknown) {
-    const axiosError = error as AxiosError<ResponseData>;
-    const errorMessage = (
-      axiosError.response && axiosError.response.data
-        ? axiosError.response.data.message || axiosError.response.data
-        : axiosError.message || 'An error occurred'
-    ).toString();
-
-    toast.error(errorMessage);
-  } finally {
-    setLoading(false);
-    setSubmitting(false);
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
-};
 
+  const handleNavigateBack = () => {
+    navigate(-1);
+  };
+
+  const handleSubmission = async (
+    values: FormData,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setLoading(true);
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (val !== null) {
+        if (key === 'attachments' && Array.isArray(val)) {
+          val.forEach((file) => formData.append('attachments', file));
+        } else {
+          formData.append(
+            key,
+            typeof val === 'object' ? JSON.stringify(val) : (val as string)
+          );
+        }
+      }
+    });
+
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/quote-request/interpolation`;
+
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    try {
+      await delay(2000);
+      await axios.post(apiUrl, formData, config);
+      toast.success('Interpolation quote sent successfully');
+      await delay(5000);
+      handleNavigateBack();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      const errorMessage = (
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+      ).toString();
+
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -289,14 +288,21 @@ const handleSubmission = async (
                     <span className={applyFormDiv}>
                       {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <InputField
-                          label="Distribution Channels: "
-                          name="distribution_channels"
-                          placeholder="e.g., Streaming Services"
+                        <label
+                          htmlFor="artist_name"
+                          className={applyLabelStyles}
+                        >
+                          Artist Name:
+                        </label>
+                        <Field
+                          className={applyInputStyles}
+                          name="artist_name"
+                          type="text"
+                          placeholder="Artist name of the Original Song"
                         />
 
                         <ErrorMessage
-                          name="distribution_channels"
+                          name="artist_name"
                           component="span"
                           className={applyErrorStyles}
                         />
@@ -311,7 +317,7 @@ const handleSubmission = async (
                         <Field
                           name="original_song"
                           type="text"
-                          placeholder="Title and Artist of the Original Song"
+                          placeholder="Title of the Original Song"
                           className={applyInputStyles}
                         />
                         <ErrorMessage
@@ -445,21 +451,14 @@ const handleSubmission = async (
                     <span className={applyFormDiv}>
                       {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="artist_name"
-                          className={applyLabelStyles}
-                        >
-                          Artist Name:
-                        </label>
-                        <Field
-                          className={applyInputStyles}
-                          name="artist_name"
-                          type="text"
-                          placeholder="Artist names"
+                        <InputField
+                          label="Distribution Channels: "
+                          name="distribution_channels"
+                          placeholder="e.g., Streaming Services"
                         />
 
                         <ErrorMessage
-                          name="artist_name"
+                          name="distribution_channels"
                           component="span"
                           className={applyErrorStyles}
                         />
@@ -499,12 +498,12 @@ const handleSubmission = async (
                     </span>
                   </div>
                   <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
-                    <button
-                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                    <div
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 text-center"
                       onClick={handleNavigateBack}
                     >
                       Back
-                    </button>
+                    </div>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
