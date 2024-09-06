@@ -37,8 +37,8 @@ router.post('/stripe/webhook',async (req,res,next)=>{
           const paymentMethod = event.data.object;
           console.log({paymentMethod})
           const newInfo = await SyncUser.findOneAndUpdate({stripeCusId : paymentMethod.customer}, {'$set' : {
-                'paymentMethod.last4card_digits' : paymentMethod.card.last4,
-                'paymentMethod.card_brand' : paymentMethod.card.brand
+                'billing.last4card_digits' : paymentMethod.card.last4,
+                'billing.card_brand' : paymentMethod.card.brand
         }},{new : true})
         console.log(newInfo)
           // Then define and call a method to handle the successful attachment of a PaymentMethod.
