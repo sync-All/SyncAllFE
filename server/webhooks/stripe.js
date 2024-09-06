@@ -13,7 +13,7 @@ router.post('/stripe/webhook',async (req,res,next)=>{
             console.log({subscription_updated})
             const syncuserDetails = await SyncUser.findOne({stripeCusId : subscription_updated.customer})
             if(!syncuserDetails.billing || syncuserDetails.billing.subscription_id == subscription_updated.id || (syncuserDetails.billing.prod_id != subscription_updated.plan.product && subscription_updated.status == "active")){
-                if(syncuserDetails.billing.prod_id != subscription_updated.plan.product && subscription_updated.status == "active"){
+                if(syncuserDetails.billing.prod_id != subscription_updated.plan.product && subscription_updated.status == "active" && syncuserDetails.billing.prod_id !== 'prod_QnB1PkDeRHAGSx'){
                     await stripe.subscriptions.cancel(
                         syncuserDetails.billing.subscription_id
                       );
