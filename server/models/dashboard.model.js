@@ -87,7 +87,6 @@ const trackSchema = new Schema({
     featuredArtist : [
         {
             type : String,
-            required : true
         }
     ],
     releaseType : {
