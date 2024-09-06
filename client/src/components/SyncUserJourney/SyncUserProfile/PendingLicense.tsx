@@ -1,4 +1,4 @@
-import { useSyncUser } from '../../../Context/syncUserData';
+import { PendingTracks, useSyncUser } from '../../../Context/syncUserData';
 import ArrowDown from '../../../assets/images/arrowdown.svg';
 import ArrowUp from '../../../assets/images/AddCircle.svg';
 import React, { useState, useMemo } from 'react';
@@ -38,24 +38,24 @@ const PendingLicense = () => {
     key: null,
     direction: 'ascending',
   });
-  const licensedTracks = useMemo(() => {
-    return user?.user?.totalLicensedTracks || [];
+  const pendingTracks = useMemo(() => {
+    return user?.user?.pendingLicensedTracks || [];
   }, [user]);
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
   const sortedData = useMemo(() => {
-    return [...licensedTracks].sort((a, b) => {
+    return [...pendingTracks].sort((a, b) => {
       if (sortConfig.key === null) return 0;
-      const aValue = a[sortConfig.key as keyof TracklistDetails];
-      const bValue = b[sortConfig.key as keyof TracklistDetails];
+      const aValue = a[sortConfig.key as keyof PendingTracks];
+      const bValue = b[sortConfig.key as keyof PendingTracks];
 
       if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
       return 0;
     });
-  }, [licensedTracks, sortConfig]);
+  }, [pendingTracks, sortConfig]);
 
   const handleSort = (key: keyof TracklistDetails) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -66,8 +66,8 @@ const PendingLicense = () => {
   };
 
   return (
-    <div className="">
-      {licensedTracks.length > 0 ? (
+    <div className="mb-20">
+      {pendingTracks.length > 0 ? (
         <table className="w-full mt-5">
           <thead>
             <tr>
@@ -111,21 +111,25 @@ const PendingLicense = () => {
             {sortedData.map((track) => (
               <tr key={track._id}>
                 <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                  {track.trackTitle}
+                  {track.track_name}
                 </td>
-                <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                  {new Date(track.date).toLocaleDateString()}
+                <td className="text-[#667085] font-inter text-[14px] font-medium py-4 leading-5 -4 px-8">
+                  {new Date(track.createdAt).toLocaleDateString()}
                 </td>
                 <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                  {track.status}
+                  {track.license_status}
                 </td>
                 <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                   {track.amount}
                 </td>
 
-                <td className="py-4 px-4">
+                <td className="">
                   <span>
-                    <MusicPlayer trackLink={track.trackLink} />
+                    <MusicPlayer
+                      trackLink={track.trackLink}
+                      songId={track._id}
+                      buttonStyle="w-4 cursor-pointer"
+                    />
                   </span>
                 </td>
               </tr>

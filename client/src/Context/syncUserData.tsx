@@ -8,54 +8,64 @@ import React, {
   useMemo,
 } from 'react';
 
- export interface TracklistDetails {
-    _id: string;
-    trackTitle: string;
-    mainArtist: string;
-    genre: string;
-    mood: string[];
-    releaseDate: string;
-    countryOfRecording: string;
-    countryOfRelease: string;
-    lyrics: string;
-    trackLink: string;
-    artWork: string;
-    audioLang: string;
-    claimBasis: string;
-    claimingUser: string;
-    composers: string[];
-    copyrightName: string;
-    copyrightYear: number;
-    createdAt: string;
-    earnings: number;
-    explicitCont: boolean;
-    featuredArtist: string[];
-    featuredInstrument: string[];
-    isrc: string;
-    percentClaim: number;
-    producers: string[];
-    publishers: string[];
-    recordingDate: string;
-    recordingVersion: string;
-    releaseDesc: string;
-    releaseLabel: string;
-    releaseTitle: string;
-    releaseType: string;
-    role: string;
-    tag: string[];
-    upc: number;
-    updatedAt: string;
-    uploadStatus: string;
-    user: string;
-    writers: string[];
-    duration: string;
-    date: Date;
-    status: string;
-    amount: number;
-  }
+export interface TracklistDetails {
+  _id: string;
+  trackTitle: string;
+  mainArtist: string;
+  genre: string;
+  mood: string[];
+  releaseDate: string;
+  countryOfRecording: string;
+  countryOfRelease: string;
+  lyrics: string;
+  trackLink: string;
+  artWork: string;
+  audioLang: string;
+  claimBasis: string;
+  claimingUser: string;
+  composers: string[];
+  copyrightName: string;
+  copyrightYear: number;
+  createdAt: string;
+  earnings: number;
+  explicitCont: boolean;
+  featuredArtist: string[];
+  featuredInstrument: string[];
+  isrc: string;
+  percentClaim: number;
+  producers: string[];
+  publishers: string[];
+  recordingDate: string;
+  recordingVersion: string;
+  releaseDesc: string;
+  releaseLabel: string;
+  releaseTitle: string;
+  releaseType: string;
+  role: string;
+  tag: string[];
+  upc: number;
+  updatedAt: string;
+  uploadStatus: string;
+  user: string;
+  writers: string[];
+  duration: string;
+  date: Date;
+  status: string;
+  amount: number;
+}
 
-  
-
+export interface PendingTracks {
+  _id: string;
+  track_name: string;
+  license_status: string;
+  amount: string;
+  trackLink: string;
+  quote_id: string;
+  quote_type: string;
+  sync_user_info: string;
+  music_uploader_info: string;
+  createdAt: string;
+}
 
 type UserDetails = {
   _id: string;
@@ -68,6 +78,7 @@ type UserDetails = {
   phoneNumber: string;
   img: string;
   totalLicensedTracks: TracklistDetails[];
+  pendingLicensedTracks: PendingTracks[]
   billing: {
     plan: string;
     amount: number;
@@ -86,14 +97,14 @@ type UserDetails = {
 };
 
 type User = {
-  user: UserDetails; 
+  user: UserDetails;
 };
 
 type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   fetchSyncData: () => void;
-  loading: boolean
+  loading: boolean;
 };
 
 const SyncUserContext = createContext<UserContextType | undefined>(undefined);
@@ -116,12 +127,11 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     try {
-       
       const response = await axios.get(apiUrl, config);
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching sync data:', error);
-    } finally{
+    } finally {
       setLoading(false);
     }
   }, []);
