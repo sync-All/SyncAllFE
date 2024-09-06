@@ -1,20 +1,19 @@
 import { PendingTracks, useSyncUser } from '../../../Context/syncUserData';
 import ArrowDown from '../../../assets/images/arrowdown.svg';
-import ArrowUp from '../../../assets/images/AddCircle.svg';
+import ArrowUp from '../../../assets/images/up-arrow.svg';
 import React, { useState, useMemo } from 'react';
 import MusicPlayer from '../../MusicPlayer';
 import NoPendingLicense from '../../../assets/images/no_track.svg';
-import { TracklistDetails } from '../../../Context/syncUserData';
 
 interface SortConfig {
-  key: keyof TracklistDetails | null;
+  key: keyof PendingTracks | null;
   direction: 'ascending' | 'descending';
 }
 
 const SortButton: React.FC<{
   sortConfig: SortConfig;
-  sortKey: keyof TracklistDetails;
-  onSort: (key: keyof TracklistDetails) => void;
+  sortKey: keyof PendingTracks;
+  onSort: (key: keyof PendingTracks) => void;
 }> = ({ sortConfig, sortKey, onSort }) => (
   <button
     type="button"
@@ -57,7 +56,7 @@ const PendingLicense = () => {
     });
   }, [pendingTracks, sortConfig]);
 
-  const handleSort = (key: keyof TracklistDetails) => {
+  const handleSort = (key: keyof PendingTracks) => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
@@ -75,7 +74,7 @@ const PendingLicense = () => {
                 Track Name{' '}
                 <SortButton
                   sortConfig={sortConfig}
-                  sortKey="trackTitle"
+                  sortKey="track_name"
                   onSort={handleSort}
                 />
               </th>
@@ -83,7 +82,7 @@ const PendingLicense = () => {
                 Request Date{' '}
                 <SortButton
                   sortConfig={sortConfig}
-                  sortKey="date"
+                  sortKey="createdAt"
                   onSort={handleSort}
                 />
               </th>
@@ -91,7 +90,7 @@ const PendingLicense = () => {
                 License Status{' '}
                 <SortButton
                   sortConfig={sortConfig}
-                  sortKey="status"
+                  sortKey="license_status"
                   onSort={handleSort}
                 />
               </th>
