@@ -285,16 +285,22 @@ const Sampling = () => {
                       </span>
                     </span>
                     <span className={applyFormDiv}>
-                      {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <InputField
-                          label="Distribution Channels: "
-                          name="distribution_channels"
-                          placeholder="e.g., Streaming Services"
+                        <label
+                          htmlFor="artist_name"
+                          className={applyLabelStyles}
+                        >
+                          Artist Name:
+                        </label>
+                        <Field
+                          className={applyInputStyles}
+                          name="artist_name"
+                          type="text"
+                          placeholder="Artist of the Original Song"
                         />
 
                         <ErrorMessage
-                          name="distribution_channels"
+                          name="artist_name"
                           component="span"
                           className={applyErrorStyles}
                         />
@@ -309,7 +315,7 @@ const Sampling = () => {
                         <Field
                           name="original_song"
                           type="text"
-                          placeholder="Title and Artist of the Original Song"
+                          placeholder="Title of the Original Song"
                           className={applyInputStyles}
                         />
                         <ErrorMessage
@@ -441,23 +447,15 @@ const Sampling = () => {
                       />
                     </div>
                     <span className={applyFormDiv}>
-                      {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
-                        <label
-                          htmlFor="artist_name"
-                          className={applyLabelStyles}
-                        >
-                          Artist Name:
-                        </label>
-                        <Field
-                          className={applyInputStyles}
-                          name="artist_name"
-                          type="text"
-                          placeholder="Artist names"
+                        <InputField
+                          label="Distribution Channels: "
+                          name="distribution_channels"
+                          placeholder="e.g., Streaming Services"
                         />
 
                         <ErrorMessage
-                          name="artist_name"
+                          name="distribution_channels"
                           component="span"
                           className={applyErrorStyles}
                         />
@@ -498,12 +496,12 @@ const Sampling = () => {
                     </span>
                   </div>
                   <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
-                    <button
-                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                    <div
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 text-center"
                       onClick={handleNavigateBack}
                     >
                       Back
-                    </button>
+                    </div>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"

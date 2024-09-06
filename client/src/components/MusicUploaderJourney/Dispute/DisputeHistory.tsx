@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import DotMenu from '../../../assets/images/threedot.svg';
 import Dot from '../../../assets/images/dot.svg';
 import ArrowDown from '../../../assets/images/arrowdown.svg';
-import ArrowUp from '../../../assets/images/AddCircle.svg';
+import ArrowUp from '../../../assets/images/up-arrow.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import NoDispute from '../../../assets/images/no_dispute.svg';

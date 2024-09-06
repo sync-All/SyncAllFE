@@ -260,27 +260,40 @@ const Pricing = () => {
                 {plan.smallText}
               </small>
             </h2>
-            {
-                plan.name === 'Enterprise' ? (
-                <a className="min-w-full" href="mailto:info@syncallmusic.com">
-                  <div
-                    className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
-                    style={{
-                      backgroundColor: plan.btnBg,
-                      color: plan.pricebtntext,
-                    }}
-                  >
-                    {plan.buttonText}
-                  </div>
-                </a>) :
-              plan.name !== "Basic" && <Link
-              className={clsx("w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6", userPlan == plan.name && paymentInfo?.subscription_status == "active" && "inactive" )}
-              style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext}}
-              to={`/payment/products/${plan.testPriceId}`}
-            >
-              {userPlan == plan.name && paymentInfo?.subscription_status == "active" ? "Active Plan" : plan.buttonText}
-            </Link>
-            }
+            {plan.name === 'Enterprise' ? (
+              <a className="min-w-full" href="mailto:info@syncallmusic.com">
+                <div
+                  className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
+                  style={{
+                    backgroundColor: plan.btnBg,
+                    color: plan.pricebtntext,
+                  }}
+                >
+                  {plan.buttonText}
+                </div>
+              </a>
+            ) : (
+              plan.name !== 'Basic' && (
+                <Link
+                  className={clsx(
+                    'w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6',
+                    userPlan == plan.name &&
+                      paymentInfo?.subscription_status == 'active' &&
+                      'inactive'
+                  )}
+                  style={{
+                    backgroundColor: plan.btnBg,
+                    color: plan.pricebtntext,
+                  }}
+                  to={`/payment/products/${plan.testPriceId}`}
+                >
+                  {userPlan == plan.name &&
+                  paymentInfo?.subscription_status == 'active'
+                    ? 'Active Plan'
+                    : plan.buttonText}
+                </Link>
+              )
+            )}
 
             <hr />
             <ul className="mt-6">
@@ -340,7 +353,7 @@ const Pricing = () => {
                       {plan.name === 'Enterprise' && (
                         <a
                           className="min-w-full"
-                          href="mailto:info@syncallmusic.com"
+                          href="mailto:enterpriserequest@syncallmusic.com"
                         >
                           <div
                             className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"

@@ -4,7 +4,7 @@ import Liked from '../../assets/images/liked.svg';
 
 import Copy from '../../assets/images/copy-link.svg';
 // import AddMusic from '../../assets/images/add-music.svg';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -14,12 +14,10 @@ import useLoading from '../../constants/loading';
 import LoadingAnimation from '../../constants/loading-animation';
 
 const TrackMetadata = () => {
-  
   const track = useSyncUser();
   const { id } = useParams();
   const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
-    const { loading, setLoading } = useLoading();
-
+  const { loading, setLoading } = useLoading();
 
   const [liked, isLiked] = useState(false);
   interface ResponseData {
@@ -81,7 +79,7 @@ const TrackMetadata = () => {
       };
 
       try {
-        setLoading(true)
+        setLoading(true);
         const res = await axios.get(apiUrl, config);
         setTrackDetails(res.data.details);
       } catch (error: unknown) {
@@ -93,13 +91,12 @@ const TrackMetadata = () => {
           ).toString()
         );
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     };
     fetchTrackDetails();
   }, [id, setLoading]);
 
-  
   useEffect(() => {
     const trackAdded = track.user?.user.tracklist || [];
     const isIdPresent = trackAdded.some((track) => track._id === id);
@@ -135,10 +132,14 @@ const TrackMetadata = () => {
     }
   };
 
-if(loading) {
-  return <LoadingAnimation/>;
-}
+   const handleCopyLink = (id: string) => {
+     navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+     toast.success('Link copied to clipboard');
+   };
 
+  if (loading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div>
@@ -168,15 +169,26 @@ if(loading) {
                 onClick={handleLikes}
               />
               {/* <img src={AddMusic} alt="" /> */}
-              <img src={Copy} alt="" className="cursor-pointer" />
-              <a href="/quote/">
-                <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
+              <img
+                src={Copy}
+                alt=""
+                className="cursor-pointer"
+                onClick={() => handleCopyLink(trackDetails?._id ?? '')}
+              />
+              <Link to={`/quote/${trackDetails?._id}`}>
+                <button className="w-fit  text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-[100px]">
                   Get Quote
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
-          <MusicPlayer trackLink={trackDetails?.trackLink} songId={trackDetails?._id} />
+          <div className="mt-20">
+            <MusicPlayer
+              trackLink={trackDetails?.trackLink}
+              songId={trackDetails?._id}
+            />
+          </div>
+
           <div className="mt-[93px] mb-[163px]">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
               Track Details
