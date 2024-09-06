@@ -444,12 +444,12 @@ const TvCommercialAds = () => {
                     </div>
                   </div>
                   <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
-                    <button
-                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5"
+                    <div
+                      className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 text-center"
                       onClick={handleNavigateBack}
                     >
                       Back
-                    </button>
+                    </div>
                     <button
                       type="submit"
                       className="w-[176px] px-4 py-2.5 border border-yellow rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 bg-yellow"
