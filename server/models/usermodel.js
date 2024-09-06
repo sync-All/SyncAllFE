@@ -154,7 +154,7 @@ const syncUserSchema = new Schema({
             ref : "track_license",
             default : [0]
         }
-    ]
+    ],
     recentActivity  : [
         {
             type : Schema.Types.ObjectId,
