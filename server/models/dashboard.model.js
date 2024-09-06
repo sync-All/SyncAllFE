@@ -263,7 +263,7 @@ const trackLicenseSchema = new Schema({
     },
     license_status : {
         type : String,
-        enum : ['pending, approved, expired, rejected'],
+        enum : ['pending', 'approved', 'expired', 'rejected'],
         default : 'pending',
         required : true
     },

@@ -355,6 +355,7 @@ router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false,
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
+            console.log(error)
             throw new BadRequestError('Invalid Request, try again later')
         }
     }else{
