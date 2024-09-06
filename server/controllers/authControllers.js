@@ -169,7 +169,7 @@ const allUsers = async (req,res,next) =>{
 
 const getsyncuserinfo = async (req,res,next)=>{
   const userId = req.user._id
-  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").populate('totalLicensedTracks').select('-password').exec()
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").populate('pendingLicensedTracks').select('-password').exec()
   res.send({user : details, success : true})
 }
 
