@@ -49,7 +49,7 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
@@ -66,7 +66,7 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -109,7 +109,7 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
@@ -126,7 +126,7 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -177,7 +177,7 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else{
@@ -194,7 +194,7 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -237,7 +237,7 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
@@ -255,7 +255,7 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -299,7 +299,7 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
@@ -316,7 +316,7 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }
@@ -351,7 +351,7 @@ router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false,
                     music_uploader_info : trackDetails.user
                 })
                 const newGeneratedLicense = await license.save()
-                await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                 res.send('Request Sent Successfully')
             })
         } catch (error) {
@@ -393,7 +393,7 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }else {
@@ -410,7 +410,7 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
                         music_uploader_info : trackDetails.user
                     })
                     const newGeneratedLicense = await license.save()
-                    await syncUser.findOneAndUpdate({_id : userId},{$push : {totalLicensedTracks : newGeneratedLicense._id}})
+                    await syncUser.findOneAndUpdate({_id : userId},{$push : {pendingLicensedTracks : newGeneratedLicense._id}})
                     res.send('Request Sent Successfully')
                 })
             }

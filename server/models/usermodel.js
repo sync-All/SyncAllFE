@@ -144,10 +144,17 @@ const syncUserSchema = new Schema({
     totalLicensedTracks : [
         {
             type : Schema.Types.ObjectId,
-            ref : "track_license",
+            ref : "track",
             default : [0]
         }
     ],
+    pendingLicensedTracks : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "track_license",
+            default : [0]
+        }
+    ]
     recentActivity  : [
         {
             type : Schema.Types.ObjectId,
