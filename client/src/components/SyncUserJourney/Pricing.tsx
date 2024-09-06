@@ -6,8 +6,30 @@ import WhiteCheck from '../../assets/images/white-check.svg';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
 import { Link } from 'react-router-dom';
+import { useSyncUser } from '../../Context/syncUserData';
+import { useEffect, useState } from 'react';
+import clsx from 'clsx';
 
 const Pricing = () => {
+  const { user } = useSyncUser();
+  const paymentInfo = user?.user?.billing
+  const [userPlan, setUserPlan] = useState('')
+
+  useEffect(()=>{
+    console.log(user)
+    switch(paymentInfo?.prod_id){
+      case "prod_QgrvvxGRYPiP7a":
+        setUserPlan("Premium")
+        break;
+      case "prod_QUeQtqvvQsy9X8":
+        setUserPlan('Standard')
+        break;
+      default:
+        setUserPlan('Basic')
+
+    }
+  },[user,paymentInfo])
+
   const pricingPlans = [
     {
       name: 'Basic',
@@ -238,20 +260,8 @@ const Pricing = () => {
                 {plan.smallText}
               </small>
             </h2>
-            <div className="w-full my-6 flex justify-center items-center">
-              {plan.name !== 'Basic' && plan.name !== 'Enterprise' && (
-                <Link
-                  className="min-w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] text-center "
-                  style={{
-                    backgroundColor: plan.btnBg,
-                    color: plan.pricebtntext,
-                  }}
-                  to={`/payment/products/${plan.testPriceId}`}
-                >
-                  {plan.buttonText}
-                </Link>
-              )}
-              {plan.name === 'Enterprise' && (
+            {
+                plan.name === 'Enterprise' ? (
                 <a className="min-w-full" href="mailto:info@syncallmusic.com">
                   <div
                     className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
@@ -262,9 +272,15 @@ const Pricing = () => {
                   >
                     {plan.buttonText}
                   </div>
-                </a>
-              )}
-            </div>
+                </a>) :
+              plan.name !== "Basic" && <Link
+              className={clsx("w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6", userPlan == plan.name && paymentInfo?.subscription_status == "active" && "inactive" )}
+              style={{ backgroundColor: plan.btnBg, color: plan.pricebtntext}}
+              to={`/payment/products/${plan.testPriceId}`}
+            >
+              {userPlan == plan.name && paymentInfo?.subscription_status == "active" ? "Active Plan" : plan.buttonText}
+            </Link>
+            }
 
             <hr />
             <ul className="mt-6">

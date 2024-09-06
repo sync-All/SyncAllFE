@@ -62,7 +62,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/',(req,res,next)=>{
-  res.render('quoteRequest', {title : "Your Quote request", user : {name : "tunes"}})
+  res.render('confirmEmail',{link : "rverververve"})
 })
 
 app.use('/', waitlistRouter)

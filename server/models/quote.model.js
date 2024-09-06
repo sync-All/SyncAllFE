@@ -66,10 +66,6 @@ const fmtSchema = new Schema({
             required : true
         }
     ],
-    license : {
-        type : String,
-        required : true
-    },
     media : [
         {
             type : String,
@@ -432,7 +428,7 @@ const interpolationSchema = new Schema({
     ],
     role_type : {
         type : String,
-        enum : ['Sampling'],
+        enum : ['Interpolation'],
         required : true
     },
     track_info : {

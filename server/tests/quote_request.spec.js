@@ -132,4 +132,31 @@ describe('Sync User quote request',()=>{
             .expect(200)
         })
     })
+    describe("TVA quote request", ()=>{
+        it('Should pass if track id is valid', async()=>{
+            const request_data = {
+                product : "Farm Fresh",
+                theme : 'ladi',
+                length : "10 seconds",
+                production_budget : "10 pounds",
+                air_date: 'lade',
+                networks : ["Original - Remix"],
+                duration_of_music_usage : "Dee Tunes",
+                intended_usage : "10:30 - 12:30",
+                territories: ["Lavida", "Innoca"],
+                license_duration : "Yearly",
+                media : "format",
+                additional_info : "N/A",
+                role_type :  "Sampling",
+                track_info : "66820c52480c119fa3c5f542",
+    
+            }
+             await request(app)
+            .post('/api/v1/quote-request/tva')
+            .set("Authorization", `${accesstoken}`)
+            .attach('attachments',  attachment_path)
+            .field(request_data)
+            .expect(200)
+        })
+    })
 })

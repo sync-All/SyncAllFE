@@ -189,3 +189,7 @@ input::-webkit-inner-spin-button {
 .has-tooltip:hover .tooltip {
   @apply visible z-50;
 }
+
+.inactive {
+  pointer-events: none;
+}
