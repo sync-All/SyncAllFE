@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const stripe = require('stripe')(process.env.STRIPE_TESTSECRET_KEY)
 const SyncUser = require('../models/usermodel').syncUser
 router.post('/stripe/webhook',async (req,res,next)=>{
     const event = req.body

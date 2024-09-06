@@ -63,9 +63,12 @@ const PlansBillings = () => {
         </p>
         <div className=" flex items-center justify-between p-8 bg-[#F9FAFB] rounded-[20px] mt-4">
           <span className="flex gap-[11px] items-center">
-            <img src={Visa} alt="" />
+            {
+              paymentInfo.card_brand == 'visa' &&
+              <img src={Visa} alt="" />
+            }
             <p className="text-[#010516] text-[16px] font-Utile-medium leading-[24px] ">
-              N/A
+              {`**** **** **** ${paymentInfo?.last4card_digits}`}
             </p>
           </span>
 
