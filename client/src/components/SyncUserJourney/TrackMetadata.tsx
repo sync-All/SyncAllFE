@@ -4,7 +4,7 @@ import Liked from '../../assets/images/liked.svg';
 
 import Copy from '../../assets/images/copy-link.svg';
 // import AddMusic from '../../assets/images/add-music.svg';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -132,6 +132,11 @@ const TrackMetadata = () => {
     }
   };
 
+   const handleCopyLink = (id: string) => {
+     navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+     toast.success('Link copied to clipboard');
+   };
+
   if (loading) {
     return <LoadingAnimation />;
   }
@@ -164,12 +169,17 @@ const TrackMetadata = () => {
                 onClick={handleLikes}
               />
               {/* <img src={AddMusic} alt="" /> */}
-              <img src={Copy} alt="" className="cursor-pointer" />
-              <a href="/quote/">
-                <button className="w-fit lg:min-w-fit text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-full">
+              <img
+                src={Copy}
+                alt=""
+                className="cursor-pointer"
+                onClick={() => handleCopyLink(trackDetails?._id ?? '')}
+              />
+              <Link to={`/quote/${trackDetails?._id}`}>
+                <button className="w-fit  text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] lg:w-[100px]">
                   Get Quote
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
           <div className="mt-20">
