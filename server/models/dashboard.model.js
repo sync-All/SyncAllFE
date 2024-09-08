@@ -107,7 +107,7 @@ const trackSchema = new Schema({
     },
     upc : {
         type : Number,
-        required : true
+        // required : true
     },
     isrc : {
         type : String,
@@ -115,117 +115,117 @@ const trackSchema = new Schema({
     },
     genre : {
         type : String,
-        required : true
+        // required : true
     },
     artWork : {
         type : String,
-        required : true
+        // required : true
     },
     recordingVersion : {
         type : String,
-        required : true
+        // required : true
     },
     featuredInstrument : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     producers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     recordingDate : {
         type : Date,
-        required : true
+        // required : true
     },
     countryOfRecording : {
         type : String,
-        required : true
+        // required : true
     },
     writers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     composers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     publishers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     claimBasis :  {
         type : String,
-        required : true
+        // required : true
     },
     claimingUser : {
         type : String,
-        required : true
+        // required : true
     },
     role : {
         type : String,
-        required : true
+        // required : true
     },
     percentClaim : {
         type : Number,
-        required : true
+        // required : true
     },
     copyrightName : {
         type : String,
-        required : true
+        // required : true
     },
     copyrightYear : {
         type : Number,
-        required : true
+        // required : true
     },
     releaseDate : {
         type : Date,
-        required : true
+        // required : true
     },
     countryOfRelease : {
         type : String,
-        required : true
+        // required : true
     },
     mood : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     tag : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     lyrics : {
         type : String,
-        required : true
+        // required : true
     },
     audioLang : {
         type : String,
-        required : true
+        // required : true
     },
     explicitCont : {
         type : Boolean,
-        required : true
+        // required : true
     },
     releaseLabel : {
         type : String,
-        required : true
+        // required : true
     },
     releaseDesc : {
         type : String,
-        required : true
+        // required : true
     },
     uploadStatus : {
         type : String,
@@ -244,7 +244,7 @@ const trackSchema = new Schema({
     ],
     spotifyLink : {
         type : String,
-        required : true
+        // required : true
     },
     duration : {
         type : String,
