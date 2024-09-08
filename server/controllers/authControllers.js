@@ -7,6 +7,7 @@ const SyncUser = require('../models/usermodel').syncUser;
 const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
 const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
+const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
 const fs = require('node:fs')
 require('dotenv').config()
@@ -176,6 +177,7 @@ const getsyncuserinfo = async (req,res,next)=>{
 const profilesetup = async (req, res, next) => {
   if (req.isAuthenticated) {
     const { fullName, spotifyLink, bio } = req.body;
+    await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     if (!fullName || !spotifyLink || !bio) {
       res
         .status(401)
@@ -197,7 +199,7 @@ const profilesetup = async (req, res, next) => {
           profileUpdate,
         });
     }
-  } else {
+  }else {
     res.status(401).json({
         success: false,
         message: 'Unauthorized, Please proceed to login',

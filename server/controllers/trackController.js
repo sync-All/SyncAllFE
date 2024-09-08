@@ -2,7 +2,7 @@ const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/dashboard.model").track
 const cloudinary = require("cloudinary").v2
 const { BadRequestError } = require("../utils/CustomError")
-const grabSpotifyPreview = require('../utils/grabSpotifyPreview')
+const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
 require('dotenv').config()
 
@@ -10,7 +10,7 @@ require('dotenv').config()
 
 const verifyTrackUpload = async(req,res,next)=>{
   const trackLink = req.query.trackLink
-  let response = await grabSpotifyPreview(res, trackLink)
+  let response = await spotifyCheck.SpotifyPreview(res, trackLink)
   const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
   if(confirmTrackUploaded){
       res.status(401).json('Track already exists')
@@ -22,7 +22,7 @@ const verifyTrackUpload = async(req,res,next)=>{
 const trackUpload = async(req,res,next)=>{
   if(req.user.role == "Music Uploader"){
     const {trackLink} = req.body
-    let response = await grabSpotifyPreview(res, trackLink)
+    let response = await spotifyCheck.SpotifyPreview(res, trackLink)
     const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
     if(confirmTrackUploaded){
         res.status(401).json('Track already exists')
