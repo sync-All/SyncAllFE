@@ -36,7 +36,7 @@ const userSchema = new Schema({
     phoneNumber :{
         type : String
     },
-    fullName : {
+    username : {
         type : String,
     },
     spotifyLink : {

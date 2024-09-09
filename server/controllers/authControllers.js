@@ -175,7 +175,7 @@ const getsyncuserinfo = async (req,res,next)=>{
 }
 
 const profilesetup = async (req, res, next) => {
-  if (req.isAuthenticated) {
+  if (req.isAuthenticated()) {
     const {username, spotifyLink, bio} = req.body;
     await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     if (!username || !spotifyLink || !bio) {
@@ -186,18 +186,17 @@ const profilesetup = async (req, res, next) => {
           message: 'Missing field please check and confirm',
         });
     } else {
-      const userId = req.user.userId;
-      const profileUpdate = await User.findByIdAndUpdate(
-        userId,
-        { username, spotifyLink, bio },
-        { new: true }
-      );
-
-      res.status(200).json({
-          success: true,
-          message: 'Profile update successful',
-          profileUpdate,
+      const userId = req.user._id;
+      try {
+        await User.findByIdAndUpdate(userId,req.body,{ new: true });
+        res.status(200).json({
+            success: true,
+            message: 'Profile update successful',
         });
+      } catch (error) {
+        console.log(error)
+        res.send(error)
+      }
     }
   }else {
     res.status(401).json({
@@ -217,12 +216,12 @@ const profileUpdate = async (req,res,next)=>{
   if(req.user.role == "Music Uploader"){
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
-      const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
       fs.unlinkSync(req.file.path)
-      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      res.status(200).json({success : true, message : 'Profile update successful'})
     }else{
-      const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
-      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      res.status(200).json({success : true, message : 'Profile update successful'})
     }
   }
   else if(req.user.role == "Sync User")
