@@ -209,9 +209,9 @@ const profilesetup = async (req, res, next) => {
 
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
-  if(req.body.email){
-    return res.status(401).send('unauthorized buddy, unable to make change')
-  }
+  // if(req.body.email){
+  //   return res.status(401).send('unauthorized buddy, unable to make change')
+  // }
   if(req.user.role == "Music Uploader"){
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
