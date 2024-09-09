@@ -36,9 +36,6 @@ const SetNewPassword = () => {
  const queryParams = new URLSearchParams(location.search);
  const token = queryParams.get('token');
 
-//  console.log(token);
-// console.log(token);
-
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -55,7 +52,7 @@ const SetNewPassword = () => {
        },
      };
 
-     console.log(config);
+     
     try {
       await delay(2000);
       const response = await axios.post(apiUrl, values, config);

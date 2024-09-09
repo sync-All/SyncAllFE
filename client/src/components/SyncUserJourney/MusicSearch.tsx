@@ -67,7 +67,7 @@ const MusicSearch = () => {
         try {
           const res = await axios.get(apiUrl, config);
           setResults(res.data.allTracks);
-          console.log(res.data.allTracks);
+          
         } catch (error) {
           const axiosError = error as AxiosError<ResponseData>;
 

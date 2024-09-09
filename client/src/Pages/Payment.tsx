@@ -30,7 +30,6 @@ const Payment = () => {
       clientSecret: clientSec,
       theme : 'stripe'
     };
-    console.log(options)
   return (
     <>
       {

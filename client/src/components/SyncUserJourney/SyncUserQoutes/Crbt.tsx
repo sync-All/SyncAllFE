@@ -212,7 +212,7 @@ const Crbt = () => {
                         <InputField
                           label="Distribution: "
                           name="distribution"
-                          placeholder="e.g., Streaming Services"
+                          placeholder="e.g., Mobile Carrier’s Network Website, App"
                         />
 
                         <ErrorMessage

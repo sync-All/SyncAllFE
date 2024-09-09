@@ -33,7 +33,7 @@ interface FormData {
   role: string;
   percentClaim: number;
   copyrightName: string;
-  copyrightYear: number;
+  copyrightYear: number | null;
   releaseDate: Date;
   countryOfRelease: string;
   mood: string[];
@@ -73,7 +73,7 @@ const initialFormData: FormData = {
   role: '',
   percentClaim: 0,
   copyrightName: '',
-  copyrightYear: 0,
+  copyrightYear: null,
   releaseDate: new Date(),
   countryOfRelease: '',
   mood: [],
@@ -96,47 +96,38 @@ const validationSchema = Yup.object().shape({
   isrc: Yup.string().required('Required'),
   genre: Yup.string().required('Required'),
   artWork: Yup.mixed().required('A file is required'),
-  recordingVersion: Yup.string().required('Required'),
-  featuredInstrument: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one featured instrument is required'),
-  producers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one producers is required'),
-  recordingDate: Yup.date().required('Required'),
-  countryOfRecording: Yup.string().required('Required'),
-  writers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one writers is required'),
-  composers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one composers is required'),
-  publishers: Yup.array()
-    .of(Yup.string())
-    .min(1, 'At least one publishers is required'),
-  claimBasis: Yup.string().required('Required'),
-  claimingUser: Yup.string().required('Required'),
-  role: Yup.string().required('Required'),
-  percentClaim: Yup.number().min(0).max(100).required('Required'),
-  copyrightName: Yup.string().required('Required'),
+  recordingVersion: Yup.string(),
+  featuredInstrument: Yup.array().of(Yup.string()),
+  producers: Yup.array().of(Yup.string()),
+  recordingDate: Yup.date(),
+  countryOfRecording: Yup.string(),
+  writers: Yup.array().of(Yup.string()),
+  composers: Yup.array().of(Yup.string()),
+  publishers: Yup.array().of(Yup.string()),
+  claimBasis: Yup.string(),
+  claimingUser: Yup.string(),
+  role: Yup.string(),
+  percentClaim: Yup.number().min(0).max(100),
+  copyrightName: Yup.string(),
   copyrightYear: Yup.number()
-    .required('Required')
+    .nullable()
+    .notRequired()
     .positive()
     .integer()
     .test(
       'len',
       'Must be exactly 4 digits',
-      (val) => val.toString().length === 4
+      (val) => (val ?? 0).toString().length === 4 || val === null
     ),
-  releaseDate: Yup.date().required('Required'),
-  countryOfRelease: Yup.string().required('Required'),
-  mood: Yup.array().of(Yup.string()).min(1, 'At least one mood is required'),
-  tag: Yup.array().of(Yup.string()).min(1, 'At least one tag is required'),
-  lyrics: Yup.string().required('Required'),
-  audioLang: Yup.string().required('Required'),
-  explicitCont: Yup.boolean().required('Required'),
-  releaseLabel: Yup.string().required('Required'),
-  releaseDesc: Yup.string().required('Required'),
+  releaseDate: Yup.date(),
+  countryOfRelease: Yup.string(),
+  mood: Yup.array().of(Yup.string()),
+  tag: Yup.array().of(Yup.string()),
+  lyrics: Yup.string(),
+  audioLang: Yup.string(),
+  explicitCont: Yup.boolean(),
+  releaseLabel: Yup.string(),
+  releaseDesc: Yup.string(),
 });
 
 const UploadTrackMultiForm: React.FC = () => {
@@ -292,7 +283,7 @@ const UploadTrackMultiForm: React.FC = () => {
               toast.success('Track Uploaded Successfully');
               refreshPage()
             } catch (error: unknown) {
-              console.log(error)
+             
               const axiosError = error as AxiosError<ResponseData>;
 
                toast.error(

@@ -3,9 +3,9 @@ import { Field, ErrorMessage } from 'formik';
 import Attach from '../../../assets/images/attachimage.svg';
 import InputField from '../../InputField';
 import { useFormikContext } from 'formik';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import IsrcError from './IsrcError';
-import { genres } from '../../../constants/genre';// import { toast } from 'react-toastify';
+import { genres } from '../../../constants/genre'; // import { toast } from 'react-toastify';
 
 const applyInputStyles =
   'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
@@ -34,6 +34,10 @@ const MinimumRecordingInfo: React.FC = () => {
     }
   };
 
+  interface ResponseData {
+    message?: string;
+  }
+
   const verifyTrackLink = async (trackLink: string) => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -44,12 +48,18 @@ const MinimumRecordingInfo: React.FC = () => {
       },
     };
     try {
-      const response = await axios.get(apiUrl, config);
-      setFieldValue('isrc', response.data.isrc);
+      const res = await axios.get(apiUrl, config);
+      setFieldValue('isrc', res.data.isrc);
 
       setIsrcValidationMessage('');
-    } catch (error) {
-      setIsrcValidationMessage('Failed to fetch ISRC, invalid track link');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      const errorMessage = (
+        axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+      ).toString();
+      setIsrcValidationMessage(errorMessage);
       setFieldValue('isrc', '');
     }
   };
@@ -57,7 +67,7 @@ const MinimumRecordingInfo: React.FC = () => {
   const handleTrackLink = (e: React.FocusEvent<HTMLInputElement>) => {
     const trackLink = e.target.value;
     if (trackLink) {
-      verifyTrackLink(trackLink)
+      verifyTrackLink(trackLink);
     }
   };
 
@@ -189,7 +199,7 @@ const MinimumRecordingInfo: React.FC = () => {
             Genre
           </label>
           <Field as="select" name="genre" className={applyInputStyles}>
-            <option value="">Select a country</option>
+            <option value="">Select genre</option>
             {genres.map((genre) => (
               <option key={genre} value={genre}>
                 {genre}

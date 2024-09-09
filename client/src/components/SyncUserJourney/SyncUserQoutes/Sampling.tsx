@@ -226,7 +226,7 @@ const Sampling = () => {
                         <Field
                           name="project_title"
                           type="text"
-                          placeholder="Title of the Film/Movie/TV Series"
+                          placeholder="Title of the Project (e.g., Song, Album)"
                           className={applyInputStyles}
                         />
                         <ErrorMessage
@@ -239,7 +239,7 @@ const Sampling = () => {
                         <InputField
                           label="Genre:"
                           name="genre"
-                          placeholder="e.g., Drama, Comedy, Action"
+                          placeholder="Genre of the Project (e.g., Hip Hop)"
                         />
 
                         <ErrorMessage
@@ -398,7 +398,7 @@ const Sampling = () => {
                         <InputField
                           label="Media Formats:"
                           name="media_formats"
-                          placeholder="e.g., Video Game, Digital"
+                          placeholder="e.g., Digital, Physical"
                         />
 
                         <ErrorMessage
@@ -451,7 +451,7 @@ const Sampling = () => {
                         <InputField
                           label="Distribution Channels: "
                           name="distribution_channels"
-                          placeholder="e.g., Streaming Services"
+                          placeholder="e.g., Streaming Services, Physical Copies"
                         />
 
                         <ErrorMessage

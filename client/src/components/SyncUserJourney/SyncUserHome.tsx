@@ -121,9 +121,6 @@ const SyncUserHome = () => {
         setTracksLoading(true);
         const res = await axios.get(apiUrl, config);
         setMusicDetails(res.data.allTracks);
-        console.log(res.data.allTracks);
-        const allTracks: TrackDetails[] = res.data.allTracks;
-        console.log(allTracks);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
 
@@ -148,9 +145,9 @@ const SyncUserHome = () => {
     return <LoadingAnimation />;
   }
 
-  if (!musicDetails || musicDetails.length === 0) {
-    return <p>No Track available.</p>;
-  }
+  // if (!musicDetails || musicDetails.length === 0) {
+  //   return <p>No Track available.</p>;
+  // }
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -184,85 +181,89 @@ const SyncUserHome = () => {
           <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
             Browse Songs
           </h3>
+          <section>
+            {musicDetails && musicDetails.length > 0 ? (
+              <div className="hidden flex-col gap-[56px] lg:flex">
+                {musicDetails.map((detail, index) => (
+                  <div key={index} className="flex items-center w-full">
+                    <Link
+                      to={`/metadata/${detail?._id}`}
+                      className="flex gap-3 w-[25%]"
+                    >
+                      <img
+                        src={detail?.artWork}
+                        alt=""
+                        className="h-[50px] w-[50px] object-cover"
+                      />
+                      <span>
+                        <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
+                          {detail.trackTitle}
+                        </h4>
+                        <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
+                          {detail.mainArtist}
+                        </p>
+                      </span>
+                    </Link>
 
-          <div className=" hidden flex-col gap-[56px] lg:flex">
-            {musicDetails.map((detail, index) => (
-              <div key={index} className="flex items-center w-full ">
-                <Link
-                  to={`/metadata/${detail?._id}`}
-                  className="flex gap-3 w-[25%]"
-                >
-                  <img
-                    src={detail?.artWork}
-                    alt=""
-                    className="h-[50px] w-[50px] object-cover"
-                  />
-                  <span>
-                    <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                      {detail.trackTitle}
-                    </h4>
-                    <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                      {detail.mainArtist}
-                    </p>
-                  </span>
-                </Link>
-
-                <MusicPlayer
-                  trackLink={detail.trackLink}
-                  songId={detail._id}
-                  duration={10}
-                  containerStyle="mt-0 flex items-center gap-3"
-                  buttonStyle="w-4 cursor-pointer"
-                  waveStyle="w-[300px]"
-                />
-                <span className="flex gap-12 w-[25%] items-start ml-[5%]">
-                  <span className="w-[50%]">
-                    <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                      {detail.duration || '3 minutes, 33 seconds'}
-                    </p>
-                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px] truncate max-w-16">
-                      {truncateText(detail.writers || 'N/A', 5)}
-                    </p>
-                  </span>
-                  <span className="w-[50%]">
-                    <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                      {detail.genre}
-                    </p>
-                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                      {detail.mood}
-                    </p>
-                  </span>
-                </span>
-                <span className="flex gap-6 w-[10%] justify-center">
-                  <img
-                    src={likedTrack[detail._id] ? Liked : Favorite}
-                    alt=""
-                    onClick={() => handleLikes(detail._id)}
-                    className="cursor-pointer"
-                  />
-                  {/* <img src={AddMusic} alt="" /> */}
-                  <img
-                    src={Copy}
-                    onClick={() => handleCopyLink(detail._id)}
-                    alt=""
-                    className="cursor-pointer"
-                  />
-                </span>
-                <span className="gap-[12px] flex w-[25%] justify-center">
-                  <Link to={`/metadata/${detail?._id}`}>
-                    <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                      View More
-                    </button>
-                  </Link>
-                  <Link to={`/quote/${detail._id}`}>
-                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                      Get Quote
-                    </button>
-                  </Link>
-                </span>
+                    <MusicPlayer
+                      trackLink={detail.trackLink}
+                      songId={detail._id}
+                      duration={10}
+                      containerStyle="mt-0 flex items-center gap-3"
+                      buttonStyle="w-4 cursor-pointer"
+                      waveStyle="w-[300px]"
+                    />
+                    <span className="flex gap-12 w-[25%] items-start ml-[5%]">
+                      <span className="w-[50%]">
+                        <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
+                          {detail.duration || '3 minutes, 33 seconds'}
+                        </p>
+                        <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px] truncate max-w-16">
+                          {truncateText(detail.writers || 'N/A', 5)}
+                        </p>
+                      </span>
+                      <span className="w-[50%]">
+                        <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
+                          {detail.genre}
+                        </p>
+                        <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
+                          {detail.mood}
+                        </p>
+                      </span>
+                    </span>
+                    <span className="flex gap-6 w-[10%] justify-center">
+                      <img
+                        src={likedTrack[detail._id] ? Liked : Favorite}
+                        alt=""
+                        onClick={() => handleLikes(detail._id)}
+                        className="cursor-pointer"
+                      />
+                      <img
+                        src={Copy}
+                        onClick={() => handleCopyLink(detail._id)}
+                        alt=""
+                        className="cursor-pointer"
+                      />
+                    </span>
+                    <span className="gap-[12px] flex w-[25%] justify-center">
+                      <Link to={`/metadata/${detail?._id}`}>
+                        <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                          View More
+                        </button>
+                      </Link>
+                      <Link to={`/quote/${detail._id}`}>
+                        <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                          Get Quote
+                        </button>
+                      </Link>
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            ) : (
+              <p className='text-center'>No Track available.</p>
+            )}
+          </section>
 
           {/* Mobile */}
           <div className="lg:hidden flex flex-col gap-6">

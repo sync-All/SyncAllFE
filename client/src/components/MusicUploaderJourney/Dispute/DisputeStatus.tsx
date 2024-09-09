@@ -77,7 +77,6 @@ const DisputeStatus = () => {
 
     try {
       const response = await axios.get<ResponseData>(apiUrl, config);
-      console.log(response);
       setDisputes(response.data.message);
       localStorage.setItem(CACHE_KEY, JSON.stringify(response.data.message));
       localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());

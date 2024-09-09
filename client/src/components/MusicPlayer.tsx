@@ -31,7 +31,6 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
     else{
       if(songId){
         values?.setCurrentPlayingTrackId(songId)
-        console.log('a song wasnt playing and your song is playing now')
       }
     }
     setIsPlaying( !isPlaying);
@@ -56,7 +55,6 @@ const MusicPlayer:React.FC<PlayerProps>= ({trackLink, containerStyle, buttonStyl
   });
 
   useEffect(()=>{
-    console.log(trackLink)
     if(waveformRef.current){
       const options = formWaveSurferOptions(waveformRef.current)
         wavesurfer.current = WaveSurfer.create(options);

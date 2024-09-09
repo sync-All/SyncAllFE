@@ -1,7 +1,7 @@
 import Background from '../../assets/images/user-homepage-head.png';
 import Favorite from '../../assets/images/favorite.svg';
 import Liked from '../../assets/images/liked.svg';
-
+import Arrowdown from '../../assets/images/arrow-down.svg';
 import Copy from '../../assets/images/copy-link.svg';
 // import AddMusic from '../../assets/images/add-music.svg';
 import { Link, useParams } from 'react-router-dom';
@@ -18,11 +18,16 @@ const TrackMetadata = () => {
   const { id } = useParams();
   const [trackDetails, setTrackDetails] = useState<TrackDetails | null>(null);
   const { loading, setLoading } = useLoading();
+  const [isVisible, setIsVisible] = useState(false);
 
   const [liked, isLiked] = useState(false);
   interface ResponseData {
     message?: string;
   }
+
+  const handleViewMore = () => {
+    setIsVisible(true);
+  };
 
   interface TrackDetails {
     _id: string;
@@ -132,10 +137,10 @@ const TrackMetadata = () => {
     }
   };
 
-   const handleCopyLink = (id: string) => {
-     navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
-     toast.success('Link copied to clipboard');
-   };
+  const handleCopyLink = (id: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+    toast.success('Link copied to clipboard');
+  };
 
   if (loading) {
     return <LoadingAnimation />;
@@ -205,7 +210,7 @@ const TrackMetadata = () => {
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Duration</p>
                   <p className="text-[#475367]">{trackDetails?.duration}</p>
-                </span>{' '}
+                </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Composed by</p>
                   <p className="text-[#475367]">
@@ -263,6 +268,100 @@ const TrackMetadata = () => {
                 </span>
               </div>
             </div>
+
+            {!isVisible && (
+              <div className="flex justify-center mt-6">
+                <button
+                  className="text-[14px] font-Utile-bold text-[#475367] cursor-pointer bg-slate-200 rounded-xl py-1 px-2.5 flex gap-2 items-center"
+                  onClick={handleViewMore}
+                >
+                  View More <img src={Arrowdown} alt="" />
+                </button>
+              </div>
+            )}
+
+            {isVisible && (
+              <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
+                <div className="flex flex-col gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Recording Date</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.recordingDate === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.recordingDate.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.recordingDate && new Date(trackDetails.recordingDate).toLocaleDateString()}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Reacordng Version</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.recordingVersion === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.recordingVersion.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.recordingVersion}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Composed by</p>
+                    <p className="text-[#475367]">
+                      {Array.isArray(trackDetails?.composers)
+                        ? trackDetails.composers.join(', ')
+                        : 'Subscribe to see this info'}
+                    </p>
+                  </span>
+                </div>
+                <div className="flex flex-col justify-between gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Mood</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.mood.join(', ') || 'N/A'}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Release date</p>
+                    <p className="text-[#475367]">
+                      {new Date(
+                        trackDetails?.releaseDate ?? ''
+                      ).toLocaleDateString() || 'N/A'}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Release Label</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.releaseLabel ||
+                        'Subscribe to see this info'}
+                    </p>
+                  </span>
+                </div>
+                <div className="flex  flex-col justify-between gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Produced by</p>
+                    <p className="text-[#475367]">
+                      {Array.isArray(trackDetails?.producers)
+                        ? trackDetails.producers.join(', ')
+                        : ''}
+                    </p>
+                  </span>
+
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Writer</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.writers || 'Subscribe to see this info'}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Featured Instrument</p>
+                    <p className="text-[#475367]">
+                      {Array.isArray(trackDetails?.featuredInstrument)
+                        ? trackDetails.featuredInstrument.join(', ')
+                        : 'Subscribe to see this info'}
+                    </p>
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
