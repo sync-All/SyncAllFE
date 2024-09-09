@@ -18,7 +18,7 @@ router.post('/api/v1/signin',asynchandler(authcontroller.signin))
 
 router.get('/api/v1/allusers', asynchandler(authcontroller.allUsers));
 router.get('/api/v1/getsyncuserinfo',passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(authcontroller.getsyncuserinfo))
-router.post('/api/v1/profilesetup', asynchandler(authcontroller.profilesetup));
+router.post('/api/v1/profilesetup', passport.authenticate('jwt',{session : false,failureRedirect : '/unauthorized'}), asynchandler(authcontroller.profilesetup));
 
 router.post('/api/v1/profileupdate',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), uploadProfileImg , asynchandler(authcontroller.profileUpdate) )
 
