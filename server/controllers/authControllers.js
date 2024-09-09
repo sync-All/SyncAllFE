@@ -176,9 +176,9 @@ const getsyncuserinfo = async (req,res,next)=>{
 
 const profilesetup = async (req, res, next) => {
   if (req.isAuthenticated) {
-    const { fullName, spotifyLink, bio } = req.body;
+    const {username, spotifyLink, bio} = req.body;
     await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
-    if (!fullName || !spotifyLink || !bio) {
+    if (!username || !spotifyLink || !bio) {
       res
         .status(401)
         .json({
@@ -189,7 +189,7 @@ const profilesetup = async (req, res, next) => {
       const userId = req.user.userId;
       const profileUpdate = await User.findByIdAndUpdate(
         userId,
-        { fullName, spotifyLink, bio },
+        { username, spotifyLink, bio },
         { new: true }
       );
 
@@ -209,8 +209,10 @@ const profilesetup = async (req, res, next) => {
 
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
-  if(req.body.email !== req.user.email){
-    return res.status(401).send('unauthorized buddy 😒, unable to make change')
+  if(req.body.email){
+    if(req.body.email !== req.user.email){
+      return res.status(401).send('unauthorized buddy 😒, unable to make changes to email')
+    }
   }
   if(req.user.role == "Music Uploader"){
     if(req.file){

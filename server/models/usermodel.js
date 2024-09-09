@@ -98,7 +98,7 @@ const syncUserSchema = new Schema({
     phoneNumber :{
         type : String
     },
-    fullName : {
+    username : {
         type : String,
     },
     billing : {
