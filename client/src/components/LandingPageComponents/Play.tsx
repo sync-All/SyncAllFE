@@ -25,9 +25,9 @@ const Play = () => {
             setMed(false)
         }
         async function load(){
-            console.log(med)
+           
             if(med){
-                console.log(audioRef.current.play())
+                
              audioRef?.current?.play()
              .then(()=>console.log("object"))
              .catch((err)=> console.log(err))

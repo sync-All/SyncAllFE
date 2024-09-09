@@ -22,11 +22,8 @@ const MusicUploaderDashboard = () => {
   const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
 
   const dashboardDetails = dashboardData?.dashboardDetails;
-  const dashboardActivities = dashboardDetails?.activities;
+  // const dashboardActivities = dashboardDetails?.activities;
   const profileDetails = dashboardData?.profileInfo;
-
-  const token = localStorage.getItem('token');
-  console.log(token);
 
   const data = [
     { name: '19', uv: 0 },
@@ -203,7 +200,7 @@ const MusicUploaderDashboard = () => {
               </div>
             )}
           </div>
-          <div>
+          {/* <div>
             <h2 className="font-formular-regular text-[16px] text-[#667185]">
               Top Activities
             </h2>
@@ -227,7 +224,7 @@ const MusicUploaderDashboard = () => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -103,10 +103,10 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
- const [loading, setLoading] = useState<boolean>(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [loading, setLoading] = useState<boolean>(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const [_token, setToken] = useState(localStorage.getItem('token'));
 
-  console.log(token);
   const fetchDashboardData = useCallback(async () => {
     // const userId = localStorage.getItem('userId');
     const token = localStorage.getItem('token');
@@ -120,7 +120,7 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.get(apiUrl, config);
 
       setDashboardData(response.data);
@@ -136,8 +136,6 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
     }
   }, []);
-
- 
 
   useEffect(() => {
     fetchDashboardData();

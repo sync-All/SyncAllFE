@@ -29,8 +29,6 @@ const SyncUserLibrary: React.FC = () => {
 
   const trackAdded = track?.user.tracklist || [];
 
-  console.log(trackAdded);
-
   const closeMenu = () => setMenuOpen(!menuOpen);
 
   const openMenu = (trackId: string) => {

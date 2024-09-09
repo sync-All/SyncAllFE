@@ -108,7 +108,6 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
           }
         })
         .catch((err) => {
-          console.log(values)
           if(err.response.status == 302){
             setGoogleAuthData({...values})
             return navigate('/selectRole')

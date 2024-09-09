@@ -32,7 +32,7 @@ const ReleaseInformation: React.FC = () => {
             Copyright Year
           </label>
           <Field
-            type="text"
+            type="number"
             name="copyrightYear"
             className={applyInputStyles}
           />
