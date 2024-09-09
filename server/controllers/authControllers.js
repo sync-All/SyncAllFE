@@ -9,7 +9,8 @@ const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
 const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
-const fs = require('node:fs')
+const fs = require('node:fs');
+const { BadRequestError } = require('../utils/CustomError');
 require('dotenv').config()
 
 
@@ -177,22 +178,18 @@ const getsyncuserinfo = async (req,res,next)=>{
 const profilesetup = async (req, res, next) => {
   if (req.isAuthenticated()) {
     const {username, spotifyLink, bio} = req.body;
+    const duplicateUsername = await User.findOne({username}).exec
+    if(duplicateUsername){
+      throw new BadRequestError('Username in exist already')
+    }
     await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     if (!username || !spotifyLink || !bio) {
-      res
-        .status(401)
-        .json({
-          success: false,
-          message: 'Missing field please check and confirm',
-        });
+      res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
     } else {
       const userId = req.user._id;
       try {
         await User.findByIdAndUpdate(userId,req.body,{ new: true });
-        res.status(200).json({
-            success: true,
-            message: 'Profile update successful',
-        });
+        res.status(200).json({success: true,message: 'Profile update successful'});
       } catch (error) {
         console.log(error)
         res.send(error)
@@ -208,9 +205,15 @@ const profilesetup = async (req, res, next) => {
 
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
-  if(req.body.email){
+  if(req.body.email || req.body.username){
     if(req.body.email !== req.user.email){
       return res.status(401).send('unauthorized buddy 😒, unable to make changes to email')
+    }
+    if(req.body.username !== req.user.username){
+      const duplicateUsername = await User.findOne({username}).exec
+      if(duplicateUsername){
+        throw new BadRequestError('Username in exist already')
+      }
     }
   }
   if(req.user.role == "Music Uploader"){
