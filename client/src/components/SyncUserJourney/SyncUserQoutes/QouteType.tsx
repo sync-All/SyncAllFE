@@ -34,7 +34,6 @@ const QouteType = () => {
 
       try {
         const res = await axios.get(apiUrl, config);
-        console.log(res);
         setTrackDetails(res.data.details);
         setIdValid(true);
       } catch (error: unknown) {

@@ -400,7 +400,7 @@ const Interpolation = () => {
                         <InputField
                           label="Media Formats:"
                           name="media_formats"
-                          placeholder="e.g., Video Game, Digital"
+                          placeholder="e.g., Digital, Physical"
                         />
 
                         <ErrorMessage
@@ -454,7 +454,7 @@ const Interpolation = () => {
                         <InputField
                           label="Distribution Channels: "
                           name="distribution_channels"
-                          placeholder="e.g., Streaming Services"
+                          placeholder="e.g., Streaming Services, Physical Copies"
                         />
 
                         <ErrorMessage

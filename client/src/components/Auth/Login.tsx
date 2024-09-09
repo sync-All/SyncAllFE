@@ -69,7 +69,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         // localStorage.setItem('userRole', response.data.user.role);
         // localStorage.setItem('userId', response.data.user._id);
         // localStorage.setItem('syncUserInfo', JSON.stringify(user));
-        console.log(response);
+       
         toast.success('Login successful');
         if (response.data.user.role == 'Music Uploader') {
           handleNavigationTODashboard(spotifyLink);

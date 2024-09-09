@@ -196,7 +196,7 @@ const SocialMediaContent = () => {
                         <InputField
                           label="Distribution: "
                           name="distribution"
-                          placeholder="e.g., Streaming Services"
+                          placeholder="e.g., Organic, Paid Advertising"
                         />
 
                         <ErrorMessage

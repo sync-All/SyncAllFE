@@ -15,8 +15,7 @@ const VerifyId = (id: string) => {
       };
 
       try {
-        const res = await axios.get(apiUrl, config);
-        console.log(res);
+        await axios.get(apiUrl, config);
         setIdValid(true);
       } catch (error: unknown) {
         setIdValid(false);

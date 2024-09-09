@@ -32,7 +32,6 @@ const PaymentStatus = () => {
                 if (!paymentIntent) {
                     return;
                 }else{
-                    console.log(paymentIntent)
                     setStatus(paymentIntent.status)
                     setTimeout(()=>{
                         setLoading(false)

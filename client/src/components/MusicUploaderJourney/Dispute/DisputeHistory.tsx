@@ -78,7 +78,7 @@ const DisputeHistory = () => {
         const allData = response.data.message;
         const filteredData = allData.filter((item) => item.status !== 'Pending');
 
-        console.log(filteredData);
+      
         setDisputes(filteredData);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;

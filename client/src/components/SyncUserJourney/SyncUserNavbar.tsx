@@ -18,7 +18,6 @@ const SyncUserNavbar: React.FC = () => {
 
   const logout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    console.log('Logout triggered');
     localStorage.clear();
     window.location.href = '/';
   };

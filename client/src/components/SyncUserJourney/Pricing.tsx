@@ -16,7 +16,7 @@ const Pricing = () => {
   const [userPlan, setUserPlan] = useState('')
 
   useEffect(()=>{
-    console.log(user)
+    
     switch(paymentInfo?.prod_id){
       case "prod_QgrvvxGRYPiP7a":
         setUserPlan("Premium")

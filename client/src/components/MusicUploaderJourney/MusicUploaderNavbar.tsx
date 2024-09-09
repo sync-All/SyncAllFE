@@ -22,7 +22,7 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
 
   const toggleModal = () => {
     setModalIsOpen((prevState) => !prevState);
-    console.log(modalIsOpen);
+  
   };
 
   const toggleDropdown = () => {
@@ -31,7 +31,7 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
 
   const logout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent the dropdown from closing before the click is processed
-    console.log('Logout triggered');
+   
     localStorage.clear();
     window.location.href = '/';
   };
