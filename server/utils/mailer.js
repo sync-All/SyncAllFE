@@ -34,9 +34,9 @@ await ejs.renderFile(pathtofile,{ link :`https://syncallfe.onrender.com/verifyEm
 
   // Compose email options
   const mainOptions = {
-    from: '"Ezekiel"info@syncallmusic.com',
+    from: '"Syncall Team"info@syncallmusic.com',
     to: user.email,
-    subject: 'Hello, Sync USer',
+    subject: 'Hello, Sync User',
     html: renderedHtml,
     attachments: [{
       filename: 'headerLogo.png',
