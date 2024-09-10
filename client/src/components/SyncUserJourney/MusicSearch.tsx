@@ -5,7 +5,7 @@ import Genre from '../../constants/genre';
 import Mood from '../../constants/mood';
 import Instrument from '../../constants/instrument';
 import { Link } from 'react-router-dom';
-import AddMusic from '../../assets/images/add-music.svg';
+// import AddMusic from '../../assets/images/add-music.svg';
 import Favorite from '../../assets/images/favorite.svg';
 import Copy from '../../assets/images/copy-link.svg';
 // import musicWave from '../../assets/images/musicwave.svg';
@@ -28,11 +28,9 @@ const MusicSearch = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [searchWord, setSearchWord] = useState<string>('');
   const [results, setResults] = useState<TrackDetails[]>([]);
-    const [likedTrack, setLikedTrack] = useState<Set<string>>(new Set());
-
+const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
     interface TrackDetails {
-      musicImg: string;
       trackTitle: string;
       _id: string;
       trackLink: string;
@@ -41,9 +39,10 @@ const MusicSearch = () => {
       duration: string;
       writers: string;
       genre: string;
-      mood: string;
+      mood: string[];
       actions: string[];
       artWork: string;
+      producers: string
     }
 
   const useSearch = (
@@ -66,7 +65,8 @@ const MusicSearch = () => {
 
         try {
           const res = await axios.get(apiUrl, config);
-          setResults(res.data.allTracks);
+         console.log(res); setResults(res.data.allTracks);
+          
           
         } catch (error) {
           const axiosError = error as AxiosError<ResponseData>;
@@ -84,28 +84,41 @@ const MusicSearch = () => {
     }, [endpoint, query, setResults]);
   };
 
+  const handleLikes = async (trackId: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/liketrack/${trackId}`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
 
-  const handleLike = (trackId: string) => {
-    const newLikedTracks = new Set(likedTrack);
-    if (newLikedTracks.has(trackId)) {
-      newLikedTracks.delete(trackId);
-    } else {
-      newLikedTracks.add(trackId);
+    try {
+      const res = await axios.get(apiUrl, config);
+      toast.success(res.data);
+      setLikedTrack((prevState) => ({
+        ...prevState,
+        [trackId]: true,
+      }));
+    } catch (error) {
+      const axiosError = error as AxiosError<ResponseData>;
+
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
     }
-    setLikedTrack(newLikedTracks);
-    localStorage.setItem(
-      'likedTracks',
-      JSON.stringify(Array.from(newLikedTracks))
-    );
   };
 
+    const handleCopyLink = (id: string) => {
+      navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+      toast.success('Link copied to clipboard');
+    };
 
-   useEffect(() => {
-     const storedLikedTracks = localStorage.getItem('likedTracks');
-     if (storedLikedTracks) {
-       setLikedTrack(new Set(JSON.parse(storedLikedTracks)));
-     }
-   }, []);
+ 
 
   useSearch('getTrackByInstrument', selectedInstrument, setResults);
   useSearch('getTrackByGenre', selectedGenre, setResults);
@@ -179,27 +192,14 @@ const MusicSearch = () => {
                       </p>
                     </span>
                   </Link>
-                  {/* <div className=" flex items-center w-[15%] justify-center">
-                    <img
-                      src={isPlaying ? pauseButton : PlayButton}
-                      alt=""
-                      onClick={handlePlayPause}
-                      className=" cursor-pointer"
-                    />
-                    <div id="waveform" ref={waveformRef} className="w-[60%]">
-                      <img src={musicWave} alt="" />
-                    </div>
-                    <p className="font-Utile-medium text-[16px] leading-4 ">
-                      {currentTime || '00:00'}
-                    </p>
-                  </div> */}
-                  <span className="flex gap-12 w-[25%] items-start ml-[5%]">
+
+                  <span className="hidden lg:flex gap-12 w-[25%] items-start ml-[5%]">
                     <span>
                       <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                        {result.duration || '3 minutes, 33 seconds'}
+                        {result.duration || 'N/A'}
                       </p>
                       <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                        {result.writers || '124bpm'}
+                        {result.producers || 'N/A'}
                       </p>
                     </span>
                     <span>
@@ -207,26 +207,31 @@ const MusicSearch = () => {
                         {result.genre}
                       </p>
                       <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                        {result.mood}
+                        {result.mood.join(', ')}
                       </p>
                     </span>
                   </span>
-                  <span className="flex gap-6 w-[10%] justify-center">
+                  <span className="hidden lg:flex gap-6 w-[10%] justify-center">
                     <img
-                      src={likedTrack.has(result._id) ? Liked : Favorite}
+                      src={likedTrack[result._id] ? Liked : Favorite}
                       alt=""
-                      onClick={() => handleLike(result._id)}
+                      onClick={() => handleLikes(result._id)}
+                      className="cursor-pointer"
                     />
-                    <img src={AddMusic} alt="" />
-                    <img src={Copy} alt="" />
+                    {/* <img src={AddMusic} alt="" /> */}
+                    <img
+                      src={Copy}
+                      alt=""
+                      onClick={() => handleCopyLink(result._id)}
+                    />
                   </span>
-                  <span className="gap-[12px] flex w-[25%] justify-center">
+                  <span className="gap-[12px] hidden lg:flex w-[25%] justify-center">
                     <Link to={`/metadata/${result?._id}`}>
                       <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                         View More
                       </button>
                     </Link>
-                    <Link to="/pricing">
+                    <Link to={`/quote/${result?._id}`}>
                       <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                         Get Quote
                       </button>

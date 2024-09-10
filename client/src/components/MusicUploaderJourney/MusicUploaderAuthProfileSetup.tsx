@@ -11,12 +11,25 @@ import { useNavigate } from 'react-router-dom';
 import useLoading from '../../constants/loading';
 
 
+
+
+const addHttpsPrefix = (value: string | undefined): string | undefined => {
+  if (value && !value.startsWith('https://')) {
+    return `https://${value}`;
+  }
+  return value;
+};
+
 const validationSchema = Yup.object({
-  fullName: Yup.string().required('Required'),
-  spotifyLink: Yup.string().url('Invalid url').required('Required'),
+  username: Yup.string().required('Required'),
+  spotifyLink: Yup.string()
+    .test('is-valid-url', 'Invalid url', (value) => {
+      const url = addHttpsPrefix(value);
+      return Yup.string().url().isValidSync(url);
+    })
+    .required('Required'),
   bio: Yup.string().required('Required'),
 });
-
 interface ResponseData {
   message?: string;
 }
@@ -63,13 +76,13 @@ function delay(ms: number) {
             </span>
           </div>
           <Formik
-            initialValues={{ fullName: '', spotifyLink: '', bio: '' }}
+            initialValues={{ username: '', spotifyLink: '', bio: '' }}
             validationSchema={validationSchema}
             onSubmit={async (values) => {
               setLoading(true)
               const token = localStorage.getItem('token');
               const urlVar = import.meta.env.VITE_APP_API_URL;
-              const apiUrl = `${urlVar}/profileUpdate/`;
+              const apiUrl = `${urlVar}/profilesetup/`;
 
               const config = {
                 headers: {
@@ -101,16 +114,16 @@ function delay(ms: number) {
               <Form className="flex flex-col gap-[32px] w-full">
                 <div className="flex flex-col gap-[8px]">
                   <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
-                    What’s your name?
+                    What’s your username?
                   </label>
                   <Field
                     type="text"
-                    name="fullName"
-                    placeholder="Enter your full name"
+                    name="username"
+                    placeholder="Enter your username"
                     className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
                   />
                   <ErrorMessage
-                    name="fullName"
+                    name="username"
                     component="div"
                     className="text-red-400 italic text-sm py-[4px]"
                   />
@@ -127,7 +140,7 @@ function delay(ms: number) {
                       https://
                     </span>
                     <Field
-                      type="url"
+                      
                       name="spotifyLink"
                       placeholder="Paste Link"
                       className="border-l-0 border border-[#D7DCE0] border-collapse rounded-bl-none rounded-tl-none rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185] w-full"

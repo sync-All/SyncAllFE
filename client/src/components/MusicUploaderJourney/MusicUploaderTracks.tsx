@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo} from 'react';
 // import Filter from '../../assets/images/Filter-lines.svg';
 // import Download from '../../assets/images/download-cloud.svg';
 import Plus from '../../assets/images/plus.svg';
-import DotMenu from '../../assets/images/threedot.svg';
+// import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
@@ -63,27 +63,27 @@ const SortButton: React.FC<{
 const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   onTabChange,
 }) => {
-  const [openDropdowns, setOpenDropdowns] = useState<{
-    [key: string]: boolean;
-  }>({});
+  // const [openDropdowns, setOpenDropdowns] = useState<{
+  //   [key: string]: boolean;
+  // }>({});
 
-  const toggleDropdown = (id: string) => {
-    setOpenDropdowns((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
-  };
+  // const toggleDropdown = (id: string) => {
+  //   setOpenDropdowns((prevState) => ({
+  //     ...prevState,
+  //     [id]: !prevState[id],
+  //   }));
+  // };
 
-  const handleClickOutside = () => {
-    setOpenDropdowns({});
-  };
+  // const handleClickOutside = () => {
+  //   setOpenDropdowns({});
+  // };
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //   };
+  // }, []);
 
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
@@ -225,7 +225,7 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
                       waveStyle="w-[70px]"
                     />
                   </td>
-                  <td
+                  {/* <td
                     className={`py-4 px-4 ${
                       openDropdowns[track._id] ? 'flex' : ''
                     }`}
@@ -244,7 +244,7 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
                         </button>
                       </div>
                     )}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

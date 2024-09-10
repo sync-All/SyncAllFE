@@ -160,7 +160,7 @@ const SyncUserLibrary: React.FC = () => {
                     {detail.genre}
                   </p>
                   <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail.mood}
+                    {detail.mood.join(', ')}
                   </p>
                 </span>
               </span>

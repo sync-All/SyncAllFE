@@ -281,8 +281,150 @@ const TrackMetadata = () => {
             )}
 
             {isVisible && (
-              <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
+              
+            
+
+              <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
+                {/* First Column */}
                 <div className="flex flex-col gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Country of Recording</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.countryOfRecording === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.countryOfRecording.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.countryOfRecording}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Country of Release</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.countryOfRelease === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.countryOfRelease.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.countryOfRelease}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Lyrics</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.lyrics === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.lyrics.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.lyrics}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Audio Language</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.audioLang === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.audioLang.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.audioLang}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Release Type</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.releaseType === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.releaseType.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.releaseType}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Tag</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.tag === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.tag.length === 0
+                        ? 'N/A'
+                        : trackDetails.tag.join(', ')}
+                    </p>
+                  </span>
+                </div>
+
+                {/* Second Column */}
+                <div className="flex flex-col justify-between gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Copyright Name</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.copyrightName === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.copyrightName.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.copyrightName}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Copyright Year</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.copyrightYear === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.copyrightYear.toString().trim() === ''
+                        ? 'N/A'
+                        : trackDetails.copyrightYear}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Earnings</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.earnings === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.earnings.toString().trim() === ''
+                        ? 'N/A'
+                        : `$${trackDetails.earnings.toLocaleString()}`}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Explicit Content</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.explicitCont === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.explicitCont
+                        ? 'Yes'
+                        : 'No'}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Featured Artist</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.featuredArtist === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.featuredArtist.length === 0
+                        ? 'N/A'
+                        : trackDetails.featuredArtist.join(', ')}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Role</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.role === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.role.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.role}
+                    </p>
+                  </span>
+                </div>
+
+                {/* Third Column */}
+                <div className="flex flex-col justify-between gap-8 lg:gap-6">
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Publishers</p>
+                    <p className="text-[#475367]">
+                      {trackDetails?.publishers === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.publishers.length === 0
+                        ? 'N/A'
+                        : trackDetails.publishers.join(', ')}
+                    </p>
+                  </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                     <p>Recording Date</p>
                     <p className="text-[#475367]">
@@ -290,11 +432,13 @@ const TrackMetadata = () => {
                         ? 'Subscribe to see this info'
                         : trackDetails.recordingDate.trim() === ''
                         ? 'N/A'
-                        : trackDetails.recordingDate && new Date(trackDetails.recordingDate).toLocaleDateString()}
+                        : new Date(
+                            trackDetails.recordingDate
+                          ).toLocaleDateString()}
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Reacordng Version</p>
+                    <p>Recording Version</p>
                     <p className="text-[#475367]">
                       {trackDetails?.recordingVersion === undefined
                         ? 'Subscribe to see this info'
@@ -304,59 +448,23 @@ const TrackMetadata = () => {
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Composed by</p>
+                    <p>Release Description</p>
                     <p className="text-[#475367]">
-                      {Array.isArray(trackDetails?.composers)
-                        ? trackDetails.composers.join(', ')
-                        : 'Subscribe to see this info'}
-                    </p>
-                  </span>
-                </div>
-                <div className="flex flex-col justify-between gap-8 lg:gap-6">
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Mood</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.mood.join(', ') || 'N/A'}
+                      {trackDetails?.releaseDesc === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.releaseDesc.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.releaseDesc}
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Release date</p>
+                    <p>Release Title</p>
                     <p className="text-[#475367]">
-                      {new Date(
-                        trackDetails?.releaseDate ?? ''
-                      ).toLocaleDateString() || 'N/A'}
-                    </p>
-                  </span>
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Release Label</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.releaseLabel ||
-                        'Subscribe to see this info'}
-                    </p>
-                  </span>
-                </div>
-                <div className="flex  flex-col justify-between gap-8 lg:gap-6">
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Produced by</p>
-                    <p className="text-[#475367]">
-                      {Array.isArray(trackDetails?.producers)
-                        ? trackDetails.producers.join(', ')
-                        : ''}
-                    </p>
-                  </span>
-
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Writer</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.writers || 'Subscribe to see this info'}
-                    </p>
-                  </span>
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Featured Instrument</p>
-                    <p className="text-[#475367]">
-                      {Array.isArray(trackDetails?.featuredInstrument)
-                        ? trackDetails.featuredInstrument.join(', ')
-                        : 'Subscribe to see this info'}
+                      {trackDetails?.releaseTitle === undefined
+                        ? 'Subscribe to see this info'
+                        : trackDetails.releaseTitle.trim() === ''
+                        ? 'N/A'
+                        : trackDetails.releaseTitle}
                     </p>
                   </span>
                 </div>
