@@ -25,4 +25,21 @@ router.post('/initialize_payment',passport.authenticate('jwt',{session : false, 
     }
 }))
 
+router.post('/transaction_status',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(async(req,res,next)=>{
+    try {
+        const {trxref} = req.body
+        const response = await axios.get(`https://${pk_path}/transaction/verify/:${trxref}`, {
+            headers : {
+                Authorization : `Bearer ${pk_sk}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        console.log(response)
+        res.send(response.data)
+    } catch (error) {
+        res.status(422).send('An error occured, kindly inform the dev team',error)
+        console.log(error)
+    }
+}))
+
 module.exports = router
