@@ -35,13 +35,7 @@ import Interpolation from './components/SyncUserJourney/SyncUserQoutes/Interpola
 import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
 import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
-import Payment from './Pages/Payment';
 import PaymentStatus from './Pages/PaymentStatus';
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPEPK_TEST_KEY);
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-} from "@stripe/react-stripe-js";
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -305,25 +299,13 @@ function App() {
           />
 
           <Route
-            path="/payment/products/:priceId"
-            element={
-              <ProtectedRoute
-                path="/payment/products/:priceId"
-                element={<Payment />}
-              />
-            }
-          />
-
-          <Route
             path="/payment/status/"
             element={
               <ProtectedRoute
                 path="/payment/status/"
                 element={
                   <SyncUserProvider>
-                    <Elements stripe={stripePromise}>
                       <PaymentStatus />
-                    </Elements>
                   </SyncUserProvider>
                 }
               />

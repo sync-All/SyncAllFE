@@ -8,13 +8,20 @@ import { Tooltip } from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { useSyncUser } from '../../Context/syncUserData';
 import { useEffect, useState } from 'react';
-import clsx from 'clsx';
+import axios from 'axios';
+import LoadingAnimation from '../../constants/loading-animation';
 
 const Pricing = () => {
   const { user } = useSyncUser();
   const paymentInfo = user?.user?.billing
   const [userPlan, setUserPlan] = useState('')
-
+  const [loading, setLoading] = useState(false)
+  const token = localStorage.getItem('token');
+  const config = {
+    headers: {
+      Authorization: `${token}`,
+    },
+  };
   useEffect(()=>{
     
     switch(paymentInfo?.prod_id){
@@ -29,6 +36,23 @@ const Pricing = () => {
 
     }
   },[user,paymentInfo])
+
+  const handleSelectPlan = async(plan?:string)=>{
+    if(userPlan == plan){
+      return
+    }
+    setLoading(true)
+    await axios.post('http://localhost:3000/api/v1/initialize_payment',{planInfo : plan},config)
+    .then((response)=>{
+      console.log(response)
+      const paystackWindow = window.open(response.data.data.authorization_url)
+      if(paystackWindow){
+        
+        setLoading(false)
+      }
+    })
+    
+  }
 
   const pricingPlans = [
     {
@@ -61,7 +85,7 @@ const Pricing = () => {
         'Licensing to use royalty free background music ',
         'Limited Advanced Search Filter',
       ],
-      testPriceId: 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB',
+      planInfo: 'PLN_v0fp2bzt5aix08w',
     },
     {
       name: 'Premium',
@@ -107,13 +131,6 @@ const Pricing = () => {
       premium: 'Unlimited',
       enterprise: 'Unlimited',
     },
-    // {
-    //   feature: 'Exclusive Content Review',
-
-    //   basic: 'Limited',
-    //   standard: 'Unlimited',
-    //   premium: 'Unlimited',
-    // },
     {
       feature: 'Ability to search and browse metadata',
       tooltip:
@@ -202,6 +219,9 @@ const Pricing = () => {
       enterprise: true,
     },
   ];
+  if(loading){
+    return(<LoadingAnimation/>)
+  }
 
   return (
     <div>
@@ -274,24 +294,19 @@ const Pricing = () => {
               </a>
             ) : (
               plan.name !== 'Basic' && (
-                <Link
-                  className={clsx(
-                    'w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6',
-                    userPlan == plan.name &&
-                      paymentInfo?.subscription_status == 'active' &&
-                      'inactive'
-                  )}
+                <div
+                  className='w-fit cursor-pointer py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6'
                   style={{
                     backgroundColor: plan.btnBg,
                     color: plan.pricebtntext,
                   }}
-                  to={`/payment/products/${plan.testPriceId}`}
+                  onClick={()=>{handleSelectPlan(plan?.planInfo)}}
                 >
                   {userPlan == plan.name &&
                   paymentInfo?.subscription_status == 'active'
                     ? 'Active Plan'
                     : plan.buttonText}
-                </Link>
+                </div>
               )
             )}
 

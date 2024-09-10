@@ -11,7 +11,7 @@ router.post('/initialize_payment',passport.authenticate('jwt',{session : false, 
     const {planInfo} = req.body
     const userInfo = req.user
     try {
-        const response = await axios.post(`${pk_path}/transaction/initialize`,{email : userInfo.email, plan : planInfo}, {
+        const response = await axios.post(`https://${pk_path}/transaction/initialize`,{email : userInfo.email, plan : planInfo, amount : "35000"}, {
             headers : {
                 Authorization : `Bearer ${pk_sk}`,
                 'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ router.post('/initialize_payment',passport.authenticate('jwt',{session : false, 
         console.log(response)
         res.send(response.data)
     } catch (error) {
-        res.status(422).send('An error occured, kindly inform the dev team')
+        res.status(422).send('An error occured, kindly inform the dev team',error)
         console.log(error)
     }
 }))
