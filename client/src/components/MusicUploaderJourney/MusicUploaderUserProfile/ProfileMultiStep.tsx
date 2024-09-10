@@ -1,13 +1,13 @@
 import ProfileBg from '../../../assets/images/profile-bg.png';
 import { useDataContext } from '../../../Context/DashboardDataProvider';
 import Placeholder from '../../../assets/images/placeholder.png';
-import Share from '../../../assets/images/share.svg';
-import Eye from '../../../assets/images/eye.svg';
+// import Share from '../../../assets/images/share.svg';
+// import Eye from '../../../assets/images/eye.svg';
 import ProfileInformation from './ProfileInformation';
 import PasswordSetting from './PasswordSetting';
 import PaymentInformation from './PaymentInfo';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 const ProfileMultiStep = () => {
   const userData = useDataContext();
@@ -29,14 +29,14 @@ const ProfileMultiStep = () => {
     }
   };
 
-  const handlePublicLink = () => {
-    const username = profileDetails?.name
+  // const handlePublicLink = () => {
+  //   const username = profileDetails?.name
 
-    const profilePublicLink = `${window.location.origin}/${username}`
-    navigator.clipboard.writeText(profilePublicLink).then(() => {
-      toast.success('Profile link copied to clipboard!');
-    })
-  };
+  //   const profilePublicLink = `${window.location.origin}/${username}`
+  //   navigator.clipboard.writeText(profilePublicLink).then(() => {
+  //     toast.success('Profile link copied to clipboard!');
+  //   })
+  // };
   return (
     <div className="lg:mx-8 ml-5 mt-[29px]  block">
       <div className="flex relative mb-[200px] lg:mb-[140px]">
@@ -52,7 +52,7 @@ const ProfileMultiStep = () => {
             />
             <span className="">
               <h1 className="poppins-semibold text-[24px] leading-normal text-[#1D2739] ">
-                {profileDetails?.fullName}
+                {profileDetails?.username}
               </h1>
               <p className="text-[16px] poppins-regular leading-normal tetx-[#667185] opacity-60">
                 {' '}
@@ -60,7 +60,7 @@ const ProfileMultiStep = () => {
               </p>
             </span>
           </div>
-          <div className="flex gap-[12px] items-center">
+          {/* <div className="flex gap-[12px] items-center">
             <button className="font-formular-regular text-[14px] leading-[20px] text-[#344054] py-2.5 px-4 gap-2 border border-[#D0D5DD] rounded-[8px] flex" onClick={handlePublicLink}>
               <img src={Share} alt="" />
               <p>Share Profile</p>
@@ -69,7 +69,7 @@ const ProfileMultiStep = () => {
               <img src={Eye} alt="" />
               <p>View Profile</p>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="mt-16 ml-5 ">

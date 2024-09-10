@@ -92,7 +92,7 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
                 </span>
                 <span className="hidden lg:block ml-2">
                   <p className="font-inter text-[14px] font-medium leading-5">
-                    {profileDetails?.fullName}
+                    {profileDetails?.name}
                   </p>
                   <p className="font-inter text-[12px] font-regular leading-4">
                     {profileDetails?.email}

@@ -53,7 +53,7 @@ interface ProfileInfo {
   emailConfirmedStatus: boolean;
   __v: number;
   bio: string;
-  fullName: string;
+  username: string;
   spotifyLink: string;
   img: string;
   createdAt: string;
@@ -122,7 +122,7 @@ const [_token, setToken] = useState(localStorage.getItem('token'));
     try {
       setLoading(true);
       const response = await axios.get(apiUrl, config);
-
+console.log(response);
       setDashboardData(response.data);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
