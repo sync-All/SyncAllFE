@@ -211,7 +211,7 @@ const profileUpdate = async (req,res,next)=>{
       return res.status(401).send('unauthorized buddy 😒, unable to make changes to email')
     }
     if(req.body.username !== req.user.username){
-      const duplicateUsername = await User.findOne({username}).exec
+      const duplicateUsername = await User.findOne({username}).exec()
       if(duplicateUsername){
         throw new BadRequestError('Username in exist already')
       }
