@@ -1,28 +1,26 @@
 const router = require('express').Router()
 const passport = require('passport');
 const asyncHandler = require('express-async-handler')
-const stripeApi = require('../utils/stripeApi')
+const axios = require('axios')
 require('dotenv').config()
-const stripe = require('stripe')(process.env.STRIPE_TESTSECRET_KEY)
 
-router.post('/create-subscription',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(async(req,res,next)=>{
-    const {priceId} = req.body
+const pk_path = process.env.PK_ROOT_PATH
+const pk_sk = process.env.PK_SK
+
+router.post('/initialize_payment',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(async(req,res,next)=>{
+    const {planInfo} = req.body
     const userInfo = req.user
     try {
-        const customerId = await stripeApi.createNewStripeCus(userInfo)
-        const subscription = await stripe.subscriptions.create({
-            customer : customerId,
-            items : [
-                {
-                    price : priceId
-                }
-            ],
-            payment_behavior: 'default_incomplete',
-            payment_settings: { save_default_payment_method: 'on_subscription' },
-            expand: ['latest_invoice.payment_intent'],
+        const response = await axios.post(`${pk_path}/transaction/initialize`,{email : userInfo.email, plan : planInfo}, {
+            headers : {
+                Authorization : `Bearer ${pk_sk}`,
+                'Content-Type': 'application/json'
+            }
         })
-        res.send({priceId, customerId, subscription})
+        console.log(response)
+        res.send(response.data)
     } catch (error) {
+        res.status(422).send('An error occured, kindly inform the dev team')
         console.log(error)
     }
 }))

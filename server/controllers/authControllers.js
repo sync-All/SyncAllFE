@@ -178,7 +178,8 @@ const getsyncuserinfo = async (req,res,next)=>{
 const profilesetup = async (req, res, next) => {
   if (req.isAuthenticated()) {
     const {username, spotifyLink, bio} = req.body;
-    const duplicateUsername = await User.findOne({username}).exec
+    const duplicateUsername = await User.findOne({username}).exec()
+    console.log(duplicateUsername)
     if(duplicateUsername){
       throw new BadRequestError('Username in exist already')
     }
