@@ -120,8 +120,8 @@ const signup = async function(req, res) {
   const googleAuth = async(req,res,next)=>{
     console.log(req.body)
         try {
-          const user = await User.findOne({email : req.body.email.toLowerCase()}).exec() 
-          const syncUser = await SyncUser.findOne({email : req.body.email.toLowerCase()}).exec()
+          const user = await User.findOne({email : req.body.email}).exec() 
+          const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
           let item = user || syncUser
           if (!item){
             if(req.body.role){
