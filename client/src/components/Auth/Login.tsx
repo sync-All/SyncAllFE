@@ -101,7 +101,7 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     const userInfo = getAdditionalUserInfo(response);
     // COlate values and assign to their proper fields
     const values = {
-      name: userInfo?.profile?.name,
+        name: userInfo?.profile?.name,
         email: userInfo?.profile?.email,
         img: userInfo?.profile?.picture,
         emailConfirmedStatus: userInfo?.profile?.verified_email,

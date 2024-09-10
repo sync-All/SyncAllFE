@@ -1,29 +1,34 @@
 import { useEffect, useState } from 'react';
-import SyncUserNavbar from '../components/SyncUserJourney/SyncUserNavbar';
+
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion} from "framer-motion"
 
 import succeedimg from "../assets/payment/succed.png";
 import failpng from "../assets/payment/failed.png";
 import pendingpng from "../assets/payment/pending.png";
+import SyncUserNavbar from '../components/SyncUserJourney/SyncUserNavbar';
 import LoadingAnimation from '../constants/loading-animation';
+import axios from 'axios';
 
 const PaymentStatus = () => {
+    // https://www.syncallmusic.com/payment/status/?trxref=coazz93yvx&reference=coazz93yvx
     const [searchParams] = useSearchParams();
     const navigate = useNavigate()
-    console.log(searchParams)
-    const [status, setStatus] = useState('')
+    const trxref = searchParams.get('trxref')
+    const [status] = useState('')
     const [loading, setLoading] = useState(false)
+    
     useEffect(()=>{
         setLoading(true)
-        // if (!stripe) {
-        //     return;
-        //   }
-        // if(!client_secret){
-        //     setLoading(false)
-        //     navigate('/pricing')
-        // }else{
-        //     stripe.retrievePaymentIntent(client_secret)
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: {
+            Authorization: `${token}`,
+            },
+        };
+        if(trxref){
+            axios.post('http://localhost:3000/transaction_status',{trxref},config)
+        }
         //     .then(({paymentIntent})=>{
         //         if (!paymentIntent) {
         //             return;
@@ -36,7 +41,7 @@ const PaymentStatus = () => {
         //     })
         // }
         
-    },[navigate])
+    },[navigate,trxref])
     let message = ''
     let title = ''
     let icon = ''

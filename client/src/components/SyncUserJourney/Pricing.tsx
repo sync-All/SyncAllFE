@@ -17,11 +17,15 @@ const Pricing = () => {
   const [userPlan, setUserPlan] = useState('')
   const [loading, setLoading] = useState(false)
   const token = localStorage.getItem('token');
+  
+
   const config = {
     headers: {
       Authorization: `${token}`,
     },
   };
+
+
   useEffect(()=>{
     
     switch(paymentInfo?.prod_id){
@@ -45,11 +49,7 @@ const Pricing = () => {
     await axios.post('http://localhost:3000/api/v1/initialize_payment',{planInfo : plan},config)
     .then((response)=>{
       console.log(response)
-      const paystackWindow = window.open(response.data.data.authorization_url)
-      if(paystackWindow){
-        
-        setLoading(false)
-      }
+      window.location.href = response.data.data.authorization_url
     })
     
   }
