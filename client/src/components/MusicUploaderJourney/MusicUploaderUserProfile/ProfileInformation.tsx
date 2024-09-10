@@ -34,7 +34,7 @@ const ProfileInformation = () => {
 
   const validationSchema = Yup.object({
     username: Yup.string(),
-    fullName: Yup.string(),
+    name: Yup.string(),
     email: Yup.string().email('Invalid email address'),
     phoneNumber: Yup.string(),
     socials: Yup.string(),
@@ -42,8 +42,8 @@ const ProfileInformation = () => {
   });
 
   const initialValues = {
-    username: userDetails?.name,
-    fullName: userDetails?.fullName,
+    username: userDetails?.username,
+    name: userDetails?.name,
     email: userDetails?.email,
     phoneNumber: userDetails?.phoneNumber,
     socials: userDetails?.spotifyLink,
@@ -94,17 +94,17 @@ const ProfileInformation = () => {
           <Form>
             <div className={applyFormDiv}>
               <div className={input}>
-                <label htmlFor="name" className={applyLabelStyles}>
+                <label htmlFor="username" className={applyLabelStyles}>
                   Username
                 </label>
                 <Field
                   type="text"
-                  name="name"
+                  name="username"
                   className={applyInputStyles}
-                  placeholder={userDetails?.name}
+                  placeholder={userDetails?.username}
                 />
                 <ErrorMessage
-                  name="name"
+                  name="username"
                   component="div"
                   className="text-red-500"
                 />
@@ -124,14 +124,14 @@ const ProfileInformation = () => {
             </div>
             <div className={applyFormDiv}>
               <div className={input}>
-                <label htmlFor="fullName" className={applyLabelStyles}>
+                <label htmlFor="name" className={applyLabelStyles}>
                   Full Name
                 </label>
                 <Field
                   type="text"
-                  name="fullName"
+                  name="name"
                   className={applyInputStyles}
-                  placeholder={userDetails?.fullName}
+                  placeholder={userDetails?.name}
                 />
                 <ErrorMessage
                   name="fullName"
@@ -146,6 +146,7 @@ const ProfileInformation = () => {
                 <Field
                   type="email"
                   name="email"
+                  disabled
                   className={applyInputStyles}
                   placeholder={userDetails?.email}
                 />

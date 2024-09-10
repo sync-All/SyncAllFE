@@ -32,7 +32,7 @@ const SyncUserHome = () => {
   const [tracksLoading, setTracksLoading] = useState<boolean>(false);
 
   interface TrackDetails {
-    musicImg: string;
+    producers: string;
     trackTitle: string;
     _id: string;
     trackLink: string;
@@ -41,7 +41,7 @@ const SyncUserHome = () => {
     duration: string;
     writers: string;
     genre: string;
-    mood: string;
+    mood: string[];
     actions: string[];
     artWork: string;
   }
@@ -216,10 +216,10 @@ const SyncUserHome = () => {
                     <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                       <span className="w-[50%]">
                         <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                          {detail.duration || '3 minutes, 33 seconds'}
+                          {detail.duration || 'N/A'}
                         </p>
                         <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px] truncate max-w-16">
-                          {truncateText(detail.writers || 'N/A', 5)}
+                          {truncateText(detail.producers || 'N/A', 5)}
                         </p>
                       </span>
                       <span className="w-[50%]">
@@ -227,7 +227,7 @@ const SyncUserHome = () => {
                           {detail.genre}
                         </p>
                         <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                          {detail.mood}
+                          {detail.mood.join(', ')}
                         </p>
                       </span>
                     </span>
@@ -261,7 +261,7 @@ const SyncUserHome = () => {
                 ))}
               </div>
             ) : (
-              <p className='text-center'>No Track available.</p>
+              <p className="text-center">No Track available.</p>
             )}
           </section>
 

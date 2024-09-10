@@ -129,7 +129,7 @@ const logout = () => {
           </span>
           <span className="ml-2 w-1/2 break-words">
             <p className="font-inter text-[14px] font-medium leading-5">
-              {profileDetails?.fullName}
+              {profileDetails?.username}
             </p>
             <p className="font-inter text-[12px] font-regular leading-4 ">
               {profileDetails?.email}

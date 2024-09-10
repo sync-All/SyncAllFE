@@ -57,7 +57,7 @@ const MusicUploaderDashboard = () => {
     },
     {
       image: Earth,
-      title: 'Countries Reached',
+      title: 'Total Tracks Licensed',
       value: `${dashboardDetails?.countryReached || 0}`,
       color: '#064e3b',
     },
@@ -80,7 +80,7 @@ const MusicUploaderDashboard = () => {
           <span className="mr-auto">
             <h1 className="text-[#667185] text-[16px] font-Utile-regular leading-normal">
               Welcome,{' '}
-              {profileDetails?.name ? profileDetails?.name : 'Loading ...'}!
+              {profileDetails?.username ? profileDetails?.username : 'Loading ...'}!
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">

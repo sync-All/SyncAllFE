@@ -1,4 +1,3 @@
-import MusicImg from '../../../assets/images/3000x3000.jpg.png';
 import Menu from '../../../assets/menu-dot-square.svg';
 import ViewMore from '../../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../../assets/images/document-add.svg';
@@ -41,7 +40,7 @@ const MyLicensedTracks = () => {
               onClick={redirectMetadata}
             >
               <span className="flex gap-3">
-                <img src={detail?.artWork || MusicImg} alt="" />
+                <img src={detail?.artWork} alt="" />
                 <span>
                   <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
                     {detail?.trackTitle}
@@ -68,7 +67,7 @@ const MyLicensedTracks = () => {
                     {detail?.genre || 'N/A'}
                   </p>
                   <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail?.mood || 'N/A'}
+                    {detail?.mood.join(', ') || 'N/A'}
                   </p>
                 </span>
               </span>
@@ -104,7 +103,7 @@ const MyLicensedTracks = () => {
               className="flex items-center w-full justify-between  "
             >
               <span className="flex gap-3">
-                <img src={detail?.artWork || MusicImg} alt="" />
+                <img src={detail?.artWork} alt="" />
                 <span>
                   <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
                     {detail.trackTitle}
