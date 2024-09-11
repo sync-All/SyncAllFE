@@ -4,6 +4,8 @@ import musicUploader from '../../../assets/images/music-uploader.svg';
 import BackgroundPattern from '../../../assets/images/user-role-pattern.svg';
 import axios from "axios"
 import { ToastContainer, toast } from 'react-toastify';
+import { useState } from 'react';
+import LoadingAnimation from '../../../constants/loading-animation';
 
 interface gauthProps {
     googleAuthData: object | null,
@@ -12,6 +14,7 @@ interface gauthProps {
 
 const GoogleAuthUserRole = ({googleAuthData}:gauthProps) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false)
 
   const handleNavigationTODashboard = (spotifyLink:string) => {
     if(!spotifyLink){
@@ -22,8 +25,7 @@ const GoogleAuthUserRole = ({googleAuthData}:gauthProps) => {
 };
 
   const handleRoleClick = async(role: string) => {
-    const colatedValues = {...googleAuthData, role}
-    console.log(colatedValues)
+    setLoading(true)
     await axios
         .post('https://syncallfe.onrender.com/api/v1/googleauth', {...googleAuthData, role})
         .then((response) => {
@@ -33,6 +35,7 @@ const GoogleAuthUserRole = ({googleAuthData}:gauthProps) => {
           localStorage.setItem('userId', response.data.user._id);
           toast.success('Login successful');
           setTimeout(()=>{
+            setLoading(false)
             if (response.data.user.role == 'Music Uploader') {
                 handleNavigationTODashboard(spotifyLink);
               } else {
@@ -41,9 +44,15 @@ const GoogleAuthUserRole = ({googleAuthData}:gauthProps) => {
           },1500)
         })
         .catch((err)=>{
-            console.log(err)
+          setLoading(false)
+          toast.error(err)
+          console.log(err)
         })
   };
+
+  if(loading){
+    return (<LoadingAnimation/>)
+  }
 
   return (
     <div className="bg-[#013131]">
