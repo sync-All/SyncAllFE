@@ -35,7 +35,7 @@ const Pricing = () => {
       currency: 'USD',
       payment_options : "card",
       payment_plan: '',
-      redirect_url: "http://localhost:5173/payment/status/",
+      redirect_url: "https://www.syncallmusic.com/payment/status/",
       customer: {
         email: `${user?.user.email}`,
         phone_number: 'N/A',
@@ -59,7 +59,7 @@ const Pricing = () => {
         currency: 'USD',
         payment_options : "card",
         payment_plan : plan,
-        redirect_url: "http://localhost:5173/payment/status/",
+        redirect_url: "https://www.syncallmusic.com/payment/status/",
         customer: {
           email: `${user?.user.email}`,
           phone_number: 'N/A',
