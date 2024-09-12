@@ -94,7 +94,7 @@ const queryTrackInfo =async(req,res,next)=>{
   const trackId = req.params.trackId
   if(req.user.role == "Sync User"){
     try {
-      if(req.user.billing.prod_id == "prod_QnB1PkDeRHAGSx"){
+      if(req.user.billing.prod_id == "free"){
         const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate").exec()
         console.log(details)
         return res.json({details})
