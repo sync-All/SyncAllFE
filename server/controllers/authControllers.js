@@ -89,6 +89,7 @@ const signup = async function(req, res) {
   }
 
   const signin = async(req,res,next)=> {
+    console.log(req.body)
     const {email,password} = req.body
     const user = await User.findOne({email : email.toLowerCase()}).exec()
     const syncUser = await SyncUser.findOne(({email : email.toLowerCase()})).exec()

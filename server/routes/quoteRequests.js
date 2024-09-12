@@ -245,6 +245,7 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                 const request = new samplingRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    console.log(uploadResponse.populate('track_info'))
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
