@@ -97,6 +97,9 @@ const signup = async function(req, res) {
     if(!item){
       return res.status(401).json({success : false, message : "User doesn't Exists"})
     }
+    if(!item.password){
+      return res.status(401).json({success : false, message : "Invalid Email or Password, Try another sign in option"})
+    }
     const match = await bcrypt.compare(password, item.password);
 
     if(!match){

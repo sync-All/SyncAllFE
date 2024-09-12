@@ -105,7 +105,7 @@ function requestForgotPassword(user, issuedJwt){
 const pathtofile = path.join(__dirname, '..', '/views/forgotPassword.ejs')
 
 console.log(pathtofile)
-ejs.renderFile(pathtofile,{ name: user.name, link :`https://sync-all-fe-1brn.vercel.app/requestforgotpw/?token=${issuedJwt}&email=${user.email}`}, (err, renderedHtml) => {
+ejs.renderFile(pathtofile,{ name: user.name, link :`https://www.syncallmusic.com/requestforgotpw/?token=${issuedJwt}&email=${user.email}`}, (err, renderedHtml) => {
   if (err) {
     console.error('Error rendering EJS template:', err);
     return;
