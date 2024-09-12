@@ -5,7 +5,6 @@ import { motion} from "framer-motion"
 
 import succeedimg from "../assets/payment/succed.png";
 import failpng from "../assets/payment/failed.png";
-import pendingpng from "../assets/payment/pending.png";
 import SyncUserNavbar from '../components/SyncUserJourney/SyncUserNavbar';
 import LoadingAnimation from '../constants/loading-animation';
 import axios from 'axios';
@@ -14,8 +13,8 @@ const PaymentStatus = () => {
     // https://www.syncallmusic.com/payment/status/?trxref=coazz93yvx&reference=coazz93yvx
     const [searchParams] = useSearchParams();
     const navigate = useNavigate()
-    const trxref = searchParams.get('trxref')
-    const [status] = useState('')
+    const trxref = searchParams.get('transaction_id')
+    const [status, setStatus] = useState('')
     const [loading, setLoading] = useState(false)
     
     useEffect(()=>{
@@ -26,20 +25,21 @@ const PaymentStatus = () => {
             Authorization: `${token}`,
             },
         };
+        console.log(trxref)
         if(trxref){
-            axios.post('http://localhost:3000/transaction_status',{trxref},config)
+
+            axios.post('http://localhost:3000/api/v1/transaction_status',{trxref},config)
+            .then(()=>{
+                setStatus('succeeded')
+                setTimeout(()=>{
+                    setLoading(false)
+                },1500)
+            })
+            .catch(()=>{
+                setStatus("Unsuccessful")
+                setLoading(false)
+            })
         }
-        //     .then(({paymentIntent})=>{
-        //         if (!paymentIntent) {
-        //             return;
-        //         }else{
-        //             setStatus(paymentIntent.status)
-        //             setTimeout(()=>{
-        //                 setLoading(false)
-        //             },1500)
-        //         }
-        //     })
-        // }
         
     },[navigate,trxref])
     let message = ''
@@ -53,20 +53,6 @@ const PaymentStatus = () => {
             title = 'Payment Successful'
             icon = succeedimg
             link1 = "/home"
-            link2 = "/home"
-            break;
-        case 'processing':
-            message = 'Your payment is currently being processed'
-            title = 'Payment Pending'
-            icon = pendingpng
-            link1 = "/pricing"
-            link2 = "/home"
-            break;
-        case 'requires_payment_method':
-            message = 'Payment Failed'
-            title = 'Please try another payment method.'
-            icon = failpng
-            link1 = "/pricing"
             link2 = "/home"
             break;
         default:

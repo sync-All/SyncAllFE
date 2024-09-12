@@ -83,11 +83,11 @@ type UserDetails = {
     plan: string;
     amount: number;
     frequency : string;
-    subscription_status : string;
+    sub_status : string;
     next_billing_date : string;
     last4card_digits : string ;
     prod_id : string,
-    subscription_id : string
+    sub_id : string
     card_brand : string;
   };
   recentActivity: string[];
