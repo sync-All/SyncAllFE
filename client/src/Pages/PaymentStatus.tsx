@@ -28,7 +28,7 @@ const PaymentStatus = () => {
         console.log(trxref)
         if(trxref){
 
-            axios.post('http://localhost:3000/api/v1/transaction_status',{trxref},config)
+            axios.post('https://syncallfe.onrender.com/api/v1/transaction_status',{trxref},config)
             .then(()=>{
                 setStatus('succeeded')
                 setTimeout(()=>{
