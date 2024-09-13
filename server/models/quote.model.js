@@ -79,14 +79,17 @@ const fmtSchema = new Schema({
     ],
     license_duration :  { 
         type : String,
+        enum : ['Yearly'],
         required : true
     },
     additional_info : {
         type : String,
+        default : "N/A"
     },
     role_type : {
         type : String,
         enum : ['Film/Movie/TV Series'],
+        default : 'Film/Movie/TV Series',
         required : true
     },
     track_info : {
@@ -156,15 +159,17 @@ const tvaSchema = new Schema({
     attachments : [
         {
             type : String,
+            default : "N/A"
         },
     ],
     additional_info : {
         type : String,
-        required : true,
+        default : "N/A"
     },
     role_type : {
         type : String,
         enum : ['TV Commercial/Ads'],
+        default : 'TV Commercial/Ads',
         required : true
     },
     track_info : {
@@ -234,15 +239,17 @@ const videosGamesSchema = new Schema({
     attachments : [
         {
             type : String,
+            default : "N/A"
         },
     ],
     additional_info : {
         type : String,
-        required : true,
+        default : "N/A"
     },
     role_type : {
         type : String,
         enum : ['Video Games'],
+        default : 'Video Games',
         required : true
     },
     track_info : {
@@ -327,10 +334,12 @@ const samplingSchema = new Schema({
     },
     additional_info : { 
         type : String,
+        default : 'N/A'
     },
     attachments : [
         {
             type : String,
+            default : 'N/A'
         },
     ],
     role_type : {
@@ -420,15 +429,18 @@ const interpolationSchema = new Schema({
     },
     additional_info : { 
         type : String,
+        default : "N/A"
     },
     attachments : [
         {
             type : String,
+            default : "N/A"
         },
     ],
     role_type : {
         type : String,
         enum : ['Interpolation'],
+        default : 'Interpolation',
         required : true
     },
     track_info : {
@@ -441,7 +453,7 @@ const interpolationSchema = new Schema({
         ref : "syncUser",
         required : true
     }
-})
+}, {timestamps : true})
 
 const crbtSchema = new Schema({
     carrier : {
@@ -483,11 +495,12 @@ const crbtSchema = new Schema({
     },
     additional_info : {
         type : String,
-        required : true
+        default : "N/A",
     },
     role_type : {
         type : String,
         enum : ['CRBT'],
+        default : "CRBT",
         required : true
     },
     track_info : {

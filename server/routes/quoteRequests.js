@@ -9,6 +9,7 @@ const cloudinary = require("cloudinary").v2
 const fs = require("node:fs")
 const { syncUser } = require('../models/usermodel')
 const { trackLicense } = require('../models/dashboard.model')
+const { createFmtRecord, createTVARecord, createVideoGamesRecord, createSampleRecord, createInterpolationRecord, createCRBTRecord, createSMCRecord } = require('../utils/createAirTable')
 const Track = require('../models/dashboard.model').track
 const fmtRequest = require('../models/quote.model').fmtRequest
 const tvaRequest = require('../models/quote.model').tvaRequest
@@ -22,23 +23,23 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
     if(req.user.role == "Sync User"){
         const userId = req.user._id
         const trackId = req.body.track_info
-        console.log(req.body)
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
                 const attachments = [...req.files]
                 let attachmentUrlList = []
-                attachments.forEach(async (attachment)=>{
+                await Promise.all(attachments.map(async (attachment)=>{
                     const linky = await cloudinary.uploader.upload(attachment.path, {folder : "tva_attachment_requests"})
                     attachmentUrlList.push(linky.secure_url)
                     fs.unlinkSync(attachment.path)
-                })
+                }))
                 const request = new tvaRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    await createTVARecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -56,6 +57,7 @@ router.post('/quote-request/tva', passport.authenticate('jwt',{session : false, 
                 const request = new tvaRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async (uploadResponse)=>{
+                    await createTVARecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -84,21 +86,29 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
                 const attachments = [...req.files]
                 let attachmentUrlList = []
-                attachments.forEach(async (attachment)=>{
-                    const linky = await cloudinary.uploader.upload(attachment.path, {folder : "fmt_attachment_requests"})
-                    attachmentUrlList.push(linky.secure_url)
-                    fs.unlinkSync(attachment.path)
-                })
+                await Promise.all(attachments.map(async (attachment) => {
+                    await cloudinary.uploader.upload(attachment.path, {folder : "fmt_attachment_requests"})
+                    .then((linky)=>{
+                        fs.unlinkSync(attachment.path)
+                        attachmentUrlList.push(linky.secure_url) 
+                    }) 
+                    .catch((error) => {
+                        console.log(error)
+                        fs.unlinkSync(attachment.path);
+                        return;
+                    });
+                  }));
                 const request = new fmtRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
                 .then(async (uploadResponse)=>{
+                    await createFmtRecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -116,6 +126,7 @@ router.post('/quote-request/fmt', passport.authenticate('jwt',{session : false, 
                 const request = new fmtRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async (uploadResponse)=>{
+                    await createFmtRecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -144,29 +155,29 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
                 const attachments = [...req.files]
                 const attachmentUrlList = []
-                attachments.forEach(async attachment => {
+                await Promise.all(attachments.map(async attachment => {
                     await cloudinary.uploader.upload(attachment.path,{folder:  "video_game_request_attachments"})
                     .then((linky)=>{
                         fs.unlinkSync(attachment.path)
                         attachmentUrlList.push(linky.secure_url)
-                        return; 
                     }) 
                     .catch((error) => {
                         console.log(error)
                         fs.unlinkSync(attachment.path);
                         return;
                     });
-                })
+                }))
                 const request = new videoGamesRequest({...req.body, user_info : userId,attachments : attachmentUrlList})
                 await request.save()
                 .then(async (uploadResponse)=>{
+                    await createVideoGamesRecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -184,6 +195,7 @@ router.post('/quote-request/video_game', passport.authenticate('jwt',{session : 
                 const request = new videoGamesRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    await createVideoGamesRecord(uploadResponse, trackDetails, req.user.email)
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -212,21 +224,24 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const  trackDetails = await Track.findOne({_id : trackId}).exec()
+            const  trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track not found')
             }
             if(req.files){
                 const attachments = [...req.files]
                 let attachmentUrlList = []
-                attachments.forEach(async (attachment)=>{
+                await Promise.all(attachments.map(async (attachment)=>{
                     const linky = await cloudinary.uploader.upload(attachment.path, {folder : "sampling_attachment_requests"})
                     attachmentUrlList.push(linky.secure_url)
                     fs.unlinkSync(attachment.path)
-                })
+                }))
                 const request = new samplingRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    // create airtable sample record
+                    await createSampleRecord(uploadResponse, trackDetails, req.user.email)
+                    // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -245,7 +260,9 @@ router.post('/quote-request/sampling', passport.authenticate('jwt',{session : fa
                 const request = new samplingRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async(uploadResponse)=>{
-                    console.log(uploadResponse.populate('track_info'))
+                    // create airtable sample record
+                    await createSampleRecord(uploadResponse, trackDetails, req.user.email)
+                    // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -275,21 +292,24 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
         console.log(req.body)
         const trackId = req.body.track_info
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             if(req.files){
                 const attachments = [...req.files]
                 let attachmentUrlList = []
-                attachments.forEach(async (attachment)=>{
+                await Promise.all(attachments.map(async (attachment)=>{
                     const linky = await cloudinary.uploader.upload(attachment.path, {folder : "interpolation_attachment_requests"})
                     attachmentUrlList.push(linky.secure_url)
                     fs.unlinkSync(attachment.path)
-                })
+                }))
                 const request = new interpolationRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    // create airtable interpolation record
+                    await createInterpolationRecord(uploadResponse, trackDetails, req.user.email)
+                    // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -307,6 +327,9 @@ router.post('/quote-request/interpolation', passport.authenticate('jwt',{session
                 const request = new interpolationRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    // create airtable interpolation record
+                    await createInterpolationRecord(uploadResponse, trackDetails, req.user.email)
+                    // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -335,13 +358,16 @@ router.post('/quote-request/crbt', passport.authenticate('jwt',{session : false,
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }
             const request = new crbtRequest({...req.body, user_info : userId})
             await request.save()
             .then(async(uploadResponse)=>{
+                // create airtable interpolation record
+                await createCRBTRecord(uploadResponse, trackDetails, req.user.email)
+                // end---
                 const license = new trackLicense({
                     track_name : trackDetails.trackTitle,
                     amount : 'N/A',
@@ -376,14 +402,17 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
             if(req.files){
                 const attachments = [...req.files]
                 let attachmentUrlList = []
-                attachments.forEach(async (attachment)=>{
+                await Promise.all(attachments.map(async (attachment)=>{
                     const linky = await cloudinary.uploader.upload(attachment.path, {folder : "smc_attachment_requests"})
                     attachmentUrlList.push(linky.secure_url)
                     fs.unlinkSync(attachment.path)
-                })
+                }))
                 const request = new smcRequest({...req.body, user_info : userId, attachments : attachmentUrlList})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    // create airtable interpolation record
+                await createSMCRecord(uploadResponse, trackDetails, req.user.email)
+                // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
@@ -401,6 +430,9 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
                 const request = new smcRequest({...req.body, user_info : userId})
                 await request.save()
                 .then(async(uploadResponse)=>{
+                    // create airtable interpolation record
+                await createSMCRecord(uploadResponse, trackDetails, req.user.email)
+                // end---
                     const license = new trackLicense({
                         track_name : trackDetails.trackTitle,
                         amount : 'N/A',
