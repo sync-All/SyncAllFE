@@ -13,7 +13,7 @@ const options = {
 };
 
 
-const strategy = new jwtStrategy(options, async (payload, done)=>{e
+const strategy = new jwtStrategy(options, async (payload, done)=>{
     const uploader = await User.findOne({_id : payload.sub}).exec()
     const syncUser = await SyncUser.findOne({_id : payload.sub})
     const item = uploader || syncUser
