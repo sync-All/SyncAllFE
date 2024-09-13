@@ -559,16 +559,18 @@ const smcSchema = new Schema({
     },
     additional_info : {
         type : String,
-        required : true
+        default : "N/A"
     },
     attachments : [
         {
             type : String,
+            default : "N/A"
         },
     ],
     role_type : {
         type : String,
         enum : ['Social Media Content'],
+        default : "Social Media Content",
         required : true
     },
     track_info : {

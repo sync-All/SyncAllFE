@@ -395,7 +395,7 @@ router.post('/quote-request/smc', passport.authenticate('jwt',{session : false, 
         const userId = req.user._id
         const trackId = req.body.track_info
         try {
-            const trackDetails = await Track.findOne({_id : trackId}).exec()
+            const trackDetails = await Track.findOne({_id : trackId}).populate('user').exec()
             if(!trackDetails){
                 throw new BadRequestError('Track does not exists')
             }

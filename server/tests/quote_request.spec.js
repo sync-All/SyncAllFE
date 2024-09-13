@@ -220,24 +220,47 @@ describe('Sync User quote request',()=>{
     //         .expect(200)
     //     })
     // })
-    describe("CRBT quote request", ()=>{
+    // describe("CRBT quote request", ()=>{
+    //     it('Should pass if track id is valid', async()=>{
+    //         const request_data = {
+    //             carrier : "Farm Fresh",
+    //             target_audience : "Young and Old",
+    //             theme: "Soft and cool",
+    //             duration : "10 seconds",
+    //             distribution : ["N/A"],
+    //             territories: ["Lavida", "Innoca"],
+    //             license_duration : "Yearly",
+    //             media : "Mp4 Mp3",
+    //             samples_of_other_songs : "Vishini",
+    //             additional_info : "N/A",
+    //             track_info : "66df121f5fa9310230668297",
+    
+    //         }
+    //          await request(app)
+    //         .post('/api/v1/quote-request/crbt')
+    //         .set("Authorization", `${accesstoken}`)
+    //         .send(request_data)
+    //         .expect(200)
+    //     })
+    // })
+
+    describe("SMC quote request", ()=>{
         it('Should pass if track id is valid', async()=>{
             const request_data = {
-                carrier : "Farm Fresh",
-                target_audience : "Young and Old",
+                platform : ["Farm Fresh"],
+                content_type : ["Young and Old"],
                 theme: "Soft and cool",
-                duration : "10 seconds",
+                length : "10 seconds",
                 distribution : ["N/A"],
                 territories: ["Lavida", "Innoca"],
                 license_duration : "Yearly",
                 media : "Mp4 Mp3",
-                samples_of_other_songs : "Vishini",
                 additional_info : "N/A",
                 track_info : "66df121f5fa9310230668297",
     
             }
              await request(app)
-            .post('/api/v1/quote-request/crbt')
+            .post('/api/v1/quote-request/smc')
             .set("Authorization", `${accesstoken}`)
             .send(request_data)
             .expect(200)

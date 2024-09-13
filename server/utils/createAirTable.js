@@ -278,12 +278,13 @@ async function createSMCRecord(formfields, extrainfo, syncEmail){
   }
 
   try {
-    await axios.post('https://api.airtable.com/v0/meta/bases/appaKCViIID5q3ZBE/tables', record, {
+    const response = await axios.post('https://api.airtable.com/v0/appaKCViIID5q3ZBE/Social_Media_Content_request', record, {
       headers : {
         Authorization : `Bearer ${air_pk}`,
         'Content-Type' : 'application/json'
       }
     })
+    console.log(response.data)
   } catch (error) {
     console.log(error)
   }
