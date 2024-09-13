@@ -8,7 +8,7 @@ require('dotenv').config()
 const pathtofile = path.join(__dirname, '..', '/views/quoteRequest.ejs')
 const pathtoheaderLogo = path.join(__dirname, '..', '/public/images/headerLogo.png')
 const pathtofooterLogo = path.join(__dirname, '..', '/public/images/footerLogo.png')
-const pathtoFbLogo = path.join(__dirname, '..', '/public/images/fb.png')
+const pathtoIgLogo = path.join(__dirname, '..', '/public/images/ig.svg')
 const pathtoLnLogo = path.join(__dirname, '..', '/public/images/ln.png')
 const pathtoXLogo = path.join(__dirname, '..', '/public/images/twitter.png')
 const pathtoMessageIcon = path.join(__dirname, '..', '/public/images/message.png')
@@ -49,9 +49,9 @@ await ejs.renderFile(pathtofile,{ link :`https://syncallfe.onrender.com/verifyEm
       cid: 'footerLogo' //same cid value as in the html img src
     },
     {
-      filename: 'fb.png',
-      path: pathtoFbLogo,
-      cid: 'fb' //same cid value as in the html img src
+      filename: 'ig.svg',
+      path: pathtoIgLogo,
+      cid: 'ig' //same cid value as in the html img src
     },
     {
       filename: 'ln.png',
