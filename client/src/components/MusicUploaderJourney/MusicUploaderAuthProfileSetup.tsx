@@ -2,7 +2,6 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios, { AxiosError } from 'axios';
 import Logo from '../../assets/logo-black.png';
-import BackgroundPattern from '../../assets/images/user-role-pattern.svg';
 import BadgeCheck from '../../assets/images/badge-check.svg';
 import BadgeUncheck from '../../assets/images/unnamed.png';
 import InfoIcon from '../../assets/images/info-fill.svg';
@@ -48,10 +47,7 @@ function delay(ms: number) {
 
   return (
     <div className="bg-[#013131]">
-      <div
-        className="h-screen flex items-center justify-center"
-        style={{ background: `url(${BackgroundPattern})` }}
-      >
+      <div className="min-h-screen  pb-24 flex items-center justify-center bg-onboardingBg">
         <div className="flex flex-col items-start justify-center bg-white lg:w-[619px] py-[56px] px-[31px] lg:px-[77px] border rounded-[20px] gap-[54px] mt-[56px] ">
           <img src={Logo} alt="" />
           <h2 className="font-formular-regular text-[32px] text-black leading-[18.5px]">
@@ -79,7 +75,7 @@ function delay(ms: number) {
             initialValues={{ username: '', spotifyLink: '', bio: '' }}
             validationSchema={validationSchema}
             onSubmit={async (values) => {
-              setLoading(true)
+              setLoading(true);
               const token = localStorage.getItem('token');
               const urlVar = import.meta.env.VITE_APP_API_URL;
               const apiUrl = `${urlVar}/profilesetup/`;
@@ -107,76 +103,72 @@ function delay(ms: number) {
               } finally {
                 setLoading(false);
               }
-             
             }}
           >
-            
-              <Form className="flex flex-col gap-[32px] w-full">
-                <div className="flex flex-col gap-[8px]">
-                  <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
-                    What’s your username?
-                  </label>
-                  <Field
-                    type="text"
-                    name="username"
-                    placeholder="Enter your username"
-                    className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
-                  />
-                  <ErrorMessage
-                    name="username"
-                    component="div"
-                    className="text-red-400 italic text-sm py-[4px]"
-                  />
-                </div>
-                <div className="flex flex-col gap-[8px] w-full">
-                  <label className="flex gap-[4px] text-[16px] poppins-medium leading-[16px] tracking-[0.4px] items-center ">
-                    Your Spotify Link{' '}
-                    <span>
-                      <img src={InfoIcon} alt="" />
-                    </span>
-                  </label>
-                  <span className="flex w-full">
-                    <span className="px-3 py-auto text-base font-normal font-inter text-[#637083] bg-[#F9FAFB] border border-[#E4E7EC] whitespace-nowrap align-middle flex items-center rounded-tl-[4px] rounded-bl-[4px]">
-                      https://
-                    </span>
-                    <Field
-                      
-                      name="spotifyLink"
-                      placeholder="Paste Link"
-                      className="border-l-0 border border-[#D7DCE0] border-collapse rounded-bl-none rounded-tl-none rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185] w-full"
-                    />
+            <Form className="flex flex-col gap-[32px] w-full">
+              <div className="flex flex-col gap-[8px]">
+                <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
+                  What’s your username?
+                </label>
+                <Field
+                  type="text"
+                  name="username"
+                  placeholder="Enter your username"
+                  className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
+                />
+                <ErrorMessage
+                  name="username"
+                  component="div"
+                  className="text-red-400 italic text-sm py-[4px]"
+                />
+              </div>
+              <div className="flex flex-col gap-[8px] w-full">
+                <label className="flex gap-[4px] text-[16px] poppins-medium leading-[16px] tracking-[0.4px] items-center ">
+                  Your Spotify Link{' '}
+                  <span>
+                    <img src={InfoIcon} alt="" />
                   </span>
-                  <ErrorMessage
-                    name="spotifyLink"
-                    component="div"
-                    className="text-red-400 italic text-sm py-[4px]"
-                  />
-                </div>
-                <div className="flex flex-col gap-[8px] w-full">
-                  <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
-                    Your Bio
-                  </label>
+                </label>
+                <span className="flex w-full">
+                  <span className="px-3 py-auto text-base font-normal font-inter text-[#637083] bg-[#F9FAFB] border border-[#E4E7EC] whitespace-nowrap align-middle flex items-center rounded-tl-[4px] rounded-bl-[4px]">
+                    https://
+                  </span>
                   <Field
-                    as="textarea"
-                    name="bio"
-                    placeholder="Tell us about yourself "
-                    className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
+                    name="spotifyLink"
+                    placeholder="Paste Link"
+                    className="border-l-0 border border-[#D7DCE0] border-collapse rounded-bl-none rounded-tl-none rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185] w-full"
                   />
-                  <ErrorMessage
-                    name="bio"
-                    component="div"
-                    className="text-red-400 italic text-sm py-[4px]"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="py-4 px-5 w-full rounded-[8px] poppins-medium text-base bg-[#14181F] text-white"
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-              </Form>
-            
+                </span>
+                <ErrorMessage
+                  name="spotifyLink"
+                  component="div"
+                  className="text-red-400 italic text-sm py-[4px]"
+                />
+              </div>
+              <div className="flex flex-col gap-[8px] w-full">
+                <label className="text-[16px] poppins-medium leading-[16px] tracking-[0.4px] ">
+                  Your Bio
+                </label>
+                <Field
+                  as="textarea"
+                  name="bio"
+                  placeholder="Tell us about yourself "
+                  className="border border-[#D7DCE0] rounded-[4px] py-[16px] pl-[16px] placeholder:poppins-light placeholder:leading-4 placeholder:text-4 text-[#667185]"
+                />
+                <ErrorMessage
+                  name="bio"
+                  component="div"
+                  className="text-red-400 italic text-sm py-[4px]"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="py-4 px-5 w-full rounded-[8px] poppins-medium text-base bg-[#14181F] text-white"
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </Form>
           </Formik>
         </div>
       </div>

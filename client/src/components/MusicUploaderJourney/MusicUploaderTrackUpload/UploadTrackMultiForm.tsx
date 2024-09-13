@@ -95,7 +95,7 @@ const validationSchema = Yup.object().shape({
   upc: Yup.number().min(0).required('Required'),
   isrc: Yup.string().required('Required'),
   genre: Yup.string().required('Required'),
-  artWork: Yup.mixed().required('A file is required'),
+  artWork: Yup.mixed(),
   recordingVersion: Yup.string(),
   featuredInstrument: Yup.array().of(Yup.string()),
   producers: Yup.array().of(Yup.string()),
