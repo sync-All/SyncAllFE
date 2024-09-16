@@ -57,6 +57,7 @@ export default {
         syncbg: "url('/src/assets/syncbg.png')",
         syncUserBg: "url('/src/assets/images/user-homepage-mobile-head.png')",
         desktopSyncUserBg: "url('/src/assets/images/user-homepage-head.png')",
+        onboardingBg: "url('src/assets/images/user-role-pattern.svg')",
       },
     },
   },
