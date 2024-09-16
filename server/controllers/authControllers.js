@@ -181,32 +181,30 @@ const getsyncuserinfo = async (req,res,next)=>{
 }
 
 const profilesetup = async (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if(req.user.userType == "Individual"){
     const {username, spotifyLink, bio} = req.body;
     const duplicateUsername = await User.findOne({username}).exec()
-    console.log(duplicateUsername)
     if(duplicateUsername){
       throw new BadRequestError('Username in exist already')
     }
     await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     if (!username || !spotifyLink || !bio) {
-      res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
-    } else {
-      const userId = req.user._id;
-      try {
-        await User.findByIdAndUpdate(userId,req.body,{ new: true });
-        res.status(200).json({success: true,message: 'Profile update successful'});
-      } catch (error) {
-        console.log(error)
-        res.send(error)
-      }
-    }
-  }else {
-    res.status(401).json({
-        success: false,
-        message: 'Unauthorized, Please proceed to login',
-      });
+      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+    }  
+  }else if(req.user.userType == "Company"){
+    const {address, representative, phoneNumber} = req.body;
+    if (!address || !representative || !phoneNumber) {
+      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+    } 
   }
+    const userId = req.user._id;
+    try {
+      await User.findByIdAndUpdate(userId,req.body,{ new: true });
+      res.status(200).json({success: true,message: 'Profile update successful'});
+    } catch (error) {
+      console.log(error)
+      res.send(error)
+    }
 }
 
 const profileUpdate = async (req,res,next)=>{

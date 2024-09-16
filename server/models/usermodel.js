@@ -19,7 +19,8 @@ const userSchema = new Schema({
     },
     userType : {
         type : String,
-        required : true
+        required : true,
+        enum : ['Individual, Company']
     },
     emailConfirmedStatus : {
         type : Boolean,
@@ -55,6 +56,12 @@ const userSchema = new Schema({
         type : String
     },
     tiktokLink : {
+        type : String,
+    },
+    address : {
+        type : String,
+    },
+    representative : {
         type : String,
     },
     bio: {
