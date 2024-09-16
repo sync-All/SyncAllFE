@@ -248,7 +248,7 @@ const TrackMetadata = () => {
                   <p className="text-[#475367]">
                     {Array.isArray(trackDetails?.producers)
                       ? trackDetails.producers.join(', ')
-                      : ''}
+                      : 'Subscribe to see this info'}
                   </p>
                 </span>
 
@@ -379,7 +379,9 @@ const TrackMetadata = () => {
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                     <p>Writer</p>
                     <p className="text-[#475367]">
-                      {trackDetails?.writers || 'Subscribe to see this info'}
+                      {Array.isArray(trackDetails?.writers)
+                        ? trackDetails.writers.join(', ')
+                        : 'Subscribe to see this info'}
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
@@ -433,7 +435,7 @@ const TrackMetadata = () => {
                         ? trackDetails.composers.join(', ')
                         : 'Subscribe to see this info'}
                     </p>
-                  </span> 
+                  </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                     <p>Release Description</p>
                     <p className="text-[#475367]">
