@@ -48,7 +48,6 @@ const TrackMetadata = () => {
     copyrightName: string;
     copyrightYear: number;
     createdAt: string;
-    earnings: number;
     explicitCont: boolean;
     featuredArtist: string[];
     featuredInstrument: string[];
@@ -62,7 +61,6 @@ const TrackMetadata = () => {
     releaseLabel: string;
     releaseTitle: string;
     releaseType: string;
-    role: string;
     tag: string[];
     upc: number;
     updatedAt: string;
@@ -212,11 +210,13 @@ const TrackMetadata = () => {
                   <p className="text-[#475367]">{trackDetails?.duration}</p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Composed by</p>
+                  <p>Tag</p>
                   <p className="text-[#475367]">
-                    {Array.isArray(trackDetails?.composers)
-                      ? trackDetails.composers.join(', ')
-                      : 'Subscribe to see this info'}
+                    {trackDetails?.tag === undefined
+                      ? 'Subscribe to see this info'
+                      : trackDetails.tag.length === 0
+                      ? 'N/A'
+                      : trackDetails.tag.join(', ')}
                   </p>
                 </span>
               </div>
@@ -248,22 +248,29 @@ const TrackMetadata = () => {
                   <p className="text-[#475367]">
                     {Array.isArray(trackDetails?.producers)
                       ? trackDetails.producers.join(', ')
-                      : ''}
+                      : 'Subscribe to see this info'}
                   </p>
                 </span>
 
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Writer</p>
+                  <p>Featured Artist</p>
                   <p className="text-[#475367]">
-                    {trackDetails?.writers || 'Subscribe to see this info'}
+                    {trackDetails?.featuredArtist === undefined
+                      ? 'Subscribe to see this info'
+                      : trackDetails.featuredArtist.length === 0
+                      ? 'N/A'
+                      : trackDetails.featuredArtist.join(', ')}
                   </p>
                 </span>
+
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Featured Instrument</p>
+                  <p>Release Title</p>
                   <p className="text-[#475367]">
-                    {Array.isArray(trackDetails?.featuredInstrument)
-                      ? trackDetails.featuredInstrument.join(', ')
-                      : 'Subscribe to see this info'}
+                    {trackDetails?.releaseTitle === undefined
+                      ? 'Subscribe to see this info'
+                      : trackDetails.releaseTitle.trim() === ''
+                      ? 'N/A'
+                      : trackDetails.releaseTitle}
                   </p>
                 </span>
               </div>
@@ -281,9 +288,6 @@ const TrackMetadata = () => {
             )}
 
             {isVisible && (
-              
-            
-
               <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
                 {/* First Column */}
                 <div className="flex flex-col gap-8 lg:gap-6">
@@ -337,16 +341,6 @@ const TrackMetadata = () => {
                         : trackDetails.releaseType}
                     </p>
                   </span>
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Tag</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.tag === undefined
-                        ? 'Subscribe to see this info'
-                        : trackDetails.tag.length === 0
-                        ? 'N/A'
-                        : trackDetails.tag.join(', ')}
-                    </p>
-                  </span>
                 </div>
 
                 {/* Second Column */}
@@ -371,16 +365,7 @@ const TrackMetadata = () => {
                         : trackDetails.copyrightYear}
                     </p>
                   </span>
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Earnings</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.earnings === undefined
-                        ? 'Subscribe to see this info'
-                        : trackDetails.earnings.toString().trim() === ''
-                        ? 'N/A'
-                        : `$${trackDetails.earnings.toLocaleString()}`}
-                    </p>
-                  </span>
+
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                     <p>Explicit Content</p>
                     <p className="text-[#475367]">
@@ -392,23 +377,19 @@ const TrackMetadata = () => {
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Featured Artist</p>
+                    <p>Writer</p>
                     <p className="text-[#475367]">
-                      {trackDetails?.featuredArtist === undefined
-                        ? 'Subscribe to see this info'
-                        : trackDetails.featuredArtist.length === 0
-                        ? 'N/A'
-                        : trackDetails.featuredArtist.join(', ')}
+                      {Array.isArray(trackDetails?.writers)
+                        ? trackDetails.writers.join(', ')
+                        : 'Subscribe to see this info'}
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Role</p>
+                    <p>Featured Instrument</p>
                     <p className="text-[#475367]">
-                      {trackDetails?.role === undefined
-                        ? 'Subscribe to see this info'
-                        : trackDetails.role.trim() === ''
-                        ? 'N/A'
-                        : trackDetails.role}
+                      {Array.isArray(trackDetails?.featuredInstrument)
+                        ? trackDetails.featuredInstrument.join(', ')
+                        : 'Subscribe to see this info'}
                     </p>
                   </span>
                 </div>
@@ -448,6 +429,14 @@ const TrackMetadata = () => {
                     </p>
                   </span>
                   <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                    <p>Composed by</p>
+                    <p className="text-[#475367]">
+                      {Array.isArray(trackDetails?.composers)
+                        ? trackDetails.composers.join(', ')
+                        : 'Subscribe to see this info'}
+                    </p>
+                  </span>
+                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                     <p>Release Description</p>
                     <p className="text-[#475367]">
                       {trackDetails?.releaseDesc === undefined
@@ -455,16 +444,6 @@ const TrackMetadata = () => {
                         : trackDetails.releaseDesc.trim() === ''
                         ? 'N/A'
                         : trackDetails.releaseDesc}
-                    </p>
-                  </span>
-                  <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    <p>Release Title</p>
-                    <p className="text-[#475367]">
-                      {trackDetails?.releaseTitle === undefined
-                        ? 'Subscribe to see this info'
-                        : trackDetails.releaseTitle.trim() === ''
-                        ? 'N/A'
-                        : trackDetails.releaseTitle}
                     </p>
                   </span>
                 </div>
