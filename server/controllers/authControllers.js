@@ -62,7 +62,10 @@ const signup = async function(req, res) {
                 await dashboard.save()
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+              console.log(err)
+              throw new BadRequestError("An Error Occurred, Invalid Input")
+            })
           })
         }else {
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
@@ -80,7 +83,10 @@ const signup = async function(req, res) {
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+              console.log(err)
+              throw new BadRequestError("An Error Occurred, Invalid Input")
+            })
           })
         }
         
@@ -122,46 +128,45 @@ const signup = async function(req, res) {
   }
 
   const googleAuth = async(req,res,next)=>{
-    console.log(req.body)
-        try {
-          const user = await User.findOne({email : req.body.email}).exec() 
-          const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
-          let item = user || syncUser
-          if (!item){
-            if(req.body.role){
-              if(req.body.role == "Music Uploader"){
-                const user = new User({...req.body,authSource : 'googleAuth'})
-                var newUser = await user.save()
-                const dashboard = new Dashboard({
-                  user : newUser._id
-                })
-                await dashboard.save()
-                newUser = newUser.toObject()
-                delete newUser.password
-              }else{
-                const user = new SyncUser({...req.body,authSource : 'googleAuth'})
-                var newSyncUser = await user.save()
-                newSyncUser = newSyncUser.toObject()
-                delete newSyncUser.password
-              }
-              item = newUser || newSyncUser
-              let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-              res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-            }else{
-              return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
-            }
-            
+    try {
+      const user = await User.findOne({email : req.body.email}).exec() 
+      const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
+      let item = user || syncUser
+      if (!item){
+        if(req.body.role){
+          if(req.body.role == "Music Uploader"){
+            const user = new User({...req.body,authSource : 'googleAuth'})
+            var newUser = await user.save()
+            const dashboard = new Dashboard({
+              user : newUser._id
+            })
+            await dashboard.save()
+            newUser = newUser.toObject()
+            delete newUser.password
           }else{
-            let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-            res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+            const user = new SyncUser({...req.body,authSource : 'googleAuth'})
+            var newSyncUser = await user.save()
+            newSyncUser = newSyncUser.toObject()
+            delete newSyncUser.password
           }
-          
-        } catch (error) {
-          console.log(error)
-          res.status(401).send(error)
+          item = newUser || newSyncUser
+          let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+          res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+        }else{
+          return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
         }
+        
+      }else{
+        let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+        res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+      }
+      
+    } catch (error) {
+      console.log(error)
+      res.status(401).send(error)
+    }
         
 }
 
@@ -197,14 +202,14 @@ const profilesetup = async (req, res, next) => {
       return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
     } 
   }
-    const userId = req.user._id;
-    try {
-      await User.findByIdAndUpdate(userId,req.body,{ new: true });
-      res.status(200).json({success: true,message: 'Profile update successful'});
-    } catch (error) {
-      console.log(error)
-      res.send(error)
-    }
+  const userId = req.user._id;
+  try {
+    await User.findByIdAndUpdate(userId,req.body,{ new: true });
+    res.status(200).json({success: true,message: 'Profile update successful'});
+  } catch (error) {
+    console.log(error)
+    res.send(error)
+  }
 }
 
 const profileUpdate = async (req,res,next)=>{
