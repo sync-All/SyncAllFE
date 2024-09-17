@@ -20,7 +20,7 @@ const userSchema = new Schema({
     userType : {
         type : String,
         required : true,
-        enum : ['Individual, Company']
+        enum : ['Individual', 'Company']
     },
     emailConfirmedStatus : {
         type : Boolean,
