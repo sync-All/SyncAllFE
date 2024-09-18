@@ -37,6 +37,14 @@ import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Soci
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 import PaymentStatus from './Pages/PaymentStatus';
 
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPEPK_TEST_KEY);
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+} from "@stripe/react-stripe-js";
+import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
+
+
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -81,7 +89,17 @@ function App() {
                 element={<MusicUploaderAuthProfileSetup />}
               />
             }
-          ></Route>
+          />
+
+          <Route
+            path="/onboarding-companies"
+            element={
+              <ProtectedRoute
+                path="/onboarding-companies"
+                element={<MusicUploaderCompanyAuthProfileSetup />}
+              />
+            }
+          />
 
           <Route path="/forgotpassword" element={<ForgetPassword />} />
 

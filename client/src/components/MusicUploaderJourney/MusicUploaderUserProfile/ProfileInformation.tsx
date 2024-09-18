@@ -17,7 +17,9 @@ const ProfileInformation = () => {
   const refreshPage = () => {
     window.location.reload();
   };
-  
+
+  const usertype = userDetails?.userType;
+
   const dateCreated = userDetails?.createdAt
     ? new Date(userDetails.createdAt)
     : null;
@@ -25,7 +27,7 @@ const ProfileInformation = () => {
   const dateJoined = dateOnly;
 
   const applyInputStyles =
-  'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
+    'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
 
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
@@ -34,6 +36,7 @@ const ProfileInformation = () => {
 
   const validationSchema = Yup.object({
     username: Yup.string(),
+    representative: Yup.string(),
     name: Yup.string(),
     email: Yup.string().email('Invalid email address'),
     phoneNumber: Yup.string(),
@@ -43,6 +46,7 @@ const ProfileInformation = () => {
 
   const initialValues = {
     username: userDetails?.username,
+    representative: userDetails?.representative,
     name: userDetails?.name,
     email: userDetails?.email,
     phoneNumber: userDetails?.phoneNumber,
@@ -74,9 +78,9 @@ const ProfileInformation = () => {
           try {
             await axios.postForm(apiUrl, values, config);
             toast.success('Profile Information Updated successful');
-            setTimeout(()=>{
-              refreshPage()
-            },1500)
+            setTimeout(() => {
+              refreshPage();
+            }, 1500);
           } catch (error: unknown) {
             const axiosError = error as AxiosError<ResponseData>;
             toast.error(
@@ -93,22 +97,41 @@ const ProfileInformation = () => {
         {({ setFieldValue }) => (
           <Form>
             <div className={applyFormDiv}>
-              <div className={input}>
-                <label htmlFor="username" className={applyLabelStyles}>
-                  Username
-                </label>
-                <Field
-                  type="text"
-                  name="username"
-                  className={applyInputStyles}
-                  placeholder={userDetails?.username}
-                />
-                <ErrorMessage
-                  name="username"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
+              {usertype === 'Company' ? (
+                <div className={input}>
+                  <label htmlFor="representative" className={applyLabelStyles}>
+                    Representative
+                  </label>
+                  <Field
+                    type="text"
+                    name="representative"
+                    className={applyInputStyles}
+                    placeholder={userDetails?.representative}
+                  />
+                  <ErrorMessage
+                    name="representative"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              ) : (
+                <div className={input}>
+                  <label htmlFor="username" className={applyLabelStyles}>
+                    Username
+                  </label>
+                  <Field
+                    type="text"
+                    name="username"
+                    className={applyInputStyles}
+                    placeholder={userDetails?.username}
+                  />
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              )}
               <div className={input}>
                 <label htmlFor="dateJoined" className={applyLabelStyles}>
                   Date Joined

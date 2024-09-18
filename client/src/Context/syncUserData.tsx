@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import React, {
   createContext,
   useState,
@@ -7,6 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+import { toast } from 'react-toastify';
 
 export interface TracklistDetails {
   _id: string;
@@ -78,10 +79,11 @@ type UserDetails = {
   phoneNumber: string;
   img: string;
   totalLicensedTracks: TracklistDetails[];
-  pendingLicensedTracks: PendingTracks[]
+  pendingLicensedTracks: PendingTracks[];
   billing: {
     plan: string;
     amount: number;
+
     frequency : string;
     sub_status : string;
     next_billing_date : string;
@@ -89,12 +91,17 @@ type UserDetails = {
     prod_id : string,
     sub_id : string
     card_brand : string;
+
   };
   recentActivity: string[];
   tracklist: TracklistDetails[];
   upcomingRenewals: number;
   __v: number;
 };
+
+interface ResponseData {
+  message?: string;
+}
 
 type User = {
   user: UserDetails;
@@ -115,6 +122,11 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const fetchSyncData = useCallback(async () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -130,7 +142,19 @@ export const SyncUserProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await axios.get(apiUrl, config);
       setUser(response.data);
     } catch (error) {
-      console.error('Error fetching sync data:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error('Unauthorized access - redirecting to login.');
+        delay(5000)
+        window.location.href = '/login';
+      } else {
+        const axiosError = error as AxiosError<ResponseData>;
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      }
     } finally {
       setLoading(false);
     }

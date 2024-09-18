@@ -58,6 +58,7 @@ interface ProfileInfo {
   img: string;
   createdAt: string;
   phoneNumber: number;
+  representative: string
 }
 
 interface transactions {
@@ -122,16 +123,20 @@ const [_token, setToken] = useState(localStorage.getItem('token'));
     try {
       setLoading(true);
       const response = await axios.get(apiUrl, config);
-console.log(response);
       setDashboardData(response.data);
     } catch (error: unknown) {
-      const axiosError = error as AxiosError<ResponseData>;
-      toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message || axiosError.response.data
-          : axiosError.message || 'An error occurred'
-        ).toString()
-      );
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error('Unauthorized access - redirecting to login.');
+        window.location.href = '/login';
+      } else {
+        const axiosError = error as AxiosError<ResponseData>;
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      }
     } finally {
       setLoading(false);
     }
