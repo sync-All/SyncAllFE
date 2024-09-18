@@ -21,7 +21,7 @@ const SigninSchema = Yup.object().shape({
 
 interface LoginProps {
   setToken: (token: string) => void;
-  setGoogleAuthData: React.Dispatch<React.SetStateAction<object | null>>
+  setGoogleAuthData: React.Dispatch<React.SetStateAction<object | null>>;
 }
 
 interface ResponseData {
@@ -33,13 +33,21 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const { loading, setLoading } = useLoading();
 
-  const handleNavigationTODashboard = (spotifyLink:string) => {
-    if(!spotifyLink){
+  const handleNavigationTODashboard = (spotifyLink: string) => {
+    if (!spotifyLink) {
       navigate('/onboarding-details');
-    }else{
+    } else {
       navigate('/dashboard');
     }
-};
+  };
+
+  const handleSpecificActionForCompany = (phoneNumber: string) => {
+    if (!phoneNumber) {
+      navigate('/onboarding-companies');
+    } else {
+      navigate('/dashboard');
+    }
+  };
 
   const { setUserRole } = useContext(UserContext);
 
@@ -58,20 +66,22 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         password: values['password'],
       });
       if (response && response.data) {
-        // Clear existing session data
+        console.log(response);
+
         localStorage.clear();
-        sessionStorage.clear()
-        const spotifyLink = response.data.user.spotifyLink
+        sessionStorage.clear();
+        const spotifyLink = response.data.user.spotifyLink;
+        const phoneNumber = response.data.user.phoneNumber;
+
         setToken(response.data.token);
-        // setUserRole(response.data.user.role);
-        // const user = response.data.user;
+
         localStorage.setItem('token', response.data.token);
-        // localStorage.setItem('userRole', response.data.user.role);
-        // localStorage.setItem('userId', response.data.user._id);
-        // localStorage.setItem('syncUserInfo', JSON.stringify(user));
-       
+        const { role, userType } = response.data.user;
+
         toast.success('Login successful');
-        if (response.data.user.role == 'Music Uploader') {
+        if (role === 'Music Uploader' && userType === 'Company') {
+          handleSpecificActionForCompany(phoneNumber);
+        } else if (role === 'Music Uploader' && userType === 'Individual') {
           handleNavigationTODashboard(spotifyLink);
         } else {
           navigate('/home');
@@ -102,23 +112,30 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     // COlate values and assign to their proper fields
     const values = {
       name: userInfo?.profile?.name,
-        email: userInfo?.profile?.email,
-        img: userInfo?.profile?.picture,
-        emailConfirmedStatus: userInfo?.profile?.verified_email,
-        userType: 'individual',
-        newUser: userInfo?.isNewUser,
+      email: userInfo?.profile?.email,
+      img: userInfo?.profile?.picture,
+      emailConfirmedStatus: userInfo?.profile?.verified_email,
+      userType: 'individual',
+      newUser: userInfo?.isNewUser,
     };
     // POst request to server to validate user
     await axios
       .post(apiUrl, values)
       .then((response) => {
-        const spotifyLink = response.data.user.spotifyLink
+        console.log(response);
+        const spotifyLink = response.data.user.spotifyLink;
+        const phoneNumber = response.data.user.phoneNumber;
+
         setUserRole(response.data.user.role); // Set the user type here
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userRole', response.data.user.role);
         localStorage.setItem('userId', response.data.user._id);
         toast.success('Login successful');
-        if (response.data.user.role == 'Music Uploader') {
+        const { role, userType } = response.data.user;
+
+        if (role === 'Music Uploader' && userType === 'Company') {
+          handleSpecificActionForCompany(phoneNumber);
+        } else if (role === 'Music Uploader') {
           handleNavigationTODashboard(spotifyLink);
         } else {
           navigate('/home');
@@ -132,12 +149,12 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
             : axiosError.message || 'An error occurred'
           ).toString()
         );
-        setTimeout(()=>{
-          if(err.response.status == 302){
-            setGoogleAuthData(values)
-            return navigate('/selectRole')
+        setTimeout(() => {
+          if (err.response.status == 302) {
+            setGoogleAuthData(values);
+            return navigate('/selectRole');
           }
-        }, 1500)
+        }, 1500);
       });
   };
 

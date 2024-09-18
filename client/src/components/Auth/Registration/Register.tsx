@@ -22,7 +22,7 @@ import useLoading from '../../../constants/loading';
 
 const SignupSchema = Yup.object().shape({
   userType: Yup.string()
-    .oneOf(['individual', 'company'], 'Invalid user type')
+    .oneOf(['Individual', 'Company'], 'Invalid user type')
     .required('User type is required'),
   name: Yup.string()
     .min(2, 'Too Short!')
@@ -208,8 +208,8 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
                         className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 "
                       >
                         <option value="select">Select from here</option>
-                        <option value="individual">Individual</option>
-                        <option value="company">Company</option>
+                        <option value="Individual">Individual</option>
+                        <option value="Company">Company</option>
                       </Field>
                       <ErrorMessage
                         name="userType"

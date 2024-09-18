@@ -80,7 +80,10 @@ const MusicUploaderDashboard = () => {
           <span className="mr-auto">
             <h1 className="text-[#667185] text-[16px] font-Utile-regular leading-normal">
               Welcome,{' '}
-              {profileDetails?.username ? profileDetails?.username : 'Loading ...'}!
+              {profileDetails?.username ||
+                profileDetails?.representative ||
+                'Please add username in the user profile'}
+              !
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
