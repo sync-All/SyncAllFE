@@ -5,23 +5,22 @@ import TooltipImg from '../../assets/images/tooltip-info.svg';
 import WhiteCheck from '../../assets/images/white-check.svg';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Tooltip } from 'react-tooltip';
-import { Link } from 'react-router-dom';
 import { useSyncUser } from '../../Context/syncUserData';
 import { useEffect, useState } from 'react';
+import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
+import { FlutterwaveConfig } from 'flutterwave-react-v3/dist/types';
 import clsx from 'clsx';
 
 const Pricing = () => {
   const { user } = useSyncUser();
   const paymentInfo = user?.user?.billing
   const [userPlan, setUserPlan] = useState('')
-
   useEffect(()=>{
-    
     switch(paymentInfo?.prod_id){
-      case "prod_QgrvvxGRYPiP7a":
+      case "68768":
         setUserPlan("Premium")
         break;
-      case "prod_QUeQtqvvQsy9X8":
+      case "68767":
         setUserPlan('Standard')
         break;
       default:
@@ -29,11 +28,74 @@ const Pricing = () => {
 
     }
   },[user,paymentInfo])
+  const configProps: FlutterwaveConfig = {
+    public_key: '',
+      tx_ref: `tx_ref_${Date.now()}`,
+      amount: 0,
+      currency: 'USD',
+      payment_options : "card",
+      payment_plan: '',
+      redirect_url: "https://www.syncallmusic.com/payment/status/",
+      customer: {
+        email: `${user?.user.email}`,
+        phone_number: 'N/A',
+        name: `${user?.user.name}`,
+      },
+      meta : { counsumer_id: "7898", consumer_mac: "kjs9s8ss7dd" },
+      customizations: {
+        title: `Syncall Payment Portal`,
+        description: `Payment for the  plan`,
+        logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+    },
+  }
+  const [configTools, setConfigTools] = useState(configProps)
 
+
+ const handleSelectPlan = (plan:string, planName:string, planAmount:number)=>{
+      setConfigTools({
+        public_key: import.meta.env.VITE_FL_TPK,
+        tx_ref: `tx_ref_${Date.now()}`,
+        amount: planAmount,
+        currency: 'USD',
+        payment_options : "card",
+        payment_plan : plan,
+        redirect_url: "https://www.syncallmusic.com/payment/status/",
+        customer: {
+          email: `${user?.user.email}`,
+          phone_number: 'N/A',
+          name: `${user?.user.name}`,
+        },
+        meta : { counsumer_id: "7898", consumer_mac: "kjs9s8ss7dd" },
+        customizations: {
+          title: `Syncall Payment Portal`,
+          description: `Payment for the ${planName} plan`,
+          logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+      },
+    })
+    
+  }
+
+  const handleFlutterPayment = useFlutterwave(configTools)
+
+  useEffect(()=>{
+    handleFlutterPayment({
+      callback: (response) => {
+         console.log(response);
+          closePaymentModal() // this will close the modal programmatically
+      },
+      onClose: () => {},
+
+    })
+    console.log(1)
+  },[configTools, handleFlutterPayment])
+
+  
+  
   const pricingPlans = [
     {
       name: 'Basic',
       price: 'Free',
+      amount : 0,
       buttonText: 'Get Basic',
       features: [
         'Limited Metadata access',
@@ -41,12 +103,13 @@ const Pricing = () => {
         'Ability to search and browse metadata',
         'Licensing quote request',
       ],
+      planInfo: '0',
     },
     {
       name: 'Standard',
       dollar: '$',
       price: '20',
-
+      amount : 20,
       bg: '#ECFDF5',
       btnBg: '#1B2128',
       btntext: '#FBFCFE',
@@ -61,13 +124,13 @@ const Pricing = () => {
         'Licensing to use royalty free background music ',
         'Limited Advanced Search Filter',
       ],
-      testPriceId: 'price_1Pdf7rG5Wy2cNC8Z7cRKZQqB',
+      planInfo: '68767',
     },
     {
       name: 'Premium',
       dollar: '$',
       price: '70',
-
+      amount : 70,
       smallText: 'per month',
       buttonText: 'Get Premium',
       features: [
@@ -77,11 +140,12 @@ const Pricing = () => {
         'Rights Share Auction',
         'Personal Account Manager',
       ],
-      testPriceId: 'price_1PpUBbG5Wy2cNC8Z47kwvxBB',
+      planInfo: '68768',
     },
     {
       name: 'Enterprise',
       bg: '#013131',
+      amount : 0,
       pricebtntext: '#FBFCFE',
       btntext: '#1B2128',
       price: 'Custom',
@@ -95,6 +159,7 @@ const Pricing = () => {
         'Additional Benefits',
       ],
       comparePlansPriceBorder: 'border-r-0',
+      planInfo: '',
     },
   ];
 
@@ -107,13 +172,6 @@ const Pricing = () => {
       premium: 'Unlimited',
       enterprise: 'Unlimited',
     },
-    // {
-    //   feature: 'Exclusive Content Review',
-
-    //   basic: 'Limited',
-    //   standard: 'Unlimited',
-    //   premium: 'Unlimited',
-    // },
     {
       feature: 'Ability to search and browse metadata',
       tooltip:
@@ -274,24 +332,22 @@ const Pricing = () => {
               </a>
             ) : (
               plan.name !== 'Basic' && (
-                <Link
-                  className={clsx(
-                    'w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6',
-                    userPlan == plan.name &&
-                      paymentInfo?.subscription_status == 'active' &&
-                      'inactive'
-                  )}
+                <div
+                  className={clsx('w-fit cursor-pointer py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6', userPlan == plan.name && 'inactive')}
                   style={{
                     backgroundColor: plan.btnBg,
                     color: plan.pricebtntext,
                   }}
-                  to={`/payment/products/${plan.testPriceId}`}
+                  onClick={()=>{
+                    handleSelectPlan(plan.planInfo, plan.name, plan.amount)
+                    ;
+                  }}
                 >
                   {userPlan == plan.name &&
-                  paymentInfo?.subscription_status == 'active'
+                  paymentInfo?.sub_status == 'successful'
                     ? 'Active Plan'
                     : plan.buttonText}
-                </Link>
+                </div>
               )
             )}
 
@@ -339,16 +395,15 @@ const Pricing = () => {
                     </p>
                     <div className="w-full my-6 flex justify-center items-center">
                       {plan.name !== 'Basic' && plan.name !== 'Enterprise' && (
-                        <Link
+                        <div
                           className="min-w-full py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] text-center "
                           style={{
                             backgroundColor: plan.btnBg,
                             color: plan.pricebtntext,
                           }}
-                          to={`/payment/products/${plan.testPriceId}`}
                         >
                           {plan.buttonText}
-                        </Link>
+                        </div>
                       )}
                       {plan.name === 'Enterprise' && (
                         <a

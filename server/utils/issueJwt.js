@@ -10,7 +10,7 @@ function issueJwtConfirmEmail(user){
 
     const payload = {
         sub : _id,
-        iat : Date.now()
+        // iat : Date.now()
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
@@ -28,7 +28,7 @@ function issueJwtLogin(user){
 
     const payload = {
         sub : _id,
-        iat : Date.now()
+        // iat : Date.now()
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
@@ -46,7 +46,7 @@ function issueJwtForgotPassword(user){
 
     const payload = {
         sub : _id,
-        iat : Date.now()
+        // iat : Date.now()
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})

@@ -87,7 +87,6 @@ const trackSchema = new Schema({
     featuredArtist : [
         {
             type : String,
-            required : true
         }
     ],
     releaseType : {
@@ -108,7 +107,7 @@ const trackSchema = new Schema({
     },
     upc : {
         type : Number,
-        required : true
+        // required : true
     },
     isrc : {
         type : String,
@@ -116,117 +115,117 @@ const trackSchema = new Schema({
     },
     genre : {
         type : String,
-        required : true
+        // required : true
     },
     artWork : {
         type : String,
-        required : true
+        // required : true
     },
     recordingVersion : {
         type : String,
-        required : true
+        // required : true
     },
     featuredInstrument : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     producers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     recordingDate : {
         type : Date,
-        required : true
+        // required : true
     },
     countryOfRecording : {
         type : String,
-        required : true
+        // required : true
     },
     writers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     composers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     publishers : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     claimBasis :  {
         type : String,
-        required : true
+        // required : true
     },
     claimingUser : {
         type : String,
-        required : true
+        // required : true
     },
     role : {
         type : String,
-        required : true
+        // required : true
     },
     percentClaim : {
         type : Number,
-        required : true
+        // required : true
     },
     copyrightName : {
         type : String,
-        required : true
+        // required : true
     },
     copyrightYear : {
         type : Number,
-        required : true
+        // required : true
     },
     releaseDate : {
         type : Date,
-        required : true
+        // required : true
     },
     countryOfRelease : {
         type : String,
-        required : true
+        // required : true
     },
     mood : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     tag : [
         {
             type : String,
-            required : true
+            // required : true
         }
     ],
     lyrics : {
         type : String,
-        required : true
+        // required : true
     },
     audioLang : {
         type : String,
-        required : true
+        // required : true
     },
     explicitCont : {
         type : Boolean,
-        required : true
+        // required : true
     },
     releaseLabel : {
         type : String,
-        required : true
+        // required : true
     },
     releaseDesc : {
         type : String,
-        required : true
+        // required : true
     },
     uploadStatus : {
         type : String,
@@ -245,7 +244,7 @@ const trackSchema = new Schema({
     ],
     spotifyLink : {
         type : String,
-        required : true
+        // required : true
     },
     duration : {
         type : String,
@@ -254,6 +253,45 @@ const trackSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
+},{timestamps : true})
+
+const trackLicenseSchema = new Schema({
+    track_name : {
+        type : String,
+        required : true
+    },
+    license_status : {
+        type : String,
+        enum : ['pending', 'approved', 'expired', 'rejected'],
+        default : 'pending',
+        required : true
+    },
+    amount : {
+        type : String,
+        required : true
+    },
+    trackLink : {
+        type : String,
+        required : true
+    },
+    quote_id : {
+        type : Schema.Types.ObjectId,
+        required : true,
+    },
+    quote_type : {
+        type : String,
+        required : true
+    },
+    sync_user_info : {
+        type : Schema.Types.ObjectId,
+        required : true,
+        ref : "syncUser",
+    },
+    music_uploader_info : {
+        type : Schema.Types.ObjectId,
+        ref : "uploader"
+    },
+
 },{timestamps : true})
 
 trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
@@ -291,9 +329,8 @@ const disputeSchema = new Schema({
 },{timestamps : true})
 
 const track = mongoose.model('track', trackSchema)
+const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 const dashboard = mongoose.model('dashboard',dashboardSchema)
 const dispute = mongoose.model('dispute',disputeSchema)
 
-module.exports.dashboard = dashboard
-module.exports.track = track
-module.exports.dispute = dispute
+module.exports = {dashboard, track, dispute, trackLicense}

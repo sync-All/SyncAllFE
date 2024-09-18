@@ -5,7 +5,6 @@ const User = require("../models/usermodel").uploader
 const Transaction = require('../models/transactions.model').uploaderTransaction
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
-const grabSpotifyPreview = require('../utils/grabSpotifyPreview')
 const fs = require("node:fs")
 require('dotenv').config()
 

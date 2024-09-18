@@ -83,13 +83,15 @@ type UserDetails = {
   billing: {
     plan: string;
     amount: number;
-    frequency: string;
-    subscription_status: string;
-    next_billing_date: string;
-    last4card_digits: string;
-    prod_id: string;
-    subscription_id: string;
-    card_brand: string;
+
+    frequency : string;
+    sub_status : string;
+    next_billing_date : string;
+    last4card_digits : string ;
+    prod_id : string,
+    sub_id : string
+    card_brand : string;
+
   };
   recentActivity: string[];
   tracklist: TracklistDetails[];
