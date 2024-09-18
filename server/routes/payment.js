@@ -1,30 +1,73 @@
 const router = require('express').Router()
 const passport = require('passport');
 const asyncHandler = require('express-async-handler')
-const stripeApi = require('../utils/stripeApi')
+const Flutterwave = require('flutterwave-node-v3');
+const { BadRequestError } = require('../utils/CustomError');
 require('dotenv').config()
-const stripe = require('stripe')(process.env.STRIPE_TESTSECRET_KEY)
 
-router.post('/create-subscription',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(async(req,res,next)=>{
-    const {priceId} = req.body
-    const userInfo = req.user
-    try {
-        const customerId = await stripeApi.createNewStripeCus(userInfo)
-        const subscription = await stripe.subscriptions.create({
-            customer : customerId,
-            items : [
-                {
-                    price : priceId
-                }
-            ],
-            payment_behavior: 'default_incomplete',
-            payment_settings: { save_default_payment_method: 'on_subscription' },
-            expand: ['latest_invoice.payment_intent'],
-        })
-        res.send({priceId, customerId, subscription})
-    } catch (error) {
-        console.log(error)
-    }
+router.post('/transaction_status',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asyncHandler(async(req,res,next)=>{
+    const flw = new Flutterwave(process.env.FLW_PK, process.env.FLW_SK);
+    const {trxref} = req.body
+    flw.Transaction.verify({ id: trxref })
+    .then((response) => {
+        if (
+            response.data.status === "successful") {
+                console.log({response})
+            res.status(200).send({success : true})
+        } else {
+            res.status(422).send({success : false, message : 'unsuccessful'})
+            // Inform the customer their payment was unsuccessful
+        }
+    })
+    .catch((err)=>{
+        console.log(err)
+        throw new BadRequestError('Looks Like Something went wrong')
+    });
 }))
+
+// 6605476
+
+
+// // to return every subscription
+
+
+
+
+
+// {
+//     id: 35326,
+//     amount: 20,
+//     customer: [Object],
+//     plan: 68767,
+//     status: 'active',
+//     created_at: '2024-09-11T22:17:02.000Z'
+//   },
+//   {
+//     id: 35325,
+//     amount: 20,
+//     customer: [Object],
+//     plan: 68767,
+//     status: 'active',
+//     created_at: '2024-09-11T21:56:32.000Z'
+//   },
+//   {
+//     id: 35324,
+//     amount: 20,
+//     customer: [Object],
+//     plan: 68767,
+//     status: 'active',
+//     created_at: '2024-09-11T21:53:33.000Z'
+//   },
+//   {
+//     id: 35323,
+//     amount: 20,
+//     customer: [Object],
+//     plan: 68767,
+//     status: 'active',
+//     created_at: '2024-09-11T21:51:44.000Z'
+//   }
+
+
+
 
 module.exports = router

@@ -111,12 +111,14 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     const userInfo = getAdditionalUserInfo(response);
     // COlate values and assign to their proper fields
     const values = {
-      name: userInfo?.profile?.name,
-      email: userInfo?.profile?.email,
-      img: userInfo?.profile?.picture,
-      emailConfirmedStatus: userInfo?.profile?.verified_email,
-      userType: 'individual',
-      newUser: userInfo?.isNewUser,
+
+        name: userInfo?.profile?.name,
+        email: userInfo?.profile?.email,
+        img: userInfo?.profile?.picture,
+        emailConfirmedStatus: userInfo?.profile?.verified_email,
+        userType: 'individual',
+        newUser: userInfo?.isNewUser,
+
     };
     // POst request to server to validate user
     await axios

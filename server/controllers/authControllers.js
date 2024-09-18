@@ -7,8 +7,10 @@ const SyncUser = require('../models/usermodel').syncUser;
 const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
 const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
+const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
-const fs = require('node:fs')
+const fs = require('node:fs');
+const { BadRequestError } = require('../utils/CustomError');
 require('dotenv').config()
 
 
@@ -60,7 +62,10 @@ const signup = async function(req, res) {
                 await dashboard.save()
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+              console.log(err)
+              res.status(400).send('An Error Occured, Invalid Input')
+            })
           })
         }else {
           bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
@@ -78,7 +83,10 @@ const signup = async function(req, res) {
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+              console.log(err)
+              res.status(400).send('An Error Occured, Invalid Input')
+            })
           })
         }
         
@@ -87,12 +95,16 @@ const signup = async function(req, res) {
   }
 
   const signin = async(req,res,next)=> {
+    console.log(req.body)
     const {email,password} = req.body
     const user = await User.findOne({email : email.toLowerCase()}).exec()
     const syncUser = await SyncUser.findOne(({email : email.toLowerCase()})).exec()
     let item = user || syncUser
     if(!item){
       return res.status(401).json({success : false, message : "User doesn't Exists"})
+    }
+    if(!item.password){
+      return res.status(401).json({success : false, message : "Invalid Email or Password, Try another sign in option"})
     }
     const match = await bcrypt.compare(password, item.password);
 
@@ -116,45 +128,45 @@ const signup = async function(req, res) {
   }
 
   const googleAuth = async(req,res,next)=>{
-        try {
-          const user = await User.findOne({email : req.body.email.toLowerCase()}).exec() 
-          const syncUser = await SyncUser.findOne({email : req.body.email.toLowerCase()}).exec()
-          let item = user || syncUser
-          if (!item){
-            if(req.body.role){
-              if(req.body.role == "Music Uploader"){
-                const user = new User({...req.body,authSource : 'googleAuth'})
-                var newUser = await user.save()
-                const dashboard = new Dashboard({
-                  user : newUser._id
-                })
-                await dashboard.save()
-                newUser = newUser.toObject()
-                delete newUser.password
-              }else{
-                const user = new SyncUser({...req.body,authSource : 'googleAuth'})
-                var newSyncUser = await user.save()
-                newSyncUser = newSyncUser.toObject()
-                delete newSyncUser.password
-              }
-              item = newUser || newSyncUser
-              let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-              res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-            }else{
-              return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
-            }
-            
+    try {
+      const user = await User.findOne({email : req.body.email}).exec() 
+      const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
+      let item = user || syncUser
+      if (!item){
+        if(req.body.role){
+          if(req.body.role == "Music Uploader"){
+            const user = new User({...req.body,authSource : 'googleAuth'})
+            var newUser = await user.save()
+            const dashboard = new Dashboard({
+              user : newUser._id
+            })
+            await dashboard.save()
+            newUser = newUser.toObject()
+            delete newUser.password
           }else{
-            let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-            res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+            const user = new SyncUser({...req.body,authSource : 'googleAuth'})
+            var newSyncUser = await user.save()
+            newSyncUser = newSyncUser.toObject()
+            delete newSyncUser.password
           }
-          
-        } catch (error) {
-          console.log(error)
-          res.status(401).send(error)
+          item = newUser || newSyncUser
+          let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+          res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+        }else{
+          return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
         }
+        
+      }else{
+        let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
+
+        res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+      }
+      
+    } catch (error) {
+      console.log(error)
+      res.status(401).send(error)
+    }
         
 }
 
@@ -169,56 +181,61 @@ const allUsers = async (req,res,next) =>{
 
 const getsyncuserinfo = async (req,res,next)=>{
   const userId = req.user._id
-  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").select('-password').exec()
+  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").populate('pendingLicensedTracks').select('-password').exec()
   res.send({user : details, success : true})
 }
 
 const profilesetup = async (req, res, next) => {
-  if (req.isAuthenticated) {
-    const { fullName, spotifyLink, bio } = req.body;
-    if (!fullName || !spotifyLink || !bio) {
-      res
-        .status(401)
-        .json({
-          success: false,
-          message: 'Missing field please check and confirm',
-        });
-    } else {
-      const userId = req.user.userId;
-      const profileUpdate = await User.findByIdAndUpdate(
-        userId,
-        { fullName, spotifyLink, bio },
-        { new: true }
-      );
-
-      res.status(200).json({
-          success: true,
-          message: 'Profile update successful',
-          profileUpdate,
-        });
+  if(req.user.userType == "Individual"){
+    const {username, spotifyLink, bio} = req.body;
+    const duplicateUsername = await User.findOne({username}).exec()
+    if(duplicateUsername){
+      throw new BadRequestError('Username in exist already')
     }
-  } else {
-    res.status(401).json({
-        success: false,
-        message: 'Unauthorized, Please proceed to login',
-      });
+    await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
+    if (!username || !spotifyLink || !bio) {
+      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+    }  
+  }else if(req.user.userType == "Company"){
+    const {address, representative, phoneNumber} = req.body;
+    if (!address || !representative || !phoneNumber) {
+      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+    } 
+  }
+  const userId = req.user._id;
+  try {
+    await User.findByIdAndUpdate(userId,req.body,{ new: true });
+    res.status(200).json({success: true,message: 'Profile update successful'});
+  } catch (error) {
+    console.log(error)
+    res.send(error)
   }
 }
 
 const profileUpdate = async (req,res,next)=>{
   const userId = req.user.id
-  if(req.body.email){
-    return res.status(401).send('unauthorized buddy, unable to make change')
+  if(req.body.email || req.body.username){
+    if(req.body.email !== req.user.email){
+      return res.status(401).send('unauthorized buddy 😒, unable to make changes to email')
+    }
+    if(req.user.username){
+      if(req.body.username !== req.user.username){
+        const duplicateUsername = await User.findOne({username}).exec()
+        if(duplicateUsername){
+          throw new BadRequestError('Username in exist already')
+        }
+      }
+    }
   }
   if(req.user.role == "Music Uploader"){
     if(req.file){
       var profilePicture = await cloudinary.uploader.upload(req.file.path)
-      const profileUpdate = await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
+      await User.findByIdAndUpdate(userId,{...req.body, img : profilePicture.secure_url}, {new : true}).exec()
       fs.unlinkSync(req.file.path)
-      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      res.status(200).json({success : true, message : 'Profile update successful'})
     }else{
-      const profileUpdate = await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
-      res.status(200).json({success : true, message : 'Profile update successful', profileUpdate})
+      await User.findByIdAndUpdate(userId,req.body,{new : true}).exec()
+      res.status(200).json({success : true, message : 'Profile update successful'})
     }
   }
   else if(req.user.role == "Sync User")

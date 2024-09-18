@@ -19,7 +19,8 @@ const userSchema = new Schema({
     },
     userType : {
         type : String,
-        required : true
+        required : true,
+        enum : ['Individual', 'Company']
     },
     emailConfirmedStatus : {
         type : Boolean,
@@ -36,7 +37,7 @@ const userSchema = new Schema({
     phoneNumber :{
         type : String
     },
-    fullName : {
+    username : {
         type : String,
     },
     spotifyLink : {
@@ -55,6 +56,12 @@ const userSchema = new Schema({
         type : String
     },
     tiktokLink : {
+        type : String,
+    },
+    address : {
+        type : String,
+    },
+    representative : {
         type : String,
     },
     bio: {
@@ -98,19 +105,19 @@ const syncUserSchema = new Schema({
     phoneNumber :{
         type : String
     },
-    fullName : {
+    username : {
         type : String,
     },
     billing : {
         prod_id : {
             type : String,
-            enum : ['prod_QnB1PkDeRHAGSx', 'prod_QgrvvxGRYPiP7a', 'prod_QUeQtqvvQsy9X8'],
-            default : 'prod_QnB1PkDeRHAGSx'
+            enum : ['free', '68768', '68767'],
+            default : 'free'
         },
-        subscription_id : {
+        sub_id : {
             type : String
         },
-        subscription_status : {
+        sub_status : {
             type : String
         },
         frequency : {
@@ -129,9 +136,6 @@ const syncUserSchema = new Schema({
             type : String
         }
     },
-    stripeCusId : {
-        type : String
-    },
     paymentInfo : {
         type : Number,
     },
@@ -145,6 +149,13 @@ const syncUserSchema = new Schema({
         {
             type : Schema.Types.ObjectId,
             ref : "track",
+            default : [0]
+        }
+    ],
+    pendingLicensedTracks : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "track_license",
             default : [0]
         }
     ],

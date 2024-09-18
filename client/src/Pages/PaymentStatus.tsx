@@ -1,46 +1,47 @@
 import { useEffect, useState } from 'react';
-import SyncUserNavbar from '../components/SyncUserJourney/SyncUserNavbar';
-import {
-    useStripe,
-  } from "@stripe/react-stripe-js";
+
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion} from "framer-motion"
-import Loading from '../components/Stripe/Loading';
 
 import succeedimg from "../assets/payment/succed.png";
 import failpng from "../assets/payment/failed.png";
-import pendingpng from "../assets/payment/pending.png";
+import SyncUserNavbar from '../components/SyncUserJourney/SyncUserNavbar';
+import LoadingAnimation from '../constants/loading-animation';
+import axios from 'axios';
 
 const PaymentStatus = () => {
-    const stripe = useStripe()
+    // https://www.syncallmusic.com/payment/status/?trxref=coazz93yvx&reference=coazz93yvx
     const [searchParams] = useSearchParams();
     const navigate = useNavigate()
-    const client_secret = searchParams.get('payment_intent_client_secret')
+    const trxref = searchParams.get('transaction_id')
     const [status, setStatus] = useState('')
     const [loading, setLoading] = useState(false)
+    
     useEffect(()=>{
         setLoading(true)
-        if (!stripe) {
-            return;
-          }
-        if(!client_secret){
-            setLoading(false)
-            navigate('/pricing')
-        }else{
-            stripe.retrievePaymentIntent(client_secret)
-            .then(({paymentIntent})=>{
-                if (!paymentIntent) {
-                    return;
-                }else{
-                    setStatus(paymentIntent.status)
-                    setTimeout(()=>{
-                        setLoading(false)
-                    },1500)
-                }
+        const token = localStorage.getItem('token');
+        const config = {
+            headers: {
+            Authorization: `${token}`,
+            },
+        };
+        console.log(trxref)
+        if(trxref){
+
+            axios.post('https://syncallfe.onrender.com/api/v1/transaction_status',{trxref},config)
+            .then(()=>{
+                setStatus('succeeded')
+                setTimeout(()=>{
+                    setLoading(false)
+                },1500)
+            })
+            .catch(()=>{
+                setStatus("Unsuccessful")
+                setLoading(false)
             })
         }
         
-    },[navigate, stripe, client_secret])
+    },[navigate,trxref])
     let message = ''
     let title = ''
     let icon = ''
@@ -54,20 +55,6 @@ const PaymentStatus = () => {
             link1 = "/home"
             link2 = "/home"
             break;
-        case 'processing':
-            message = 'Your payment is currently being processed'
-            title = 'Payment Pending'
-            icon = pendingpng
-            link1 = "/pricing"
-            link2 = "/home"
-            break;
-        case 'requires_payment_method':
-            message = 'Payment Failed'
-            title = 'Please try another payment method.'
-            icon = failpng
-            link1 = "/pricing"
-            link2 = "/home"
-            break;
         default:
             message = 'An Error Occurred'
             title = 'Something went wrong'
@@ -79,7 +66,7 @@ const PaymentStatus = () => {
         <>
             <SyncUserNavbar/>
             {
-                loading ? (<Loading/>) :(
+                loading ? (<LoadingAnimation/>) :(
                 <motion.div className='flex flex-col gap-6 items-center justify-center h-[70vh] text-[#013131]' initial={{opacity : 0 , scale:  0.8}} whileInView={{opacity : 1, scale : 1}}>
                     <img src={icon} alt="" />
                     <h1 className=' text-3xl lg:text-[56px] lg:leading-[56px] font-bold' >{title}</h1>
