@@ -37,11 +37,6 @@ import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Soci
 // import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 import PaymentStatus from './Pages/PaymentStatus';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPEPK_TEST_KEY);
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-} from "@stripe/react-stripe-js";
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
 
 
