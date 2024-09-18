@@ -64,7 +64,7 @@ const signup = async function(req, res) {
             })
             .catch(err => {
               console.log(err)
-              throw new BadRequestError("An Error Occurred, Invalid Input")
+              res.status(400).send('An Error Occured, Invalid Input')
             })
           })
         }else {
@@ -85,7 +85,7 @@ const signup = async function(req, res) {
             })
             .catch(err => {
               console.log(err)
-              throw new BadRequestError("An Error Occurred, Invalid Input")
+              res.status(400).send('An Error Occured, Invalid Input')
             })
           })
         }
