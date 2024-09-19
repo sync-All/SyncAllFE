@@ -88,7 +88,8 @@ const syncUserSchema = new Schema({
     },
     userType : {
         type : String,
-        required : true
+        required : true,
+        enum : ['Individual', 'Company']
     },
     emailConfirmedStatus : {
         type : Boolean,

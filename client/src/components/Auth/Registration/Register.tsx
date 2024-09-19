@@ -68,6 +68,15 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
         navigate('/dashboard');
       }
   };
+
+  const handleSpecificActionForCompany = (phoneNumber: string) => {
+    if (!phoneNumber) {
+      navigate('/onboarding-companies');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+  
   const { setUserRole } = useContext(UserContext);
   const { loading, setLoading } = useLoading();
 
@@ -88,7 +97,6 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
         email: userInfo?.profile?.email,
         img: userInfo?.profile?.picture,
         emailConfirmedStatus: userInfo?.profile?.verified_email,
-        userType: 'individual',
         newUser: userInfo?.isNewUser,
       };
       // POst request to server to validate user
@@ -101,7 +109,9 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
           localStorage.setItem('userRole', response.data.user.role);
           localStorage.setItem('userId', response.data.user._id);
           toast.success('Login successful');
-          if (response.data.user.role == 'Music Uploader') {
+          if (response.data.user.role === 'Music Uploader' && response.data.user.userType === 'Company') {
+            handleSpecificActionForCompany(response.data.user.phoneNumber);
+          } else if (response.data.user.role === 'Music Uploader' && response.data.user.userType === 'Individual') {
             handleNavigationTODashboard(spotifyLink);
           } else {
             navigate('/home');

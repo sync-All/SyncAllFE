@@ -81,7 +81,7 @@ const signup = async function(req, res) {
                   const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
                  const grabber = EmailDomain.grabEmailDomain(users)
                  confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
-                res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
+                res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
             })
             .catch(err => {
               console.log(err)
@@ -134,8 +134,9 @@ const signup = async function(req, res) {
       let item = user || syncUser
       if (!item){
         if(req.body.role){
+          const {userType} = EmailDomain.grabEmailDomain(req.body)
           if(req.body.role == "Music Uploader"){
-            const user = new User({...req.body,authSource : 'googleAuth'})
+            const user = new User({...req.body,authSource : 'googleAuth', userType})
             var newUser = await user.save()
             const dashboard = new Dashboard({
               user : newUser._id
@@ -144,7 +145,7 @@ const signup = async function(req, res) {
             newUser = newUser.toObject()
             delete newUser.password
           }else{
-            const user = new SyncUser({...req.body,authSource : 'googleAuth'})
+            const user = new SyncUser({...req.body,authSource : 'googleAuth', userType})
             var newSyncUser = await user.save()
             newSyncUser = newSyncUser.toObject()
             delete newSyncUser.password
