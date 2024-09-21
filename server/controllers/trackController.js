@@ -22,26 +22,40 @@ const verifyTrackUpload = async(req,res,next)=>{
 const trackUpload = async(req,res,next)=>{
   if(req.user.role == "Music Uploader"){
     const {trackLink} = req.body
-    let response = await spotifyCheck.SpotifyPreview(res, trackLink)
-    const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
+    let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
+    const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
     if(confirmTrackUploaded){
         res.status(401).json('Track already exists')
     }else{
-      console.log('track not avaiable please continue')
       let songInfo = req.body
-      var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
-      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : response.preview_url, spotifyLink : response.spotifyLink, duration : response.duration}
-      const track = new Track(adjustedsongInfo)
-      track.save()
-      .then(async (track)=>{
-        await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-        fs.unlinkSync(req.file.path)
-        res.status(200).json({success : true, message : 'Music Information has been successfully added'})
-      })
-      .catch((err)=>{
-        console.log(err)
-        res.status(401).json(err)
-      })
+      if(req.file){
+        var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
+        const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration}
+        const track = new Track(adjustedsongInfo)
+        track.save()
+        .then(async (track)=>{
+          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+          fs.unlinkSync(req.file.path)
+          res.status(200).json({success : true, message : 'Music Information has been successfully added'})
+        })
+        .catch((err)=>{
+          console.log(err)
+          res.status(401).json(err)
+        })
+      }else{
+        const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration}
+        const track = new Track(adjustedsongInfo)
+        track.save()
+        .then(async (track)=>{
+          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+          fs.unlinkSync(req.file.path)
+          res.status(200).json({success : true, message : 'Music Information has been successfully added'})
+        })
+        .catch((err)=>{
+          console.log(err)
+          res.status(401).json(err)
+        })
+      }
     }
   }else{
     res.status(401).json('Unauthorized Access, Role not Supported')
