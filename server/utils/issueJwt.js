@@ -39,6 +39,23 @@ function issueJwtLogin(user){
     }
 }
 
+function issueJwtAdminLogin(user){
+    const _id = user._id
+    const expiresIn = '1h'
+
+    const payload = {
+        sub : _id,
+        kid : "admin"
+    }
+
+    const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
+
+    return {
+        token : "Bearer " + signedToken,
+        expires : expiresIn
+    }
+}
+
 function issueJwtForgotPassword(user){
     const _id = user._id
 
@@ -57,6 +74,4 @@ function issueJwtForgotPassword(user){
     }
 }
 
-module.exports.issueJwtConfirmEmail = issueJwtConfirmEmail
-module.exports.issueJwtLogin = issueJwtLogin
-module.exports.issueJwtForgotPassword = issueJwtForgotPassword
+module.exports = {issueJwtConfirmEmail, issueJwtAdminLogin, issueJwtLogin, issueJwtForgotPassword}

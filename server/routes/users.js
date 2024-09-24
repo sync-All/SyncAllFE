@@ -2,8 +2,6 @@ var express = require('express');
 const asynchandler = require('express-async-handler');
 const authcontroller = require('../controllers/authControllers');
 const passport = require('passport');
-const User = require('../models/usermodel').uploader;
-const SyncUser = require('../models/usermodel').syncUser
 const multer = require("multer")
 const uploadProfileImg = multer({dest: 'uploads/'}).single('img')
 var router = express.Router();
@@ -12,6 +10,7 @@ var router = express.Router();
 router.post('/api/v1/signup', asynchandler(authcontroller.signup));
 
 router.post('/api/v1/signin', asynchandler(authcontroller.signin));
+
 router.post('/api/v1/googleauth', asynchandler(authcontroller.googleAuth))
 
 router.post('/api/v1/signin',asynchandler(authcontroller.signin))

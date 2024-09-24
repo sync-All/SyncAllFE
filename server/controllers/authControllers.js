@@ -95,7 +95,6 @@ const signup = async function(req, res) {
   }
 
   const signin = async(req,res,next)=> {
-    console.log(req.body)
     const {email,password} = req.body
     const user = await User.findOne({email : email.toLowerCase()}).exec()
     const syncUser = await SyncUser.findOne(({email : email.toLowerCase()})).exec()
@@ -115,9 +114,7 @@ const signup = async function(req, res) {
       confirmEmail.sendConfirmationMail(user ||  syncUser,toBeIssuedJwt.token)
       return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
     }else{
-
       const toBeIssuedJwt = issueJwt.issueJwtLogin(user || syncUser)
-
       const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
       const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').exec()
