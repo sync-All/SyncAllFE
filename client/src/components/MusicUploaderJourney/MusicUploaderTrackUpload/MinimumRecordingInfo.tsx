@@ -76,7 +76,7 @@ const MinimumRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="mainArtist" className={applyLabelStyles}>
-            Main Artist
+            Main Artist*
           </label>
           <Field type="text" name="mainArtist" className={applyInputStyles} />
           <ErrorMessage
@@ -87,7 +87,7 @@ const MinimumRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <InputField
-            label="Featured Artist"
+            label="Featured Artist*"
             name="featuredArtist"
             placeholder=""
           />
@@ -101,7 +101,7 @@ const MinimumRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="releaseType" className={applyLabelStyles}>
-            Release Type
+            Release Type*
           </label>
           <Field as="select" name="releaseType" className={applyInputStyles}>
             <option value="">Select...</option>
@@ -117,7 +117,7 @@ const MinimumRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="releaseTitle" className={applyLabelStyles}>
-            Release Title
+            Release Title*
           </label>
           <Field as="select" name="releaseTitle" className={applyInputStyles}>
             <option value="">Select...</option>
@@ -135,7 +135,7 @@ const MinimumRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="trackTitle" className={applyLabelStyles}>
-            Track Title
+            Track Title*
           </label>
           <Field type="text" name="trackTitle" className={applyInputStyles} />
           <ErrorMessage
@@ -146,7 +146,7 @@ const MinimumRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="trackLink" className={applyLabelStyles}>
-            Track Link
+            Track Link*
           </label>
           <Field
             type="text"
@@ -164,7 +164,7 @@ const MinimumRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="upc" className={applyLabelStyles}>
-            UPC
+            UPC*
           </label>
           <Field type="number" name="upc" className={applyInputStyles} />
           <ErrorMessage
@@ -175,7 +175,7 @@ const MinimumRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="isrc" className={applyLabelStyles}>
-            ISRC
+            ISRC*
           </label>
           <Field
             type="text"
@@ -196,7 +196,7 @@ const MinimumRecordingInfo: React.FC = () => {
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="genre" className={applyLabelStyles}>
-            Genre
+            Genre*
           </label>
           <Field as="select" name="genre" className={applyInputStyles}>
             <option value="">Select genre</option>
@@ -214,7 +214,7 @@ const MinimumRecordingInfo: React.FC = () => {
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="artWork" className={applyLabelStyles}>
-            Upload Digital Artwork
+            Upload Digital Artwork*
           </label>
           <div className="relative">
             <label

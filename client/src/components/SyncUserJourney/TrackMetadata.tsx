@@ -289,7 +289,6 @@ const TrackMetadata = () => {
             {!isVisible && (
               <>
                 <hr className="mt-2" />
-
                 <div className="flex justify-center mt-6">
                   <button
                     className="text-[14px] font-Utile-bold text-[#475367] cursor-pointer bg-slate-200 rounded-xl py-1 px-2.5 flex gap-2 items-center"
@@ -305,9 +304,12 @@ const TrackMetadata = () => {
             {isVisible && (
               <>
                 {subscriptionStatus && (
-                  <p className="text-center italic my-2 font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                    kindly upgrade your current plan to view this informations
-                  </p>
+                  <>
+                    <hr className="mt-4" />
+                    <p className="text-center italic my-2 font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                      kindly upgrade your current plan to view this informations
+                    </p>
+                  </>
                 )}
                 <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
                   {/* First Column */}

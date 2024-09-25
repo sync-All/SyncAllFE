@@ -65,7 +65,7 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
         try {
           const res = await axios.get(apiUrl, config);
-         console.log(res); setResults(res.data.allTracks);
+        setResults(res.data.allTracks);
           
           
         } catch (error) {

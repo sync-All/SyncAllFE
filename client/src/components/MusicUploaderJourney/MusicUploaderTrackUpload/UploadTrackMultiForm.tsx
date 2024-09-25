@@ -95,7 +95,7 @@ const validationSchema = Yup.object().shape({
   upc: Yup.number().min(0).required('Required'),
   isrc: Yup.string().required('Required'),
   genre: Yup.string().required('Required'),
-  artWork: Yup.mixed(),
+  artWork: Yup.mixed().nullable(),
   recordingVersion: Yup.string(),
   featuredInstrument: Yup.array().of(Yup.string()),
   producers: Yup.array().of(Yup.string()),
@@ -135,7 +135,7 @@ const UploadTrackMultiForm: React.FC = () => {
     'Minimum Recording Information'
   );
 
-  const {loading, setLoading} = useLoading()
+  const { loading, setLoading } = useLoading();
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -145,7 +145,6 @@ const UploadTrackMultiForm: React.FC = () => {
   const activeLiClass = 'border-b border-[#013131] text-[#013131]';
   const controlBtn =
     'btn bg-[#EFA705] py-3 px-4 border border-[#EFA705] rounded-[8px] font-formular-medium text-[14px] leading-5 text-black2';
-
 
   const renderSection = () => {
     switch (currentSection) {
@@ -193,7 +192,7 @@ const UploadTrackMultiForm: React.FC = () => {
   };
 
   return (
-    <div className="lg:mx-8 ml-5" >
+    <div className="lg:mx-8 ml-5">
       <div>
         <span className="flex gap-2">
           <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
@@ -256,7 +255,7 @@ const UploadTrackMultiForm: React.FC = () => {
           enableReinitialize
           validationSchema={validationSchema}
           onSubmit={async (values, { validateForm }) => {
-            setLoading(true)
+            setLoading(true);
             const token = localStorage.getItem('token');
             const urlVar = import.meta.env.VITE_APP_API_URL;
             const apiUrl = `${urlVar}/trackUpload/`;
@@ -278,33 +277,24 @@ const UploadTrackMultiForm: React.FC = () => {
               return; // Prevent form submission if there are errors
             }
             try {
-              await delay(2000)
+              await delay(2000);
               await axios.postForm(apiUrl, values, config);
               toast.success('Track Uploaded Successfully');
-              refreshPage()
+              refreshPage();
             } catch (error: unknown) {
-             
               const axiosError = error as AxiosError<ResponseData>;
 
-               toast.error(
-                 (axiosError.response && axiosError.response.data
-                   ? axiosError.response.data.message ||
-                     axiosError.response.data
-                   : axiosError.message || 'An error occurred'
-                 ).toString()
-               );
-
-             
-            }finally {
-              setLoading(false)
+              toast.error(
+                (axiosError.response && axiosError.response.data
+                  ? axiosError.response.data.message || axiosError.response.data
+                  : axiosError.message || 'An error occurred'
+                ).toString()
+              );
+            } finally {
+              setLoading(false);
             }
-
-           
           }}
         >
-
-
-          
           <Form>
             {renderSection()}
             <div className="buttons flex justify-between my-4 pr-2 ">
@@ -329,7 +319,6 @@ const UploadTrackMultiForm: React.FC = () => {
               {currentSection === 'Release Information' && (
                 <button type="submit" className={controlBtn} disabled={loading}>
                   {loading ? 'Uploading...' : 'Upload Track'}
-                 
                 </button>
               )}
             </div>

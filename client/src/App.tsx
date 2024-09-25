@@ -38,6 +38,9 @@ import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Soci
 import PaymentStatus from './Pages/PaymentStatus';
 
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
+import Login from './components/Admin/Auth/Login';
+import AdminDashboard from './Pages/AdminDashboard';
+
 
 
 function App() {
@@ -318,12 +321,16 @@ function App() {
                 path="/payment/status/"
                 element={
                   <SyncUserProvider>
-                      <PaymentStatus />
+                    <PaymentStatus />
                   </SyncUserProvider>
                 }
               />
             }
           />
+
+          <Route path="/admin/login" element={<Login />} />
+
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </UserContext.Provider>
     </>
