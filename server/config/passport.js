@@ -1,5 +1,6 @@
 const User = require('../models/usermodel').uploader
 const SyncUser = require('../models/usermodel').syncUser
+const Admin = require('../models/usermodel').admin
 const jwtStrategy = require('passport-jwt').Strategy
 const extractJwt = require('passport-jwt').ExtractJwt
 require("dotenv").config()
@@ -14,9 +15,14 @@ const options = {
 
 
 const strategy = new jwtStrategy(options, async (payload, done)=>{
-    const uploader = await User.findOne({_id : payload.sub}).exec()
-    const syncUser = await SyncUser.findOne({_id : payload.sub})
-    const item = uploader || syncUser
+    let admin, uploader, syncUser = {}
+    if(payload.kid && payload.kid == "admin"){
+        admin = await Admin.findOne({_id : payload.sub})
+    }else{
+        uploader = await User.findOne({_id : payload.sub}).exec()
+        syncUser = await SyncUser.findOne({_id : payload.sub})
+    }
+    const item = uploader || syncUser || admin
 
     if(item) {
         return done(null, item)

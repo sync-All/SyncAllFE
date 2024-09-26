@@ -172,6 +172,11 @@ const syncUserSchema = new Schema({
         default : 0
 
     },
+    isAdmin : {
+        type : Boolean,
+        enum : [false, true],
+        default : false
+    },
 })
 
 const syncAdminSchema = new Schema({
@@ -186,11 +191,6 @@ const syncAdminSchema = new Schema({
     password : {
         required : true,
         type : String
-    },
-    role : {
-        required : true,
-        type : String,
-        default : "Admin"
     }
 }, {timestamps : true})
 

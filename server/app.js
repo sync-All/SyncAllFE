@@ -11,6 +11,7 @@ require('dotenv').config()
 
 var trackRouter = require('./routes/track');
 var usersRouter = require('./routes/users')
+var adminAuthRouter = require('./routes/admin_routes/auth')
 let requestRouter = require('./routes/quoteRequests')
 var dashboardRouter = require('./routes/dashboard');
 var waitlistRouter = require('./routes/waitlist');
@@ -69,6 +70,7 @@ app.use('/', waitlistRouter)
 app.use('/api/v1/', trackRouter);
 app.use('/api/v1/', paymentRouter);
 app.use('/api/v1/', requestRouter);
+app.use('/api/v1/', adminAuthRouter);
 app.use('/', stripWebhookRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
