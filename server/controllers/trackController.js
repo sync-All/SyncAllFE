@@ -48,7 +48,6 @@ const trackUpload = async(req,res,next)=>{
         track.save()
         .then(async (track)=>{
           await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-          fs.unlinkSync(req.file.path)
           res.status(200).json({success : true, message : 'Music Information has been successfully added'})
         })
         .catch((err)=>{

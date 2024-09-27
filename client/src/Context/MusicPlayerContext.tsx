@@ -9,7 +9,6 @@ interface PlayerContextProps {
 
 interface Props {
     children?: React.ReactNode
-    // any props that come into the component
 }
 
 export const MusicPlayerProvider = ({children}:Props)=>{
