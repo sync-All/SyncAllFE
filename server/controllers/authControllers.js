@@ -188,7 +188,7 @@ const profilesetup = async (req, res, next) => {
     const {username, spotifyLink, bio} = req.body;
     const duplicateUsername = await User.findOne({username}).exec()
     if(duplicateUsername){
-      throw new BadRequestError('Username in exist already')
+      throw new BadRequestError('Username exist already')
     }
     await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     if (!username || !spotifyLink || !bio) {
