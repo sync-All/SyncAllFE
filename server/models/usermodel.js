@@ -67,7 +67,11 @@ const userSchema = new Schema({
     bio: {
         type : String,
     },
-
+    accountStatus : {
+        type : String,
+        enum : ['Active', 'Inactive'],
+        default : 'Active'
+    }
 }, {timestamps : true})
 
 const syncUserSchema = new Schema({
@@ -172,12 +176,12 @@ const syncUserSchema = new Schema({
         default : 0
 
     },
-    isAdmin : {
-        type : Boolean,
-        enum : [false, true],
-        default : false
-    },
-})
+    accountStatus : {
+        type : String,
+        enum : ['Active', 'Inactive'],
+        default : 'Active'
+    }
+}, {timestamps : true})
 
 const syncAdminSchema = new Schema({
     name : {

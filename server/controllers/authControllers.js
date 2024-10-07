@@ -168,15 +168,6 @@ const signup = async function(req, res) {
         
 }
 
-const allUsers = async (req,res,next) =>{
-  const users = await User.find().exec()
-  if(users){
-    res.json({success : true, message : users})
-  }else{
-    res.json({success : false, message : "Error fetching users"})
-  }
-}
-
 const getsyncuserinfo = async (req,res,next)=>{
   const userId = req.user._id
   const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers").populate('pendingLicensedTracks').select('-password').exec()
@@ -320,6 +311,6 @@ const requestForgotPw = async (req,res,next)=>{
     }
 }
 
-module.exports = {signup, signin, googleAuth, allUsers, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
+module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
 
   
