@@ -1,5 +1,5 @@
 const dashboard = require("../models/dashboard.model").dashboard
-const Track = require("../models/dashboard.model").track
+const Track = require("../models/track.model").track
 const cloudinary = require("cloudinary").v2
 const { BadRequestError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')

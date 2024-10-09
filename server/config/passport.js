@@ -16,19 +16,26 @@ const options = {
 
 const strategy = new jwtStrategy(options, async (payload, done)=>{
     let admin, uploader, syncUser = {}
+    let item = {}
+   try {
     if(payload.kid && payload.kid == "admin"){
-        admin = await Admin.findOne({_id : payload.sub})
+        admin = await Admin.findById(payload.sub).exec()
+        item = admin
     }else{
         uploader = await User.findOne({_id : payload.sub}).exec()
-        syncUser = await SyncUser.findOne({_id : payload.sub})
+        syncUser = await SyncUser.findOne({_id : payload.sub}).exec()
+        item = uploader || syncUser
+        
     }
-    const item = uploader || syncUser || admin
-
     if(item) {
         return done(null, item)
     }else {
         return done(null, false)
     }
+   } catch (error) {
+    console.log(error)
+    return done(error, false)
+   }
 })
 
 module.exports = (passport)=>{

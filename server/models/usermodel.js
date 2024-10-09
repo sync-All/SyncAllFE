@@ -195,7 +195,11 @@ const syncAdminSchema = new Schema({
     password : {
         required : true,
         type : String
-    }
+    },
+    role : {
+        type : String,
+        enum : ['Admin'],
+    },
 }, {timestamps : true})
 
 const admin = mongoose.model('admin',syncAdminSchema)

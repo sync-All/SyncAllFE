@@ -9,16 +9,19 @@ const passport = require('passport');
 
 require('dotenv').config()
 
-var trackRouter = require('./routes/track');
-var usersRouter = require('./routes/users')
+var trackRouter = require('./routes/main_app/track');
+var usersRouter = require('./routes/main_app/users')
+let requestRouter = require('./routes/main_app/quoteRequests')
+var dashboardRouter = require('./routes/main_app/dashboard');
+var waitlistRouter = require('./routes/main_app/waitlist');
+const unauthorizedRouter = require('./routes/main_app/unauthorized');
+const paymentRouter = require('./routes/main_app/payment');
+
 var adminAuthRouter = require('./routes/admin_routes/auth')
 const adminUsersRouter = require('./routes/admin_routes/user')
-let requestRouter = require('./routes/quoteRequests')
-var dashboardRouter = require('./routes/dashboard');
-var waitlistRouter = require('./routes/waitlist');
-var stripWebhookRouter = require('./webhooks/stripe')
-const unauthorizedRouter = require('./routes/unauthorized')
-const paymentRouter = require('./routes/payment')
+const adminManageContentRouter = require('./routes/admin_routes/manage_content')
+
+
 var app = express();
 
 var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com']
@@ -61,23 +64,33 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/',(req,res,next)=>{
   res.render('confirmEmail',{link : "rverververve"})
 })
 
+// Start Main Middlewares
+
 app.use('/', waitlistRouter)
 app.use('/api/v1/', trackRouter);
 app.use('/api/v1/', paymentRouter);
 app.use('/api/v1/', requestRouter);
-app.use('/api/v1/', adminAuthRouter);
-app.use('/api/v1/', adminUsersRouter);
-app.use('/', stripWebhookRouter);
 app.use('/', usersRouter);
 app.use('/', dashboardRouter);
 app.use('/', unauthorizedRouter);
 
+// End Main Middlewares
+
+
+// Start Admin MiddleWares
+
+app.use('/api/v1/', adminAuthRouter);
+app.use('/api/v1/', adminUsersRouter);
+app.use('/api/v1/', adminManageContentRouter);
+
+// End Admin MiddleWares
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

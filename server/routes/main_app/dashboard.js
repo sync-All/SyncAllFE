@@ -1,10 +1,9 @@
 var express = require('express');
 const asyncHandler = require('express-async-handler')
-const dashbordControllers = require('../controllers/dashboardControllers')
+const dashbordControllers = require('../../controllers/dashboardControllers')
 const multer = require("multer")
 const disputeUpload = multer({dest: 'uploads/'}).single('supportingDoc')
 const passport = require('passport');
-const Dispute = require('../models/dashboard.model').dispute
 const router = express.Router()
 
 router.get('/api/v1/dashboardhome',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.dashboardcontrol))
