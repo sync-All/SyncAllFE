@@ -24,7 +24,7 @@ function issueJwtConfirmEmail(user){
 function issueJwtLogin(user){
     const _id = user._id
 
-    const expiresIn = '1h'
+    const expiresIn = '7d'
 
     const payload = {
         sub : _id,
@@ -41,7 +41,7 @@ function issueJwtLogin(user){
 
 function issueJwtAdminLogin(user){
     const _id = user._id
-    const expiresIn = '1h'
+    const expiresIn = '7d'
 
     const payload = {
         sub : _id,
