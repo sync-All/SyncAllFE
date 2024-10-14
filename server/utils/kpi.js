@@ -50,7 +50,7 @@ const totalUsersKpi = async(queryFilter)=>{
 
        totalUserskpi = Math.floor(Math.abs(previousTotalUsers - totalCurrentUsers)/ totalCurrentUsers * 100)
     }
-    totalUserskpi = isNaN(totalUserskpi) && 0
+    totalUserskpi = isNaN(totalUserskpi) ? 0 : totalUserskpi
     return{
         totalCurrentUsers,
         totalUserskpi
@@ -109,7 +109,7 @@ const newUsersKpi = async(queryFilter)=>{
 
        newUsersKpi = Math.floor((totalNewUsers - previousNewUsers )/ previousNewUsers * 100)
     }
-    newUsersKpi = isNaN(newUsersKpi) && 0
+    newUsersKpi = isNaN(newUsersKpi) ? 0 : newUsersKpi
     return{
         totalNewUsers,
         newUsersKpi
@@ -168,7 +168,7 @@ const activeUsersKpi = async(queryFilter)=>{
        activeUsersKpi = Math.floor((totalActiveUsers - previousActiveUsers )/ previousActiveUsers * 100)
     }
 
-    activeUsersKpi = isNaN(activeUsersKpi) && 0
+    activeUsersKpi = isNaN(activeUsersKpi) ? 0 : activeUsersKpi
     return{
         totalActiveUsers,
         activeUsersKpi
@@ -227,7 +227,7 @@ const inActiveUsersKpi = async(queryFilter)=>{
        inActiveUsersKpi = Math.floor((totalInActiveUsers - previousInActiveUsers )/ previousInActiveUsers * 100)
     }
 
-    inActiveUsersKpi = isNaN(inActiveUsersKpi) && 0
+    inActiveUsersKpi = isNaN(inActiveUsersKpi) ? 0 : inActiveUsersKpi
 
     return{
         totalInActiveUsers,
