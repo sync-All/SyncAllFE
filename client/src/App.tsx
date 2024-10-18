@@ -8,7 +8,6 @@ import RegisterUserRole from './Pages/RegisterUserRole';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserContext } from './Context/UserRole';
-// import UserTypeOnboardingPage from './Pages/UserTypeOnboardingPage';
 import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardDataProvider from './Context/DashboardDataProvider';
@@ -24,7 +23,6 @@ import SetNewPassword from './components/Auth/SetNewPassword';
 import MusicUploaderAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderAuthProfileSetup';
 import GoogleAuthUserRole from './components/Auth/Registration/GoogleAuthUserRole';
 import MusicUploaderPublicProfile from './components/MusicUploaderJourney/MusicUploaderPublicProfile';
-
 import QouteType from './components/SyncUserJourney/SyncUserQoutes/QouteType';
 import FilmMoviesTv from './components/SyncUserJourney/SyncUserQoutes/Film_Movies_Tv';
 import TvCommercialAds from './components/SyncUserJourney/SyncUserQoutes/Tv_Commercial&Ads';
@@ -34,13 +32,10 @@ import Sampling from './components/SyncUserJourney/SyncUserQoutes/Sampling';
 import Interpolation from './components/SyncUserJourney/SyncUserQoutes/Interpolation';
 import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
 import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
-// import SyncLicense from './components/SyncUserJourney/SyncUserQoutes/SyncLicense';
 import PaymentStatus from './Pages/PaymentStatus';
-
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
 import Login from './components/Admin/Auth/Login';
 import AdminDashboard from './Pages/AdminDashboard';
-
 
 
 function App() {
@@ -330,7 +325,8 @@ function App() {
 
           <Route path="/admin/login" element={<Login />} />
 
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/*" element={<AdminDashboard />} />
+         
         </Routes>
       </UserContext.Provider>
     </>

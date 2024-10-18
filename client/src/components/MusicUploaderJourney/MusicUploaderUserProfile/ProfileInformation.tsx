@@ -42,6 +42,7 @@ const ProfileInformation = () => {
     phoneNumber: Yup.string(),
     socials: Yup.string(),
     bio: Yup.string(),
+    address: Yup.string()
   });
 
   const initialValues = {
@@ -196,22 +197,41 @@ const ProfileInformation = () => {
                   className="text-red-500"
                 />
               </div>
-              <div className={input}>
-                <label htmlFor="socials" className={applyLabelStyles}>
-                  Spotify Link
-                </label>
-                <Field
-                  type="text"
-                  name="socials"
-                  className={applyInputStyles}
-                  placeholder={userDetails?.spotifyLink}
-                />
-                <ErrorMessage
-                  name="socials"
-                  component="div"
-                  className="text-red-500"
-                />
-              </div>
+              {usertype === 'Company' ? (
+                <div className={input}>
+                  <label htmlFor="address" className={applyLabelStyles}>
+                    Company Address{' '}
+                  </label>
+                  <Field
+                    type="text"
+                    name="address"
+                    className={applyInputStyles}
+                    placeholder={userDetails?.address}
+                  />
+                  <ErrorMessage
+                    name="address"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              ) : (
+                <div className={input}>
+                  <label htmlFor="socials" className={applyLabelStyles}>
+                    Spotify Link
+                  </label>
+                  <Field
+                    type="text"
+                    name="socials"
+                    className={applyInputStyles}
+                    placeholder={userDetails?.spotifyLink}
+                  />
+                  <ErrorMessage
+                    name="socials"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              )}
             </div>
             <div className={applyFormDiv}>
               <div className={`${input} relative `}>

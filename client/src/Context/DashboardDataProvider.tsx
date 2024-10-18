@@ -59,6 +59,7 @@ interface ProfileInfo {
   createdAt: string;
   phoneNumber: number;
   representative: string
+  address: string;
 }
 
 interface transactions {

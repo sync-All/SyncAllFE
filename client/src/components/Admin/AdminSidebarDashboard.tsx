@@ -1,25 +1,25 @@
-
 import Logo from '../../assets/logo-black.png';
 import DashboardIcon from '../../assets/images/Widget 5.svg';
 import ManageUser from '../../assets/images/User Rounded.svg';
 import TrackIcon from '../../assets/images/Music Library 2.svg';
-import EarningIcon from '../../assets/images/Banknote 2.svg';
-import ProfileIcon from '../../assets/images/User Rounded.svg';
-import DisputeIcon from '../../assets/images/dispute.svg';
+import QuotesIcon from '../../assets/images/quoteicon.svg';
+// import DisputeIcon from '../../assets/images/dispute.svg';
 import Chat_Support from '../../assets/images/chat, support.svg';
 import LogoutIcon from '../../assets/images/Login 2.svg';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
 import Placeholder from '../../assets/images/placeholder.png';
+import { Link } from 'react-router-dom';
 
-interface MusicUploaderDashboardSidebarProps {
+interface AdminDashboardSidebarProps {
   activeItem: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (item: string) => void;
+  toggleMenu: () => void;
 }
 
-const AdminSidebarDashboard: React.FC<MusicUploaderDashboardSidebarProps> = ({
+const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
   activeItem,
   onTabChange,
-}) => {
+  toggleMenu }) => {
   // const profileInfo = useDataContext();
   // const profileDetails = profileInfo.dashboardData?.profileInfo;
 
@@ -49,49 +49,47 @@ const AdminSidebarDashboard: React.FC<MusicUploaderDashboardSidebarProps> = ({
 
   return (
     <div className="h-screen overflow-y-auto overflow-x-hidden border border-r-[#E4E7EC] flex flex-col">
-      <div className="mt-[40px] ml-[40px]">
+      <div className="flex justify-between mt-[40px] ml-[40px]">
         <img src={Logo} alt="" />
+        <p className="pointer" onClick={toggleMenu}>
+          X
+        </p>
       </div>
       <div className=" mt-[53px]">
         <ul>
-          <li
-            onClick={() => onTabChange('Dashboard')}
-            style={liStyle('Dashboard')}
-          >
-            <img src={DashboardIcon} alt=""></img>
-            <p style={pStyle('Dashboard')}>Dashboard</p>
+          <li onClick={() => onTabChange('Dashboard')}>
+            <Link to="/admin/dashboard" style={liStyle('Dashboard')}>
+              <img src={DashboardIcon} alt="" />
+              <p style={pStyle('Dashboard')}>Dashboard</p>
+            </Link>
           </li>
-          <li
-            onClick={() => onTabChange('Manage Users')}
-            style={liStyle('Manage Users')}
-          >
-            <img src={ManageUser} alt="" />
-            <p style={pStyle('Manage Users')}>Manage Users</p>
+          <li onClick={() => onTabChange('Manage User')}>
+            <Link to="/admin/manage-users" style={liStyle('Manage Users')}>
+              <img src={ManageUser} alt="" />
+              <p style={pStyle('Manage Users')}>Manage Users</p>
+            </Link>
           </li>
-          <li
-            onClick={() => onTabChange('My Tracks')}
-            style={liStyle('My Tracks')}
-          >
-            <img src={TrackIcon} alt="" />
-            <p style={pStyle('My Tracks')}>My Tracks</p>
+
+          <li onClick={() => onTabChange('Manage Content')}>
+            <Link to="/admin/manage-contents" style={liStyle('Manage Content')}>
+              <img src={TrackIcon} alt="" />
+              <p style={pStyle('Manage Content')}>Manage Content</p>
+            </Link>
           </li>
-          <li
-            onClick={() => onTabChange('Earnings')}
-            style={liStyle('Earnings')}
-          >
-            <img src={EarningIcon} alt="" />
-            <p style={pStyle('Earnings')}>Earnings</p>
-          </li>
-          <li
-            onClick={() => onTabChange('User Profile')}
-            style={liStyle('User Profile')}
-          >
-            <img src={ProfileIcon} alt="" />
-            <p style={pStyle('User Profile')}>User Profile</p>
-          </li>
-          <li onClick={() => onTabChange('Dispute')} style={liStyle('Dispute')}>
-            <img src={DisputeIcon} alt="" />
-            <p style={pStyle('Dispute')}>Dispute</p>
+
+          {/* <li onClick={() => onTabChange('Manage User')}>
+            <Link to="/admin/disputes" style={liStyle('Dispute')}>
+              {' '}
+              <img src={DisputeIcon} alt="" />
+              <p style={pStyle('Dispute')}>Dispute</p>
+            </Link>
+          </li> */}
+
+          <li onClick={() => onTabChange('Quotes')}>
+            <Link to="/admin/music-quotes" style={liStyle('Music Quotes')}>
+              <img src={QuotesIcon} alt="" />
+              <p style={pStyle('Music Quotes')}>Quotes</p>
+            </Link>
           </li>
         </ul>
       </div>
@@ -144,5 +142,3 @@ const AdminSidebarDashboard: React.FC<MusicUploaderDashboardSidebarProps> = ({
 };
 
 export default AdminSidebarDashboard;
-
-

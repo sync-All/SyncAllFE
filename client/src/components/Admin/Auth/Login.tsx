@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 // import { useNavigate } from 'react-router-dom';
 import useLoading from '../../../constants/loading';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SigninSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -14,10 +15,6 @@ const SigninSchema = Yup.object().shape({
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
 });
-
-// interface LoginProps {
-//   setToken: (token: string) => void;
-// }
 
 interface ResponseData {
   message?: string;
@@ -27,6 +24,11 @@ interface ResponseData {
 const Login = () => {
   const { loading, setLoading } = useLoading();
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const navigate = useNavigate();
+
+  const handleNavigationTODashboard = () => {
+    navigate('/admin/dashboard');
+  };
 
   useEffect(() => {
     if (token) {
@@ -49,8 +51,6 @@ const Login = () => {
         password: values['password'],
       });
       if (response && response.data) {
-        console.log(response);
-
         localStorage.clear();
         sessionStorage.clear();
 
@@ -59,6 +59,7 @@ const Login = () => {
         localStorage.setItem('token', response.data.token);
 
         toast.success('Login successful');
+        handleNavigationTODashboard();
       } else {
         throw new Error('Response or response data is undefined');
       }

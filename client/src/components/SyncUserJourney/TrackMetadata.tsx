@@ -207,8 +207,8 @@ const TrackMetadata = () => {
               Track Details
             </h4>
             <hr />
-            <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
-              <div className="flex flex-col gap-8 lg:gap-6">
+            <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
+              <div className="flex flex-col gap-8 lg:gap-6 min-w-[300px]">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Genre</p>
                   <p className="text-[#475367]">
@@ -230,7 +230,7 @@ const TrackMetadata = () => {
                   </p>
                 </span>
               </div>
-              <div className="flex flex-col justify-between gap-8 lg:gap-6">
+              <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Mood</p>
                   <p className="text-[#475367]">
@@ -252,7 +252,7 @@ const TrackMetadata = () => {
                   </p>
                 </span>
               </div>
-              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
+              <div className="flex  flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Produced by</p>
                   <p className="text-[#475367]">
@@ -311,9 +311,9 @@ const TrackMetadata = () => {
                     </p>
                   </>
                 )}
-                <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
+                <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
                   {/* First Column */}
-                  <div className="flex flex-col gap-8 lg:gap-6">
+                  <div className="flex flex-col gap-8 lg:gap-6 min-w-[300px]">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Country of Recording</p>
                       <p className="text-[#475367]">
@@ -367,7 +367,7 @@ const TrackMetadata = () => {
                   </div>
 
                   {/* Second Column */}
-                  <div className="flex flex-col justify-between gap-8 lg:gap-6">
+                  <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Copyright Name</p>
                       <p className="text-[#475367]">
@@ -418,7 +418,7 @@ const TrackMetadata = () => {
                   </div>
 
                   {/* Third Column */}
-                  <div className="flex flex-col justify-between gap-8 lg:gap-6">
+                  <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Publishers</p>
                       <p className="text-[#475367]">

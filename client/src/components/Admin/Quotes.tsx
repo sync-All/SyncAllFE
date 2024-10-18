@@ -1,30 +1,27 @@
 import React, { useState, useMemo, useEffect } from 'react';
-// import Filter from '../../assets/images/Filter-lines.svg';
-
-import Dot from '../../assets/images/dot.svg';
-import ArrowDown from '../../assets/images/arrowdown.svg';
-import ArrowUp from '../../assets/images/up-arrow.svg';
-
-import NoTrack from '../../assets/images/no_track.svg';
 import useLoading from '../../constants/loading';
 import LoadingAnimation from '../../constants/loading-animation';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import Search from '../../assets/images/search-1.svg';
+import ArrowDown from '../../assets/images/arrowdown.svg';
+import ArrowUp from '../../assets/images/up-arrow.svg';
+import NoQuote from '../../assets/images/no_track.svg';
+import Dot from '../../assets/images/dot.svg';
+
+
 
 interface User {
   _id: string;
   fullName: string;
   name: string;
   email: string;
-  status: string
+  status: string;
   role: string;
   img: string;
   spotifyLink: string;
   createdAt: Date;
 }
-
-
 interface TableData {
   _id: string;
   fullName: string;
@@ -42,7 +39,6 @@ interface SortConfig {
   key: keyof TableData | null;
   direction: 'ascending' | 'descending';
 }
-
 const SortButton: React.FC<{
   sortConfig: SortConfig;
   sortKey: keyof TableData;
@@ -64,7 +60,7 @@ const SortButton: React.FC<{
   </button>
 );
 
-const ManageUsers = () => {
+const Quotes = () => {
   const { loading, setLoading } = useLoading();
   const [users, setUsers] = useState<User[]>([]);
 
@@ -138,21 +134,21 @@ const ManageUsers = () => {
           <div>
             <span className="flex gap-2">
               <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
-                User Management
+                Quotes Request
               </h2>
               <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
-                Users List
+                All Quotes
               </p>
             </span>
             <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
-              Manage and oversee registered users.
+              Review and manage user-generated content.
             </p>
           </div>
           <div>
             <div className="relative w-full flex items-center gap-4 min-w-[320px]">
               <input
                 type="text"
-                placeholder="Search by username or email address"
+                placeholder="Search User ID, Title, or Keywords"
                 className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
                 name="searchWord"
                 // value={searchWord}
@@ -173,7 +169,7 @@ const ManageUsers = () => {
             <thead>
               <tr>
                 <th className={ThStyles}>
-                  Name
+                  Track
                   <SortButton
                     sortConfig={sortConfig}
                     sortKey="name"
@@ -181,7 +177,7 @@ const ManageUsers = () => {
                   />
                 </th>
                 <th className={ThStyles}>
-                  Email Address
+                  User
                   <SortButton
                     sortConfig={sortConfig}
                     sortKey="email"
@@ -189,7 +185,7 @@ const ManageUsers = () => {
                   />
                 </th>
                 <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6">
-                  Account Status
+                  Status
                 </th>
                 <th className={ThStyles}>
                   User Role
@@ -222,9 +218,9 @@ const ManageUsers = () => {
                   </td>
                   <td
                     className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer"
-                    // onClick={() => onTabChange('Manage User', user)}
+                    // onClick={() => onTabChange('Quote Detail', user)}
                   >
-                    View
+                    Review
                   </td>
                   {/* <td
                     className={`py-4 px-4 ${
@@ -252,12 +248,12 @@ const ManageUsers = () => {
           </table>
         ) : (
           <div className="flex flex-col justify-center items-center mx-auto mt-[195px]">
-            <img src={NoTrack} alt="No Track" />
+            <img src={NoQuote} alt="No Track" />
             <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
-              No User
+              No Quotes
             </p>
             <p className="text-[#667085] text-[12px] font-formular-medium leading-4">
-              You don't have an user
+              You don't have any quote at the moment.
             </p>
           </div>
         )}
@@ -266,4 +262,4 @@ const ManageUsers = () => {
   );
 };
 
-export default ManageUsers;
+export default Quotes;

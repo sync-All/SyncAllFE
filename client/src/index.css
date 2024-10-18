@@ -193,3 +193,9 @@ input::-webkit-inner-spin-button {
 .inactive {
   pointer-events: none;
 }
+
+.vertical-text {
+  writing-mode: vertical-lr;
+  text-orientation: sideways-right;
+  transform: rotate(180deg); 
+}

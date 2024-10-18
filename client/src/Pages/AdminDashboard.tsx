@@ -1,43 +1,26 @@
 import { useState } from 'react';
 import AdminDashboardSidebar from '../components/Admin/AdminSidebarDashboard';
-import Dashboard from '../components/Admin/Dashboard';
-import AdminNavbar from '../components/Admin/AdminDashboardNavbar';
+import { Route, Routes } from 'react-router-dom';
+import ProtectedRoute from '../components/ProtectedRoute';
 import ManageUsers from '../components/Admin/ManageUsers';
-import SingleUserPage from '../components/Admin/SingleUserPage';
-
- interface User {
-  _id: string;
-  fullName: string;
-  name: string;
-  email: string;
-  status: string;
-  role: string;
-}
+import ManageContent from '../components/Admin/ManageContent';
+import Quotes from '../components/Admin/Quotes';
+import Dashboard from '../components/Admin/Dashboard';
+import AdminDashboardNavbar from '../components/Admin/AdminDashboardNavbar';
+import  { ContentProvider } from '../Context/ContentContext';
+import ContentReview from '../components/Admin/ContentReview';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('Dashboard');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
- const [selectedUser, setSelectedUser] = useState<User | null>(null); // Track the selected user
+  const [activeTab, setActiveTab] = useState('Dashboard');
 
-const handleTabChange = (tab: string, user?: User) => {
-  // Updated signature
-  setActiveTab(tab);
-  if (user) {
-    setSelectedUser(user); // Store the selected user if provided
-  }
-  setIsMenuOpen(false);
-};
-
-
-  
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
- 
-
-
 
   return (
     <div className="flex">
@@ -49,17 +32,60 @@ const handleTabChange = (tab: string, user?: User) => {
         <AdminDashboardSidebar
           activeItem={activeTab}
           onTabChange={handleTabChange}
+          toggleMenu={toggleMenu}
         />
       </div>
       <div className="flex-grow lg:ml-[16.67%] lg:h-screen lg:overflow-auto">
-        <AdminNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
-        {activeTab === 'Dashboard' && <Dashboard />}
-        {activeTab === 'Manage Users' && (
-          <ManageUsers onTabChange={handleTabChange} />
-        )}
-        {activeTab === 'Manage User' && selectedUser && (
-          <SingleUserPage user={selectedUser} />
-        )}
+        <AdminDashboardNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
+        <Routes>
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute path="dashboard" element={<Dashboard />} />
+            }
+          />
+          <Route
+            path="manage-users"
+            element={
+              <ProtectedRoute path="manage-users" element={<ManageUsers />} />
+            }
+          />
+
+          <Route
+            path="manage-contents"
+            element={
+              <ProtectedRoute
+                path="manage-contents"
+                element={
+                  <ContentProvider>
+                    <ManageContent />
+                  </ContentProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="music-quotes"
+            element={
+              <ProtectedRoute path="music-quotes" element={<Quotes />} />
+            }
+          />
+
+          <Route
+            path="manage-contents/:id"
+            element={
+              <ProtectedRoute
+                path="manage-contents/:id"
+                element={
+                  <ContentProvider>
+                    <ContentReview />
+                  </ContentProvider>
+                }
+              />
+            }
+          />
+        </Routes>
       </div>
     </div>
   );
