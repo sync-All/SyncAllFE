@@ -68,7 +68,7 @@ const getAllSongs = async(req,res,next)=>{
 
 const getTracksByGenre = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({genre : req.params.genre}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
+      const allTracks = await Track.find({genre : {$regex : req.params.genre, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -77,7 +77,7 @@ const getTracksByGenre = async(req,res,next)=>{
 
 const getTracksByInstrument = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({featuredInstrument : req.params.instrument}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
+      const allTracks = await Track.find({featuredInstrument : {$regex : req.params.instrument, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -86,7 +86,7 @@ const getTracksByInstrument = async(req,res,next)=>{
 
 const getTracksByMood = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({mood : req.params.mood}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
+      const allTracks = await Track.find({mood : {$regex : req.params.mood, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
