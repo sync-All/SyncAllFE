@@ -34,9 +34,6 @@ import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
 import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
 import PaymentStatus from './Pages/PaymentStatus';
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
-import Login from './components/Admin/Auth/Login';
-import AdminDashboard from './Pages/AdminDashboard';
-
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -323,10 +320,7 @@ function App() {
             }
           />
 
-          <Route path="/admin/login" element={<Login />} />
-
-          <Route path="/admin/*" element={<AdminDashboard />} />
-         
+        
         </Routes>
       </UserContext.Provider>
     </>

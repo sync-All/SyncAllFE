@@ -19,9 +19,25 @@ import MusicSearch from './MusicSearch';
 import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
 import LoadingAnimation from '../../constants/loading-animation';
+import usePagination from '../../hooks/usePaginate';
+
+interface TrackDetails {
+  producers: string;
+  trackTitle: string;
+  _id: string;
+  trackLink: string;
+  mainArtist: string;
+  musicWaves: string[];
+  duration: string;
+  writers: string;
+  genre: string;
+  mood: string[];
+  actions: string[];
+  artWork: string;
+}
+
 const SyncUserHome = () => {
   const { user, loading } = useSyncUser();
-
   const track = user;
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,20 +47,25 @@ const SyncUserHome = () => {
   const { id } = useParams();
   const [tracksLoading, setTracksLoading] = useState<boolean>(false);
 
-  interface TrackDetails {
-    producers: string;
-    trackTitle: string;
-    _id: string;
-    trackLink: string;
-    mainArtist: string;
-    musicWaves: string[];
-    duration: string;
-    writers: string;
-    genre: string;
-    mood: string[];
-    actions: string[];
-    artWork: string;
-  }
+  const itemsPerPage = 30; // Can be dynamic as needed
+    const {
+      currentPage,
+      totalPages,
+      paginatedItems,
+      goToNextPage,
+      goToPreviousPage,
+      goToPage,
+      getPaginationRange,
+    } = usePagination<TrackDetails>(musicDetails, itemsPerPage);
+
+
+  const totaltracks = musicDetails.length;
+  const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+
+  const active =
+    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+
+  
 
   const closeMenu = () => setMenuOpen(!menuOpen);
 
@@ -178,13 +199,21 @@ const SyncUserHome = () => {
           </div>
         </section>
         <section className="mt-[63px] relative">
-          <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
-            Browse Songs
-          </h3>
+          <div className="flex justify-between items-center">
+            {' '}
+            <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
+              Browse Songs
+            </h3>
+            <div className="text-[12px] font-formular-regular">
+              Showing<span className="font-Utile-regular">:</span> {endIndex} of{' '}
+              {totaltracks}
+            </div>
+          </div>
+
           <section>
-            {musicDetails && musicDetails.length > 0 ? (
+            {paginatedItems && paginatedItems.length > 0 ? (
               <div className="hidden flex-col gap-[56px] lg:flex">
-                {musicDetails.map((detail, index) => (
+                {paginatedItems.map((detail, index) => (
                   <div key={index} className="flex items-center w-full">
                     <Link
                       to={`/metadata/${detail?._id}`}
@@ -245,7 +274,7 @@ const SyncUserHome = () => {
                         className="cursor-pointer"
                       />
                     </span>
-                    <span className="gap-[12px] flex w-[25%] justify-center">
+                    <span className="gap-[12px] flex w-[25%] justify-end">
                       <Link to={`/metadata/${detail?._id}`}>
                         <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
                           View More
@@ -259,6 +288,42 @@ const SyncUserHome = () => {
                     </span>
                   </div>
                 ))}
+                <div className="flex items-center mx-auto gap-3 mt-5">
+                  <button
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    Prev
+                  </button>
+                  <div className="gap-3 flex">
+                    {getPaginationRange().map((page, index) =>
+                      typeof page === 'number' ? (
+                        <div>
+                          <button
+                            key={index}
+                            onClick={() => goToPage(page)}
+                            className={
+                              currentPage === page
+                                ? active
+                                : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
+                            }
+                          >
+                            {page}
+                          </button>
+                        </div>
+                      ) : (
+                        <span key={index}>...</span>
+                      )
+                    )}
+                  </div>
+
+                  <button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             ) : (
               <p className="text-center">No Track available.</p>
@@ -267,7 +332,7 @@ const SyncUserHome = () => {
 
           {/* Mobile */}
           <div className="lg:hidden flex flex-col gap-6">
-            {musicDetails.map((detail, index) => (
+            {paginatedItems.map((detail, index) => (
               <div
                 key={index}
                 className="flex items-center w-full justify-between"
@@ -294,6 +359,39 @@ const SyncUserHome = () => {
                 </span>
               </div>
             ))}
+            <div className="flex items-center mx-auto gap-3 mt-5">
+              <button onClick={goToPreviousPage} disabled={currentPage === 1}>
+                Prev
+              </button>
+              <div className="gap-3 flex">
+                {getPaginationRange().map((page, index) =>
+                  typeof page === 'number' ? (
+                    <div>
+                      <button
+                        key={index}
+                        onClick={() => goToPage(page)}
+                        className={
+                          currentPage === page
+                            ? active
+                            : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
+                        }
+                      >
+                        {page}
+                      </button>
+                    </div>
+                  ) : (
+                    <span key={index}>...</span>
+                  )
+                )}
+              </div>
+
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           </div>
 
           {menuOpen && selectedTrackId && (

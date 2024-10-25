@@ -12,13 +12,11 @@ import Copy from '../../assets/images/copy-link.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import Liked from '../../assets/images/liked.svg';
+import usePagination from '../../hooks/usePaginate';
 
-
-
- interface ResponseData {
-   message?: string;
- }
-
+interface ResponseData {
+  message?: string;
+}
 
 const MusicSearch = () => {
   const [selectedInstrument, setSelectedInstrument] = useState<string | null>(
@@ -28,22 +26,25 @@ const MusicSearch = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [searchWord, setSearchWord] = useState<string>('');
   const [results, setResults] = useState<TrackDetails[]>([]);
-const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
+  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
-    interface TrackDetails {
-      trackTitle: string;
-      _id: string;
-      trackLink: string;
-      mainArtist: string;
-      musicWaves: string[];
-      duration: string;
-      writers: string;
-      genre: string;
-      mood: string[];
-      actions: string[];
-      artWork: string;
-      producers: string
-    }
+  interface TrackDetails {
+    trackTitle: string;
+    _id: string;
+    trackLink: string;
+    mainArtist: string;
+    musicWaves: string[];
+    duration: string;
+    writers: string;
+    genre: string;
+    mood: string[];
+    actions: string[];
+    artWork: string;
+    producers: string;
+  }
+
+const active =
+  'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
 
   const useSearch = (
     endpoint: string,
@@ -65,9 +66,7 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
         try {
           const res = await axios.get(apiUrl, config);
-        setResults(res.data.allTracks);
-          
-          
+          setResults(res.data.allTracks);
         } catch (error) {
           const axiosError = error as AxiosError<ResponseData>;
 
@@ -113,17 +112,27 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
     }
   };
 
-    const handleCopyLink = (id: string) => {
-      navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
-      toast.success('Link copied to clipboard');
-    };
-
- 
+  const handleCopyLink = (id: string) => {
+    navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
+    toast.success('Link copied to clipboard');
+  };
 
   useSearch('getTrackByInstrument', selectedInstrument, setResults);
   useSearch('getTrackByGenre', selectedGenre, setResults);
   useSearch('getTrackByMood', selectedMood, setResults);
   useSearch('querySongs', searchWord, setResults);
+
+  const itemsPerPage = 30;
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination(results, itemsPerPage);
 
   const noResults =
     results.length === 0 &&
@@ -136,7 +145,7 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
           placeholder="Search for music, genres, moods, keywords or lyrics"
           className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
           name="searchWord"
-          value={searchWord}
+          value={selectedInstrument || selectedGenre || selectedMood || searchWord}
           onChange={(e) => setSearchWord(e.target.value)}
         />
         <img
@@ -150,29 +159,36 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
         <ul className="flex gap-[35px] relative ">
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Genre
-              onSelect={(genre) => setSelectedGenre(`:${genre.toLowerCase()}`)}
+              onSelect={(genre) => setSelectedGenre(`${genre.toLowerCase()}`)}
             />
           </li>
           <li className="flex gap-[7px]   uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Mood
-              onSelect={(mood) => setSelectedMood(`:${mood.toLowerCase()}`)}
+              onSelect={(mood) => setSelectedMood(`${mood.toLowerCase()}`)}
             />
           </li>
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Instrument
               onSelect={(instrument) =>
-                setSelectedInstrument(`:${instrument.toLowerCase()}`)
+                setSelectedInstrument(`${instrument.toLowerCase()}`)
               }
             />
           </li>
         </ul>
       </div>
       <div className="mt-[32px]">
-        {results.length > 0 ? (
+        {paginatedItems.length > 0 ? (
           <div>
-            <h2 className="text-[18px] font-bold mb-[16px]">Search Results:</h2>
-            <ul>
-              {results.map((result, index) => (
+            <h2 className="text-[18px] font-bold mb-[16px]">
+              Search Results for{' '}
+              {searchWord ||
+                selectedGenre ||
+                selectedInstrument ||
+                selectedMood}
+              :
+            </h2>
+            <ul className="flex flex-col gap-2">
+              {paginatedItems.map((result, index) => (
                 <div key={index} className="flex items-center w-full ">
                   <Link
                     to={`/metadata/${result?._id}`}
@@ -240,13 +256,57 @@ const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
                 </div>
               ))}
             </ul>
+            <div className="flex items-center mx-auto gap-3 justify-center mt-5">
+              <button onClick={goToPreviousPage} disabled={currentPage === 1}>
+                Prev
+              </button>
+              <div className="gap-3 flex">
+                {getPaginationRange().map((page, index) =>
+                  typeof page === 'number' ? (
+                    <div>
+                      <button
+                        key={index}
+                        onClick={() => goToPage(page)}
+                        className={
+                          currentPage === page
+                            ? active
+                            : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
+                        }
+                      >
+                        {page}
+                      </button>
+                    </div>
+                  ) : (
+                    <span key={index}>...</span>
+                  )
+                )}
+              </div>
+
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           </div>
         ) : (
-          noResults && <p>No results found.</p>
+          noResults && (
+            <p>
+              No results found for{' '}
+              <strong>
+                {' '}
+                {searchWord ||
+                  selectedGenre ||
+                  selectedInstrument ||
+                  selectedMood}
+              </strong>{' '}
+            </p>
+          )
         )}
       </div>
     </div>
   );
-}
+};
 
 export default MusicSearch;

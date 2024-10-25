@@ -20,6 +20,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "../admin/src/Pages/AdminDashboard.tsx",
+    "../admin/src/contexts/ContentContext.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
