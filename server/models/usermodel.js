@@ -8,7 +8,8 @@ const userSchema = new Schema({
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        trim : true
     },
     password : {
         type : String,
@@ -81,7 +82,8 @@ const syncUserSchema = new Schema({
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        trim :  true
     },
     password : {
         type : String,
