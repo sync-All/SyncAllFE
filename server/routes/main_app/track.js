@@ -1,11 +1,15 @@
 var express = require("express");
+
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" }).single("artWork");
+const { fileFilter } = require("../../utils/upload");
+const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}}).single("artWork");
+const bulkUpload = multer({ dest: "bulkUploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}, fileFilter}).single("bulkUpload")
 const asyncHandler = require("express-async-handler");
 const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
+
 
 router.get(
   "/verifyTrackUploaded/",
@@ -24,6 +28,16 @@ router.post(
   }),
   upload,
   asyncHandler(trackController.trackUpload)
+);
+
+router.post(
+  "/trackBulkUpload/",
+  passport.authenticate("jwt", {
+    session: false,
+    failureRedirect: "/unauthorized",
+  }),
+  bulkUpload,
+  asyncHandler(trackController.trackBulkUpload)
 );
 
 router.get(
