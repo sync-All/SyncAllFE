@@ -2,6 +2,7 @@ import { Content } from '../contexts/ContentContext';
 
 interface AdditionalRecordingInfoProps {
   details?: Content;
+  
 }
 
 const applyInputStyles =
