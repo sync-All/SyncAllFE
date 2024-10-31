@@ -1,9 +1,11 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/track.model").track
 const cloudinary = require("cloudinary").v2
-const { BadRequestError } = require("../utils/CustomError")
+const { BadRequestError, unauthorizedError, ForbiddenError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
+const csv = require('fast-csv');
+const mongoose = require('mongoose')
 require('dotenv').config()
 
 
@@ -59,6 +61,95 @@ const trackUpload = async(req,res,next)=>{
   }else{
     res.status(401).json('Unauthorized Access, Role not Supported')
   }
+}
+
+const trackBulkUpload = async(req,res,next)=>{
+  if(req.user.role == "Music Uploader"){
+    if(!req.file){
+      throw new ForbiddenError('Kindly input a valid file type')
+    }
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+
+
+    let newMuiscData = []
+    let existingMuiscData = []
+    let sortedMuiscData = []
+    let rowCount = 0
+    let parsedRows = 0
+    let existingData = 0
+    fs.createReadStream(req.file.path)
+    .pipe(csv.parse({ignoreEmpty : true, headers : [undefined,'releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'explicitCont', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
+    .validate(async(data)=>{
+      const confirmTrackUploaded =  await Track.findOne({isrc : data.isrc}).exec()
+        if(confirmTrackUploaded){
+          res.write(`event: warning\n`);
+          res.write(`data: ${JSON.stringify({duplicateData : existingData++, status : "Not Uploaded", message : "Looks like we already have this tracks"})}\n\n`);
+        }
+        // else{
+        //   newMuiscData.push(data)
+        // }
+      return !confirmTrackUploaded
+      
+      
+    })
+    .on('data', (data) => {
+      rowCount++
+      newMuiscData.push(data)
+    })
+    .on('error', (error) => {
+      res.write(`event: error\n`);
+      console.error(error)
+      res.write(`data: ${JSON.stringify({ error })}\n\n`);
+      fs.unlinkSync(req.file.path)
+
+    })
+    .on('end', async (rowCount) => {
+      res.write(`event: total\n`);
+      res.write(`data: ${JSON.stringify({ rowCount})}\n\n`);
+      try {
+        for(const row of newMuiscData){
+          let spotifyresponse = {}
+          parsedRows++;
+          const confirmTrackUploaded = await Track.findOne({isrc : row.isrc}).exec()
+          if(confirmTrackUploaded){
+            console.log('Got here ke!')
+          }
+          res.write(`event: progress\n`);
+          res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
+          try {
+              spotifyresponse = await spotifyCheck.SpotifyPreview(res, row.trackLink)
+            } catch (error) {
+              if(error){
+                res.write(`event: progress\n`);
+                res.write(`data: "error somewhere"\n\n`);
+              }
+              continue;
+            }
+            row.spotifyLink = spotifyresponse.spotifyLink
+            row.user = req.user.id
+            row.trackLink = spotifyresponse.preview_url, 
+            row.duration = spotifyresponse.duration
+            sortedMuiscData.push(row)
+        }
+        console.log(sortedMuiscData)
+        res.write(`event: done\n`);
+        res.write(`data: "Parsing complete!"\n\n`);
+        fs.unlinkSync(req.file.path)
+        res.end();
+    
+      } catch (error) {
+        console.log(error)
+      }
+    });
+    
+  }else{
+    throw new unauthorizedError('Unauthorized User')
+  }
+  
 }
 
 const getAllSongs = async(req,res,next)=>{
@@ -123,4 +214,4 @@ const queryTrackInfo =async(req,res,next)=>{
   res.status(400).send("Bad request")
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload}
