@@ -175,13 +175,15 @@ const getsyncuserinfo = async (req,res,next)=>{
 }
 
 const profilesetup = async (req, res, next) => {
+  let bodyParams = {...req.body}
   if(req.user.userType == "Individual"){
     const {username, spotifyLink, bio} = req.body;
     const duplicateUsername = await User.findOne({username}).exec()
     if(duplicateUsername){
       throw new BadRequestError('Username exist already')
     }
-    await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
+    const spotifyId = await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
+    bodyParams = {...req.body, spotifyId}
     if (!username || !spotifyLink || !bio) {
       return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
     }  
@@ -193,7 +195,7 @@ const profilesetup = async (req, res, next) => {
   }
   const userId = req.user._id;
   try {
-    await User.findByIdAndUpdate(userId,req.body,{ new: true });
+    await User.findByIdAndUpdate(userId,bodyParams,{ new: true });
     res.status(200).json({success: true,message: 'Profile update successful'});
   } catch (error) {
     console.log(error)

@@ -44,6 +44,9 @@ const userSchema = new Schema({
     spotifyLink : {
         type : String,
     },
+    spotifyId : {
+        type : String
+    },
     facebookLink : {
         type : String,
     },

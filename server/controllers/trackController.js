@@ -25,6 +25,7 @@ const trackUpload = async(req,res,next)=>{
   if(req.user.role == "Music Uploader"){
     const {trackLink} = req.body
     let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
+    console.log(spotifyresponse)
     const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
     if(confirmTrackUploaded){
         res.status(401).json('Track already exists')
@@ -32,7 +33,7 @@ const trackUpload = async(req,res,next)=>{
       let songInfo = req.body
       if(req.file){
         var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
-        const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration}
+        const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
         const track = new Track(adjustedsongInfo)
         track.save()
         .then(async (track)=>{
@@ -45,7 +46,7 @@ const trackUpload = async(req,res,next)=>{
           res.status(401).json(err)
         })
       }else{
-        const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration}
+        const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
         const track = new Track(adjustedsongInfo)
         track.save()
         .then(async (track)=>{
@@ -83,19 +84,6 @@ const trackBulkUpload = async(req,res,next)=>{
     let existingData = 0
     fs.createReadStream(req.file.path)
     .pipe(csv.parse({ignoreEmpty : true, headers : [undefined,'releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'explicitCont', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
-    .validate(async(data)=>{
-      const confirmTrackUploaded =  await Track.findOne({isrc : data.isrc}).exec()
-        if(confirmTrackUploaded){
-          res.write(`event: warning\n`);
-          res.write(`data: ${JSON.stringify({duplicateData : existingData++, status : "Not Uploaded", message : "Looks like we already have this tracks"})}\n\n`);
-        }
-        // else{
-        //   newMuiscData.push(data)
-        // }
-      return !confirmTrackUploaded
-      
-      
-    })
     .on('data', (data) => {
       rowCount++
       newMuiscData.push(data)
@@ -116,12 +104,17 @@ const trackBulkUpload = async(req,res,next)=>{
           parsedRows++;
           const confirmTrackUploaded = await Track.findOne({isrc : row.isrc}).exec()
           if(confirmTrackUploaded){
-            console.log('Got here ke!')
+            res.write(`event: warning\n`);
+            res.write(`data: ${JSON.stringify({duplicateData : existingData++, status : "Not Uploaded", message : "Looks like we already have this tracks", errType : 'duplicateError'})}\n\n`);
+            continue;
           }
-          res.write(`event: progress\n`);
-          res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           try {
-              spotifyresponse = await spotifyCheck.SpotifyPreview(res, row.trackLink)
+
+              // spotifyresponse = await spotifyCheck.SpotifyPreview(res, row.trackLink)
+
+              res.write(`event: progress\n`);
+              res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
+
             } catch (error) {
               if(error){
                 res.write(`event: progress\n`);

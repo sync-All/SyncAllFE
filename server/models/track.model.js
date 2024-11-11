@@ -168,6 +168,11 @@ const trackSchema = new Schema({
         type : String,
         // required : true
     },
+    spotifyArtistIds : [
+        {
+            type : String
+        }
+    ],
     duration : {
         type : String,
     },
