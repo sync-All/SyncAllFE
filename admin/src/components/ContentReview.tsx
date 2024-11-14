@@ -23,8 +23,7 @@ const ContentReview = () => {
 
   const contentItem = getContentById(id || '');
 
-  console.log(contentItem);
-
+  
   if (loading) {
     return <LoadingAnimation />;
   }

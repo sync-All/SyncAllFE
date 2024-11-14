@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import AdminDashboardSidebar from '../components/AdminSidebarDashboard';
 import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -9,6 +8,9 @@ import Dashboard from '../components/Dashboard';
 import AdminDashboardNavbar from '../components/AdminDashboardNavbar';
 import { ContentProvider } from '../contexts/ContentContext';
 import ContentReview from '../components/ContentReview';
+import { useState } from 'react';
+import SingleUserPage from '../components/SingleUserPage';
+import { UserProvider } from '../contexts/UserContext';
 
 const AdminDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,9 +25,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <div
-        className={`fixed inset-0 z-50 bg-white  lg:bg-transparent lg:w-1/6 lg:h-screen lg:fixed lg:top-0 lg:left-0 ${
+        className={`fixed inset-0 z-50 bg-white lg:bg-transparent lg:w-1/6 lg:h-screen lg:fixed lg:top-0 lg:left-0 ${
           isMenuOpen ? 'block' : 'hidden'
         } lg:block`}
       >
@@ -37,55 +39,64 @@ const AdminDashboard = () => {
       </div>
       <div className="flex-grow lg:ml-[16.67%] lg:h-screen lg:overflow-auto">
         <AdminDashboardNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
-        <Routes>
-          <Route
-            path="dashboard"
-            element={
-              <ProtectedRoute path="dashboard" element={<Dashboard />} />
-            }
-          />
-          <Route
-            path="manage-users"
-            element={
-              <ProtectedRoute path="manage-users" element={<ManageUsers />} />
-            }
-          />
+        <UserProvider>
+          <ContentProvider>
+            <Routes>
+              <Route
+                path="dashboard"
+                element={
+                  <ProtectedRoute path="dashboard" element={<Dashboard />} />
+                }
+              />
+              <Route
+                path="manage-users"
+                element={
+                  <ProtectedRoute
+                    path="manage-users"
+                    element={<ManageUsers />}
+                  />
+                }
+              />
 
-          <Route
-            path="manage-contents"
-            element={
-              <ProtectedRoute
+              <Route
+                path="manage-users/:id"
+                element={
+                  <ProtectedRoute
+                    path="manage-users/:id"
+                    element={<SingleUserPage />}
+                  />
+                }
+              />
+
+              <Route
                 path="manage-contents"
                 element={
-                  <ContentProvider>
-                    <ManageContent />
-                  </ContentProvider>
+                  <ProtectedRoute
+                    path="manage-contents"
+                    element={<ManageContent />}
+                  />
                 }
               />
-            }
-          />
 
-          <Route
-            path="music-quotes"
-            element={
-              <ProtectedRoute path="music-quotes" element={<Quotes />} />
-            }
-          />
-
-          <Route
-            path="manage-contents/:id"
-            element={
-              <ProtectedRoute
+              <Route
                 path="manage-contents/:id"
                 element={
-                  <ContentProvider>
-                    <ContentReview />
-                  </ContentProvider>
+                  <ProtectedRoute
+                    path="manage-contents/:id"
+                    element={<ContentReview />}
+                  />
                 }
               />
-            }
-          />
-        </Routes>
+
+              <Route
+                path="music-quotes"
+                element={
+                  <ProtectedRoute path="music-quotes" element={<Quotes />} />
+                }
+              />
+            </Routes>
+          </ContentProvider>
+        </UserProvider>
       </div>
     </div>
   );

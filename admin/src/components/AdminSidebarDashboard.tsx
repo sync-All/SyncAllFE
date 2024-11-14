@@ -51,7 +51,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
     <div className="h-screen overflow-y-auto overflow-x-hidden border border-r-[#E4E7EC] flex flex-col">
       <div className="flex justify-between mt-[40px] ml-[40px]">
         <img src={Logo} alt="" />
-        <p className="pointer" onClick={toggleMenu}>
+        <p className="pointer lg:hidden" onClick={toggleMenu}>
           X
         </p>
       </div>

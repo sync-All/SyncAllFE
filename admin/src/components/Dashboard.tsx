@@ -5,6 +5,11 @@ import TotalUser from '../assets/images/TotalUser.svg';
 import NewUser from '../assets/images/NewUser.svg';
 import useLoading from '../constants/loading';
 import LoadingAnimation from '../constants/loading-animation';
+import Earning from '../assets/images/Cash Out.svg';
+import Uploaded from '../assets/images/Upload Track 2.svg';
+import Earth from '../assets/images/Earth.svg';
+import QuotesIcon from '../assets/images/quoteicon.svg';
+
 import Bull from '../assets/images/bull.svg';
 import Bear from '../assets/images/bear.svg';
 import {
@@ -15,12 +20,17 @@ import {
   ResponsiveContainer,
   BarChart,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
 import { usePDF } from 'react-to-pdf';
 import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import Currencyformatter from '../helper/currencyformatter';
+import formatToShortCurrency from '../helper/formatToShortCurrency';
 // import LoadingAnimation from '../../constants/loading-animation';
 
 interface ResponseData {
@@ -134,6 +144,34 @@ const Dashboard = () => {
 
   const cardData = [
     {
+      image: Earning,
+      title: 'Total Revenue',
+      value: kpidata?.totalCurrentUsers,
+      kpi: kpidata?.totalUserskpi,
+      color: '#064e3b',
+    },
+    {
+      image: Uploaded,
+      title: 'Total Tracks Uploaded',
+      value: kpidata?.totalNewUsers,
+      kpi: kpidata?.newUsersKpi,
+      color: '#f62c2c',
+    },
+    {
+      image: Earth,
+      title: 'Total Licensed Tracks',
+      value: kpidata?.totalActiveUsers,
+      kpi: kpidata?.activeUsersKpi,
+      color: '#064e3b',
+    },
+    {
+      image: QuotesIcon,
+      title: 'Total Quotes Submitted',
+      value: kpidata?.totalInActiveUsers,
+      kpi: kpidata?.inActiveUsersKpi,
+      color: '#064e3b',
+    },
+    {
       image: TotalUser,
       title: 'Total Users',
       value: kpidata?.totalCurrentUsers,
@@ -163,8 +201,40 @@ const Dashboard = () => {
     },
   ];
 
+  const revenueData = [
+    {
+      revenue: 'Transaction Fees',
+      amt: 0,
+    },
+    {
+      revenue: 'Membership Subscriptions ',
+      amt: 0,
+    },
+    {
+      revenue: 'Advertising Revenue',
+      amt: 0,
+    },
+    {
+      revenue: 'Platform Service Fees',
+      amt: 0,
+    },
+    {
+      revenue: 'Music licensing',
+      amt: 1,
+    },
+  ];
+
+  const getColor = (index:number) => {
+    const colors = ['#037847', '#FF9152', '#5C9BFF', '#9933FF', '#45CFB6'];
+    return colors[index % colors.length]; // Repeats colors if there are more segments than colors
+  };
+
+  const totalAmount = revenueData.reduce((sum, item) => sum + item.amt, 0);
+
+
+
   return (
-    <div ref={targetRef}>
+    <div ref={targetRef} className="mb-[91px]">
       <div className="ml-[20px] mr-[20px] lg:mx-8">
         <div className="flex mt-7 lg:mt-8">
           <span className="mr-auto">
@@ -173,7 +243,7 @@ const Dashboard = () => {
               {/* {profileDetails?.username ||
                 profileDetails?.representative ||
                 'Please add username in the user profile'} */}
-              Tom !
+              Admin !
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
@@ -231,7 +301,7 @@ const Dashboard = () => {
 
         <div className="mt-[30px] lg:mt-[60px] flex flex-col gap-6 lg:flex-row">
           <div className="flex-1">
-            <h2 className="font-formular-regular text-[16px] text-[#667185]">
+            <h2 className="font-formular-bold text-[18px] text-[#202020] leading-[29.244px]">
               User Growth{' '}
             </h2>
 
@@ -272,6 +342,22 @@ const Dashboard = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            <div className="flex gap-2.5 mt-4 mb-8">
+              <div className="py-3 px-4 bg-[#F9F9F9] rounded-[8px] flex-1">
+                <p className="text-[#5e5e5e] font-inter text-[14px] font-medium leading-5">
+                  In <span className="text-yellow">May,</span> you experienced
+                  significant growth, with the highest number of sign-ups to
+                  date, reaching a total of{' '}
+                  <span className="font-bold">1,204</span> new users.
+                </p>
+              </div>
+              <div className="py-3 px-4 bg-[#F9F9F9] rounded-[8px] flex-1 ">
+                <p className="text-[#5e5e5e] font-inter text-[14px] font-medium leading-5 ">
+                  Your average new registered users is{' '}
+                  <span className="text-yellow">304</span>
+                </p>
+              </div>
+            </div>
             {/* ) : (
               <div className="text-center mt-9 text-[16px] leading-[20px] py-6">
                 <img src={NoEarning} alt="" className="mx-auto" />
@@ -283,6 +369,120 @@ const Dashboard = () => {
             )} */}
           </div>
         </div>
+
+        <section>
+          <div className="flex justify-between items-center">
+            <p className="text-[18px] font-inter font-medium leading-[30px] ">
+              Revenue Breakdown by Activity
+            </p>
+            <select
+              name=""
+              id=""
+              className="rounded-[8px] border border-[#DADCE0] px-3 py-2 text-[#5E5E5E] text-[14px] font-formular-regular leading-10"
+            >
+              <option value="" className="">
+                All time{' '}
+              </option>
+            </select>
+          </div>
+          <div className="flex mt-[21px] flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <table className="w-full border-collapse border border-[#DADCE0] ">
+                <thead className="bg-[#f9f9f9]">
+                  <tr>
+                    <th className="text-[#838383] text-[14px] font-semibold text-left py-2 px-4 border-b">
+                      Category
+                    </th>
+                    <th className="text-[#838383] text-[14px] font-semibold text-left py-2 px-4  border-b">
+                      Spent
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {revenueData.map((rev, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="py-2 px-4 text-left text-[#202020] border-b font-semibold">
+                        {rev.revenue}
+                      </td>
+                      <td className="py-2 px-4 text-left text-[#202020] font-semibold border-b">
+                        {Currencyformatter(rev.amt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-col md:flex-row flex-1 border md:gap-[10%] xl:gap-[72px] items-center">
+              <ResponsiveContainer width="50%" height={208}>
+                <PieChart width={208} height={208}>
+                  <Pie
+                    data={revenueData}
+                    dataKey="amt"
+                    nameKey="revenue"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#82ca9d"
+                    // label={({ amt }) => ` ₦${formatToShortCurrency(amt)}`}
+                  >
+                    {revenueData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={getColor(index)} />
+                    ))}
+                  </Pie>
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 'bold',
+                      fill: '#202020', // Text color
+                    }}
+                  >
+                    ₦{formatToShortCurrency(totalAmount)}
+                  </text>
+                  <text
+                    x="50%"
+                    y="60%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 'regular',
+                      fill: '#5E5E5E', // Text color
+                    }}
+                  >
+                    Total expenses
+                  </text>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-col gap-3 ">
+                <div className="flex items-center gap-2">
+                  <div className="min-w-4 h-4 rounded-[4px] bg-[#037847]"></div>
+                  <p>Transaction Fees</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="min-w-4 h-4 rounded-[4px] bg-[#FF9152]"></div>
+                  <p>Subscriptions </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="min-w-4 h-4 rounded-[4px] bg-[#5C9BFF]"></div>
+                  <p>Advertising Revenue</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="min-w-4 h-4 rounded-[4px] bg-[#9933FF]"></div>
+                  <p>Platform Service Fees</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="min-w-4 h-4 rounded-[4px] bg-[#45CFB6]"></div>
+                  <p>Music licensing</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

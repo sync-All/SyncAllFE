@@ -123,10 +123,14 @@
     font-weight: 600;
 }
 
+
+
 .plus-jarkata-sans-bold {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
 }
+
+
 
 .plus-jarkata-sans-extrabold {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -198,4 +202,5 @@ input::-webkit-inner-spin-button {
   writing-mode: vertical-lr;
   text-orientation: sideways-right;
   transform: rotate(180deg); 
+  justify-content: space-between;
 }

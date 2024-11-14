@@ -11,6 +11,7 @@ import LoadingAnimation from '../constants/loading-animation';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import Search from '../assets/images/search-1.svg';
+import { Link } from 'react-router-dom';
 
 interface User {
   _id: string;
@@ -103,6 +104,7 @@ const ManageUsers = () => {
         setLoading(true);
         const res = await axios.get(apiUrl, config);
         setUsers(res.data.message);
+        console.log(res.data.message);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
@@ -220,11 +222,8 @@ const ManageUsers = () => {
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {user.role}
                   </td>
-                  <td
-                    className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer"
-                    // onClick={() => onTabChange('Manage User', user)}
-                  >
-                    View
+                  <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
+                    <Link to={user._id}>View</Link>
                   </td>
                   {/* <td
                     className={`py-4 px-4 ${

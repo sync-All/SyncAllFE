@@ -36,6 +36,8 @@ interface TrackDetails {
   artWork: string;
 }
 
+
+
 const SyncUserHome = () => {
   const { user, loading } = useSyncUser();
   const track = user;
