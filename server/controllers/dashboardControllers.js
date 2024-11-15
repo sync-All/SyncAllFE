@@ -2,6 +2,7 @@ const dashboard = require("../models/dashboard.model").dashboard
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel").uploader
 const Transaction = require('../models/transactions.model').uploaderTransaction
+const uploaderAccountInfo = require('../models/dashboard.model').uploaderAccountInfo
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
 const fs = require("node:fs")
@@ -104,11 +105,14 @@ const allDispute = async (req,res,next)=>{
 const updatePaymentInfo = async (req,res,next)=>{
     if(req.user.role == 'Music Uploader'){
         const userId = req.user.id
-        const dashboardAccInfoUpdate = await dashboard.findOneAndUpdate({user : userId}, {
-           '$set' : {
-            'earnings' : {...req.body}
-           }
-        },{new : true})
+        const existingAccountinfo = await uploaderAccountInfo.findOne({user : userId})
+        if (existingAccountinfo){
+            await uploaderAccountInfo.findOneAndUpdate({user : userId},{...req.body})
+        }else{
+            const newInfo = new uploaderAccountInfo({...req.body, user : userId})
+            await newInfo.save()
+            await dashboard.findOneAndUpdate({user : userId}, {accountInfo : newInfo._id},{new : true})
+        }
         res.status(200).json({success : true, message : dashboardAccInfoUpdate})
     }else{
         res.status(401).json('Unauthorized')
