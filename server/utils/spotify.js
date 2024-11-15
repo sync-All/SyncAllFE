@@ -85,6 +85,8 @@ const SpotifyPreview = async(res, trackLink)=>{
             spotifyLink : trackDetails.data.external_urls.spotify,
             artwork : trackDetails.data.album.images[0].url,
             duration : trackDuration,
+            explicit_content : trackDetails.data.explicit,
+            release_date : trackDetails.data.album.release_date,
             artistIds
         }
         

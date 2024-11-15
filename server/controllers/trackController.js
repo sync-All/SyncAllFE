@@ -13,11 +13,12 @@ require('dotenv').config()
 const verifyTrackUpload = async(req,res,next)=>{
   const trackLink = req.query.trackLink
   let response = await spotifyCheck.SpotifyPreview(res, trackLink)
+  console.log(response)
   const confirmTrackUploaded = await Track.findOne({isrc : response.isrc}).exec()
   if(confirmTrackUploaded){
       res.status(401).json('Track already exists')
   }else{
-      res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc})
+      res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc, explicit_content : response.explicit_content, release_date : response.release_date})
   }
 }
 
