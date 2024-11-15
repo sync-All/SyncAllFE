@@ -2,28 +2,11 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema
 
 
-const uploaderTransactionSchema = new Schema({
-   transactionType : {
-    type : String,
-    enum : ['Withdrawal', 'New Earning']
-   },
-   transactionStatus : {
-    type : String,
-    enum : ['Completed', 'Pending']
-   },
-   amount : {
-    type : Number
-   },
-   user : {
-    type : Schema.Types.ObjectId,
-    ref : "uploader"
-    },
-}, {timestamps : true})
 
 const userTransactionSchema = new Schema({
     transactionType : {
      type : String,
-     enum : ['Withdrawal', 'New Earning']
+     enum : ['Withdrawal', 'New Earning', 'Subscription']
     },
     transactionStatus : {
      type : String,
@@ -38,10 +21,33 @@ const userTransactionSchema = new Schema({
      },
  }, {timestamps : true})
 
-const uploaderTransaction = mongoose.model('uploaderTransaction',uploaderTransactionSchema)
+ const transactionSchema = new Schema({
+    transactionType : {
+        type : String,
+        enum : ['Withdrawal', 'New Earning', 'Subscription', 'Licensing', '']
+    },
+    transactionStatus : {
+    type : String,
+    enum : ['Completed', 'Pending', 'Failed']
+    },
+    userType : {
+        type : String,
+        enum : ['uploader', 'Sync User', 'Admin']
+    },
+    amount : {
+        type : Number,
+        required : true
+    },
+    user : {
+        type : Schema.Types.ObjectId,
+        ref : function(){
+            return this.userType == 'uploader' ? 'user' : this.userType == 'syncUser' ? 'syncUser' : 'admin'
+        }
+    }
+ }, {timestamps : true})
 
-const userTransaction = mongoose.model('userTransaction',userTransactionSchema)
 
-module.exports.uploaderTransaction = uploaderTransaction
+const transaction = mongoose.model('transaction',transactionSchema)
 
-module.exports.userTransaction = userTransaction
+
+module.exports.transaction = transaction

@@ -7,235 +7,132 @@ const {crbtRequest,interpolationRequest,fmtRequest,samplingRequest,smcRequest,tv
 
 const totalUsersKpi = async(queryFilter)=>{
     const currentDate = new Date();
-    let totalCurrentUsers = 0
+    let currentTotalUsers = 0
     let previousTotalUsers = 0
-    let totalUserskpi = 0
-    if(queryFilter == "this_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() , 1);
+    let totalUsers = 0
+    let totalUserkpi = 0
+    const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - (queryFilter - 1) , 1);
 
-        const [countCurrent1, countCurrent2] = await Promise.all([
-             uploader.countDocuments()
-            .where('createdAt').lte(currentMonth).exec(),  syncUser.countDocuments()
-            .where('createdAt').lte(currentMonth).exec()
-        ])
-
-        const [countPrevious1, countPrevious2] = await Promise.all([
+    const [countCurrent1, countCurrent2] = await Promise.all([
             uploader.countDocuments()
-            .where('createdAt').lte(previousMonth).exec(), syncUser.countDocuments()
-            .where('createdAt').lte(previousMonth).exec()
-        ])
+        .where('createdAt').lte(currentMonth).exec(),  syncUser.countDocuments()
+        .where('createdAt').lte(currentMonth).exec()
+    ])
 
-        totalCurrentUsers = countCurrent1 + countCurrent2
+    const [countPrevious1, countPrevious2] = await Promise.all([
+        uploader.countDocuments()
+        .where('createdAt').lte(previousMonth).exec(), syncUser.countDocuments()
+        .where('createdAt').lte(previousMonth).exec()
+    ])
 
-        previousTotalUsers = countPrevious1 + countPrevious2
+    currentTotalUsers = countCurrent1 + countCurrent2
 
-        totalUserskpi = Math.floor(Math.abs(previousTotalUsers - totalCurrentUsers)/ totalCurrentUsers * 100)
+    previousTotalUsers = countPrevious1 + countPrevious2
 
-    }else if(queryFilter == "2_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1 , 1);
-
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-           .where('createdAt').lte(currentMonth).exec(),  syncUser.countDocuments()
-           .where('createdAt').lte(currentMonth).exec()
-       ])
-
-       const [countPrevious1, countPrevious2] = await Promise.all([
-           uploader.countDocuments()
-           .where('createdAt').lte(previousMonth).exec(), syncUser.countDocuments()
-           .where('createdAt').lte(previousMonth).exec()
-       ])
-
-       totalCurrentUsers = countCurrent1 + countCurrent2
-
-       previousTotalUsers = countPrevious1 + countPrevious2
-
-       totalUserskpi = Math.floor(Math.abs(previousTotalUsers - totalCurrentUsers)/ totalCurrentUsers * 100)
+    if (previousTotalUsers > 0 ){
+        totalUserkpi = Math.floor((currentTotalUsers - previousTotalUsers)/ previousTotalUsers * 100)
+    }else{
+        totalUserkpi = 100
     }
-    totalUserskpi = isNaN(totalUserskpi) ? 0 : totalUserskpi
+
+    let newUsers = currentTotalUsers - previousTotalUsers
+
+    totalUsers = currentTotalUsers
+    let newusersKpi = totalUserkpi
     return{
-        totalCurrentUsers,
-        totalUserskpi
+        totalUsers,
+        newUsers,
+        newusersKpi,
+        totalUserkpi
     }
 }
 
-const newUsersKpi = async(queryFilter)=>{
-    const currentDate = new Date();
-    let totalNewUsers = 0
-    let previousNewUsers = 0
-    let newUsersKpi = 0
-    if(queryFilter == "this_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() , 1);
-        const otherPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth()-1 , 1);
-
-        const [countCurrent1, countCurrent2] = await Promise.all([
-             uploader.countDocuments()
-            .where('createdAt').lte(currentMonth).gte(previousMonth).exec(),  syncUser.countDocuments()
-            .where('createdAt').lte(currentMonth).gte(previousMonth).exec()
-        ])
-
-        const [countPrevious1, countPrevious2] = await Promise.all([
-            uploader.countDocuments()
-            .where('createdAt').lte(previousMonth).gte(otherPreviousMonth).exec(), syncUser.countDocuments()
-            .where('createdAt').lte(previousMonth).gte(otherPreviousMonth).exec()
-        ])
-
-        totalNewUsers = countCurrent1 + countCurrent2
-
-        previousNewUsers = countPrevious1 + countPrevious2
-
-        newUsersKpi = Math.floor((totalNewUsers - previousNewUsers )/ previousNewUsers * 100)
-
-    }else if(queryFilter == "2_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1 , 1);
-        const otherPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth()-2 , 1);
-
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-           .where('createdAt').lte(currentMonth).gte(previousMonth).exec(),  syncUser.countDocuments()
-           .where('createdAt').lte(currentMonth).gte(previousMonth).exec()
-       ])
-
-       const [countPrevious1, countPrevious2] = await Promise.all([
-           uploader.countDocuments()
-           .where('createdAt').lte(previousMonth).gte(otherPreviousMonth).exec(), syncUser.countDocuments()
-           .where('createdAt').lte(previousMonth).gte(otherPreviousMonth).exec()
-       ])
-
-
-       totalNewUsers = countCurrent1 + countCurrent2
-
-       previousTotalUsers = countPrevious1 + countPrevious2
-
-       newUsersKpi = Math.floor((totalNewUsers - previousNewUsers )/ previousNewUsers * 100)
-    }
-    newUsersKpi = isNaN(newUsersKpi) ? 0 : newUsersKpi
-    return{
-        totalNewUsers,
-        newUsersKpi
-    }
-}
 
 const activeUsersKpi = async(queryFilter)=>{
     const currentDate = new Date();
     let totalActiveUsers = 0
+    let currentActiveUsers = 0
     let previousActiveUsers = 0
-    let activeUsersKpi = 0
-    if(queryFilter == "this_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() , 1);
+    let activeUserKpi = 0
+    const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - (queryFilter - 1), 1);
 
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-            .where('createdAt').lte(currentMonth)
-            .where('accountStatus').equals('Active'),  syncUser.countDocuments()
-            .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active')
-        ])
+    const [countCurrent1, countCurrent2] = await Promise.all([
+        uploader.countDocuments()
+        .where('createdAt').lte(currentMonth)
+        .where('accountStatus').equals('Active'),  syncUser.countDocuments()
+        .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active')
+    ])
 
-        const [countPrevious1, countPrevious2] = await Promise.all([
-            uploader.countDocuments()
-            .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active'), syncUser.countDocuments()
-            .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active')
-        ])
+    const [countPrevious1, countPrevious2] = await Promise.all([
+        uploader.countDocuments()
+        .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active'), syncUser.countDocuments()
+        .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active')
+    ])
 
-        totalActiveUsers = countCurrent1 + countCurrent2
+    currentActiveUsers = countCurrent1 + countCurrent2
 
-        previousActiveUsers = countPrevious1 + countPrevious2
+    previousActiveUsers = countPrevious1 + countPrevious2
 
-        activeUsersKpi = Math.floor((totalActiveUsers - previousActiveUsers )/ previousActiveUsers * 100)
-
-    }else if(queryFilter == "2_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1 , 1);
-
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-           .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active'),  syncUser.countDocuments()
-           .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active')
-       ])
-
-       const [countPrevious1, countPrevious2] = await Promise.all([
-           uploader.countDocuments()
-           .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active'), syncUser.countDocuments()
-           .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active')
-       ])
-
-
-       totalActiveUsers = countCurrent1 + countCurrent2
-
-       previousActiveUsers = countPrevious1 + countPrevious2
-
-       activeUsersKpi = Math.floor((totalActiveUsers - previousActiveUsers )/ previousActiveUsers * 100)
+    if (previousActiveUsers > 0 ){
+        activeUserKpi = Math.floor((currentActiveUsers - previousActiveUsers )/ currentActiveUsers * 100)
+    }else{
+        activeUserKpi = 100
     }
 
-    activeUsersKpi = isNaN(activeUsersKpi) ? 0 : activeUsersKpi
+    totalActiveUsers = currentActiveUsers
+
+    if(queryFilter > 1){
+        totalActiveUsers = previousActiveUsers
+    }
+
     return{
         totalActiveUsers,
-        activeUsersKpi
+        activeUserKpi
     }
 }
 
 const inActiveUsersKpi = async(queryFilter)=>{
     const currentDate = new Date();
     let totalInActiveUsers = 0
+    let currentInActiveUsers = 0
     let previousInActiveUsers = 0
-    let inActiveUsersKpi = 0
-    if(queryFilter == "this_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() , 1);
+    let inActiveUserKpi = 0
+    const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - (queryFilter - 1) , 1);
 
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-            .where('createdAt').lte(currentMonth)
-            .where('accountStatus').equals('Inactive'),  syncUser.countDocuments()
-            .where('createdAt').lte(currentMonth).where('accountStatus').equals('Inactive')
-        ])
+    const [countCurrent1, countCurrent2] = await Promise.all([
+        uploader.countDocuments()
+        .where('createdAt').lte(currentMonth)
+        .where('accountStatus').equals('Inactive'),  syncUser.countDocuments()
+        .where('createdAt').lte(currentMonth).where('accountStatus').equals('Inactive')
+    ])
 
-        const [countPrevious1, countPrevious2] = await Promise.all([
-            uploader.countDocuments()
-            .where('createdAt').lte(previousMonth).where('accountStatus').equals('Inactive'), syncUser.countDocuments()
-            .where('createdAt').lte(previousMonth).where('accountStatus').equals('Inactive')
-        ])
+    const [countPrevious1, countPrevious2] = await Promise.all([
+        uploader.countDocuments()
+        .where('createdAt').lte(previousMonth).where('accountStatus').equals('Inactive'), syncUser.countDocuments()
+        .where('createdAt').lte(previousMonth).where('accountStatus').equals('Inactive')
+    ])
 
-        totalInActiveUsers = countCurrent1 + countCurrent2
+    currentInActiveUsers = countCurrent1 + countCurrent2
+    previousInActiveUsers = countPrevious1 + countPrevious2
 
-        previousInActiveUsers = countPrevious1 + countPrevious2
-
-        inActiveUsersKpi = Math.floor((totalInActiveUsers - previousInActiveUsers )/ previousInActiveUsers * 100)
-
-    }else if(queryFilter == "2_month"){
-        const currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1 , 1);
-
-        const [countCurrent1, countCurrent2] = await Promise.all([
-            uploader.countDocuments()
-           .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active'),  syncUser.countDocuments()
-           .where('createdAt').lte(currentMonth).where('accountStatus').equals('Active')
-       ])
-
-        const [countPrevious1, countPrevious2] = await Promise.all([
-           uploader.countDocuments()
-           .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active'), syncUser.countDocuments()
-           .where('createdAt').lte(previousMonth).where('accountStatus').equals('Active')
-       ])
-
-
-       totalInActiveUsers = countCurrent1 + countCurrent2
-
-       previousInActiveUsers = countPrevious1 + countPrevious2
-
-       inActiveUsersKpi = Math.floor((totalInActiveUsers - previousInActiveUsers )/ previousInActiveUsers * 100)
+    totalInActiveUsers = currentInActiveUsers
+    if(queryFilter > 1){
+        totalInActiveUsers = previousInActiveUsers
     }
 
-    inActiveUsersKpi = isNaN(inActiveUsersKpi) ? 0 : inActiveUsersKpi
+    if(previousInActiveUsers > 0){
+        inActiveUserKpi = Math.floor((currentInActiveUsers - previousInActiveUsers )/ previousInActiveUsers * 100)
+    }else{
+        inActiveUserKpi = 0
+    }
+    
 
     return{
         totalInActiveUsers,
-        inActiveUsersKpi
+        inActiveUserKpi
     }
 }
 
@@ -257,9 +154,12 @@ const totalTracks = async(queryFilter)=>{
         totalTracks = countPrevious
     }
 
-    totalTracksKpi = Math.floor((countCurrent - countPrevious )/ countPrevious * 100)
-    totalTracksKpi = isNaN(totalTracksKpi) ? 0 : totalTracksKpi
-
+    if(countPrevious > 0){
+        totalTracksKpi = Math.floor((countCurrent - countPrevious )/ countPrevious * 100)
+    }else{
+        totalTracksKpi = 100
+    }
+    
     return{
         totalTracks,
         totalTracksKpi
@@ -283,8 +183,12 @@ const totalLicensedTracks = async(queryFilter)=>{
     if(queryFilter > 1) {
         totalLicensedTracks =  countPrevious
     }
-    totalLicensedTracksKpi = Math.floor((countCurrent - countPrevious )/ countPrevious * 100)
-
+    if(countPrevious > 0){
+        totalLicensedTracksKpi = Math.floor((countCurrent - countPrevious )/ countPrevious * 100)
+    }else{
+        totalLicensedTracksKpi = 0
+    }
+    
 
     
     totalLicensedTracksKpi = isNaN(totalLicensedTracksKpi) ? 0 : totalLicensedTracksKpi
@@ -349,12 +253,14 @@ const quotesSubmitted = async(queryFilter)=>{
         totalQuotes = previousTotalQuotes
     }
 
-
-    quotesSubmittedKpi = Math.floor((totalCurrentQuotes - previousTotalQuotes )/ previousTotalQuotes * 100)
-    quotesSubmittedKpi = isNaN(quotesSubmittedKpi) ? 0 : quotesSubmittedKpi
+    if(previousTotalQuotes > 0){
+        quotesSubmittedKpi = Math.floor((totalCurrentQuotes - previousTotalQuotes )/ previousTotalQuotes * 100)
+    }else{
+        quotesSubmittedKpi = 0
+    }
 
     return{
-        totalCurrentQuotes,
+        totalQuotes,
         quotesSubmittedKpi
     }
 }
@@ -362,17 +268,20 @@ const quotesSubmitted = async(queryFilter)=>{
 
 const metricEvaluator = async(queryFilter)=>{
 
-    const metric = {
-        ...await totalUsersKpi(queryFilter),
-        ...await newUsersKpi(queryFilter),
-        ...await activeUsersKpi(queryFilter),
-        ...await inActiveUsersKpi(queryFilter),
-        ...await totalTracks(queryFilter),
-        ...await totalLicensedTracks(queryFilter),
-        ...await quotesSubmitted(queryFilter),
-
+    try {
+        const metric = {
+            ...await totalUsersKpi(queryFilter),
+            ...await activeUsersKpi(queryFilter),
+            ...await inActiveUsersKpi(queryFilter),
+            ...await totalTracks(queryFilter),
+            ...await totalLicensedTracks(queryFilter),
+            ...await quotesSubmitted(queryFilter),
+    
+        }
+        return metric
+    } catch (error) {
+        console.log(error)
     }
-    return metric
 }
 
 

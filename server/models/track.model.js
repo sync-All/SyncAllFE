@@ -216,7 +216,7 @@ const trackLicenseSchema = new Schema({
     },
     music_uploader_info : {
         type : Schema.Types.ObjectId,
-        ref : "uploader"
+        ref : "user"
     },
 
 },{timestamps : true})

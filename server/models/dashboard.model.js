@@ -75,7 +75,7 @@ const dashboardSchema = new Schema({
     ],
     user : {
         type : Schema.Types.ObjectId,
-        ref : "uploader"
+        ref : "user"
     },
 })
 
