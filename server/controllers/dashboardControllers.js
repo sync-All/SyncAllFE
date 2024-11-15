@@ -113,7 +113,7 @@ const updatePaymentInfo = async (req,res,next)=>{
             await newInfo.save()
             await dashboard.findOneAndUpdate({user : userId}, {accountInfo : newInfo._id},{new : true})
         }
-        res.status(200).json({success : true, message : dashboardAccInfoUpdate})
+        res.status(200).json({success : true, message : 'Update Successful'})
     }else{
         res.status(401).json('Unauthorized')
     }
