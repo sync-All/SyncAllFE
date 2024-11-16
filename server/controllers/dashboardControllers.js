@@ -1,7 +1,7 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const bcrypt = require('bcrypt')
 const User = require("../models/usermodel").uploader
-const Transaction = require('../models/transactions.model').uploaderTransaction
+const Transaction = require('../models/transactions.model').transaction
 const uploaderAccountInfo = require('../models/dashboard.model').uploaderAccountInfo
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
@@ -27,6 +27,7 @@ const dashboardcontrol = async (req,res,next)=>{
                 res.status(401).json('Unauthorized access')
             }
         } catch (error) {
+            console.log(error)
             res.status(401).json('User does not exists')
         }
 

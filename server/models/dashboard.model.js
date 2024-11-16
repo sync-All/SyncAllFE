@@ -12,6 +12,7 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'uploaderAccountInfo'
     },
+
     countryReached : {
         type : Number,
         default : 0,
@@ -31,7 +32,9 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
-},{versionKey : '__v'})
+})
+
+
 
 const uploaderAccountSchema = new Schema({
     availableBal : {
@@ -113,7 +116,7 @@ const disputeSchema = new Schema({
     },
     user : {
         type : Schema.Types.ObjectId,
-        ref : 'uploader'
+        ref : 'user'
     }
 
 },{timestamps : true})
