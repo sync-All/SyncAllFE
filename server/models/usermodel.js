@@ -216,6 +216,7 @@ const syncAdminSchema = new Schema({
     role : {
         type : String,
         enum : ['Admin'],
+        default : 'Admin'
     },
 }, {timestamps : true})
 
