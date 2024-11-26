@@ -52,7 +52,7 @@ try {
 }
 
 async function main(){
-  await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+  await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
   return
 }
 
