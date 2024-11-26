@@ -20,6 +20,7 @@ const paymentRouter = require('./routes/main_app/payment');
 var adminAuthRouter = require('./routes/admin_routes/auth')
 const adminUsersRouter = require('./routes/admin_routes/user')
 const adminManageContentRouter = require('./routes/admin_routes/manage_content')
+const adminManageDispute = require('./routes/admin_routes/dispute')
 
 
 var app = express();
@@ -89,6 +90,7 @@ app.use('/', unauthorizedRouter);
 app.use('/api/v1/', adminAuthRouter);
 app.use('/api/v1/', adminUsersRouter);
 app.use('/api/v1/', adminManageContentRouter);
+app.use('/api/v1/', adminManageDispute);
 
 // End Admin MiddleWares
 
