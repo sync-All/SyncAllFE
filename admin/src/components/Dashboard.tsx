@@ -42,14 +42,22 @@ interface User {
 }
 
 interface KpiData {
-  totalCurrentUsers?: string;
-  totalUserskpi: number;
-  totalNewUsers: number;
-  newUsersKpi: number;
-  totalActiveUsers: number;
-  activeUsersKpi: number;
-  totalInActiveUsers: number;
-  inActiveUsersKpi: number;
+  totalTracks?: number;
+  totalTracksKpi?: number;
+  totalLicensedTracks?: number;
+  totalLicensedTracksKpi?: number;
+  totalQuotes?: number;
+  quotesSubmittedKpi?: number;
+  totalUsers?: number;
+  totalUserkpi?: number;
+  newUsers?: number;
+  newusersKpi?: number;
+  totalActiveUsers?: number;
+  activeUserKpi?: number;
+  totalInActiveUsers?: number;
+  inActiveUserKpi?: number;
+  totalUserskpi?: number;
+  totalCurrentUsers?: number;
 }
 
 const Dashboard = () => {
@@ -62,7 +70,7 @@ const Dashboard = () => {
     const fetchKeyMetrics = async () => {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/get_key_metrics/this_month`;
+      const apiUrl = `${urlVar}/get_key_metrics/?filter=1`;
       const config = {
         headers: {
           Authorization: `${token}`,
@@ -146,57 +154,57 @@ const Dashboard = () => {
     {
       image: Earning,
       title: 'Total Revenue',
-      value: kpidata?.totalCurrentUsers,
-      kpi: kpidata?.totalUserskpi,
+      value: kpidata?.totalCurrentUsers || 0,
+      kpi: kpidata?.totalUserskpi || 0,
       color: '#064e3b',
     },
     {
       image: Uploaded,
       title: 'Total Tracks Uploaded',
-      value: kpidata?.totalNewUsers,
-      kpi: kpidata?.newUsersKpi,
+      value: kpidata?.totalTracks,
+      kpi: kpidata?.totalTracksKpi,
       color: '#f62c2c',
     },
     {
       image: Earth,
       title: 'Total Licensed Tracks',
-      value: kpidata?.totalActiveUsers,
-      kpi: kpidata?.activeUsersKpi,
+      value: kpidata?.totalLicensedTracks,
+      kpi: kpidata?.totalLicensedTracksKpi,
       color: '#064e3b',
     },
     {
       image: QuotesIcon,
       title: 'Total Quotes Submitted',
-      value: kpidata?.totalInActiveUsers,
-      kpi: kpidata?.inActiveUsersKpi,
+      value: kpidata?.totalQuotes,
+      kpi: kpidata?.quotesSubmittedKpi,
       color: '#064e3b',
     },
     {
       image: TotalUser,
       title: 'Total Users',
-      value: kpidata?.totalCurrentUsers,
-      kpi: kpidata?.totalUserskpi,
+      value: kpidata?.totalUsers,
+      kpi: kpidata?.totalUserkpi,
       color: '#064e3b',
     },
     {
       image: NewUser,
       title: 'New Users',
-      value: kpidata?.totalNewUsers,
-      kpi: kpidata?.newUsersKpi,
+      value: kpidata?.newUsers,
+      kpi: kpidata?.newusersKpi,
       color: '#f62c2c',
     },
     {
       image: ActiveUser,
       title: 'Active Users',
       value: kpidata?.totalActiveUsers,
-      kpi: kpidata?.activeUsersKpi,
+      kpi: kpidata?.activeUserKpi,
       color: '#064e3b',
     },
     {
       image: SuspendedUser,
       title: 'Suspended Users',
       value: kpidata?.totalInActiveUsers,
-      kpi: kpidata?.inActiveUsersKpi,
+      kpi: kpidata?.inActiveUserKpi,
       color: '#064e3b',
     },
   ];
@@ -204,23 +212,23 @@ const Dashboard = () => {
   const revenueData = [
     {
       revenue: 'Transaction Fees',
-      amt: 0,
+      amt: 1000,
     },
     {
       revenue: 'Membership Subscriptions ',
-      amt: 0,
+      amt: 2000,
     },
     {
       revenue: 'Advertising Revenue',
-      amt: 0,
+      amt: 3000,
     },
     {
       revenue: 'Platform Service Fees',
-      amt: 0,
+      amt: 4000,
     },
     {
       revenue: 'Music licensing',
-      amt: 1,
+      amt: 5000,
     },
   ];
 

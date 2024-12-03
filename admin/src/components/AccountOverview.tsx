@@ -39,7 +39,7 @@ const AccountOverview = () => {
 
     {
       imgSrc: Earth,
-      title: 'Pending License Request',
+      title: 'Quotes Sent',
       value: 1000,
     },
   ];

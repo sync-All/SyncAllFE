@@ -11,6 +11,8 @@ import ContentReview from '../components/ContentReview';
 import { useState } from 'react';
 import SingleUserPage from '../components/SingleUserPage';
 import { UserProvider } from '../contexts/UserContext';
+import Dispute from '../components/Dispute/Dispute';
+import DisputeDetails from '../components/Dispute/DisputeDetails';
 
 const AdminDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -85,6 +87,20 @@ const AdminDashboard = () => {
                     path="manage-contents/:id"
                     element={<ContentReview />}
                   />
+                }
+              />
+
+              <Route
+                path="disputes"
+                element={
+                  <ProtectedRoute path="disputes" element={<Dispute />} />
+                }
+              />
+
+              <Route
+                path="dispute-details"
+                element={
+                  <ProtectedRoute path="dispute-details" element={<DisputeDetails />} />
                 }
               />
 

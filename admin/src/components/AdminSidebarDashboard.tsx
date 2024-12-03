@@ -3,7 +3,7 @@ import DashboardIcon from '../assets/images/Widget 5.svg';
 import ManageUser from '../assets/images/User Rounded.svg';
 import TrackIcon from '../assets/images/Music Library 2.svg';
 import QuotesIcon from '../assets/images/quoteicon.svg';
-// import DisputeIcon from '../../assets/images/dispute.svg';
+import DisputeIcon from '../assets/images/dispute.svg';
 import Chat_Support from '../assets/images/chat, support.svg';
 import LogoutIcon from '../assets/images/Login 2.svg';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
@@ -63,7 +63,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
               <p style={pStyle('Dashboard')}>Dashboard</p>
             </Link>
           </li>
-          <li onClick={() => onTabChange('Manage User')}>
+          <li onClick={() => onTabChange('Manage Users')}>
             <Link to="/admin/manage-users" style={liStyle('Manage Users')}>
               <img src={ManageUser} alt="" />
               <p style={pStyle('Manage Users')}>Manage Users</p>
@@ -77,15 +77,15 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
             </Link>
           </li>
 
-          {/* <li onClick={() => onTabChange('Manage User')}>
-            <Link to="/admin/disputes" style={liStyle('Dispute')}>
+          <li onClick={() => onTabChange('Manage Dispute')}>
+            <Link to="/admin/disputes" style={liStyle('Manage Dispute')}>
               {' '}
               <img src={DisputeIcon} alt="" />
-              <p style={pStyle('Dispute')}>Dispute</p>
+              <p style={pStyle('Manage Dispute')}>Manage Dispute</p>
             </Link>
-          </li> */}
+          </li>
 
-          <li onClick={() => onTabChange('Quotes')}>
+          <li onClick={() => onTabChange('Music Quotes')}>
             <Link to="/admin/music-quotes" style={liStyle('Music Quotes')}>
               <img src={QuotesIcon} alt="" />
               <p style={pStyle('Music Quotes')}>Quotes</p>
