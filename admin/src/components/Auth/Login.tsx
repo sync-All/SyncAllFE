@@ -16,6 +16,8 @@ const SigninSchema = Yup.object().shape({
     .required('Password is required'),
 });
 
+
+
 interface ResponseData {
   message?: string;
   role?: { userType: string };
@@ -54,10 +56,12 @@ const Login = () => {
         localStorage.clear();
         sessionStorage.clear();
 
-        setToken(response.data.token);
+        const { token, user } = response.data;
 
-        localStorage.setItem('token', response.data.token);
+        setToken(token);
 
+        localStorage.setItem('token', token);
+        localStorage.setItem('adminData', JSON.stringify(user));
         toast.success('Login successful');
         handleNavigationTODashboard();
       } else {

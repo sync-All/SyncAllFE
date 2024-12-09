@@ -23,7 +23,6 @@ const ContentReview = () => {
 
   const contentItem = getContentById(id || '');
 
-  
   if (loading) {
     return <LoadingAnimation />;
   }
@@ -37,7 +36,7 @@ const ContentReview = () => {
   const renderSection = () => {
     switch (currentSection) {
       case 'Minimum Recording Information':
-        return <MinimumRecordingInfo details={contentItem}/>;
+        return <MinimumRecordingInfo details={contentItem} />;
       case 'Additional Recording Information':
         return <AdditionalRecordingInfo details={contentItem} />;
       case 'Copyright Owner Claim':
@@ -103,11 +102,11 @@ const ContentReview = () => {
       </div>
       <div className="flex flex-col lg:flex-row lg:gap-[50px] mt-12">
         {' '}
-        <div className="lg:w-[40%]">
+        <div className="lg:min-w-[40%] h-[412px]">
           <img
             src={contentItem?.artWork || Background}
             alt=""
-            className="w-full h-[412px] object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
@@ -123,10 +122,9 @@ const ContentReview = () => {
           </div>
           <div className="mt-20">
             <MusicPlayer
-            trackLink={contentItem?.trackLink}
-            songId={contentItem?._id}
-          />
-            
+              trackLink={contentItem?.trackLink}
+              songId={contentItem?._id}
+            />
           </div>
         </div>
       </div>

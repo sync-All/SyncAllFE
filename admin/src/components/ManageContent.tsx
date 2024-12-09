@@ -12,6 +12,8 @@ import { useContent } from '../contexts/ContentContext';
 import { Content } from '../contexts/ContentContext';
 import { Link } from 'react-router-dom';
 import usePagination from '../hooks/usePaginate';
+import Left from '../assets/images/left-arrow.svg';
+import Right from '../assets/images/right-arrow.svg'; 
 
 // interface ManageContentProps {
 //   onTabChange: (tab: string, content?: Content) => void;
@@ -54,8 +56,6 @@ const SortButton: React.FC<{
 );
 
 const ManageContent = () => {
-  // const { loading, setLoading } = useLoading();
-  // const [users, setUsers] = useState<Content[]>([]);
   const { content, loading } = useContent();
 
   const ThStyles =
@@ -268,19 +268,7 @@ const ManageContent = () => {
                       : 'text-[#5E5E5E]'
                   }`}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 12"
-                    fill="none"
-                  >
-                    <path
-                      d="M15 6.75C15.4142 6.75 15.75 6.41421 15.75 6C15.75 5.58579 15.4142 5.25 15 5.25V6.75ZM0.46967 5.46967C0.176777 5.76256 0.176777 6.23744 0.46967 6.53033L5.24264 11.3033C5.53553 11.5962 6.01041 11.5962 6.3033 11.3033C6.59619 11.0104 6.59619 10.5355 6.3033 10.2426L2.06066 6L6.3033 1.75736C6.59619 1.46447 6.59619 0.989593 6.3033 0.696699C6.01041 0.403806 5.53553 0.403806 5.24264 0.696699L0.46967 5.46967ZM15 5.25L1 5.25V6.75L15 6.75V5.25Z"
-                      fill="#5E5E5E"
-                    />
-                  </svg>{' '}
-                  Prev
+                  <img src={Left} alt="" /> Prev
                 </button>
                 <button
                   onClick={goToNextPage}
@@ -292,18 +280,7 @@ const ManageContent = () => {
                   }`}
                 >
                   Next{' '}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="12"
-                    viewBox="0 0 16 12"
-                    fill="none"
-                  >
-                    <path
-                      d="M1 5.25C0.585786 5.25 0.25 5.58579 0.25 6C0.25 6.41421 0.585786 6.75 1 6.75V5.25ZM15.5303 6.53033C15.8232 6.23744 15.8232 5.76256 15.5303 5.46967L10.7574 0.696699C10.4645 0.403806 9.98959 0.403806 9.6967 0.696699C9.40381 0.989593 9.40381 1.46447 9.6967 1.75736L13.9393 6L9.6967 10.2426C9.40381 10.5355 9.40381 11.0104 9.6967 11.3033C9.98959 11.5962 10.4645 11.5962 10.7574 11.3033L15.5303 6.53033ZM1 6.75H15V5.25H1V6.75Z"
-                      fill="#5E5E5E"
-                    />
-                  </svg>
+                  <img src={Right} alt="" />
                 </button>
               </div>
             </div>

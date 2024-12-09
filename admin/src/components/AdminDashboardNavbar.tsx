@@ -11,12 +11,25 @@ interface MusicUploaderNavbarProp {
   toggleMenu: () => void;
 }
 
+interface User {
+  name: string;
+  email: string;
+}
+
 const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
   toggleMenu,
   activeItem,
 }) => {
   // const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+   const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const userData = localStorage.getItem('adminData');
+        if (userData) {
+            setUser(JSON.parse(userData) as User);
+        }
+    }, []);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +63,9 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
   // const profileInfo = useDataContext();
   // const profileDetails = profileInfo.dashboardData?.profileInfo;
 
+   
+  
+
   return (
     <div>
       <nav className="lg:mx-8 flex items-center mt-6 gap-3 mb-9">
@@ -80,17 +96,17 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
               <div className="flex items-center lg:mx-3">
                 <span>
                   <img
-                    src={ Placeholder}
+                    src={Placeholder}
                     alt=""
                     className="w-10 h-10 object-cover rounded-[50%]"
                   />
                 </span>
                 <span className="hidden lg:block ml-2">
                   <p className="font-inter text-[14px] font-medium leading-5">
-                    {/* {profileDetails?.name} */} Tom
+                    {user?.name || 'Admin'}
                   </p>
                   <p className="font-inter text-[12px] font-regular leading-4">
-                    {/* {profileDetails?.email} */} Tom
+                    {user?.email || 'Admin Email'}
                   </p>
                 </span>
 
@@ -124,4 +140,3 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
 };
 
 export default AdminDashboardNavbar;
-

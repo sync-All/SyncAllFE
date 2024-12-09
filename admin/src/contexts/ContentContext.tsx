@@ -17,6 +17,7 @@ interface User {
 
 export interface Content {
   _id: string;
+  duration: string;
   mainArtist: string;
   featuredArtist: string[];
   releaseType: string;
@@ -24,6 +25,8 @@ export interface Content {
   trackTitle: string;
   trackLink: string;
   upc: string;
+  uploadStatus: string;
+  earnings: number;
   isrc: string;
   genre: string;
   artWork: string;
