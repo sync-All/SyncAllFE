@@ -435,7 +435,11 @@ const Dashboard = () => {
                     // label={({ amt }) => ` ₦${formatToShortCurrency(amt)}`}
                   >
                     {revenueData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={getColor(index)} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={getColor(index)}
+                        name={entry.revenue}
+                      />
                     ))}
                   </Pie>
                   <text
