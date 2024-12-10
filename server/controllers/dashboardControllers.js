@@ -5,7 +5,10 @@ const Transaction = require('../models/transactions.model').transaction
 const uploaderAccountInfo = require('../models/dashboard.model').uploaderAccountInfo
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
+const Ticket = require('../models/dashboard.model').ticket
+const nanoId = require('nanoid')
 const fs = require("node:fs")
+const { request } = require("node:http")
 require('dotenv').config()
 
 cloudinary.config({
@@ -68,6 +71,12 @@ const fileDispute = async (req,res,next)=>{
             })
             newDispute.save()
                 .then((response)=>{
+                    let newTicket = new Ticket({
+                        tickId : `Tick_${nanoId()}`,
+                        user : req.user.id,
+                        associatedDisputes : [response._id]
+                    })
+                    newTicket.save()
                     fs.unlinkSync(req.file.path)
                     res.status(200).json({success : true, message : response})
                 })
@@ -81,6 +90,12 @@ const fileDispute = async (req,res,next)=>{
             })
                 newDispute.save()
                 .then((response)=>{
+                    let newTicket = new Ticket({
+                        tickId : `Tick_${nanoId()}`,
+                        user : req.user.id,
+                        associatedDisputes : [response._id]
+                    })
+                    newTicket.save()
                     res.status(200).json({success : true, message : response})
                 })
                 .catch((err)=>{

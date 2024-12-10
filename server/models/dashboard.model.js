@@ -90,6 +90,25 @@ const uploaderAccountSchema = new Schema({
     }
 },{timestamps : true})
 
+const ticketSchema = new Schema({
+    tickId : {
+        type : string
+    },
+
+    associatedDisputes : [{
+        type : Schema.Types.ObjectId,
+        ref : 'dispute'
+    }],
+    status : {
+        enum : ['Under review', 'Rejected', 'Approved'],
+        default : 'Under review'
+    },
+    user : {
+        type : Schema.Types.ObjectId,
+        ref : 'user'
+    }
+},{timestamps : true})
+
 
 const disputeSchema = new Schema({
     nameOfTrack  : {
@@ -124,6 +143,7 @@ const disputeSchema = new Schema({
 
 const dashboard = mongoose.model('dashboard',dashboardSchema)
 const dispute = mongoose.model('dispute',disputeSchema)
+const ticket = mongoose.model('ticket', ticketSchema)
 const uploaderAccountInfo = mongoose.model('uploaderAccountInfo', uploaderAccountSchema)
 
-module.exports = {dashboard, dispute, uploaderAccountInfo}
+module.exports = {dashboard, dispute, uploaderAccountInfo, ticket}
