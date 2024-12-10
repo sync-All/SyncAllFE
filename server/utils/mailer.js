@@ -14,7 +14,8 @@ const pathtoXLogo = path.join(__dirname, '..', '/public/images/twitter.png')
 const pathtoMessageIcon = path.join(__dirname, '..', '/public/images/message.png')
 const pathtoLinkIcon = path.join(__dirname, '..', '/public/images/link.png')
 const pathtoCallIcon = path.join(__dirname, '..', '/public/images/call.png')
-
+let envi = process.env.NODE_ENV
+ 
 async function sendConfirmationMail(user, issuedJwt){
   const transporter = nodemailer.createTransport({
     service : "Gmail",
@@ -26,7 +27,7 @@ async function sendConfirmationMail(user, issuedJwt){
 
 const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
 
-await ejs.renderFile(pathtofile,{ link :`https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
+await ejs.renderFile(pathtofile,{ link : envi == 'development' ? `https://syncall-testserver.onrender.com/verifyEmail/?token=${issuedJwt}` : `https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
   if (err) {
     console.error('Error rendering EJS template:', err);
     return;

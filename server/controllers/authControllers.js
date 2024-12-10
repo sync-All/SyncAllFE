@@ -271,7 +271,7 @@ const verifyEmail =  async (req,res,next)=>{
 }
 
 const changePassword = async(req,res,next)=>{
-  const {password, confirmPassword} = req.body
+  const {password, confirmassword} = req.body
  if(req.isAuthenticated()){
   const userId = req.user.id
   if(password !== confirmPassword){
