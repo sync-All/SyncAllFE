@@ -100,6 +100,7 @@ const ticketSchema = new Schema({
         ref : 'dispute'
     }],
     status : {
+        type : String,
         enum : ['Under review', 'Rejected', 'Approved'],
         default : 'Under review'
     },
