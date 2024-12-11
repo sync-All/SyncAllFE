@@ -92,7 +92,7 @@ const uploaderAccountSchema = new Schema({
 
 const ticketSchema = new Schema({
     tickId : {
-        type : string
+        type : String
     },
 
     associatedDisputes : [{
