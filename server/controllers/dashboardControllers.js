@@ -6,7 +6,7 @@ const uploaderAccountInfo = require('../models/dashboard.model').uploaderAccount
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
 const Ticket = require('../models/dashboard.model').ticket
-const nanoId = require('nanoid')
+const {nanoid} = require('nanoid')
 const fs = require("node:fs")
 const { request } = require("node:http")
 require('dotenv').config()
@@ -72,7 +72,7 @@ const fileDispute = async (req,res,next)=>{
             newDispute.save()
                 .then((response)=>{
                     let newTicket = new Ticket({
-                        tickId : `Tick_${nanoId()}`,
+                        tickId : `Tick_${nanoid()}`,
                         user : req.user.id,
                         associatedDisputes : [response._id]
                     })
@@ -91,7 +91,7 @@ const fileDispute = async (req,res,next)=>{
                 newDispute.save()
                 .then((response)=>{
                     let newTicket = new Ticket({
-                        tickId : `Tick_${nanoId()}`,
+                        tickId : `Tick_${nanoid()}`,
                         user : req.user.id,
                         associatedDisputes : [response._id]
                     })
