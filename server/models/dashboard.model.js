@@ -101,7 +101,7 @@ const ticketSchema = new Schema({
     }],
     status : {
         type : String,
-        enum : ['Under review', 'Rejected', 'Approved'],
+        enum : ['Under review', 'Rejected', 'Resolved'],
         default : 'Under review'
     },
     user : {
@@ -127,14 +127,25 @@ const disputeSchema = new Schema({
         type : Buffer
     },
 
+    supportingDocType : {
+        type : String
+    },
     isrc : {
         type : String
     },
     status : {
         type : String,
-        enum : ['Pending', 'Approved', 'Rejected'],
+        enum : ['Pending', 'Resolved', 'Rejected'],
         default : 'Pending'
     },
+    assignedTo : {
+        type : Schema.Types.ObjectId,
+        ref : 'admin'
+    },
+    activityLog : [{
+        type : Schema.Types.ObjectId,
+        ref : 'adminActivityLog'
+    }],
     user : {
         type : Schema.Types.ObjectId,
         ref : 'user'

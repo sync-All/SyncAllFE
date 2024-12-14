@@ -67,7 +67,7 @@ const fileDispute = async (req,res,next)=>{
         if(req.file){
             const fileBuffer = fs.readFileSync(req.file.path)
             let newDispute = new Dispute({
-                ...req.body, supportingDoc : fileBuffer, user : req.user.id
+                ...req.body, supportingDoc : fileBuffer, supportingDocType : req.fileMime, user : req.user.id
             })
             newDispute.save()
                 .then((response)=>{

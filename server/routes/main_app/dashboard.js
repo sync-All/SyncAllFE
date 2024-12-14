@@ -2,7 +2,8 @@ var express = require('express');
 const asyncHandler = require('express-async-handler')
 const dashbordControllers = require('../../controllers/dashboardControllers')
 const multer = require("multer")
-const disputeUpload = multer({dest: 'uploads/'}).single('supportingDoc')
+const disputeFileFilter = require('../../utils/upload').disputeFileFilter
+const disputeUpload = multer({dest: 'uploads/', fileFilter : disputeFileFilter, limits : {fieldSize : 5 * 1024 * 1024 }}).single('supportingDoc')
 const passport = require('passport');
 const router = express.Router()
 
