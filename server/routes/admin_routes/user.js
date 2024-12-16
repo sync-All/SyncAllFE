@@ -2,6 +2,7 @@ var express = require('express');
 const router = express.Router()
 const asynchandler = require('express-async-handler');
 const kpi = require('../../utils/kpi')
+const {checkAdmin} = require('../../utils/AuthenticateChecker')
 const userControllers = require('../../controllers/admin/users')
 const passport = require('passport');
 const { BadRequestError } = require('../../utils/CustomError');
@@ -16,7 +17,9 @@ router.get('/get_key_metrics/', passport.authenticate('jwt',{session : false, fa
     }
 }))
 
-router.get('/allusers',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}), asynchandler(userControllers.allUsers));
+router.get('/allusers',checkAdmin, asynchandler(userControllers.allUsers));
+
+router.get('/allAdmins',checkAdmin, asynchandler(userControllers.allAdmin))
 
 module.exports = router
 

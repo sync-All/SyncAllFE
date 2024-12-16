@@ -13,6 +13,7 @@ const checkAdmin = (req,res,next)=>{
         if (user.role !== 'Admin') {
             return next(new ForbiddenError('Admin access required'));
         }
+        req.user = user
         return next();
     })(req,res,next)
 }
