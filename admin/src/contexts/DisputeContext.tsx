@@ -21,7 +21,7 @@ export interface Dispute {
   __v: number;
 }
 
-interface SupportingDoc {
+export interface SupportingDoc {
   type: string;
   data: number[]; // Since the data array appears empty, we'll use `number[]` assuming it's meant to hold numeric data.
 }
@@ -36,6 +36,7 @@ export interface AssociatedDispute {
   user: string;
   createdAt: string;
   updatedAt: string;
+  supportingDocType: string;
   __v: number;
 }
 

@@ -1,16 +1,41 @@
-import { useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import Dropdown from '../../constants/Dropdown';
 import DisputeResolve from '../../modals/DisputeResolve';
 import ConfirmTransferOwnership from '../../modals/ConfirmTransferOwnership';
-import { useDispute } from '../../contexts/DisputeContext';
+import {
+  useDispute,
+} from '../../contexts/DisputeContext';
 import { useParams } from 'react-router-dom';
 import LoadingAnimation from '../../constants/loading-animation';
 import { toast } from 'react-toastify';
+import axios, { AxiosError } from 'axios';
+import Dot from '../../assets/images/dot.svg';
+import { downloadFile } from '../../utils/filedownloader';
+
+interface ResponseData {
+  message: string;
+}
+
+interface Option {
+  value: string;
+  label: ReactNode;
+}
+
+interface Admin {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 
 const DisputeDetails = () => {
   const { id } = useParams();
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const { dispute, loading } = useDispute();
 
   const parentDispute = dispute.find((d) =>
@@ -25,40 +50,32 @@ const DisputeDetails = () => {
     ...user,
   };
 
-  // const disputeData = {
-  //   disputeId: '012345',
-  //   reason: 'Ownership incorrectly attributed',
-  //   filedBy: 'Gbasky',
-  //   dateFiled: 'November 21, 2024',
-  //   customerContact: 'gbasky12@gmail.com',
-  //   associatedItem: 'ile ife',
-  //   supportingDocument: {
-  //     name: 'ife_license_2022.pdf',
-  //     downloadUrl: '#',
-  //   },
-  //   activityLog: [
-  //     {
-  //       dateTime: 'November 20, 2024 10:15 AM',
-  //       actionTaken: 'Assigned to Amara Chidiogo',
-  //       performedBy: 'Amara Chidiogo',
-  //     },
-  //     {
-  //       dateTime: 'November 20, 2024 10:20 AM',
-  //       actionTaken: 'Requested additional documentation',
-  //       performedBy: 'Amara Chidiogo',
-  //     },
-  //     {
-  //       dateTime: 'November 20, 2024 1:45 PM',
-  //       actionTaken: 'Documentation received',
-  //       performedBy: 'System',
-  //     },
-  //     {
-  //       dateTime: 'November 20, 2024 1:45 PM',
-  //       actionTaken: 'Ownership transferred to Gbasky',
-  //       performedBy: 'Amara Chidiogo',
-  //     },
-  //   ],
-  // };
+  const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return 'N/A';
+
+    const date = new Date(dateString);
+
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    return `${month} ${day}, ${year}`;
+  };
 
   const tdStyles =
     'px-4 py-3 text-[14px] text-[#667085] leading-[18px] font-inter font-normal border border-[#EAECF0]';
@@ -82,44 +99,110 @@ const DisputeDetails = () => {
     setIsConfirmationModalOpen(false);
   };
 
+  const changeStatus = async (newStatus: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/dispute/setstatus?status=${newStatus}&disputeId=${id}`;
+
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
+
+    try {
+      const res = await axios.get(apiUrl, config);
+      console.log(res.data);
+      toast.success('Status updated successfully');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
+
+  const handleStatusChange = (option: Option) => {
+    if (option.value === 'Resolved') {
+      changeStatus('Resolved');
+    }
+  };
+
+  
+
+  const fetchAdmins = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/allAdmins`;
+
+    try {
+      setIsLoading(true);
+      const res = await axios.get(apiUrl, {
+        headers: { Authorization: `${token}` },
+      });
+      setAdmins(res.data.admins); // Access the admins array from response
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+      setAdmins([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const assignDispute = async (adminId: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/dispute/assign?adminId=${adminId}&disputeId=${id}`;
+
+    try {
+      await axios.get(apiUrl, {
+        headers: { Authorization: `${token}` },
+      });
+      toast.success('Dispute assigned successfully');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
+
+  const handleAdminChange = (option: Option) => {
+    assignDispute(option.value);
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, [fetchAdmins]);
+
+  const adminData = localStorage.getItem('adminData');
+  const currentUserId = adminData ? JSON.parse(adminData)._id : null;
+  console.log(currentUserId);
+  const currentAdmin = admins.find((admin) => admin._id === currentUserId);
+
+  const dropdownOptions: Option[] = admins.map((admin) => ({
+    value: admin._id,
+    label: admin.name,
+  }));
   if (loading) {
     return <LoadingAnimation />;
   }
 
-const handleDownload = ({
-  bufferData,
-  fileName,
-  mimeType,
-}: {
-  bufferData: number[];
-  fileName: string;
-  mimeType: string;
-}) => {
-  if (!bufferData || bufferData.length === 0) {
-    console.error('Buffer data is missing or empty.');
-        toast('No support doc is added');
-
-    return;
+  if (isLoading) {
+    return <LoadingAnimation />;
   }
-
-  // Convert the Buffer to a Blob
-  const blob = new Blob([Uint8Array.from(bufferData)], { type: mimeType });
-
-  // Create a temporary URL for the Blob
-  const blobUrl = URL.createObjectURL(blob);
-
-  // Create an anchor element and trigger a download
-  const link = document.createElement('a');
-  link.href = blobUrl;
-  link.download = fileName || 'downloaded_file'; // Provide a default name if none is given
-  document.body.appendChild(link);
-  link.click();
-
-  // Clean up the URL object after download
-  document.body.removeChild(link);
-  URL.revokeObjectURL(blobUrl);
-};
-
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
       <div className="flex items-center justify-between ">
@@ -146,23 +229,28 @@ const handleDownload = ({
               Change Status:
             </p>
             <Dropdown
-              options={[
-                { value: 'apple', label: 'Apple' },
-                { value: 'banana', label: 'Banana' },
-              ]}
+              options={[{ value: 'Resolved', label: 'Resolved' }]}
+              onChange={handleStatusChange}
               placeholder={
-                <span className="text-[12px] font-inter leading-5 text-[#0F172A] font-normal flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="8"
-                    height="8"
-                    viewBox="0 0 8 8"
-                    fill="none"
-                  >
-                    <circle cx="4" cy="4" r="3" fill="#F3A218" />
-                  </svg>{' '}
-                  Pending
-                </span>
+                disputeData.status === 'Resolved' ? (
+                  <span className="flex items-center gap-2">
+                    <img src={Dot} alt="status dot" />
+                    <span>Resolved</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="8"
+                      height="8"
+                      viewBox="0 0 8 8"
+                      fill="none"
+                    >
+                      <circle cx="4" cy="4" r="3" fill="#F3A218" />
+                    </svg>
+                    <span>Pending</span>
+                  </span>
+                )
               }
             />
           </div>
@@ -171,13 +259,12 @@ const handleDownload = ({
               Assign to Admin:
             </p>
             <Dropdown
-              options={[
-                { value: 'apple', label: 'Apple' },
-                { value: 'banana', label: 'Banana' },
-              ]}
+              options={dropdownOptions}
+              onChange={handleAdminChange}
               placeholder={
                 <span className="text-[12px] font-inter leading-5 text-[#667185] font-normal flex items-center gap-2">
-                  Victor(You)
+                  {currentAdmin?.name ?? 'Select Admin'}
+                  {currentUserId === currentAdmin?._id ? ' (You)' : ''}
                 </span>
               }
             />
@@ -186,7 +273,7 @@ const handleDownload = ({
       </div>
 
       <div className="max-w-4xl mt-[60px] space-y-10">
-        {/* {disputeData?.status === 'Resolved' && (
+        {disputeData?.status === 'Resolved' && (
           <div className="space-y-6 ">
             <div className="flex items-center">
               <h2 className="text-[18px] leading-7 font-inter font-normal ">
@@ -198,15 +285,15 @@ const handleDownload = ({
             </div>
 
             {/* Summary Details */}
-        {/* <div className=" rounded-md overflow-hidden">
+            {/* <div className=" rounded-md overflow-hidden">
               <table className="w-full">
                 <tbody className="divide-y divide-gray-200">
                   <tr className="bg-[#F0F2F5]">
                     <td className={tdStyles}>Resolution Outcome</td>
-                    <td className={tdValueStyles}>{disputeData.reason}</td>
+                    <td className={tdValueStyles}>{disputeData.issueType}</td>
                   </tr>
                   <tr>
-                    <td className={tdStyles}>Resolution</td>
+                    <td className={tdStyles}>Resolution Notes</td>
                     <td className={tdValueStyles}>{disputeData.filedBy}</td>
                   </tr>
                   <tr>
@@ -219,17 +306,11 @@ const handleDownload = ({
                       {disputeData.customerContact}
                     </td>
                   </tr>
-                  <tr>
-                    <td className={tdStyles}>Associated Item</td>
-                    <td className={tdValueStyles}>
-                      {disputeData.associatedItem}
-                    </td>
-                  </tr>
                 </tbody>
               </table>
-            </div>
+            </div> */}
           </div>
-        )} */}
+        )}
 
         <div className="space-y-6 ">
           <div className="flex items-center">
@@ -255,7 +336,9 @@ const handleDownload = ({
                 </tr>
                 <tr>
                   <td className={tdStyles}>Date Filed</td>
-                  <td className={tdValueStyles}>{disputeData?.createdAt}</td>
+                  <td className={tdValueStyles}>
+                    {formatDate(disputeData?.createdAt)}
+                  </td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Customer Contact</td>
@@ -271,13 +354,18 @@ const handleDownload = ({
                     <div className="flex items-center gap-2">
                       <span>{disputeData.nameOfTrack} support document</span>
                       <p
-                        onClick={() =>
-                          handleDownload({
-                            bufferData: disputeData.supportingDoc?.data || [],
-                            fileName: 'support_document.png',
-                            mimeType: 'application/pdf',
-                          })
-                        }
+                        onClick={() => {
+                          if (disputeData.supportingDoc) {
+                            downloadFile(
+                              disputeData.supportingDoc,
+                              disputeData.supportingDocType === 'image/png'
+                                ? 'image/png'
+                                : 'application/pdf'
+                            );
+                          } else {
+                            toast.error('No document available for download');
+                          }
+                        }}
                         className="text-blue-600 hover:underline text-sm"
                       >
                         (Download Here)
