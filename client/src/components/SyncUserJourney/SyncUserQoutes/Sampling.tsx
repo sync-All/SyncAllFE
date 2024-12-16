@@ -76,7 +76,7 @@ const Sampling = () => {
     project_title: '',
     genre: [],
     artists_or_group: [],
-    release_date: new Date(),
+    release_date: null,
     distribution_channels: [],
     original_song: '',
     artist_name: '',
@@ -96,7 +96,7 @@ const Sampling = () => {
     project_title: string;
     genre: string[];
     artists_or_group: string[];
-    release_date: Date;
+    release_date: Date | null;
     distribution_channels: string[];
     original_song: string;
     artist_name: string;

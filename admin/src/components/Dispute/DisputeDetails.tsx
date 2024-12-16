@@ -2,45 +2,63 @@ import { useState } from 'react';
 import Dropdown from '../../constants/Dropdown';
 import DisputeResolve from '../../modals/DisputeResolve';
 import ConfirmTransferOwnership from '../../modals/ConfirmTransferOwnership';
+import { useDispute } from '../../contexts/DisputeContext';
+import { useParams } from 'react-router-dom';
+import LoadingAnimation from '../../constants/loading-animation';
+import { toast } from 'react-toastify';
 
 const DisputeDetails = () => {
+  const { id } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const { dispute, loading } = useDispute();
 
+  const parentDispute = dispute.find((d) =>
+    d.associatedDisputes.some((ad) => ad._id === id)
+  );
+  const associatedDispute = parentDispute?.associatedDisputes.find(
+    (ad) => ad._id === id
+  );
+  const user = parentDispute?.user;
   const disputeData = {
-    disputeId: '012345',
-    reason: 'Ownership incorrectly attributed',
-    filedBy: 'Gbasky',
-    dateFiled: 'November 21, 2024',
-    customerContact: 'gbasky12@gmail.com',
-    associatedItem: 'ile ife',
-    supportingDocument: {
-      name: 'ife_license_2022.pdf',
-      downloadUrl: '#',
-    },
-    activityLog: [
-      {
-        dateTime: 'November 20, 2024 10:15 AM',
-        actionTaken: 'Assigned to Amara Chidiogo',
-        performedBy: 'Amara Chidiogo',
-      },
-      {
-        dateTime: 'November 20, 2024 10:20 AM',
-        actionTaken: 'Requested additional documentation',
-        performedBy: 'Amara Chidiogo',
-      },
-      {
-        dateTime: 'November 20, 2024 1:45 PM',
-        actionTaken: 'Documentation received',
-        performedBy: 'System',
-      },
-      {
-        dateTime: 'November 20, 2024 1:45 PM',
-        actionTaken: 'Ownership transferred to Gbasky',
-        performedBy: 'Amara Chidiogo',
-      },
-    ],
+    ...associatedDispute,
+    ...user,
   };
+
+  // const disputeData = {
+  //   disputeId: '012345',
+  //   reason: 'Ownership incorrectly attributed',
+  //   filedBy: 'Gbasky',
+  //   dateFiled: 'November 21, 2024',
+  //   customerContact: 'gbasky12@gmail.com',
+  //   associatedItem: 'ile ife',
+  //   supportingDocument: {
+  //     name: 'ife_license_2022.pdf',
+  //     downloadUrl: '#',
+  //   },
+  //   activityLog: [
+  //     {
+  //       dateTime: 'November 20, 2024 10:15 AM',
+  //       actionTaken: 'Assigned to Amara Chidiogo',
+  //       performedBy: 'Amara Chidiogo',
+  //     },
+  //     {
+  //       dateTime: 'November 20, 2024 10:20 AM',
+  //       actionTaken: 'Requested additional documentation',
+  //       performedBy: 'Amara Chidiogo',
+  //     },
+  //     {
+  //       dateTime: 'November 20, 2024 1:45 PM',
+  //       actionTaken: 'Documentation received',
+  //       performedBy: 'System',
+  //     },
+  //     {
+  //       dateTime: 'November 20, 2024 1:45 PM',
+  //       actionTaken: 'Ownership transferred to Gbasky',
+  //       performedBy: 'Amara Chidiogo',
+  //     },
+  //   ],
+  // };
 
   const tdStyles =
     'px-4 py-3 text-[14px] text-[#667085] leading-[18px] font-inter font-normal border border-[#EAECF0]';
@@ -63,6 +81,44 @@ const DisputeDetails = () => {
     console.log('Transfer confirmed');
     setIsConfirmationModalOpen(false);
   };
+
+  if (loading) {
+    return <LoadingAnimation />;
+  }
+
+const handleDownload = ({
+  bufferData,
+  fileName,
+  mimeType,
+}: {
+  bufferData: number[];
+  fileName: string;
+  mimeType: string;
+}) => {
+  if (!bufferData || bufferData.length === 0) {
+    console.error('Buffer data is missing or empty.');
+        toast('No support doc is added');
+
+    return;
+  }
+
+  // Convert the Buffer to a Blob
+  const blob = new Blob([Uint8Array.from(bufferData)], { type: mimeType });
+
+  // Create a temporary URL for the Blob
+  const blobUrl = URL.createObjectURL(blob);
+
+  // Create an anchor element and trigger a download
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = fileName || 'downloaded_file'; // Provide a default name if none is given
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up the URL object after download
+  document.body.removeChild(link);
+  URL.revokeObjectURL(blobUrl);
+};
 
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
@@ -128,49 +184,52 @@ const DisputeDetails = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-4xl mt-[60px] space-y-10">
-        <div className="space-y-6 ">
-          <div className="flex items-center">
-            <h2 className="text-[18px] leading-7 font-inter font-normal ">
-              Dispute Resolution Summary{' '}
-            </h2>
-            <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
-              {disputeData.disputeId}
-            </span>
-          </div>
 
-          {/* Summary Details */}
-          <div className=" rounded-md overflow-hidden">
-            <table className="w-full">
-              <tbody className="divide-y divide-gray-200">
-                <tr className="bg-[#F0F2F5]">
-                  <td className={tdStyles}>Resolution Outcome</td>
-                  <td className={tdValueStyles}>{disputeData.reason}</td>
-                </tr>
-                <tr>
-                  <td className={tdStyles}>Resolution</td>
-                  <td className={tdValueStyles}>{disputeData.filedBy}</td>
-                </tr>
-                <tr>
-                  <td className={tdStyles}>Resolved By</td>
-                  <td className={tdValueStyles}>{disputeData.dateFiled}</td>
-                </tr>
-                <tr>
-                  <td className={tdStyles}>Date Resolved</td>
-                  <td className={tdValueStyles}>
-                    {disputeData.customerContact}
-                  </td>
-                </tr>
-                <tr>
-                  <td className={tdStyles}>Associated Item</td>
-                  <td className={tdValueStyles}>
-                    {disputeData.associatedItem}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+      <div className="max-w-4xl mt-[60px] space-y-10">
+        {/* {disputeData?.status === 'Resolved' && (
+          <div className="space-y-6 ">
+            <div className="flex items-center">
+              <h2 className="text-[18px] leading-7 font-inter font-normal ">
+                Dispute Resolution Summary{' '}
+              </h2>
+              <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
+                {disputeData?._id}
+              </span>
+            </div>
+
+            {/* Summary Details */}
+        {/* <div className=" rounded-md overflow-hidden">
+              <table className="w-full">
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="bg-[#F0F2F5]">
+                    <td className={tdStyles}>Resolution Outcome</td>
+                    <td className={tdValueStyles}>{disputeData.reason}</td>
+                  </tr>
+                  <tr>
+                    <td className={tdStyles}>Resolution</td>
+                    <td className={tdValueStyles}>{disputeData.filedBy}</td>
+                  </tr>
+                  <tr>
+                    <td className={tdStyles}>Resolved By</td>
+                    <td className={tdValueStyles}>{disputeData.dateFiled}</td>
+                  </tr>
+                  <tr>
+                    <td className={tdStyles}>Date Resolved</td>
+                    <td className={tdValueStyles}>
+                      {disputeData.customerContact}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={tdStyles}>Associated Item</td>
+                    <td className={tdValueStyles}>
+                      {disputeData.associatedItem}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )} */}
 
         <div className="space-y-6 ">
           <div className="flex items-center">
@@ -178,7 +237,7 @@ const DisputeDetails = () => {
               Dispute Summary
             </h2>
             <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
-              {disputeData.disputeId}
+              {disputeData?._id}
             </span>
           </div>
 
@@ -188,39 +247,41 @@ const DisputeDetails = () => {
               <tbody className="divide-y divide-gray-200">
                 <tr className="bg-[#F0F2F5]">
                   <td className={tdStyles}>Dispute Reason</td>
-                  <td className={tdValueStyles}>{disputeData.reason}</td>
+                  <td className={tdValueStyles}>{disputeData?.issueType}</td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Filed By</td>
-                  <td className={tdValueStyles}>{disputeData.filedBy}</td>
+                  <td className={tdValueStyles}>{disputeData?.name}</td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Date Filed</td>
-                  <td className={tdValueStyles}>{disputeData.dateFiled}</td>
+                  <td className={tdValueStyles}>{disputeData?.createdAt}</td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Customer Contact</td>
-                  <td className={tdValueStyles}>
-                    {disputeData.customerContact}
-                  </td>
+                  <td className={tdValueStyles}>{disputeData.email}</td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Associated Item</td>
-                  <td className={tdValueStyles}>
-                    {disputeData.associatedItem}
-                  </td>
+                  <td className={tdValueStyles}>{disputeData.nameOfTrack}</td>
                 </tr>
                 <tr>
                   <td className={tdStyles}>Supporting Document</td>
                   <td className={tdValueStyles}>
                     <div className="flex items-center gap-2">
-                      <span>{disputeData.supportingDocument.name}</span>
-                      <a
-                        href={disputeData.supportingDocument.downloadUrl}
+                      <span>{disputeData.nameOfTrack} support document</span>
+                      <p
+                        onClick={() =>
+                          handleDownload({
+                            bufferData: disputeData.supportingDoc?.data || [],
+                            fileName: 'support_document.png',
+                            mimeType: 'application/pdf',
+                          })
+                        }
                         className="text-blue-600 hover:underline text-sm"
                       >
                         (Download Here)
-                      </a>
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -230,7 +291,7 @@ const DisputeDetails = () => {
         </div>
 
         {/* Activity Log */}
-        <div className="space-y-6">
+        {/* <div className="space-y-6">
           <div className="flex items-center">
             <h3 className="text-lg font-medium">Activity Log</h3>
             <button className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
@@ -258,7 +319,7 @@ const DisputeDetails = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </div> */}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">

@@ -23,7 +23,7 @@ interface FormData {
   recordingVersion: string;
   featuredInstrument: string[];
   producers: string[];
-  recordingDate: Date;
+  recordingDate: Date | null;
   countryOfRecording: string;
   writers: string[];
   composers: string[];
@@ -34,7 +34,7 @@ interface FormData {
   percentClaim: number;
   copyrightName: string;
   copyrightYear: number | null;
-  releaseDate: Date;
+  releaseDate: Date | null;
   countryOfRelease: string;
   mood: string[];
   tag: string[];
@@ -63,7 +63,7 @@ const initialFormData: FormData = {
   recordingVersion: '',
   featuredInstrument: [],
   producers: [],
-  recordingDate: new Date(),
+  recordingDate: null,
   countryOfRecording: '',
   writers: [],
   composers: [],
@@ -74,7 +74,7 @@ const initialFormData: FormData = {
   percentClaim: 0,
   copyrightName: '',
   copyrightYear: null,
-  releaseDate: new Date(),
+  releaseDate: null,
   countryOfRelease: '',
   mood: [],
   tag: [],
@@ -99,7 +99,7 @@ const validationSchema = Yup.object().shape({
   recordingVersion: Yup.string(),
   featuredInstrument: Yup.array().of(Yup.string()),
   producers: Yup.array().of(Yup.string()),
-  recordingDate: Yup.date(),
+  recordingDate: Yup.date().nullable(),
   countryOfRecording: Yup.string(),
   writers: Yup.array().of(Yup.string()),
   composers: Yup.array().of(Yup.string()),
@@ -119,7 +119,7 @@ const validationSchema = Yup.object().shape({
       'Must be exactly 4 digits',
       (val) => (val ?? 0).toString().length === 4 || val === null
     ),
-  releaseDate: Yup.date(),
+  releaseDate: Yup.date().nullable(),
   countryOfRelease: Yup.string(),
   mood: Yup.array().of(Yup.string()),
   tag: Yup.array().of(Yup.string()),
