@@ -6,7 +6,7 @@ const { checkAdmin } = require('../../utils/AuthenticateChecker')
 const {assignAdmin, setDisputeStatus} = require('../../controllers/admin/dispute')
 
 router.get('/dispute/all_tickets', checkAdmin, asynchandler(async(req,res,next)=>{
-    const tickets = await ticket.find({}).populate('user', 'name email userType').populate('associatedDisputes').populate({path : 'associatedDisputes.activityLog', model : 'adminActivityLog'}).exec()
+    const tickets = await ticket.find({}).populate('user', 'name email userType').populate('associatedDisputes').populate({path : 'associatedDisputes', populate : {path : 'activityLog', model : 'adminActivityLog'}}).exec()
     res.send(tickets)
 }))
 
