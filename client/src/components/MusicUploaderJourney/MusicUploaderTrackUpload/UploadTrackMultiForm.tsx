@@ -8,6 +8,8 @@ import ReleaseInformation from './ReleaseInformation';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useLoading from '../../../constants/loading';
+import Plus from '../../../assets/images/plus.svg';
+import { Link } from 'react-router-dom';
 
 interface FormData {
   mainArtist: string;
@@ -193,18 +195,27 @@ const UploadTrackMultiForm: React.FC = () => {
 
   return (
     <div className="lg:mx-8 ml-5">
-      <div>
-        <span className="flex gap-2">
-          <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
-            New Track Upload
-          </h2>
-          <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
-            Track Details
+      <div className='flex justify-between'>
+        <div>
+          <span className="flex gap-2">
+            <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
+              New Track Upload
+            </h2>
+            <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
+              Track Details
+            </p>
+          </span>
+          <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
+            Upload your track for distribution and licensing.
           </p>
-        </span>
-        <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
-          Upload your track for distribution and licensing.
-        </p>
+        </div>
+        <Link
+          to="/dashboard/bulkupload"
+          className="border-none rounded-[8px] bg-yellow py-2.5 px-4 flex items-center gap-2 w-fit"
+        >
+          <img src={Plus} alt="Plus" />
+          <p>Bulk Upload</p>
+        </Link>
       </div>
       <div className="w-fit">
         {' '}

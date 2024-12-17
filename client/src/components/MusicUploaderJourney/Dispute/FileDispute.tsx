@@ -60,8 +60,8 @@ const FileDispute: React.FC = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          setLoading(true)
-          
+          setLoading(true);
+
           const token = localStorage.getItem('token');
           const urlVar = import.meta.env.VITE_APP_API_URL;
           const apiUrl = `${urlVar}/dispute/`;
@@ -160,7 +160,7 @@ const FileDispute: React.FC = () => {
                         {fileName}
                       </span>
                       <p className="font-Utile-regular text-[16px] leading-normal text-[#A9ACB4] mt-3">
-                        SVG, PNG, JPG or GIF (max. 800x400px)
+                        PNG or PDF (max. 5mb)
                       </p>
                     </>
                   ) : (
@@ -175,7 +175,7 @@ const FileDispute: React.FC = () => {
                         </span>
                       </p>
                       <p className="font-Utile-regular text-[16px] leading-normal text-[#A9ACB4] mt-3">
-                        SVG, PNG, JPG or GIF (max. 800x400px)
+                        PNG or PDF (max. 5mb)
                       </p>
                     </>
                   )}
@@ -183,7 +183,7 @@ const FileDispute: React.FC = () => {
                 <input
                   type="file"
                   id="supportingDoc"
-                  accept="image/svg+xml, image/png, image/jpeg, image/gif"
+                  accept="image/png, image/gif, application/pdf"
                   name="supportingDoc"
                   required
                   className="opacity-0 w-0.1 h-0.1 absolute z-[-1]"
@@ -207,7 +207,7 @@ const FileDispute: React.FC = () => {
               className="bg-yellow py-2.5 px-4 border border-yellow rounded-[8px] font-formular-medium text-[14px] leading-5 text-black2"
               disabled={loading}
             >
-           {loading ? "Filing a dispute..." : "File Dispute"}   
+              {loading ? 'Filing a dispute...' : 'File Dispute'}
             </button>
           </Form>
         )}

@@ -8,7 +8,6 @@ import RegisterUserRole from './Pages/RegisterUserRole';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserContext } from './Context/UserRole';
-import Dashboard from './Pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardDataProvider from './Context/DashboardDataProvider';
 import SyncUserHome from './components/SyncUserJourney/SyncUserHome';
@@ -34,6 +33,7 @@ import Crbt from './components/SyncUserJourney/SyncUserQoutes/Crbt';
 import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Social_Media_Content';
 import PaymentStatus from './Pages/PaymentStatus';
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
+import DashboardLayout from './Pages/Dashboard';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -99,10 +99,13 @@ function App() {
 
           {/* Wrap the DashboardDataProvider around the routes that require it */}
           <Route
-            path="/dashboard"
+            path="/dashboard/*"
             element={
               <DashboardDataProvider>
-                <ProtectedRoute path="/dashboard" element={<Dashboard />} />
+                <ProtectedRoute
+                  path="/dashboard/*"
+                   element={<DashboardLayout />}
+                />
               </DashboardDataProvider>
             }
           />
@@ -319,8 +322,6 @@ function App() {
               />
             }
           />
-
-        
         </Routes>
       </UserContext.Provider>
     </>
