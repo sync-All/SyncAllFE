@@ -11,7 +11,9 @@ import ContentReview from '../components/ContentReview';
 import { useState } from 'react';
 import SingleUserPage from '../components/SingleUserPage';
 import { UserProvider } from '../contexts/UserContext';
-import Dispute from '../components/Dispute/Dispute';
+import DisputeTicket from '../components/Dispute/DisputeTicket';
+import { DisputeProvider } from '../contexts/DisputeContext';
+import TicketDIsputes from '../components/Dispute/TicketDIsputes';
 import DisputeDetails from '../components/Dispute/DisputeDetails';
 
 const AdminDashboard = () => {
@@ -93,14 +95,42 @@ const AdminDashboard = () => {
               <Route
                 path="disputes"
                 element={
-                  <ProtectedRoute path="disputes" element={<Dispute />} />
+                  <ProtectedRoute
+                    path="disputes"
+                    element={
+                      <DisputeProvider>
+                        <DisputeTicket />
+                      </DisputeProvider>
+                    }
+                  />
                 }
               />
 
               <Route
-                path="dispute-details"
+                path="dispute-tick/:id"
                 element={
-                  <ProtectedRoute path="dispute-details" element={<DisputeDetails />} />
+                  <ProtectedRoute
+                    path="dispute-tick/:id"
+                    element={
+                      <DisputeProvider>
+                        <TicketDIsputes />
+                      </DisputeProvider>
+                    }
+                  />
+                }
+              />
+
+              <Route
+                path="dispute-tick/details/:id"
+                element={
+                  <ProtectedRoute
+                    path="dispute-tick/details/:id"
+                    element={
+                      <DisputeProvider>
+                        <DisputeDetails />
+                      </DisputeProvider>
+                    }
+                  />
                 }
               />
 

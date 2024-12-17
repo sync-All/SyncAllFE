@@ -1,24 +1,29 @@
 import { useMemo, useState } from 'react';
 import Search from '../../assets/images/search-1.svg';
 import LoadingAnimation from '../../constants/loading-animation';
-import { useUsers } from '../../contexts/UserContext';
-import { User } from '../../contexts/UserContext';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
 import Dot from '../../assets/images/dot.svg';
 import NoDispute from '../../assets/images/no_track.svg';
 import { Link } from 'react-router-dom';
+import { Dispute, useDispute } from '../../contexts/DisputeContext';
 
 interface SortConfig {
-  key: keyof User | null;
+  key: keyof Dispute | null;
   direction: 'ascending' | 'descending';
 }
 
-const SortButton: React.FC<{
+interface SortButtonProps {
   sortConfig: SortConfig;
-  sortKey: keyof User;
-  onSort: (key: keyof User) => void;
-}> = ({ sortConfig, sortKey, onSort }) => (
+  sortKey: keyof Dispute;
+  onSort: (key: keyof Dispute) => void;
+}
+
+const SortButton: React.FC<SortButtonProps> = ({
+  sortConfig,
+  sortKey,
+  onSort,
+}) => (
   <button
     type="button"
     onClick={() => onSort(sortKey)}
@@ -35,8 +40,8 @@ const SortButton: React.FC<{
   </button>
 );
 
-const Dispute = () => {
-  const { users, loading } = useUsers();
+const DisputeTicket = () => {
+  const { dispute, loading } = useDispute();
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
@@ -47,28 +52,37 @@ const Dispute = () => {
   });
 
   const sortedData = useMemo(() => {
-    if (!Array.isArray(users) || users.length === 0) return [];
+    if (!Array.isArray(dispute) || dispute.length === 0) return [];
 
-    return [...users].sort((a, b) => {
+    return [...dispute].sort((a, b) => {
       if (sortConfig.key === null) return 0;
 
       // Use nullish coalescing to provide fallback values for comparison
-      const aValue = a[sortConfig.key as keyof User] ?? '';
-      const bValue = b[sortConfig.key as keyof User] ?? '';
+      const aValue = a[sortConfig.key as keyof Dispute] ?? '';
+      const bValue = b[sortConfig.key as keyof Dispute] ?? '';
 
       if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
       return 0;
     });
-  }, [users, sortConfig]);
+  }, [dispute, sortConfig]);
 
-  const handleSort = (key: keyof User) => {
+  const handleSort = (key: keyof Dispute) => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
     }
     setSortConfig({ key, direction });
   };
+
+  const truncateText = (text: string, length: number) => {
+    if (text.length <= length) return text;
+    return text.slice(0, length);
+  };
+
+  const totalDisputes = dispute.map(
+    (dispute) => dispute.associatedDisputes.length
+  );
 
   if (loading) {
     return <LoadingAnimation />;
@@ -109,64 +123,95 @@ const Dispute = () => {
             </div>
           </div>
         </div>
-        {users.length > 0 ? (
+        {dispute.length > 0 ? (
           <table className="w-full mt-5">
             <thead>
               <tr>
                 <th className={ThStyles}>
-                  Track
+                  Ticket ID
                   <SortButton
                     sortConfig={sortConfig}
-                    sortKey="name"
+                    sortKey="tickId"
                     onSort={handleSort}
                   />
                 </th>
                 <th className={ThStyles}>
-                  User
+                  Username
                   <SortButton
                     sortConfig={sortConfig}
-                    sortKey="email"
+                    sortKey="user"
                     onSort={handleSort}
                   />
                 </th>
-                <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6">
+                <th className={ThStyles}>
+                  Number of Disputes
+                  <SortButton
+                    sortConfig={sortConfig}
+                    sortKey="__v"
+                    onSort={handleSort}
+                  />
+                </th>
+                <th className={ThStyles}>
+                  Date Opened
+                  <SortButton
+                    sortConfig={sortConfig}
+                    sortKey="createdAt"
+                    onSort={handleSort}
+                  />
+                </th>
+                <th className={ThStyles}>
+                  Last Updated
+                  <SortButton
+                    sortConfig={sortConfig}
+                    sortKey="updatedAt"
+                    onSort={handleSort}
+                  />
+                </th>
+                <th className={ThStyles}>
                   Status
-                </th>
-                <th className={ThStyles}>
-                  User Role
                   <SortButton
                     sortConfig={sortConfig}
-                    sortKey="role"
+                    sortKey="status"
                     onSort={handleSort}
                   />
                 </th>
+
                 <th className={ThStyles}>Actions</th>
-                <th className="bg-grey-100 py-3 px-6"></th>
               </tr>
             </thead>
             <tbody>
-              {sortedData.map((user) => (
-                <tr key={user._id} className="items-center relative">
+              {sortedData.map((ticket) => (
+                <tr className="items-center relative">
                   <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                    {user.name}
+                    {truncateText(ticket.tickId, 12)}
                   </td>
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    {user.email}
+                    {ticket.user.name}
                   </td>
-                  <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                    {totalDisputes}{' '}
+                  </td>
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                    {new Date(ticket.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                    {new Date(ticket.updatedAt).toLocaleDateString()}
+                  </td>
+
+                  <td className="text-[#F3A218] bg-[#FEF6E7] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
                     <img src={Dot} alt="Dot" />
-                    ACTIVE
-                    {/* {track.uploadStatus} */}
+                    {ticket.status}
                   </td>
-                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    {user.role}
+                  <td>
+                    <Link
+                      to={`/admin/dispute-tick/${ticket._id}`}
+                      className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer"
+                     
+                    >
+                      View
+                    </Link>
                   </td>
-                  <Link to='/admin/dispute-details'
-                    className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer"
-                    // onClick={() => onTabChange('Quote Detail', user)}
-                  >
-                    Review
-                  </Link>
+
                   {/* <td
                     className={`py-4 px-4 ${
                       openDropdowns[track._id] ? 'flex' : ''
@@ -207,4 +252,4 @@ const Dispute = () => {
   );
 };
 
-export default Dispute;
+export default DisputeTicket;

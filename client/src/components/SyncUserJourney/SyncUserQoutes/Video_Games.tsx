@@ -66,7 +66,7 @@ const VideoGames = () => {
     game_title: '',
     genre: [],
     platform: '',
-    release_date: new Date(),
+    release_date: null,
     target_audience: '',
     length: '',
     development_stage: '',
@@ -84,7 +84,7 @@ const VideoGames = () => {
     game_title: string;
     genre: string[];
     platform: string;
-    release_date: Date;
+    release_date: Date | null;
     target_audience: string;
     length: string;
     development_stage: string;

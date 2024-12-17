@@ -48,7 +48,7 @@ const ReleaseInformation: React.FC = () => {
           <label htmlFor="releaseDate" className={applyLabelStyles}>
             Release Date
           </label>
-          <Field type="date" name="releaseDate" className={applyInputStyles} />
+          <Field disabled name="releaseDate" className={applyInputStyles} />
 
           <ErrorMessage
             name="releaseDate"
@@ -56,6 +56,7 @@ const ReleaseInformation: React.FC = () => {
             className={applyErrorStyles}
           />
         </div>
+
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="countryOfRelease" className={applyLabelStyles}>
             Country Of Release
@@ -137,11 +138,8 @@ const ReleaseInformation: React.FC = () => {
           <label htmlFor="explicitCont" className={applyLabelStyles}>
             Explicit Content
           </label>
-          <Field name="explicitCont" className={applyInputStyles} as="select">
-            <option value="">Select...</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </Field>
+          <Field name="explicitCont" className={applyInputStyles} disabled />
+       
           <ErrorMessage
             name="explicitCont"
             component="div"

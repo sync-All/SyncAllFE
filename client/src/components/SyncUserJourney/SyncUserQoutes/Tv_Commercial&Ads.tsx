@@ -70,7 +70,7 @@ const TvCommercialAds = () => {
     theme: '',
     length: '',
     production_budget: '',
-    air_date: new Date(),
+    air_date: null,
     networks: [],
     duration_of_music_usage: '',
     intended_usage: [],
@@ -88,7 +88,7 @@ const TvCommercialAds = () => {
     theme: string;
     length: string;
     production_budget: string;
-    air_date: Date;
+    air_date: Date | null;
     networks: string[];
     duration_of_music_usage: string;
     intended_usage: string[];
