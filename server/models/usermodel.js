@@ -81,9 +81,9 @@ const userSchema = new Schema({
         type : String,
         enum : ['Active', 'Inactive'],
         default : 'Active'
-    }
+    },
+    uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]
 }, {timestamps : true})
-userSchema.add({uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]})
 
 const syncUserSchema = new Schema({
     name : {

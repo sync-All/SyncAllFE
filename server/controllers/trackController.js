@@ -142,7 +142,13 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`event: done\n`);
         res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink})}\n\n`);
         await Track.insertMany(sortedMusicData)
-        await uploadTrackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        const errorRes = await uploadTrackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        if(errorRes){
+          for(let i = 0; i < errorRes.length; i++){
+            await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : errorRes[i]._id}}).exec()
+
+          }
+        }
         fs.unlinkSync(req.file.path)
         res.end();
     
