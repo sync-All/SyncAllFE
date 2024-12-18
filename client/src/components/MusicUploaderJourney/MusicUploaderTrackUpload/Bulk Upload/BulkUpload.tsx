@@ -6,7 +6,7 @@ import FileType from '../../../../assets/images/filetype.svg';
 import { useCallback, useState } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import { toast } from 'react-toastify';
-import axios, { AxiosError, AxiosProgressEvent } from 'axios';
+import axios, { AxiosProgressEvent } from 'axios';
 import UploadCompletionModal from './UploadCompletionModal';
 
 interface UploadProgressProps {
@@ -15,14 +15,54 @@ interface UploadProgressProps {
   status: string;
 }
 
-interface ResponseData {
-  message: string;
+export interface TrackData {
+  releaseType: string;
+  releaseTitle: string;
+  mainArtist: string;
+  featuredArtist: string;
+  trackTitle: string;
+  upc: string;
+  isrc: string;
+  trackLink: string;
+  genre: string;
+  subGenre: string;
+  claimBasis: string;
+  copyrightName: string;
+  copyrightYear: string;
+  audioLang: string;
+  message?: string;
+  err_type?: string;
+  // ... other fields
 }
+
+// Types for the upload response
+interface UploadResponse {
+  failedCount: number;
+  successCount: number;
+  duplicateData: TrackData[];
+  invalidSpotifyLink: TrackData[];
+}
+
+interface UploadStats {
+  fileName: string;
+  fileSize: string;
+  totalTracks: number;
+  failedUploads: number;
+  successfulUploads: number;
+  errors: {
+    duplicates: TrackData[];
+    invalidLinks: TrackData[];
+  };
+}
+
+// interface ResponseData {
+//   message: string;
+// }
 
 const UploadProgress: React.FC<UploadProgressProps> = ({
   progress,
   fileName,
-  status
+  status,
 }) => {
   return (
     <div className="border-2 border-dashed border-green-200 rounded-lg p-8 max-w-md mx-auto">
@@ -62,13 +102,17 @@ const BulkUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const [uploadStats, setUploadStats] = useState({
-    fileName: '',
-    fileSize: '',
-    totalTracks: 0,
-    failedUploads: 0,
-    successfulUploads: 0,
-  });
+ const [uploadStats, setUploadStats] = useState<UploadStats>({
+   fileName: '',
+   fileSize: '',
+   totalTracks: 0,
+   failedUploads: 0,
+   successfulUploads: 0,
+   errors: {
+     duplicates: [],
+     invalidLinks: [],
+   },
+ });
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -115,66 +159,89 @@ const BulkUpload = () => {
 
         try {
           const response = await axios.post(apiUrl, formData, config);
+          console.log('Raw response:', response.data);
 
-          // Parse the SSE data
+          if (!response.data) {
+            throw new Error('No response data received');
+          }
+
           const events = response.data.split('\n\n');
+          console.log('Split events:', events);
+
           for (const event of events) {
             if (!event.trim()) continue;
 
-            const lines = event.split('\n');
-            const eventType = lines[0].replace('event: ', '');
-            const data = JSON.parse(lines[1].replace('data: ', ''));
+            try {
+              console.log('Processing event:', event);
+              const lines = event.split('\n');
 
-           switch (eventType) {
-             case 'total': {
-               console.log('Total rows:', data.rowCount);
-               setUploadStatus(`Processing ${data.rowCount} rows...`);
-               break;
-             }
+              // Handle both typed events and direct data events
+              if (event.startsWith('event:')) {
+                // Event with type (like 'total' and 'done')
+                const eventType = lines[0].replace('event: ', '');
+                const dataLine = lines[1].replace('data: ', '');
+                const data = JSON.parse(dataLine);
 
-             case 'progress': {
-               const progressPercentage =
-                 (data.processed / data.total) * 50 + 50;
-               setUploadProgress(Math.round(progressPercentage));
-               setUploadStatus(
-                 `Processed ${data.processed} of ${data.total} rows`
-               );
-               break;
-             }
-
-             case 'done': {
-               setUploadProgress(100);
-               setUploadStatus('Upload complete!');
-               setUploadStats({
-                 fileName: file?.name || 'Bulk Uploaded Track',
-                 fileSize: `${((file?.size || 0) / (1024 * 1024)).toFixed(1)}mb`,
-                 totalTracks: data.total || 0,
-                 failedUploads: data.failed || 0,
-                 successfulUploads: data.successful || 0,
-               });
-               setShowCompletionModal(true);
-               break;
-             }
-           }
+                switch (eventType) {
+                  case 'total': {
+                    setUploadStatus(`Processing ${data.rowCount} rows...`);
+                    break;
+                  }
+                  case 'done': {
+                    const data = JSON.parse(dataLine) as UploadResponse;
+                    setUploadProgress(100);
+                    setUploadStatus('Upload complete!');
+                    setShowCompletionModal(true);
+                    setUploadStats({
+                      fileName: uploadedFile.name,
+                      fileSize: `${(uploadedFile.size / (1024 * 1024)).toFixed(
+                        1
+                      )}mb`,
+                      totalTracks: data.failedCount + data.successCount,
+                      failedUploads: data.failedCount,
+                      successfulUploads: data.successCount,
+                      errors: {
+                        duplicates: data.duplicateData,
+                        invalidLinks: data.invalidSpotifyLink,
+                      },
+                    });
+                    break;
+                  }
+                }
+              } else if (event.startsWith('data:')) {
+                // Progress update events
+                const data = JSON.parse(event.replace('data: ', ''));
+                if (data.parsedRows && data.rowCount) {
+                  const progressPercentage =
+                    (data.parsedRows / data.rowCount) * 50 + 50;
+                  setUploadProgress(Math.round(progressPercentage));
+                  setUploadStatus(
+                    `Processed ${data.parsedRows} of ${data.rowCount} rows`
+                  );
+                }
+              }
+            } catch (parseError) {
+              console.error('Error processing event:', parseError);
+              console.error('Problematic event:', event);
+            }
           }
         } catch (error: unknown) {
-          const axiosError = error as AxiosError<ResponseData>;
-          console.error('Upload error:', axiosError.response?.data);
-          toast.error(
-            (axiosError.response && axiosError.response.data
-              ? axiosError.response.data.message || axiosError.response.data
-              : axiosError.message || 'An error occurred'
-            ).toString()
-          );
+          console.error('Upload error:', error);
+          toast.error('An error occurred during upload. Please try again.');
           setIsUploading(false);
           setUploadProgress(0);
           setUploadStatus('');
         }
       }
     },
-    []
-  ); // No dependencies needed since we're using everything inside the callback
-
+    [
+      setFile,
+      setUploadProgress,
+      setUploadStatus,
+      setShowCompletionModal,
+      setUploadStats,
+    ]
+  ); // Include all state setters used
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -302,10 +369,6 @@ const BulkUpload = () => {
         isOpen={showCompletionModal}
         onClose={() => setShowCompletionModal(false)}
         stats={uploadStats}
-        onResolveErrors={() => {
-          // Handle error resolution
-          setShowCompletionModal(false);
-        }}
         onProceed={() => {
           // Handle proceed action
           setShowCompletionModal(false);

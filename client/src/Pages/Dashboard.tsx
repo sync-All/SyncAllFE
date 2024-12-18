@@ -15,6 +15,7 @@ import MusicUploaderEarnings from '../components/MusicUploaderJourney/MusicUploa
 import ProfileMultiStep from '../components/MusicUploaderJourney/MusicUploaderUserProfile/ProfileMultiStep';
 import MusicUploaderDispute from '../components/MusicUploaderJourney/Dispute/MusicUploaderDispute';
 import BulkUpload from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/BulkUpload';
+import ResolveError from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
 
 const DashboardLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -73,6 +74,7 @@ const DashboardLayout = () => {
           <Route index element={<MusicUploaderDashboard />} />
           <Route path="upload" element={<UploadTrackMultiForm />} />
           <Route path="bulkupload" element={<BulkUpload />} />
+          <Route path="/bulk-upload/resolve-errors" element={<ResolveError/>}/>
           <Route
             path="tracks"
             element={<MusicUploaderTracks onTabChange={handleTabChange} />}

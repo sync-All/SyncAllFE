@@ -2,6 +2,8 @@ import FileType from '../../../../assets/images/filetype.svg';
 import TotalTracks from '../../../../assets/images/totaltracks.svg';
 import FailedUploads from '../../../../assets/images/failed-uploads.svg';
 import SuccessfulUploads from '../../../../assets/images/successful-uploads.svg';
+import { useNavigate } from 'react-router-dom';
+import { TrackData } from './BulkUpload';
 
 interface UploadCompletionModalProps {
   isOpen: boolean;
@@ -12,8 +14,11 @@ interface UploadCompletionModalProps {
     totalTracks: number;
     failedUploads: number;
     successfulUploads: number;
+    errors: {
+      duplicates: TrackData[];
+      invalidLinks: TrackData[];
+    };
   };
-  onResolveErrors: () => void;
   onProceed: () => void;
 }
 
@@ -21,9 +26,25 @@ const UploadCompletionModal: React.FC<UploadCompletionModalProps> = ({
   isOpen,
   onClose,
   stats,
-  onResolveErrors,
   onProceed,
 }) => {
+
+
+  const navigate = useNavigate();
+
+  const handleResolveErrors = () => {
+    navigate('/dashboard/bulk-upload/resolve-errors', {
+      state: {
+        errors: {
+          duplicates: stats.errors.duplicates,
+          invalidLinks: stats.errors.invalidLinks,
+        },
+        fileName: stats.fileName,
+      },
+    });
+    onClose();
+  };  
+  
   if (!isOpen) return null;
 
   const uploadStatusData = [
@@ -87,7 +108,7 @@ const UploadCompletionModal: React.FC<UploadCompletionModalProps> = ({
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4 mt-20">
             <button
-              onClick={onResolveErrors}
+              onClick={handleResolveErrors}
               className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Resolve errors
