@@ -83,6 +83,7 @@ const userSchema = new Schema({
         default : 'Active'
     }
 }, {timestamps : true})
+userSchema.add({uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]})
 
 const syncUserSchema = new Schema({
     name : {

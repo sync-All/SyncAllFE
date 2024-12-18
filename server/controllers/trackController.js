@@ -1,11 +1,13 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/track.model").track
+const User = require('../models/usermodel').uploader
 const cloudinary = require("cloudinary").v2
-const { BadRequestError, unauthorizedError, ForbiddenError } = require("../utils/CustomError")
+const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
 const csv = require('fast-csv');
 const mongoose = require('mongoose')
+const { uploadTrackError } = require("../models/track.model")
 require('dotenv').config()
 
 
@@ -75,16 +77,16 @@ const trackBulkUpload = async(req,res,next)=>{
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-
-
     let newMuiscData = []
-    let existingMuiscData = []
-    let sortedMuiscData = []
+    let duplicateData = []
+    let invalidSpotifyLink = []
+    let sortedMusicData = []
     let rowCount = 0
     let parsedRows = 0
-    let existingData = 0
+    let failedCount = 0
+    let successCount = 0
     fs.createReadStream(req.file.path)
-    .pipe(csv.parse({ignoreEmpty : true, headers : [undefined,'releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'explicitCont', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
+    .pipe(csv.parse({ignoreEmpty : true, headers : ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
     .on('data', (data) => {
       rowCount++
       newMuiscData.push(data)
@@ -100,43 +102,53 @@ const trackBulkUpload = async(req,res,next)=>{
       res.write(`event: total\n`);
       res.write(`data: ${JSON.stringify({ rowCount})}\n\n`);
       try {
+        const spotifyToken = await spotifyCheck.grabSpotifyToken()
         for(const row of newMuiscData){
-          let spotifyresponse = {}
           parsedRows++;
-          const confirmTrackUploaded = await Track.findOne({isrc : row.isrc}).exec()
-          if(confirmTrackUploaded){
-            res.write(`event: warning\n`);
-            res.write(`data: ${JSON.stringify({duplicateData : existingData++, status : "Not Uploaded", message : "Looks like we already have this tracks", errType : 'duplicateError'})}\n\n`);
+          let spotifyresponse = {}
+          let confirmTrackUploaded = {}
+
+          try {
+            spotifyresponse = await spotifyCheck.spotifyResult(row.trackLink, spotifyToken);
+            confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
+          } catch (error) {
+            if(error instanceof spotifyError){
+              res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
+              failedCount++
+              invalidSpotifyLink.push({...row, message  : error.message, err_type : 'spotify link error', user : req.user._id})
+            }else if (error instanceof mongoose.MongooseError){
+              console.log(error)
+            }
             continue;
           }
-          try {
 
-              // spotifyresponse = await spotifyCheck.SpotifyPreview(res, row.trackLink)
+          if(confirmTrackUploaded){
+            res.write(`event: warning duplicate data\n`);
+            res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
+            failedCount++
+            duplicateData.push({...row, trackOwner : confirmTrackUploaded.user._id, message : 'Duplicate data found', err_type : 'duplicate', user : req.user._id})
+            continue;
+          }
+          res.write(`event: progress\n`);
+          res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
-              res.write(`event: progress\n`);
-              res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
-
-            } catch (error) {
-              if(error){
-                res.write(`event: progress\n`);
-                res.write(`data: "error somewhere"\n\n`);
-              }
-              continue;
-            }
-            row.spotifyLink = spotifyresponse.spotifyLink
-            row.user = req.user.id
-            row.trackLink = spotifyresponse.preview_url, 
-            row.duration = spotifyresponse.duration
-            sortedMuiscData.push(row)
+          row.spotifyLink = spotifyresponse.spotifyLink
+          row.user = req.user.id
+          row.trackLink = spotifyresponse.preview_url
+          row.duration = spotifyresponse.duration
+          successCount++
+          sortedMusicData.push(row)
         }
-        console.log(sortedMuiscData)
         res.write(`event: done\n`);
-        res.write(`data: "Parsing complete!"\n\n`);
+        res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink})}\n\n`);
+        await Track.insertMany(sortedMusicData)
+        await uploadTrackError.insertMany([...invalidSpotifyLink, ...duplicateData])
         fs.unlinkSync(req.file.path)
         res.end();
     
       } catch (error) {
         console.log(error)
+        fs.unlinkSync(req.file.path)
       }
     });
     

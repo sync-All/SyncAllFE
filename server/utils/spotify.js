@@ -25,7 +25,9 @@ const grabSpotifyToken = async()=>{
 }
 
 const spotifyResult = async( trackLink, spotifyToken)=>{
+
     const trackId = trackLink.split('k/')[1]?.split('?')[0]
+
     try {
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
     
@@ -34,13 +36,15 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
             }
         })
 
-        // if(!trackDetails.data.preview_url){
-        //     return res.status(422).send('No preview available for this track, Please try again later')
-        // }
+        if(!trackDetails.data.preview_url){
+            throw new spotifyError('Unavailable Preview Track')
+        }
+
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
         const trackDuration = `${String(minutes)} minutes ${String(seconds)} seconds`;
         const artistIds = trackDetails.data.artists.map((item)=> item.id)
+        console.log(trackDetails.data.preview_url)
         return {
             preview_url : trackDetails.data.preview_url,
             isrc : trackDetails.data.external_ids.isrc,
@@ -50,8 +54,7 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
             artistIds
         }
     } catch (error) {
-        console.log(error)
-        throw new spotifyError(error)
+        throw new spotifyError('Invalid spotify link')
     }
 
 }
