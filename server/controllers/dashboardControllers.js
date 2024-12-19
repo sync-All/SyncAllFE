@@ -22,8 +22,8 @@ const dashboardcontrol = async (req,res,next)=>{
         const userId = req.user.id
         try {
             if(req.user.role == "Music Uploader"){
-                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
-                const profileInfo = await User.findById(userId)
+                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks')
+                const profileInfo = await User.findById(userId).populate('uploadErrors')
                 const transactions = await Transaction.find({user : userId})
                 res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{
