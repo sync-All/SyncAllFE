@@ -36,6 +36,7 @@ export interface TrackData {
   releaseDesc: string;
   message?: string;
   err_type?: string;
+  user: string;
 }
 
 interface LocationState {
@@ -106,12 +107,19 @@ import DuplicateByYouTab from './DuplicateByYouTab';
 import DuplicateByOtherTab from './DuplicateByOtherTab';
 import InvalidSpotifyTab from './InvalidSpotifyTab';
 import ProceedBulkError from './ProceedBulkError';
+import DuplicateByYouResolveBulkError from './DuplicateByYouResolveBulkError';
+import DuplicateByOthersResolveBulkError from './DuplicateByOthersResolveBulkError';
+import { useDataContext } from '../../../../Context/DashboardDataProvider';
+
 
 const ResolveError = () => {
   const [activeTab, setActiveTab] = useState('duplicateByYou');
   const [showProceedModal, setShowProceedModal] = useState(false);
+  const [showResolveModal, setShowResolveModal] = useState(false)
+  const { dashboardData } = useDataContext()
   const location = useLocation();
   const navigate = useNavigate();
+  
 
    const handleProceed = () => {
      setShowProceedModal(true);
@@ -133,8 +141,24 @@ const ResolveError = () => {
 
   const { errors, fileName } = location.state as LocationState;
 
-  const duplicatesCount = errors?.duplicates?.length || 0;
-  const duplicatesOtherCount = errors?.duplicatesOther?.length || 0;
+  const loggedInUserId = dashboardData?.profileInfo._id
+
+  const filterDuplicatesByUser = (
+    tracks: TrackData[],
+    loggedInUserId: string
+  ) => {
+    return tracks.filter((track) => track.user === loggedInUserId);
+  };
+
+  const duplicatesByYou = filterDuplicatesByUser(
+    errors?.duplicates || [],
+    'loggedInUserId'
+  );
+  const duplicatesByOthers = (errors?.duplicates || []).filter(
+    (track) => track.user !== loggedInUserId
+  );
+  const duplicatesCount = duplicatesByYou.length;
+  const duplicatesOtherCount = duplicatesByOthers.length;
   const invalidLinksCount = errors?.invalidLinks?.length || 0;
 
   const errorCount = duplicatesCount + duplicatesOtherCount + invalidLinksCount;
@@ -152,6 +176,28 @@ const ResolveError = () => {
     }
   };
 
+    const renderModal = () => {
+      switch (activeTab) {
+        case 'duplicateByYou':
+          return (
+            <DuplicateByYouResolveBulkError
+              isOpen={showResolveModal}
+              onClose={() => setShowResolveModal(false)}
+              errorCount={duplicatesCount}
+            />
+          );
+        case 'duplicateByOther':
+          return (
+            <DuplicateByOthersResolveBulkError
+              isOpen={showResolveModal}
+              onClose={() => setShowResolveModal(false)}
+              errorCount={duplicatesOtherCount}
+            />
+          );
+        
+      }
+    };
+
   return (
     <div className="lg:mx-8 ml-5">
       <div className="flex justify-between items-center">
@@ -168,13 +214,16 @@ const ResolveError = () => {
             Upload multiple tracks at once to save time
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Resolve All
-          </button>
+        <div className="flex gap-2 items-end">
+          {activeTab !== 'invalidSpotify' && (
+            <button
+              onClick={() => setShowResolveModal(true)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Resolve All
+            </button>
+            
+          )}{renderModal()}
           <button
             onClick={handleProceed}
             className="px-4 py-2.5 bg-[#0B1B2B] text-white rounded-lg hover:bg-opacity-90 transition-colors"
