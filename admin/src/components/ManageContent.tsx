@@ -58,6 +58,8 @@ const SortButton: React.FC<{
 const ManageContent = () => {
   const { content, loading } = useContent();
 
+  console.log(content);
+
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
@@ -289,10 +291,10 @@ const ManageContent = () => {
           <div className="flex flex-col justify-center items-center mx-auto mt-[195px]">
             <img src={NoTrack} alt="No Track" />
             <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
-              No User
+              No Track
             </p>
             <p className="text-[#667085] text-[12px] font-formular-medium leading-4">
-              You don't have an user
+              You don't have any track
             </p>
           </div>
         )}

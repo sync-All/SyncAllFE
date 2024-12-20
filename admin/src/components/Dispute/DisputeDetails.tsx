@@ -74,7 +74,18 @@ const DisputeDetails = () => {
     const day = date.getDate();
     const year = date.getFullYear();
 
-    return `${month} ${day}, ${year}`;
+    // Get time
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format
+    hours = hours % 12 || 12;
+
+    // Format minutes as two digits
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+
+    return `${month} ${day}, ${year} ${hours}:${formattedMinutes} ${period}`;
   };
 
   const tdStyles =
@@ -203,12 +214,21 @@ const DisputeDetails = () => {
   if (isLoading) {
     return <LoadingAnimation />;
   }
+
+ const truncateText = (text: string, length: number) => {
+   if (text.length <= length) return text;
+   return text.slice(0, length);
+ };
+
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
       <div className="flex items-center justify-between ">
         <div className="flex items-center gap-2.5">
           <h1 className="text-black2 text-[24px] font-inter font-semibold leading-6 tracking-[-0.96px]">
-            Dispute ID: D12345
+            Dispute ID:{' '}
+            <span className="uppercase">
+              D{truncateText(disputeData._id ?? '', 6)}
+            </span>
           </h1>
           <span className="text-[#F3A218] text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#FEF6E7] rounded-2xl w-fit gap-[6px]">
             <svg
@@ -279,36 +299,40 @@ const DisputeDetails = () => {
               <h2 className="text-[18px] leading-7 font-inter font-normal ">
                 Dispute Resolution Summary{' '}
               </h2>
-              <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
-                {disputeData?._id}
+              <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center uppercase flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
+                D{truncateText(disputeData._id ?? '', 6)}
               </span>
             </div>
 
             {/* Summary Details */}
-            {/* <div className=" rounded-md overflow-hidden">
+            <div className=" rounded-md overflow-hidden">
               <table className="w-full">
                 <tbody className="divide-y divide-gray-200">
                   <tr className="bg-[#F0F2F5]">
                     <td className={tdStyles}>Resolution Outcome</td>
-                    <td className={tdValueStyles}>{disputeData.issueType}</td>
+                    <td className={tdValueStyles}>Ownership Transferred</td>
                   </tr>
                   <tr>
                     <td className={tdStyles}>Resolution Notes</td>
-                    <td className={tdValueStyles}>{disputeData.filedBy}</td>
+                    <td className={tdValueStyles}>
+                      Ownership reassigned to {disputeData.name}
+                    </td>
                   </tr>
                   <tr>
                     <td className={tdStyles}>Resolved By</td>
-                    <td className={tdValueStyles}>{disputeData.dateFiled}</td>
+                    <td className={tdValueStyles}>
+                      {disputeData.assignedTo?.name}
+                    </td>
                   </tr>
                   <tr>
                     <td className={tdStyles}>Date Resolved</td>
                     <td className={tdValueStyles}>
-                      {disputeData.customerContact}
+                      {formatDate(disputeData.createdAt)}
                     </td>
                   </tr>
                 </tbody>
               </table>
-            </div> */}
+            </div>
           </div>
         )}
 
@@ -317,8 +341,8 @@ const DisputeDetails = () => {
             <h2 className="text-[18px] leading-7 font-inter font-normal ">
               Dispute Summary
             </h2>
-            <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
-              {disputeData?._id}
+            <span className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px] uppercase">
+              D{truncateText(disputeData._id ?? '', 6)}
             </span>
           </div>
 
@@ -379,35 +403,41 @@ const DisputeDetails = () => {
         </div>
 
         {/* Activity Log */}
-        {/* <div className="space-y-6">
-          <div className="flex items-center">
-            <h3 className="text-lg font-medium">Activity Log</h3>
-            <button className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
-              All Activity
-            </button>
-          </div>
+        {disputeData?.activityLog?.length ?? 0 > 0 ? (
+          <div className="space-y-6">
+            <div className="flex items-center">
+              <h3 className="text-lg font-medium">Activity Log</h3>
+              <button className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl w-fit gap-[6px]">
+                All Activity
+              </button>
+            </div>
 
-          <div className="bg-white border rounded-md">
-            <table className="w-full">
-              <thead className="bg-[#F0F2F5]">
-                <tr>
-                  <th className={tdValueStyles}>Date & Time</th>
-                  <th className={tdValueStyles}>Action Taken</th>
-                  <th className={tdValueStyles}>Performed By</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {disputeData.activityLog.map((activity, index) => (
-                  <tr key={index}>
-                    <td className={tdStyles}>{activity.dateTime}</td>
-                    <td className={tdStyles}>{activity.actionTaken}</td>
-                    <td className={tdStyles}>{activity.performedBy}</td>
+            <div className="bg-white border rounded-md">
+              <table className="w-full">
+                <thead className="bg-[#F0F2F5]">
+                  <tr>
+                    <th className={tdValueStyles}>Date & Time</th>
+                    <th className={tdValueStyles}>Action Taken</th>
+                    <th className={tdValueStyles}>Performed By</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {disputeData.activityLog?.map((activity, index) => (
+                    <tr key={index}>
+                      <td className={tdStyles}>
+                        {formatDate(activity.activityDate)}
+                      </td>
+                      <td className={tdStyles}>{activity.action_taken}</td>
+                      <td className={tdStyles}>{activity.performedBy}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div> */}
+        ) : (
+          ''
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">

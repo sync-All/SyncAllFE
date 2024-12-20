@@ -26,8 +26,22 @@ export interface SupportingDoc {
   data: number[]; // Since the data array appears empty, we'll use `number[]` assuming it's meant to hold numeric data.
 }
 
+interface Activity {
+  activityDate: string;
+  action_taken: string;
+  performedBy: string;
+}
+
+interface Assign {
+  email: string
+  name: string
+  role: string
+}
+
 export interface AssociatedDispute {
   _id: string;
+  activityLog: Activity[];
+  assignedTo: Assign
   nameOfTrack: string;
   issueType: string;
   desc: string;

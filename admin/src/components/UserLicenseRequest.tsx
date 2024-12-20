@@ -1,79 +1,80 @@
 
 
-// import React, { useState, useMemo } from 'react';
-// import ArrowDown from '../assets/images/arrowdown.svg';
-// import ArrowUp from '../assets/images/up-arrow.svg';
+import React, { useState, useMemo } from 'react';
+import ArrowDown from '../assets/images/arrowdown.svg';
+import ArrowUp from '../assets/images/up-arrow.svg';
 // import { useSyncUser } from '../../../Context/syncUserData';
 import NoPendingLicense from '../assets/images/no_track.svg';
+import { Track, User } from '../contexts/UserContext';
 
-// interface SortConfig {
-//   key: keyof LicensedTracks | null;
-//   direction: 'ascending' | 'descending';
-// }
+interface UserLicenseRequestProps {
+  userDetails: User | undefined
+}
 
-// const SortButton: React.FC<{
-//   sortConfig: SortConfig;
-//   sortKey: keyof LicensedTracks;
-//   onSort: (key: keyof LicensedTracks) => void;
-// }> = ({ sortConfig, sortKey, onSort }) => (
-//   <button
-//     type="button"
-//     onClick={() => onSort(sortKey)}
-//     aria-label={`Sort by ${sortKey}`}
-//   >
-//     <img
-//       src={
-//         sortConfig.key === sortKey && sortConfig.direction === 'ascending'
-//           ? ArrowUp
-//           : ArrowDown
-//       }
-//       alt="Sort"
-//     />
-//   </button>
-// );
+interface SortConfig {
+  key: keyof Track | null;
+  direction: 'ascending' | 'descending';
+}
 
-const UserLicenseRequest = () => {
-  //  const { user } = useSyncUser();
-  //  const [sortConfig, setSortConfig] = useState<SortConfig>({
-  //    key: null,
-  //    direction: 'ascending',
-  //  });
-  //  const pendingTracks = useMemo(() => {
-  //    return user?.user?.pendingLicensedTracks || [];
-  //  }, [user]);
+const SortButton: React.FC<{
+  sortConfig: SortConfig;
+  sortKey: keyof Track;
+  onSort: (key: keyof Track) => void;
+}> = ({ sortConfig, sortKey, onSort }) => (
+  <button
+    type="button"
+    onClick={() => onSort(sortKey)}
+    aria-label={`Sort by ${sortKey}`}
+  >
+    <img
+      src={
+        sortConfig.key === sortKey && sortConfig.direction === 'ascending'
+          ? ArrowUp
+          : ArrowDown
+      }
+      alt="Sort"
+    />
+  </button>
+);
+
+const UserLicenseRequest:React.FC<UserLicenseRequestProps> = ({userDetails}) => {
+   const [sortConfig, setSortConfig] = useState<SortConfig>({
+     key: null,
+     direction: 'ascending',
+   });
+   const pendingLicensedTracks = userDetails?.pendingLicensedTracks;
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
-  //  const sortedData = useMemo(() => {
-  //    return [...pendingTracks].sort((a, b) => {
-  //      if (sortConfig.key === null) return 0;
-  //      const aValue = a[sortConfig.key as keyof LicensedTracks];
-  //      const bValue = b[sortConfig.key as keyof LicensedTracks];
+ const sortedData = useMemo(() => {
+   return [...(pendingLicensedTracks || [])].sort((a, b) => {
+     if (sortConfig.key === null) return 0;
 
-  //      if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-  //      if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
-  //      return 0;
-  //    });
-  //  }, [pendingTracks, sortConfig]);
+     const aValue = a[sortConfig.key as keyof Track];
+     const bValue = b[sortConfig.key as keyof Track];
 
-  //  const handleSort = (key: keyof LicensedTracks) => {
-  //    let direction: 'ascending' | 'descending' = 'ascending';
-  //    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-  //      direction = 'descending';
-  //    }
-  //    setSortConfig({ key, direction });
-  //  };
+     if (aValue == null && bValue == null) return 0; // Both null or undefined
+     if (aValue == null) return sortConfig.direction === 'ascending' ? -1 : 1; // aValue is null/undefined
+     if (bValue == null) return sortConfig.direction === 'ascending' ? 1 : -1; // bValue is null/undefined
 
-  const sortedData = [
-    {
-      _id: 1,
-      track_name: 'tom',
-      license_status: 'done',
-      createdAt: '1/1/2021',
-      license_type: 'Interpolation',
-    },
-  ];
+     if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
+     if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+     return 0;
+   });
+ }, [pendingLicensedTracks, sortConfig]);
+
+
+
+   const handleSort = (key: keyof Track) => {
+     let direction: 'ascending' | 'descending' = 'ascending';
+     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+       direction = 'descending';
+     }
+     setSortConfig({ key, direction });
+   };
+
+
 
   return (
     <div className="mb-20">
@@ -83,35 +84,35 @@ const UserLicenseRequest = () => {
             <tr>
               <th className={ThStyles}>
                 Track
-                {/* <SortButton
-                 sortConfig={sortConfig}
-                 sortKey="track_name"
-                 onSort={handleSort}
-               /> */}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="trackTitle"
+                  onSort={handleSort}
+                />
               </th>
               <th className={ThStyles}>
                 Quote Request
-                {/* <SortButton
-                 sortConfig={sortConfig}
-                 sortKey="createdAt"
-                 onSort={handleSort}
-               /> */}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="createdAt"
+                  onSort={handleSort}
+                />
               </th>
               <th className={ThStyles}>
                 Request Date
-                {/* <SortButton
-                 sortConfig={sortConfig}
-                 sortKey="license_status"
-                 onSort={handleSort}
-               /> */}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="status"
+                  onSort={handleSort}
+                />
               </th>
               <th className={ThStyles}>
                 License Type
-                {/* <SortButton
-                 sortConfig={sortConfig}
-                 sortKey="amount"
-                 onSort={handleSort}
-               /> */}
+                <SortButton
+                  sortConfig={sortConfig}
+                  sortKey="amount"
+                  onSort={handleSort}
+                />
               </th>
             </tr>
           </thead>
@@ -119,11 +120,11 @@ const UserLicenseRequest = () => {
             {sortedData.map((track) => (
               <tr key={track._id}>
                 <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                  {track.track_name}
+                  {track.trackTitle}
                 </td>
 
                 <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                  {track.license_status}
+                  {track.status}
                 </td>
                 <td className="text-[#667085] font-inter text-[14px] font-medium py-4 leading-5 -4 px-8">
                   {new Date(track.createdAt).toLocaleDateString()}
