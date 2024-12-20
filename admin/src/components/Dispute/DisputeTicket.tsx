@@ -3,7 +3,7 @@ import Search from '../../assets/images/search-1.svg';
 import LoadingAnimation from '../../constants/loading-animation';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
-import Dot from '../../assets/images/dot.svg';
+// import Dot from '../../assets/images/dot.svg';
 import NoDispute from '../../assets/images/no_track.svg';
 import { Link } from 'react-router-dom';
 import { Dispute, useDispute } from '../../contexts/DisputeContext';
@@ -79,10 +79,7 @@ const DisputeTicket = () => {
     if (text.length <= length) return text;
     return text.slice(0, length);
   };
-
-  const totalDisputes = dispute.map(
-    (dispute) => dispute.associatedDisputes.length
-  );
+  
 
   if (loading) {
     return <LoadingAnimation />;
@@ -102,7 +99,7 @@ const DisputeTicket = () => {
               </p>
             </span>
             <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
-              Review and manage user-generated content{' '}
+              Review and manage user-generated content
             </p>
           </div>
           <div>
@@ -189,7 +186,9 @@ const DisputeTicket = () => {
                     {ticket.user.name}
                   </td>
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    {totalDisputes}{' '}
+                    {Array.isArray(ticket.associatedDisputes)
+                      ? ticket.associatedDisputes.length
+                      : 0}
                   </td>
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {new Date(ticket.createdAt).toLocaleDateString()}
@@ -199,14 +198,21 @@ const DisputeTicket = () => {
                   </td>
 
                   <td className="text-[#F3A218] bg-[#FEF6E7] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
-                    <img src={Dot} alt="Dot" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="8"
+                      height="8"
+                      viewBox="0 0 8 8"
+                      fill="none"
+                    >
+                      <circle cx="4" cy="4" r="3" fill="#F3A218" />
+                    </svg>
                     {ticket.status}
                   </td>
                   <td>
                     <Link
                       to={`/admin/dispute-tick/${ticket._id}`}
                       className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer"
-                     
                     >
                       View
                     </Link>
@@ -240,10 +246,10 @@ const DisputeTicket = () => {
           <div className="flex flex-col justify-center items-center mx-auto mt-[195px]">
             <img src={NoDispute} alt="No Track" />
             <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
-              No Quotes
+              No Disputes
             </p>
             <p className="text-[#667085] text-[12px] font-formular-medium leading-4">
-              You don't have any quote at the moment.
+              You don't have any dispute at the moment.
             </p>
           </div>
         )}

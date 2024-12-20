@@ -45,6 +45,7 @@ const TicketDIsputes = () => {
   const disputes = ticketDispute?.associatedDisputes || [];
 
   const totalDisputes = disputes.length;
+  console.log(totalDisputes);
 
   console.log(disputes);
 
@@ -80,6 +81,11 @@ const TicketDIsputes = () => {
   if (loading) {
     return <LoadingAnimation />;
   }
+
+   const truncateText = (text: string, length: number) => {
+     if (text.length <= length) return text;
+     return text.slice(0, length);
+   };
   return (
     <div>
       <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
@@ -168,8 +174,8 @@ const TicketDIsputes = () => {
             <tbody>
               {sortedData.map((dispute) => (
                 <tr key={dispute._id} className="items-center relative">
-                  <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                    {dispute._id}
+                  <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8 uppercase">
+                    D{truncateText(dispute._id ?? '', 6)}
                   </td>
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {dispute.nameOfTrack}
