@@ -8,7 +8,7 @@ import AccountOverview from './AccountOverview';
 import PlansBillings from './Plans_Billings';
 import UserLicenseRequest from './UserLicenseRequest';
 import UserLicensedTracks from './UserLicensedTracks';
-import MusicUploaderInfromation from './MusicUploaderInfromation';
+import MusicUploaderInfromation from './MusicUploaderInformation';
 import MusicUploaderTrack from './MusicUploaderTrack';
 
 const SingleUserPage = () => {

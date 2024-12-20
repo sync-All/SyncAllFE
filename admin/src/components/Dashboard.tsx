@@ -70,7 +70,7 @@ const Dashboard = () => {
     const fetchKeyMetrics = async () => {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/get_key_metrics/?filter=1`;
+      const apiUrl = `${urlVar}/get_key_metrics/?filter=6`;
       const config = {
         headers: {
           Authorization: `${token}`,
@@ -435,7 +435,11 @@ const Dashboard = () => {
                     // label={({ amt }) => ` ₦${formatToShortCurrency(amt)}`}
                   >
                     {revenueData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={getColor(index)} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={getColor(index)}
+                        name={entry.revenue}
+                      />
                     ))}
                   </Pie>
                   <text

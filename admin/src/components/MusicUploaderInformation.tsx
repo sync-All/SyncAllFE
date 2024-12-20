@@ -1,4 +1,3 @@
-import React from 'react';
 import Uploaded from '../assets/images/Upload Track 2.svg';
 import Earning from '../assets/images/Cash Out.svg';
 import Earth from '../assets/images/Earth.svg';
@@ -7,7 +6,7 @@ import { User, useUsers } from '../contexts/UserContext';
 import { useParams } from 'react-router-dom';
 import LoadingAnimation from '../constants/loading-animation';
 
-const MusicUploaderInfromation = () => {
+const MusicUploaderInformation = () => {
    const { users, loading } = useUsers();
    const { id } = useParams();
 
@@ -183,4 +182,4 @@ const MusicUploaderInfromation = () => {
       );
 }
 
-export default MusicUploaderInfromation;
+export default MusicUploaderInformation;

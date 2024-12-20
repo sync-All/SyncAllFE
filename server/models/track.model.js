@@ -6,11 +6,6 @@ const trackSchema = new Schema({
         type : String,
         required : true
     },
-    featuredArtist : [
-        {
-            type : String,
-        }
-    ],
     releaseType : {
         type : String,
         required : true
@@ -18,22 +13,27 @@ const trackSchema = new Schema({
     releaseTitle: {
         type : String,
         required : true
-    },
+        },
     trackTitle : {
         type : String,
         required : true
-    },
+        },
     trackLink : {
         type : String,
         required : true
-    },
-    upc : {
-        type : Number,
-        // required : true
-    },
+        },
     isrc : {
         type : String,
         required : true
+        },
+    featuredArtist : [
+        {
+            type : String,
+        }
+    ],
+    upc : {
+        type : Number,
+        // required : true
     },
     genre : {
         type : String,
@@ -182,6 +182,39 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
+const uploadTrackErrorSchema = new Schema()
+uploadTrackErrorSchema.add(trackSchema).add({mainArtist : {
+    type : String,
+    required : false
+},
+releaseType : {
+    type : String,
+    required : false
+},
+releaseTitle: {
+    type : String,
+    required : false
+    },
+trackTitle : {
+    type : String,
+    required : false
+    },
+trackLink : {
+    type : String,
+    required : false
+    },
+isrc : {
+    type : String,
+    required : false
+    }, message : String, user : {
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    }, err_type : String, trackOwner : {
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    }})
+
+
 const trackLicenseSchema = new Schema({
     track_name : {
         type : String,
@@ -224,7 +257,8 @@ const trackLicenseSchema = new Schema({
 trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const track = mongoose.model('track', trackSchema)
+const uploadTrackError = mongoose.model('uploadTrackError', uploadTrackErrorSchema)
 const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 
 
-module.exports = {track, trackLicense}
+module.exports = {track, trackLicense, uploadTrackError}

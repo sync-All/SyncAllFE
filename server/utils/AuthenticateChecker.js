@@ -3,7 +3,6 @@ const { unauthorizedError, ForbiddenError, TokenExpiredError } = require('./Cust
 
 const checkAdmin = (req,res,next)=>{
     passport.authenticate('jwt',{session : false},(err,user,info)=>{
-        console.log({info})
         if(info && info.name == "TokenExpiredError"){
            return next(new TokenExpiredError('Session expired, proceed to login'))
         }
@@ -14,6 +13,7 @@ const checkAdmin = (req,res,next)=>{
         if (user.role !== 'Admin') {
             return next(new ForbiddenError('Admin access required'));
         }
+        req.user = user
         return next();
     })(req,res,next)
 }

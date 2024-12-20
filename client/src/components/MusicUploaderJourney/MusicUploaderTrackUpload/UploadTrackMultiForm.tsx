@@ -8,6 +8,8 @@ import ReleaseInformation from './ReleaseInformation';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useLoading from '../../../constants/loading';
+import Plus from '../../../assets/images/plus.svg';
+import { Link } from 'react-router-dom';
 
 interface FormData {
   mainArtist: string;
@@ -23,7 +25,7 @@ interface FormData {
   recordingVersion: string;
   featuredInstrument: string[];
   producers: string[];
-  recordingDate: Date;
+  recordingDate: Date | null;
   countryOfRecording: string;
   writers: string[];
   composers: string[];
@@ -34,7 +36,7 @@ interface FormData {
   percentClaim: number;
   copyrightName: string;
   copyrightYear: number | null;
-  releaseDate: Date;
+  releaseDate: Date | null;
   countryOfRelease: string;
   mood: string[];
   tag: string[];
@@ -63,7 +65,7 @@ const initialFormData: FormData = {
   recordingVersion: '',
   featuredInstrument: [],
   producers: [],
-  recordingDate: new Date(),
+  recordingDate: null,
   countryOfRecording: '',
   writers: [],
   composers: [],
@@ -74,7 +76,7 @@ const initialFormData: FormData = {
   percentClaim: 0,
   copyrightName: '',
   copyrightYear: null,
-  releaseDate: new Date(),
+  releaseDate: null,
   countryOfRelease: '',
   mood: [],
   tag: [],
@@ -99,7 +101,7 @@ const validationSchema = Yup.object().shape({
   recordingVersion: Yup.string(),
   featuredInstrument: Yup.array().of(Yup.string()),
   producers: Yup.array().of(Yup.string()),
-  recordingDate: Yup.date(),
+  recordingDate: Yup.date().nullable(),
   countryOfRecording: Yup.string(),
   writers: Yup.array().of(Yup.string()),
   composers: Yup.array().of(Yup.string()),
@@ -119,7 +121,7 @@ const validationSchema = Yup.object().shape({
       'Must be exactly 4 digits',
       (val) => (val ?? 0).toString().length === 4 || val === null
     ),
-  releaseDate: Yup.date(),
+  releaseDate: Yup.date().nullable(),
   countryOfRelease: Yup.string(),
   mood: Yup.array().of(Yup.string()),
   tag: Yup.array().of(Yup.string()),
@@ -193,18 +195,27 @@ const UploadTrackMultiForm: React.FC = () => {
 
   return (
     <div className="lg:mx-8 ml-5">
-      <div>
-        <span className="flex gap-2">
-          <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
-            New Track Upload
-          </h2>
-          <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
-            Track Details
+      <div className='flex justify-between'>
+        <div>
+          <span className="flex gap-2">
+            <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
+              New Track Upload
+            </h2>
+            <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
+              Track Details
+            </p>
+          </span>
+          <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
+            Upload your track for distribution and licensing.
           </p>
-        </span>
-        <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
-          Upload your track for distribution and licensing.
-        </p>
+        </div>
+        <Link
+          to="/dashboard/bulkupload"
+          className="border-none rounded-[8px] bg-yellow py-2.5 px-4 flex items-center gap-2 w-fit"
+        >
+          <img src={Plus} alt="Plus" />
+          <p>Bulk Upload</p>
+        </Link>
       </div>
       <div className="w-fit">
         {' '}

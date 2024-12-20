@@ -20,6 +20,7 @@ const paymentRouter = require('./routes/main_app/payment');
 var adminAuthRouter = require('./routes/admin_routes/auth')
 const adminUsersRouter = require('./routes/admin_routes/user')
 const adminManageContentRouter = require('./routes/admin_routes/manage_content')
+const adminManageDispute = require('./routes/admin_routes/dispute')
 
 
 var app = express();
@@ -52,7 +53,7 @@ try {
 }
 
 async function main(){
-  await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+  await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
   return
 }
 
@@ -89,6 +90,7 @@ app.use('/', unauthorizedRouter);
 app.use('/api/v1/', adminAuthRouter);
 app.use('/api/v1/', adminUsersRouter);
 app.use('/api/v1/', adminManageContentRouter);
+app.use('/api/v1/', adminManageDispute);
 
 // End Admin MiddleWares
 
@@ -102,6 +104,7 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.log(err)
 
   res.status(err.statusCode || 500).send(err.message);
 });

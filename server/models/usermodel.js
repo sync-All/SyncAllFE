@@ -71,11 +71,18 @@ const userSchema = new Schema({
     bio: {
         type : String,
     },
+    notifications : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : 'notification'
+        }
+    ],
     accountStatus : {
         type : String,
         enum : ['Active', 'Inactive'],
         default : 'Active'
-    }
+    },
+    uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]
 }, {timestamps : true})
 
 const syncUserSchema = new Schema({
@@ -181,6 +188,12 @@ const syncUserSchema = new Schema({
         default : 0
 
     },
+    notifications : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : 'notification'
+        }
+    ],
     accountStatus : {
         type : String,
         enum : ['Active', 'Inactive'],
@@ -204,8 +217,31 @@ const syncAdminSchema = new Schema({
     role : {
         type : String,
         enum : ['Admin'],
+        default : 'Admin'
     },
 }, {timestamps : true})
+
+const notificationSchema = new Schema({
+    title : {
+        type : String,
+        required : true
+    },
+    message : {
+        type : String,
+        required : true
+    },
+    userType : {
+        type : String,
+        enum : ['uploader', 'syncuser'],
+        required : true
+    },
+    user : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : function(){
+            this.userType == 'uploader' ? 'user' : 'syncUser'
+        }
+    }
+},{timestamps : true})
 
 const admin = mongoose.model('admin',syncAdminSchema)
 
@@ -213,5 +249,7 @@ const uploader = mongoose.model('user',userSchema)
 
 const syncUser = mongoose.model('syncUser',syncUserSchema)
 
-module.exports = {uploader, syncUser, admin}
+const notification = mongoose.model('notification',notificationSchema)
+
+module.exports = {uploader, syncUser, admin, notification}
 

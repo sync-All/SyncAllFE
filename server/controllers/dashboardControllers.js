@@ -5,7 +5,10 @@ const Transaction = require('../models/transactions.model').transaction
 const uploaderAccountInfo = require('../models/dashboard.model').uploaderAccountInfo
 const cloudinary = require("cloudinary").v2
 const Dispute = require('../models/dashboard.model').dispute
+const Ticket = require('../models/dashboard.model').ticket
+const {v4 : uuidv4} = require('uuid')
 const fs = require("node:fs")
+const { request } = require("node:http")
 require('dotenv').config()
 
 cloudinary.config({
@@ -19,8 +22,8 @@ const dashboardcontrol = async (req,res,next)=>{
         const userId = req.user.id
         try {
             if(req.user.role == "Music Uploader"){
-                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
-                const profileInfo = await User.findById(userId)
+                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks')
+                const profileInfo = await User.findById(userId).populate('uploadErrors')
                 const transactions = await Transaction.find({user : userId})
                 res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{
@@ -64,10 +67,16 @@ const fileDispute = async (req,res,next)=>{
         if(req.file){
             const fileBuffer = fs.readFileSync(req.file.path)
             let newDispute = new Dispute({
-                ...req.body, supportingDoc : fileBuffer, user : req.user.id
+                ...req.body, supportingDoc : fileBuffer, supportingDocType : req.fileMime, user : req.user.id
             })
             newDispute.save()
                 .then((response)=>{
+                    let newTicket = new Ticket({
+                        tickId : `Tick_${uuidv4()}`,
+                        user : req.user.id,
+                        associatedDisputes : [response._id]
+                    })
+                    newTicket.save()
                     fs.unlinkSync(req.file.path)
                     res.status(200).json({success : true, message : response})
                 })
@@ -81,6 +90,12 @@ const fileDispute = async (req,res,next)=>{
             })
                 newDispute.save()
                 .then((response)=>{
+                    let newTicket = new Ticket({
+                        tickId : `Tick_${uuidv4()}`,
+                        user : req.user.id,
+                        associatedDisputes : [response._id]
+                    })
+                    newTicket.save()
                     res.status(200).json({success : true, message : response})
                 })
                 .catch((err)=>{

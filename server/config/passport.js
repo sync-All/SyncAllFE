@@ -32,8 +32,7 @@ const strategy = new jwtStrategy(options, async (payload, done)=>{
     }else {
         return done(null, false)
     }
-   } catch (error) {
-    console.log(error)
+   } catch (error) {    
     return done(error, false)
    }
 })

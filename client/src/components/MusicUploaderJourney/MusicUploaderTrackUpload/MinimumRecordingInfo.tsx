@@ -50,7 +50,8 @@ const MinimumRecordingInfo: React.FC = () => {
     try {
       const res = await axios.get(apiUrl, config);
       setFieldValue('isrc', res.data.isrc);
-
+      setFieldValue('releaseDate', res.data.release_date);
+      setFieldValue('explicitCont', res.data.explicit_content);
       setIsrcValidationMessage('');
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
@@ -61,6 +62,8 @@ const MinimumRecordingInfo: React.FC = () => {
       ).toString();
       setIsrcValidationMessage(errorMessage);
       setFieldValue('isrc', '');
+      setFieldValue('releaseDate', '');
+      setFieldValue('explicitCont', '');
     }
   };
 
@@ -173,6 +176,7 @@ const MinimumRecordingInfo: React.FC = () => {
             className={applyErrorStyles}
           />
         </div>
+
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="isrc" className={applyLabelStyles}>
             ISRC*
