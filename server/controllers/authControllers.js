@@ -60,6 +60,7 @@ const signup = async function(req, res) {
                   user : users._id
                 })
                 await dashboard.save()
+                await User.findByIdAndUpdate(users.id, {dashboard : dashboard._id})
                 res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
             })
             .catch(err => {

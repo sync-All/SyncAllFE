@@ -1,5 +1,6 @@
 const Track = require("../models/track.model").track;
 const dashboard = require('../models/dashboard.model').dashboard
+const User = require('../models/usermodel').uploader
 const mongoose = require("mongoose");
 const { grabSpotifyToken, spotifyResult } = require("../utils/spotify")
 require('dotenv').config
@@ -16,7 +17,7 @@ try {
   }
   
   async function main(){
-    await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+    await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
     return
   }
 
@@ -44,6 +45,21 @@ try {
 // }
 
 // Utwa()
+
+async function addDashboardToUserSchema(){
+  try {
+    const allDashboardDetails = await dashboard.find({}).exec()
+    for(var i = 0; i < allDashboardDetails.length; i++){
+      const updateUserSchema = await User.findByIdAndUpdate(allDashboardDetails[i].user, {dashboard : allDashboardDetails[i]._id}, {new : true})
+      console.log(updateUserSchema)
+    }
+    return;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+addDashboardToUserSchema()
 
 
 // async function addFieldToExistingDocuments() {

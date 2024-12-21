@@ -84,6 +84,12 @@ const userSchema = new Schema({
     },
     uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]
 }, {timestamps : true})
+userSchema.add({
+    dashboard : {
+        type : Schema.Types.ObjectId,
+        ref : 'dashboard'
+    }
+})
 
 const syncUserSchema = new Schema({
     name : {
@@ -201,6 +207,7 @@ const syncUserSchema = new Schema({
     }
 }, {timestamps : true})
 
+
 const syncAdminSchema = new Schema({
     name : {
         required : true,
@@ -242,6 +249,9 @@ const notificationSchema = new Schema({
         }
     }
 },{timestamps : true})
+
+syncUserSchema.index({email : "text", username : "text"})
+userSchema.index({email :  "text", username : "text"})
 
 const admin = mongoose.model('admin',syncAdminSchema)
 
