@@ -45,6 +45,8 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
     cursor: 'pointer',
   });
 
+
+
   //
 
   return (
@@ -85,12 +87,20 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
             </Link>
           </li>
 
-          <li onClick={() => onTabChange('Music Quotes')}>
+          {/* <li onClick={() => onTabChange('Music Quotes')}>
             <Link to="/admin/music-quotes" style={liStyle('Music Quotes')}>
               <img src={QuotesIcon} alt="" />
               <p style={pStyle('Music Quotes')}>Quotes</p>
             </Link>
-          </li>
+          </li> */}
+          <Link
+            to="https://airtable.com/verifyEmailAndLogInWithMobileHandoffToken"
+            className="flex gap-4 cursor-pointer pt-4 pl-[33px] pb-4"
+            target="_blank"
+          >
+            <img src={QuotesIcon} alt="" />
+            <p className="text-[#667185] leading-[145%]">Quotes</p>
+          </Link>
         </ul>
       </div>
       <div className=" mt-auto ">

@@ -1,46 +1,47 @@
 import Uploaded from '../assets/images/black-upload-icon.svg';
 import Earning from '../assets/images/Cash Out.svg';
 import Earth from '../assets/images/Earth.svg';
-// import { useSyncUser } from '../../../Context/syncUserData';
+import { User } from '../contexts/UserContext';
 
-const AccountOverview = () => {
-  //   const { user } = useSyncUser();
-  //   // const licensedTracks = ;
-  // const licensedTracksNo = user?.user.totalLicensedTracks?.length || 0;
-  //   const recentActivity = user?.user.recentActivity;
+interface AccountOverviewProps {
+  userDetails: User | undefined
+}
+
+const AccountOverview:React.FC<AccountOverviewProps> = ({userDetails}) => {
+
 
   const cardData = [
     {
       imgSrc: Earning,
       title: 'Total Spent:',
-      value: 1000000,
+      value: 0,
     },
     {
       imgSrc: Uploaded,
       title: 'Total Tracks Licensed',
-      value: 100,
+      value: userDetails?.totalLicensedTracks.length,
     },
 
     {
       imgSrc: Earth,
       title: 'Upcoming Renewals',
-      value: 1000,
+      value: userDetails?.upcomingRenewals,
     },
     {
       imgSrc: Earning,
       title: 'Pending License Request:',
-      value: 100000,
+      value: userDetails?.pendingLicensedTracks.length,
     },
     {
       imgSrc: Uploaded,
       title: 'License Rejected',
-      value: 100,
+      value: 0,
     },
 
     {
       imgSrc: Earth,
       title: 'Quotes Sent',
-      value: 1000,
+      value: 0,
     },
   ];
 

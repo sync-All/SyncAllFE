@@ -2,35 +2,19 @@
 // import Visa from '../assets/images/visa.svg'
 // import { useSyncUser } from '../../../Context/syncUserData';
 import { Link } from 'react-router-dom';
+import { User } from '../contexts/UserContext';
 
+interface PlansBillingsProps {
+  userDetails: User | undefined
+}
 
-const PlansBillings = () => {
-    // const { user } = useSyncUser();
-    // const paymentInfo = user?.user?.billing
-    // const [userPlan, setUserPlan] = useState('')
-    
-    // useEffect(()=>{
-    //   switch(paymentInfo?.prod_id){
-    //     case "68768":
-    //       setUserPlan("Premium")
-    //       break;
-    //     case "68767":
-    //       setUserPlan('Standard')
-    //       break;
-    //     default:
-    //       setUserPlan('Basic')
-
-    //   }
-    // },[user,paymentInfo])
+const PlansBillings:React.FC<PlansBillingsProps> = ({userDetails}) => {
 
 
 
   return (
     <div className="mb-[136px]">
       <section className="mt-[53px]">
-        <p className="text-[#555C74] text-[16px] font-formular-regular leading-[22px] ">
-          {/* {!paymentInfo?.sub_status  ? "You are currently on the Basic Plan" : paymentInfo?.sub_status == "incomplete" ? "Payment Processing, we will inform you as soon as payment succeeds" :`You are currently subscribed to a monthly ${userPlan} plan`} */}
-        </p>
         <div className="p-8 mt-4 bg-[#F9FAFB] rounded-[20px] ">
           <div className="flex items-center justify-between">
             <span>
@@ -38,7 +22,7 @@ const PlansBillings = () => {
                 Current plan
               </p>
               <h3 className="text-[#3e3e3e] text-[24px] font-formular-bold leading-[24px] capitalize">
-                {/* {userPlan} */} Premium
+               {userDetails?.billing.plan}
               </h3>
             </span>
             <Link
@@ -54,8 +38,8 @@ const PlansBillings = () => {
             <p>Amount : ${paymentInfo?.amount || "N/A"}</p> */}
 
             <p>Frequency : Monthly</p>
-            <p>Next billing date : July 22, 2024</p>
-             <p>Amount : $20</p>
+            <p>Next billing date : None</p>
+             <p>Amount : 0</p>
           </div>
         </div>
       </section>

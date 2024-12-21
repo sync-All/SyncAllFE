@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 import ManageUsers from '../components/ManageUsers';
 import ManageContent from '../components/ManageContent';
-import Quotes from '../components/Quotes';
+// import Quotes from '../components/Quotes';
 import Dashboard from '../components/Dashboard';
 import AdminDashboardNavbar from '../components/AdminDashboardNavbar';
 import { ContentProvider } from '../contexts/ContentContext';
@@ -134,12 +134,12 @@ const AdminDashboard = () => {
                 }
               />
 
-              <Route
+              {/* <Route
                 path="music-quotes"
                 element={
                   <ProtectedRoute path="music-quotes" element={<Quotes />} />
                 }
-              />
+              /> */}
             </Routes>
           </ContentProvider>
         </UserProvider>

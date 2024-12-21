@@ -33,11 +33,23 @@ const SingleUserPage = () => {
     const activeLiClass = 'border-b border-[#013131] text-[#013131]';
 
     const sections = [
-      { id: 'Account Overview', component: <AccountOverview /> },
-      { id: 'License Requests', component: <UserLicenseRequest /> },
-      { id: 'Licensed Tracks', component: <UserLicensedTracks /> },
+      {
+        id: 'Account Overview',
+        component: <AccountOverview userDetails={userDetails} />,
+      },
+      {
+        id: 'License Requests',
+        component: <UserLicenseRequest userDetails={userDetails} />,
+      },
+      {
+        id: 'Licensed Tracks',
+        component: <UserLicensedTracks userDetails={userDetails} />,
+      },
 
-      { id: 'Plan & Billings', component: <PlansBillings /> },
+      {
+        id: 'Plan & Billings',
+        component: <PlansBillings userDetails={userDetails} />,
+      },
     ];
 
     return (
