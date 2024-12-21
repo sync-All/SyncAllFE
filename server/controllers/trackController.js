@@ -91,11 +91,11 @@ const trackBulkUpload = async(req,res,next)=>{
       rowCount++
       newMuiscData.push(data)
     })
-    .on('error', (error) => {
-      res.write(`event: error\n`);
-      console.error(error)
-      res.write(`data: ${JSON.stringify({ error })}\n\n`);
+    .on('error', (err) => {
+      res.status(400).write(`event: error\n`);
+      res.status(400).write(`data: ${JSON.stringify({ error: err.message})}\n\n`);
       fs.unlinkSync(req.file.path)
+      res.status(400).end()
 
     })
     .on('end', async (rowCount) => {
