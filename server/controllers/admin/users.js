@@ -6,9 +6,11 @@ const SyncUser = require('../../models/usermodel').syncUser;
 const Admin = require('../../models/usermodel').admin
 
 const allUsers = async (req,res,next) =>{
-    const [Users1, Users2] = await Promise.all([User.find().select('-password').exec(), SyncUser.find().select('-password').exec()])
+    const [Users1, Users2] = await Promise.all([User.find().populate('dashboard')
+      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+    SyncUser.find().populate('totalLicensedTracks')
+    .populate('pendingLicensedTracks').select('-password').exec()])
     const allusers = [...Users1, ...Users2]
-    console.log(allusers)
     if(allusers){
       res.json({success : true, message : allusers})
     }else{
@@ -25,4 +27,20 @@ const allAdmin = async (req,res,next)=>{
   }
 }
 
-module.exports = {allUsers, allAdmin}
+const userFilter = async (req,res,next)=>{
+  try {
+    const {filter} = req.query
+    console.log(filter)
+    const users = await User.find({$text : {$search : 'ibironketomiwa4@gmail.com'}}).exec()
+    // const users = await Promise.all([User.find({$text : {$search : 'd'}}).populate('dashboard')
+    //   .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+    // SyncUser.find({$text : {$search : 'd'}}).populate('totalLicensedTracks')
+    // .populate('pendingLicensedTracks').select('-password').exec()])
+    res.send({users})
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError('An error occurred, contact dev team')
+  }
+}
+
+module.exports = {allUsers, allAdmin, userFilter}
