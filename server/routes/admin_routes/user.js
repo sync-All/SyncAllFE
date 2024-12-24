@@ -21,6 +21,8 @@ router.get('/allusers',checkAdmin, asynchandler(userControllers.allUsers));
 
 router.get('/userFilter', checkAdmin, asynchandler(userControllers.userFilter))
 
+router.get('/userSearch', checkAdmin, asynchandler(userControllers.userSearch))
+
 router.get('/allAdmins',checkAdmin, asynchandler(userControllers.allAdmin))
 
 module.exports = router

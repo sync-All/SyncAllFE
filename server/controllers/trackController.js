@@ -82,7 +82,6 @@ const trackBulkUpload = async(req,res,next)=>{
     let invalidSpotifyLink = []
     let sortedMusicData = []
     let rowCount = 0
-    let totalrows = 0
     let parsedRows = 0
     let failedCount = 0
     let successCount = 0
@@ -95,7 +94,6 @@ const trackBulkUpload = async(req,res,next)=>{
       res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
       const fieldValue = data['isrc'];
       if (fieldValue) {
-        totalrows++
         if (seen.has(fieldValue)) {
           duplicates.add(fieldValue);
         } else if(!seen.has(fieldValue)){

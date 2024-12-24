@@ -273,6 +273,8 @@ const adminNotificationSchema = new Schema({
     }
 },{timestamps : true})
 
+userSchema.index({ email: 'text', username: 'text', name : 'text' })
+
 
 const admin = mongoose.model('admin',syncAdminSchema)
 
