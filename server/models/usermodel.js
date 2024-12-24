@@ -227,6 +227,14 @@ const syncAdminSchema = new Schema({
         default : 'Admin'
     },
 }, {timestamps : true})
+syncAdminSchema.add({
+    notifications : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : ''
+        }
+    ]
+})
 
 const notificationSchema = new Schema({
     title : {
@@ -250,8 +258,21 @@ const notificationSchema = new Schema({
     }
 },{timestamps : true})
 
-syncUserSchema.index({email : "text", username : "text"})
-userSchema.index({email :  "text", username : "text"})
+const adminNotificationSchema = new Schema({
+    title : {
+        type : String,
+        required : true
+    },
+    message : {
+        type : String,
+        required : true
+    },
+    admin : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'admin'
+    }
+},{timestamps : true})
+
 
 const admin = mongoose.model('admin',syncAdminSchema)
 

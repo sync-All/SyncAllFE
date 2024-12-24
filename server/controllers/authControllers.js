@@ -186,18 +186,18 @@ const profilesetup = async (req, res, next) => {
     const spotifyId = await spotifyChecker.validateSpotifyArtistLink(spotifyLink)
     bodyParams = {...req.body, spotifyId}
     if (!username || !spotifyLink || !bio) {
-      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+      return res.status(401).json({success: false, message: 'Missing field please check and confirm',})
     }  
   }else if(req.user.userType == "Company"){
     const {address, representative, phoneNumber} = req.body;
     if (!address || !representative || !phoneNumber) {
-      return res.status(401).json({success: false,message: 'Missing field please check andconfirm',})
+      return res.status(401).json({success: false,message: 'Missing field please check and confirm',})
     } 
   }
   const userId = req.user._id;
   try {
     await User.findByIdAndUpdate(userId,bodyParams,{ new: true });
-    res.status(200).json({success: true,message: 'Profile update successful'});
+    res.status(200).json({success: true,message: 'Profile setup successful'});
   } catch (error) {
     console.log(error)
     res.send(error)

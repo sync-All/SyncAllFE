@@ -24,7 +24,8 @@ const trackSchema = new Schema({
         },
     isrc : {
         type : String,
-        required : true
+        required : true,
+        unique : true
         },
     featuredArtist : [
         {

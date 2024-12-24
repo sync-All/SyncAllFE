@@ -13,7 +13,6 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'uploaderAccountInfo'
     },
-
     countryReached : {
         type : Number,
         default : 0,
@@ -33,6 +32,21 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
+},{timestamps : true})
+dashboardSchema.add({
+    totalQuotesRequested : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "quote",
+        }
+    ],
+    totalLicensedTracks : [ 
+        {
+            type : Schema.Types.ObjectId,
+            ref : "track_license",
+        }
+        
+    ],
 })
 
 

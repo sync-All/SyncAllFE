@@ -82,14 +82,33 @@ const trackBulkUpload = async(req,res,next)=>{
     let invalidSpotifyLink = []
     let sortedMusicData = []
     let rowCount = 0
+    let totalrows = 0
+    let duplicaterowIdx = []
     let parsedRows = 0
     let failedCount = 0
     let successCount = 0
+    const seen = new Set();
+    const duplicates = new Set();
     fs.createReadStream(req.file.path)
     .pipe(csv.parse({ignoreEmpty : true, headers : ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
     .on('data', (data) => {
-      rowCount++
-      newMuiscData.push(data)
+      res.write(`event: processing\n`);
+      res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
+      const fieldValue = data['isrc'];
+      if (fieldValue) {
+        totalrows++
+        if (seen.has(fieldValue)) {
+          duplicaterowIdx.push(totalrows-1)
+          // newMuiscData.splice(totalrows-1, 1)
+          console.log(newMuiscData.length)
+          duplicates.add(fieldValue);
+        } else if(!seen.has(fieldValue)){
+          rowCount++
+          newMuiscData.push(data);
+          seen.add(fieldValue);
+        }
+      }
+      console.log(newMuiscData.length)
     })
     .on('error', (err) => {
       res.status(400).write(`event: error\n`);
@@ -98,16 +117,22 @@ const trackBulkUpload = async(req,res,next)=>{
       res.status(400).end()
 
     })
-    .on('end', async (rowCount) => {
+    .on('end', async () => {
+      if (duplicates.size > 0) {
+            console.log('Duplicates found:', Array.from(duplicates));
+        } else {
+          console.log('No duplicates found.');
+      }
       res.write(`event: total\n`);
-      res.write(`data: ${JSON.stringify({ rowCount})}\n\n`);
+      res.write(`data: ${JSON.stringify({rowCount})}\n\n`);
       try {
         const spotifyToken = await spotifyCheck.grabSpotifyToken()
+        console.log('here')
+        console.log(newMuiscData.length)
         for(const row of newMuiscData){
           parsedRows++;
           let spotifyresponse = {}
           let confirmTrackUploaded = {}
-
           try {
             spotifyresponse = await spotifyCheck.spotifyResult(row.trackLink, spotifyToken);
             confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
@@ -117,7 +142,7 @@ const trackBulkUpload = async(req,res,next)=>{
               failedCount++
               invalidSpotifyLink.push({...row, message  : error.message, err_type : 'spotify link error', user : req.user._id})
             }else if (error instanceof mongoose.MongooseError){
-              console.log(error)
+              console.log('here')
             }
             continue;
           }
@@ -141,7 +166,11 @@ const trackBulkUpload = async(req,res,next)=>{
         }
         res.write(`event: done\n`);
         res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink})}\n\n`);
-        await Track.insertMany(sortedMusicData)
+        const uploadedTracks = await Track.insertMany(sortedMusicData)
+        console.log(uploadedTracks)
+        await Promise.all(uploadedTracks.map(async (track)=>{
+          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+        }))
         const errorRes = await uploadTrackError.insertMany([...invalidSpotifyLink, ...duplicateData])
         if(errorRes){
           for(let i = 0; i < errorRes.length; i++){
@@ -153,7 +182,11 @@ const trackBulkUpload = async(req,res,next)=>{
         res.end();
     
       } catch (error) {
-        console.log(error)
+        if(error.name == 'MongoBulkWriteError'){
+          res.status(400).write(`event: error\n`);
+          res.end()
+        }
+        // console.log(error)
         fs.unlinkSync(req.file.path)
       }
     });

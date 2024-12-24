@@ -29,14 +29,12 @@ const allAdmin = async (req,res,next)=>{
 
 const userFilter = async (req,res,next)=>{
   try {
-    const {filter} = req.query
-    console.log(filter)
-    const users = await User.find({$text : {$search : 'ibironketomiwa4@gmail.com'}}).exec()
-    // const users = await Promise.all([User.find({$text : {$search : 'd'}}).populate('dashboard')
-    //   .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
-    // SyncUser.find({$text : {$search : 'd'}}).populate('totalLicensedTracks')
-    // .populate('pendingLicensedTracks').select('-password').exec()])
-    res.send({users})
+    const {username} = req.query
+    const users = await Promise.all([User.find({username}).populate('dashboard')
+      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+    SyncUser.find({username}).populate('totalLicensedTracks')
+    .populate('pendingLicensedTracks').select('-password').exec()])
+    res.send({users : [...users[0], ...users[1]]})
   } catch (error) {
     console.log(error)
     throw new BadRequestError('An error occurred, contact dev team')
