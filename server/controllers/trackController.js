@@ -83,7 +83,6 @@ const trackBulkUpload = async(req,res,next)=>{
     let sortedMusicData = []
     let rowCount = 0
     let totalrows = 0
-    let duplicaterowIdx = []
     let parsedRows = 0
     let failedCount = 0
     let successCount = 0
@@ -98,9 +97,6 @@ const trackBulkUpload = async(req,res,next)=>{
       if (fieldValue) {
         totalrows++
         if (seen.has(fieldValue)) {
-          duplicaterowIdx.push(totalrows-1)
-          // newMuiscData.splice(totalrows-1, 1)
-          console.log(newMuiscData.length)
           duplicates.add(fieldValue);
         } else if(!seen.has(fieldValue)){
           rowCount++
@@ -119,16 +115,16 @@ const trackBulkUpload = async(req,res,next)=>{
     })
     .on('end', async () => {
       if (duplicates.size > 0) {
-            console.log('Duplicates found:', Array.from(duplicates));
-        } else {
-          console.log('No duplicates found.');
+        res.write(`event: processing\n`);
+        res.write(`data: ${Array.from(duplicates)} duplicate fields found and have been filtered\n\n`);
+      } else {
+        res.write(`event: processing\n`);
+        res.write(`data: No Duplicates Found\n\n`);
       }
       res.write(`event: total\n`);
       res.write(`data: ${JSON.stringify({rowCount})}\n\n`);
       try {
         const spotifyToken = await spotifyCheck.grabSpotifyToken()
-        console.log('here')
-        console.log(newMuiscData.length)
         for(const row of newMuiscData){
           parsedRows++;
           let spotifyresponse = {}
@@ -167,7 +163,6 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`event: done\n`);
         res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink})}\n\n`);
         const uploadedTracks = await Track.insertMany(sortedMusicData)
-        console.log(uploadedTracks)
         await Promise.all(uploadedTracks.map(async (track)=>{
           await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
         }))
