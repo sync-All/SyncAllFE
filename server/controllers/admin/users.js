@@ -27,19 +27,6 @@ const allAdmin = async (req,res,next)=>{
   }
 }
 
-const userFilter = async (req,res,next)=>{
-  try {
-    const {username} = req.query
-    const users = await Promise.all([User.find({username}).populate('dashboard')
-      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
-    SyncUser.find({username}).populate('totalLicensedTracks')
-    .populate('pendingLicensedTracks').select('-password').exec()])
-    res.send({users : [...users[0], ...users[1]]})
-  } catch (error) {
-    console.log(error)
-    throw new BadRequestError('An error occurred, contact dev team')
-  }
-}
 
 const userSearch = async (req,res,next)=>{
   try {
@@ -67,4 +54,4 @@ const userSearch = async (req,res,next)=>{
   }
 }
 
-module.exports = {allUsers, allAdmin, userFilter, userSearch}
+module.exports = {allUsers, allAdmin, userSearch}
