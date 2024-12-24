@@ -46,12 +46,12 @@ try {
 
 // Utwa()
 
-async function addDashboardToUserSchema(){
+async function toogleTrackUploadStatus(){
   try {
-    const allDashboardDetails = await dashboard.find({}).exec()
-    for(var i = 0; i < allDashboardDetails.length; i++){
-      const updateUserSchema = await User.findByIdAndUpdate(allDashboardDetails[i].user, {dashboard : allDashboardDetails[i]._id}, {new : true})
-      console.log(updateUserSchema)
+    const allDMCETracks = await Track.find({user : '66fa6eb39b6d88aacad97852'}).exec()
+    for(var i = 0; i < allDMCETracks.length; i++){
+      const updateTrack = await Track.findByIdAndUpdate(allDMCETracks[i]._id, {uploadStatus : 'Approved'}, {new : true})
+      console.log(updateTrack.uploadStatus)
     }
     return;
   } catch (error) {
@@ -59,7 +59,7 @@ async function addDashboardToUserSchema(){
   }
 }
 
-addDashboardToUserSchema()
+toogleTrackUploadStatus()
 
 
 // async function addFieldToExistingDocuments() {
