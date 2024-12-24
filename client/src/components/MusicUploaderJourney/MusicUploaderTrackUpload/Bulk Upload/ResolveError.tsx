@@ -139,7 +139,7 @@ const ResolveError = () => {
     );
   }
 
-  const { errors, fileName } = location.state as LocationState;
+  const { errors } = location.state as LocationState;
 
   const loggedInUserId = dashboardData?.profileInfo._id
 
@@ -234,9 +234,7 @@ const ResolveError = () => {
       </div>
 
       <div className="mt-8">
-        <h2 className="text-[24px] font-formular-bold text-[#1D2739] mb-6">
-          Failed Uploads - {fileName}
-        </h2>
+       
         <ErrorTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}

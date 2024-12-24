@@ -9,11 +9,54 @@ import React, {
 } from 'react';
 import { toast } from 'react-toastify';
 
-
 // Interfaces
 interface Activity {
   title: string;
   description: string;
+}
+
+export interface Track {
+  _id: string;
+  audioLang: string;
+  claimBasis: string;
+  composers: string[];
+  copyrightName: string;
+  copyrightYear: number;
+  countryOfRecording: string;
+  countryOfRelease: string;
+  createdAt: string;
+  earnings: number;
+  err_type: string;
+  featuredArtist: string[];
+  featuredInstrument: string[];
+  genre: string;
+  isrc: string;
+  likes: string[];
+  lyrics: string;
+  mainArtist: string;
+  message: string;
+  mood: string[];
+  percentClaim: number;
+  producers: string[];
+  publishers: string[];
+  recordingDate: string;
+  recordingVersion: string;
+  releaseDate: string;
+  releaseDesc: string;
+  releaseLabel: string;
+  releaseTitle: string;
+  releaseType: string;
+  role: string;
+  spotifyArtistIds: string[];
+  tag: string[];
+  trackLink: string;
+  trackTitle: string;
+  upc: number;
+  updatedAt: string;
+  uploadStatus: string;
+  user: string;
+  writers: string[];
+  __v: number;
 }
 
 interface Earnings {
@@ -58,8 +101,9 @@ interface ProfileInfo {
   img: string;
   createdAt: string;
   phoneNumber: number;
-  representative: string
+  representative: string;
   address: string;
+  uploadErrors: Track[];
 }
 
 interface transactions {
@@ -89,8 +133,6 @@ interface ResponseData {
   message?: string;
 }
 
-
-
 // Create Context
 const DashboardDataContext = createContext<DataContextType | undefined>(
   undefined
@@ -107,7 +149,7 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [loading, setLoading] = useState<boolean>(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const [_token, setToken] = useState(localStorage.getItem('token'));
+  const [_token, setToken] = useState(localStorage.getItem('token'));
 
   const fetchDashboardData = useCallback(async () => {
     // const userId = localStorage.getItem('userId');
@@ -158,8 +200,6 @@ const [_token, setToken] = useState(localStorage.getItem('token'));
     </DashboardDataContext.Provider>
   );
 };
-
-
 
 export const useDataContext = () => {
   const context = useContext(DashboardDataContext);
