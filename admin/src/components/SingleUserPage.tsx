@@ -29,7 +29,7 @@ const SingleUserPage = () => {
     const [activeSection, setActiveSection] = useState('Account Overview');
 
     const liClass =
-      'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
+      'text-[#81909D] font-inter text-[14px]  font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
     const activeLiClass = 'border-b border-[#013131] text-[#013131]';
 
     const sections = [

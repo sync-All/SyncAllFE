@@ -199,7 +199,7 @@ const ManageContent = () => {
                     </td>
                     <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
                       <img src={Dot} alt="Dot" />
-                      ACTIVE
+                      {content.uploadStatus}
                     </td>
 
                     <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">

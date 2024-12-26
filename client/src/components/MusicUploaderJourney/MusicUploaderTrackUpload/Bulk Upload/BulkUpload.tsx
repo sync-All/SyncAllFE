@@ -6,9 +6,9 @@ import FileType from '../../../../assets/images/filetype.svg';
 import { useCallback, useState } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import { toast } from 'react-toastify';
-// import axios, { AxiosError } from 'axios';
 import UploadCompletionModal from './UploadCompletionModal';
 import ProceedBulkError from './ProceedBulkError';
+import { useUpload } from '../../../../Context/UploadContext';
 
 interface UploadProgressProps {
   progress: number;
@@ -17,50 +17,6 @@ interface UploadProgressProps {
   currentRow?: number;
   totalRows?: number;
 }
-
-export interface TrackData {
-  releaseType: string;
-  releaseTitle: string;
-  mainArtist: string;
-  featuredArtist: string;
-  trackTitle: string;
-  upc: string;
-  isrc: string;
-  trackLink: string;
-  genre: string;
-  subGenre: string;
-  claimBasis: string;
-  copyrightName: string;
-  copyrightYear: string;
-  audioLang: string;
-  message?: string;
-  err_type?: string;
-  // ... other fields
-}
-
-// Types for the upload response
-// interface UploadResponse {
-//   failedCount: number;
-//   successCount: number;
-//   duplicateData: TrackData[];
-//   invalidSpotifyLink: TrackData[];
-// }
-
-interface UploadStats {
-  fileName: string;
-  fileSize: string;
-  totalTracks: number;
-  failedUploads: number;
-  successfulUploads: number;
-  errors: {
-    duplicates: TrackData[];
-    invalidLinks: TrackData[];
-  };
-}
-
-// interface ResponseData {
-//   message: string;
-// }
 
 const UploadProgress: React.FC<UploadProgressProps> = ({
   progress,
@@ -114,19 +70,10 @@ const BulkUpload = () => {
   const [showConfirmProceedModal, setShowConfirmProceedModal] = useState(false);
   const [currentRow, setCurrentRow] = useState<number>(0);
   const [totalRows, setTotalRows] = useState<number>(0);
-  const [uploadStats, setUploadStats] = useState<UploadStats>({
-    fileName: '',
-    fileSize: '',
-    totalTracks: 0,
-    failedUploads: 0,
-    successfulUploads: 0,
-    errors: {
-      duplicates: [],
-      invalidLinks: [],
-    },
-  });
 
-  const resetUploadState = () => {
+  const { setUploadStats } = useUpload();
+
+  const resetUploadUI = () => {
     setFile(null);
     setIsUploading(false);
     setUploadProgress(0);
@@ -134,17 +81,6 @@ const BulkUpload = () => {
     setCurrentRow(0);
     setTotalRows(0);
     setShowCompletionModal(false);
-    setUploadStats({
-      fileName: '',
-      fileSize: '',
-      totalTracks: 0,
-      failedUploads: 0,
-      successfulUploads: 0,
-      errors: {
-        duplicates: [],
-        invalidLinks: [],
-      },
-    });
   };
 
   const handleProceed = () => {
@@ -219,30 +155,50 @@ const BulkUpload = () => {
             buffer += decoder.decode(value, { stream: true });
             const events = buffer.split('\n\n');
 
-            // Process all complete events
             for (let i = 0; i < events.length - 1; i++) {
               const event = events[i];
               if (!event.trim()) continue;
 
               try {
-                if (event.includes('"parsedRows"')) {
-                  const data = JSON.parse(event.replace('data: ', ''));
-                  const currentRow = data.parsedRows;
-                  const totalRows = data.rowCount;
+                // For processing status events
+                if (event.includes('event: processing')) {
+                  const dataLine = event.split('data:')[1]?.trim();
+                  if (dataLine) {
+                    setUploadStatus(dataLine); // Will show "Scanning and Sorting..." or "No Duplicates Found"
+                  }
+                }
+                // For progress events with row counts
+                else if (
+                  event.includes('data:') &&
+                  event.includes('parsedRows')
+                ) {
+                  const dataLine = event.split('data:')[1].trim();
+                  const data = JSON.parse(dataLine);
 
-                  const percentage = (currentRow / totalRows) * 100;
-                  setUploadProgress(Math.round(percentage));
-                  setUploadStatus(
-                    `Processing ${currentRow} of ${totalRows} rows...`
-                  );
-                  setCurrentRow(currentRow);
-                  setTotalRows(totalRows);
-                } else if (event.startsWith('event: done')) {
-                  const dataLine = event.split('\n')[1].replace('data: ', '');
+                  if (
+                    data.parsedRows !== undefined &&
+                    data.rowCount !== undefined
+                  ) {
+                    const currentRow = data.parsedRows;
+                    const totalRows = data.rowCount;
+
+                    const percentage = (currentRow / totalRows) * 100;
+                    setUploadProgress(Math.round(percentage));
+                    setUploadStatus(
+                      `Processing ${currentRow} of ${totalRows} rows...`
+                    );
+                    setCurrentRow(currentRow);
+                    setTotalRows(totalRows);
+                  }
+                }
+                // For completion event
+                else if (event.includes('event: done')) {
+                  const dataLine = event.split('data:')[1].trim();
                   const data = JSON.parse(dataLine);
 
                   setUploadProgress(100);
                   setUploadStatus('Upload complete!');
+
                   setShowCompletionModal(true);
                   setUploadStats({
                     fileName: uploadedFile.name,
@@ -257,11 +213,10 @@ const BulkUpload = () => {
                   });
                 }
               } catch (parseError) {
-                console.error('Error processing event:', parseError);
+                console.error('Error processing event:', event);
               }
             }
 
-            // Keep the last partial event in the buffer
             buffer = events[events.length - 1];
           }
         } catch (error) {
@@ -404,17 +359,15 @@ const BulkUpload = () => {
         isOpen={showCompletionModal}
         onClose={() => {
           setShowCompletionModal(false);
-          resetUploadState();
+          resetUploadUI();
         }}
-        stats={uploadStats}
         onProceed={handleProceed}
       />{' '}
       <ProceedBulkError
         isOpen={showConfirmProceedModal}
         onClose={() => setShowConfirmProceedModal(false)}
-        stats={uploadStats}
+        source="upload"
       />
-      ;
     </div>
   );
 };

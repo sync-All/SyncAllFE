@@ -31,6 +31,8 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import Currencyformatter from '../helper/currencyformatter';
 import formatToShortCurrency from '../helper/formatToShortCurrency';
+import Dropdown, { Option } from '../constants/Dropdown';
+// import Dropdown from '../constants/Dropdown';
 // import LoadingAnimation from '../../constants/loading-animation';
 
 interface ResponseData {
@@ -66,11 +68,37 @@ const Dashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
   const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
 
+  const dataFilterOptions = [
+    {
+      name: 'This Month',
+      value: '1',
+    },
+    {
+      name: '3 Months',
+      value: '3',
+    },
+    {
+      name: '6 Months',
+      value: '6',
+    },
+    {
+      name: '9 Months',
+      value: '9',
+    },
+    {
+      name: '12 Months',
+      value: '12',
+    },
+  ];
+  const [selectedPeriod, setSelectedPeriod] = useState<Option>({
+    label: dataFilterOptions[0].name,
+    value: String(dataFilterOptions[0].value),
+  });
   useEffect(() => {
     const fetchKeyMetrics = async () => {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/get_key_metrics/?filter=6`;
+      const apiUrl = `${urlVar}/get_key_metrics/?filter=${selectedPeriod.value}`;
       const config = {
         headers: {
           Authorization: `${token}`,
@@ -95,7 +123,7 @@ const Dashboard = () => {
       }
     };
     fetchKeyMetrics();
-  }, [setLoading]);
+  }, [setLoading, selectedPeriod]);
 
   useEffect(() => {
     const fetchTrackDetails = async () => {
@@ -218,10 +246,10 @@ const Dashboard = () => {
       revenue: 'Membership Subscriptions ',
       amt: 2000,
     },
-    {
-      revenue: 'Advertising Revenue',
-      amt: 3000,
-    },
+    // {
+    //   revenue: 'Advertising Revenue',
+    //   amt: 3000,
+    // },
     {
       revenue: 'Platform Service Fees',
       amt: 4000,
@@ -232,14 +260,13 @@ const Dashboard = () => {
     },
   ];
 
-  const getColor = (index:number) => {
+ 
+  const getColor = (index: number) => {
     const colors = ['#037847', '#FF9152', '#5C9BFF', '#9933FF', '#45CFB6'];
     return colors[index % colors.length]; // Repeats colors if there are more segments than colors
   };
 
   const totalAmount = revenueData.reduce((sum, item) => sum + item.amt, 0);
-
-
 
   return (
     <div ref={targetRef} className="mb-[91px]">
@@ -255,7 +282,18 @@ const Dashboard = () => {
             </h1>
           </span>
           <div className="hidden lg:flex gap-[16px]">
-            <button className="flex bg-[#EFA705] p-[10px] gap-[8px] rounded-[5px]">
+            <Dropdown
+              options={dataFilterOptions.map((option) => ({
+                label: option.name,
+                value: String(option.value),
+              }))}
+              defaultValue={selectedPeriod}
+              onChange={(option) => setSelectedPeriod(option)}
+              className="rounded-[6px] text-[#0D0F11] text-[16px] font-inter min-h-full"
+              placeholder={<div>This Month</div>}
+            />
+
+            <button className="flex bg-[#EFA705] items-center p-[10px] gap-[8px] rounded-[5px]">
               <img src={Folder} alt=""></img>
               <button onClick={() => toPDF()}>Download PDF</button>
             </button>
@@ -319,29 +357,14 @@ const Dashboard = () => {
               </p>
 
               <div className="flex gap-[18px] items-center justify-end absolute right-0">
-                <select
-                  name=""
-                  id=""
-                  className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
-                >
-                  <option value="" className="">
-                    Total Earning
-                  </option>
-                </select>
-                <select
-                  name=""
-                  id=""
-                  className="rounded-[6px] border border-[#6D7D93] px-[19px] py-[8px] text-[#6D7D93] text-[11px] font-formular-regular"
-                >
-                  <option value="">Monthly</option>
-                </select>
+              
               </div>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart width={730} height={250} data={data}>
                   <XAxis dataKey="name" stroke="#013131" />
                   <YAxis />
                   <Tooltip />
-                  <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                  <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false}/>
                   <Bar
                     dataKey="No of registered user"
                     fill="#013131"
@@ -479,10 +502,10 @@ const Dashboard = () => {
                   <div className="min-w-4 h-4 rounded-[4px] bg-[#FF9152]"></div>
                   <p>Subscriptions </p>
                 </div>
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                   <div className="min-w-4 h-4 rounded-[4px] bg-[#5C9BFF]"></div>
                   <p>Advertising Revenue</p>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-2">
                   <div className="min-w-4 h-4 rounded-[4px] bg-[#9933FF]"></div>
                   <p>Platform Service Fees</p>

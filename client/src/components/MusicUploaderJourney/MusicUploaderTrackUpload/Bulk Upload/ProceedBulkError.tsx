@@ -2,46 +2,29 @@ import React from 'react';
 import Modal from 'react-modal';
 import Warning from '../../../../assets/images/warning.svg';
 import { useNavigate } from 'react-router-dom';
-import { TrackData } from './BulkUpload';
+import { useUpload } from '../../../../Context/UploadContext';
 
 interface ProceedBulkErrorProps {
   isOpen: boolean;
   onClose: () => void;
-  stats?: {
-    fileName: string;
-    fileSize: string;
-    totalTracks: number;
-    failedUploads: number;
-    successfulUploads: number;
-    errors: {
-      duplicates: TrackData[];
-      invalidLinks: TrackData[];
-    };
-  };
   errorCount?: number;
+  source: 'upload' | 'resolve';
 }
 
 const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
   isOpen,
   onClose,
-  stats,
   errorCount,
+  source,
 }) => {
-  const isFromUpload = !!stats;
-  const isFromResolve = errorCount !== undefined;
+  const { uploadStats } = useUpload();
+   const isFromUpload = source === 'upload';
+   const isFromResolve = source === 'resolve';
 
   const navigate = useNavigate();
 
   const handleResolveErrors = () => {
-    navigate('/dashboard/bulk-upload/resolve-errors', {
-      state: {
-        errors: {
-          duplicates: stats?.errors.duplicates,
-          invalidLinks: stats?.errors.invalidLinks,
-        },
-        fileName: stats?.fileName,
-      },
-    });
+    navigate('/dashboard/bulk-upload/resolve-errors');
     onClose();
   };
   return (
@@ -69,7 +52,7 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
             <>
               <p className="text-[24px] leading-[28px] font-Utile-regular  text-[#013131] tracking-[-0.96px] mt-[23px]">
                 You have{' '}
-                <span className="font-semibold">{stats.failedUploads}</span>{' '}
+                <span className="font-semibold">{uploadStats?.failedUploads}</span>{' '}
                 unresolved errors in your upload. Proceeding without fixing
                 these errors may result in incomplete or incorrect uploads. Are
                 you sure you want to continue?

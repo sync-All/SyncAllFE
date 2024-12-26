@@ -5,8 +5,8 @@ import usePagination from '../../../../hooks/usePaginate';
 import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
-import { TrackData } from './ResolveError';
 import React, { useMemo, useState } from 'react';
+import { TrackData } from '../../../../Context/UploadContext';
 
 // SortButton.tsx
 interface SortButtonProps {
