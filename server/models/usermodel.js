@@ -82,7 +82,7 @@ const userSchema = new Schema({
         enum : ['Active', 'Inactive'],
         default : 'Active'
     },
-    uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadTrackError'}]
+    uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadErrorHistory'}]
 }, {timestamps : true})
 userSchema.add({
     dashboard : {
@@ -273,7 +273,6 @@ const adminNotificationSchema = new Schema({
     }
 },{timestamps : true})
 
-userSchema.index({ email: 'text', username: 'text', name : 'text' })
 
 
 const admin = mongoose.model('admin',syncAdminSchema)

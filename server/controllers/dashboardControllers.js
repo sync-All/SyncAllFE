@@ -8,7 +8,6 @@ const Dispute = require('../models/dashboard.model').dispute
 const Ticket = require('../models/dashboard.model').ticket
 const {v4 : uuidv4} = require('uuid')
 const fs = require("node:fs")
-const { request } = require("node:http")
 require('dotenv').config()
 
 cloudinary.config({

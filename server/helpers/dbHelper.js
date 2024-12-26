@@ -2,7 +2,8 @@ const Track = require("../models/track.model").track;
 const dashboard = require('../models/dashboard.model').dashboard
 const User = require('../models/usermodel').uploader
 const mongoose = require("mongoose");
-const { grabSpotifyToken, spotifyResult } = require("../utils/spotify")
+const { grabSpotifyToken, spotifyResult } = require("../utils/spotify");
+const { uploadErrorHistory } = require("../models/track.model");
 require('dotenv').config
 
 
@@ -17,7 +18,7 @@ try {
   }
   
   async function main(){
-    await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+    await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
     return
   }
 
@@ -48,11 +49,12 @@ try {
 
 async function toogleTrackUploadStatus(){
   try {
-    const allDMCETracks = await Track.find({user : '66fa6eb39b6d88aacad97852'}).exec()
-    for(var i = 0; i < allDMCETracks.length; i++){
-      const updateTrack = await Track.findByIdAndUpdate(allDMCETracks[i]._id, {uploadStatus : 'Approved'}, {new : true})
-      console.log(updateTrack.uploadStatus)
-    }
+    const {uploadErrors} = await User.findOne({_id : '675824cd97dc98e98eaa6c04'}).exec()
+    await Promise.all(uploadErrors.map(async(history)=>{
+      const result = await uploadErrorHistory.findByIdAndUpdate(history, {user : '675824cd97dc98e98eaa6c04'}, {new : true})
+
+      console.log(result)
+    }))
     return;
   } catch (error) {
     console.log(error)
@@ -61,7 +63,12 @@ async function toogleTrackUploadStatus(){
 
 toogleTrackUploadStatus()
 
-
+// async function clearUploadErrors(){
+//   const user = await User.findByIdAndUpdate('675824cd97dc98e98eaa6c04',{$set : {uploadErrors : []}}, {new : true})
+//   console.log(user)
+//   return
+// }
+// clearUploadErrors()
 // async function addFieldToExistingDocuments() {
 //   try {
 //       const result = await dashboard.updateMany(
