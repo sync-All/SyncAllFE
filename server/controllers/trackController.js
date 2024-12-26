@@ -6,8 +6,10 @@ const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError } = req
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
 const csv = require('fast-csv');
+const  {writeToBuffer} = require('@fast-csv/format');
 const mongoose = require('mongoose')
-const { uploadTrackError } = require("../models/track.model")
+const { trackError, uploadErrorHistory } = require("../models/track.model")
+const {v4 : uuidv4} = require('uuid')
 require('dotenv').config()
 
 
@@ -87,8 +89,9 @@ const trackBulkUpload = async(req,res,next)=>{
     let successCount = 0
     const seen = new Set();
     const duplicates = new Set();
+    const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
     fs.createReadStream(req.file.path)
-    .pipe(csv.parse({ignoreEmpty : true, headers : ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc'], renameHeaders: true }))
+    .pipe(csv.parse({ignoreEmpty : true, headers : allowedHeaders, renameHeaders: true }))
     .on('data', (data) => {
       res.write(`event: processing\n`);
       res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
@@ -102,7 +105,6 @@ const trackBulkUpload = async(req,res,next)=>{
           seen.add(fieldValue);
         }
       }
-      console.log(newMuiscData.length)
     })
     .on('error', (err) => {
       res.status(400).write(`event: error\n`);
@@ -134,7 +136,7 @@ const trackBulkUpload = async(req,res,next)=>{
             if(error instanceof spotifyError){
               res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
               failedCount++
-              invalidSpotifyLink.push({...row, message  : error.message, err_type : 'spotify link error', user : req.user._id})
+              invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id})
             }else if (error instanceof mongoose.MongooseError){
               console.log('here')
             }
@@ -145,7 +147,7 @@ const trackBulkUpload = async(req,res,next)=>{
             res.write(`event: warning duplicate data\n`);
             res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
             failedCount++
-            duplicateData.push({...row, trackOwner : confirmTrackUploaded.user._id, message : 'Duplicate data found', err_type : 'duplicate', user : req.user._id})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
             continue;
           }
           res.write(`event: progress\n`);
@@ -154,23 +156,44 @@ const trackBulkUpload = async(req,res,next)=>{
           row.spotifyLink = spotifyresponse.spotifyLink
           row.user = req.user.id
           row.trackLink = spotifyresponse.preview_url
+          row.artWork = spotifyresponse.artwork
           row.duration = spotifyresponse.duration
           successCount++
           sortedMusicData.push(row)
         }
-        res.write(`event: done\n`);
-        res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink})}\n\n`);
         const uploadedTracks = await Track.insertMany(sortedMusicData)
         await Promise.all(uploadedTracks.map(async (track)=>{
           await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
         }))
-        const errorRes = await uploadTrackError.insertMany([...invalidSpotifyLink, ...duplicateData])
-        if(errorRes){
-          for(let i = 0; i < errorRes.length; i++){
-            await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : errorRes[i]._id}}).exec()
-
+        let fileBuffer;
+        if(invalidSpotifyLink.length > 0 || duplicateData.length > 0){
+          if(invalidSpotifyLink.length > 0){
+            let errorFile = [
+              [...allowedHeaders, 'message', 'err_type', 'user'],
+              ...invalidSpotifyLink
+            ]
+            fileBuffer = await writeToBuffer(errorFile)
           }
+          res.write(`event: progress\n`);
+          res.write(`data: Cleaning up\n\n`);
+          const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+          const errorIds = errorRes.map((error)=> error._id)
+          const uploadHistory = new uploadErrorHistory({
+            uploadId : `UI_${uuidv4()}`,
+            associatedErrors : errorIds,
+            filename : req.file.originalname,
+            fileBuffer
+          })
+          await uploadHistory.save().then(async(res)=>{
+            await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()
+          })
         }
+
+        const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
+
+        res.write(`event: done\n`);
+        res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink, errorCsv })}\n\n`);
+
         fs.unlinkSync(req.file.path)
         res.end();
     
@@ -179,7 +202,7 @@ const trackBulkUpload = async(req,res,next)=>{
           res.status(400).write(`event: error\n`);
           res.end()
         }
-        // console.log(error)
+        console.log(error)
         fs.unlinkSync(req.file.path)
       }
     });

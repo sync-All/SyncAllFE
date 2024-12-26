@@ -17,7 +17,7 @@ try {
   }
   
   async function main(){
-    await mongoose.connect( process.env.NODE_ENV == 'test' ? mongoTestString :  mongoString)
+    await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
     return
   }
 
@@ -46,22 +46,27 @@ try {
 
 // Utwa()
 
-async function toogleTrackUploadStatus(){
-  try {
-    const allDMCETracks = await Track.find({user : '66fa6eb39b6d88aacad97852'}).exec()
-    for(var i = 0; i < allDMCETracks.length; i++){
-      const updateTrack = await Track.findByIdAndUpdate(allDMCETracks[i]._id, {uploadStatus : 'Approved'}, {new : true})
-      console.log(updateTrack.uploadStatus)
-    }
-    return;
-  } catch (error) {
-    console.log(error)
-  }
-}
+// async function toogleTrackUploadStatus(){
+//   try {
+//     const allDMCETracks = await Track.find({user : '66fa6eb39b6d88aacad97852'}).exec()
+//     for(var i = 0; i < allDMCETracks.length; i++){
+//       const updateTrack = await Track.findByIdAndUpdate(allDMCETracks[i]._id, {uploadStatus : 'Approved'}, {new : true})
+//       console.log(updateTrack.uploadStatus)
+//     }
+//     return;
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 
-toogleTrackUploadStatus()
+// toogleTrackUploadStatus()
 
-
+// async function clearUploadErrors(){
+//   const user = await User.findByIdAndUpdate('675824cd97dc98e98eaa6c04',{$set : {uploadErrors : []}}, {new : true})
+//   console.log(user)
+//   return
+// }
+// clearUploadErrors()
 // async function addFieldToExistingDocuments() {
 //   try {
 //       const result = await dashboard.updateMany(

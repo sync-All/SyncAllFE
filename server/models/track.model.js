@@ -183,8 +183,8 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
-const uploadTrackErrorSchema = new Schema()
-uploadTrackErrorSchema.add(trackSchema).add({mainArtist : {
+const trackErrorSchema = new Schema()
+trackErrorSchema.add(trackSchema).add({mainArtist : {
     type : String,
     required : false
 },
@@ -210,10 +210,40 @@ isrc : {
     }, message : String, user : {
         type : Schema.Types.ObjectId,
         ref : "user"
-    }, err_type : String, trackOwner : {
+    }, err_type : String, 
+    trackOwner : {
         type : Schema.Types.ObjectId,
         ref : "user"
-    }})
+    }
+    
+})
+
+const uploadErrorHistorySchema =  new Schema({
+    uploadId : {
+        type : String
+    },
+    associatedErrors : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : 'trackError'
+        }
+    ],
+    filename : {
+        type : String,
+        required : true
+    },
+    status : {
+        type : String,
+        enum : ['Partially Processed', 'Not Processed'],
+        default : 'Not Processed'
+    },
+    fileBuffer : {
+        type : Buffer,
+    },
+    fileType : {
+        type : String,
+    },
+},{timestamps : true})
 
 
 const trackLicenseSchema = new Schema({
@@ -252,14 +282,13 @@ const trackLicenseSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
-
 },{timestamps : true})
 
 trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const track = mongoose.model('track', trackSchema)
-const uploadTrackError = mongoose.model('uploadTrackError', uploadTrackErrorSchema)
+const trackError = mongoose.model('trackError', trackErrorSchema)
+const uploadErrorHistory = mongoose.model('uploadErrorHistory', uploadErrorHistorySchema)
 const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 
-
-module.exports = {track, trackLicense, uploadTrackError}
+module.exports = {track, trackLicense, trackError, uploadErrorHistory}

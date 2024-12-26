@@ -132,15 +132,12 @@ const disputeSchema = new Schema({
     issueType : {
         type : String
     },
-
     desc : {
         type : String
     },
-
     supportingDoc : {
         type : Buffer
     },
-
     supportingDocType : {
         type : String
     },
@@ -164,7 +161,6 @@ const disputeSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'user'
     }
-
 },{timestamps : true})
 
 const dashboard = mongoose.model('dashboard',dashboardSchema)
