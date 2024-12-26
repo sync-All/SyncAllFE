@@ -34,6 +34,7 @@ const trackSchema = new Schema({
     ],
     upc : {
         type : Number,
+        unique : false
         // required : true
     },
     genre : {
