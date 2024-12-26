@@ -30,7 +30,6 @@ const trackUpload = async(req,res,next)=>{
   if(req.user.role == "Music Uploader"){
     const {trackLink} = req.body
     let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
-    console.log(spotifyresponse)
     const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
     if(confirmTrackUploaded){
         res.status(401).json('Track already exists')
@@ -43,6 +42,10 @@ const trackUpload = async(req,res,next)=>{
         track.save()
         .then(async (track)=>{
           await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+          if(songInfo.err_type && songInfo._id){
+            await trackError.findByIdAndDelete(songInfo._id)
+            await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+          }
           fs.unlinkSync(req.file.path)
           res.status(200).json({success : true, message : 'Music Information has been successfully added'})
         })
@@ -96,10 +99,10 @@ const trackBulkUpload = async(req,res,next)=>{
       res.write(`event: processing\n`);
       res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
       const fieldValue = data['isrc'];
-      if (fieldValue) {
-        if (seen.has(fieldValue)) {
+      if (fieldValue){
+        if (seen.has(fieldValue)){
           duplicates.add(fieldValue);
-        } else if(!seen.has(fieldValue)){
+        }else if(!seen.has(fieldValue)){
           rowCount++
           newMuiscData.push(data);
           seen.add(fieldValue);
@@ -182,7 +185,8 @@ const trackBulkUpload = async(req,res,next)=>{
             uploadId : `UI_${uuidv4()}`,
             associatedErrors : errorIds,
             filename : req.file.originalname,
-            fileBuffer
+            fileBuffer,
+            user : req.user._id
           })
           await uploadHistory.save().then(async(res)=>{
             await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()

@@ -235,7 +235,7 @@ const uploadErrorHistorySchema =  new Schema({
     },
     status : {
         type : String,
-        enum : ['Partially Processed', 'Not Processed'],
+        enum : ['Partially Processed', 'Not Processed', 'Processed'],
         default : 'Not Processed'
     },
     fileBuffer : {
@@ -244,6 +244,10 @@ const uploadErrorHistorySchema =  new Schema({
     fileType : {
         type : String,
     },
+    user : {
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    }
 },{timestamps : true})
 
 
