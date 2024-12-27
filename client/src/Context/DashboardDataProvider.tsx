@@ -57,6 +57,11 @@ export interface Track {
   user: string;
   writers: string[];
   __v: number;
+  uploadId: string;
+  filename: string;
+  errorCount: number;
+  associatedErrors: string[];
+  status: string
 }
 
 interface Earnings {

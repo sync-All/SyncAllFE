@@ -356,15 +356,17 @@ const Dashboard = () => {
                 Number of New Users
               </p>
 
-              <div className="flex gap-[18px] items-center justify-end absolute right-0">
-              
-              </div>
+              <div className="flex gap-[18px] items-center justify-end absolute right-0"></div>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart width={730} height={250} data={data}>
                   <XAxis dataKey="name" stroke="#013131" />
                   <YAxis />
                   <Tooltip />
-                  <CartesianGrid stroke="#ccc" strokeDasharray="5 5" vertical={false}/>
+                  <CartesianGrid
+                    stroke="#ccc"
+                    strokeDasharray="5 5"
+                    vertical={false}
+                  />
                   <Bar
                     dataKey="No of registered user"
                     fill="#013131"
@@ -373,7 +375,7 @@ const Dashboard = () => {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex gap-2.5 mt-4 mb-8">
+            {/* <div className="flex gap-2.5 mt-4 mb-8">
               <div className="py-3 px-4 bg-[#F9F9F9] rounded-[8px] flex-1">
                 <p className="text-[#5e5e5e] font-inter text-[14px] font-medium leading-5">
                   In <span className="text-yellow">May,</span> you experienced
@@ -388,7 +390,7 @@ const Dashboard = () => {
                   <span className="text-yellow">304</span>
                 </p>
               </div>
-            </div>
+            </div> */}
             {/* ) : (
               <div className="text-center mt-9 text-[16px] leading-[20px] py-6">
                 <img src={NoEarning} alt="" className="mx-auto" />
@@ -401,12 +403,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <section>
+        <section className="mt-8">
           <div className="flex justify-between items-center">
             <p className="text-[18px] font-inter font-medium leading-[30px] ">
               Revenue Breakdown by Activity
             </p>
-            <select
+            {/* <select
               name=""
               id=""
               className="rounded-[8px] border border-[#DADCE0] px-3 py-2 text-[#5E5E5E] text-[14px] font-formular-regular leading-10"
@@ -414,7 +416,7 @@ const Dashboard = () => {
               <option value="" className="">
                 All time{' '}
               </option>
-            </select>
+            </select> */}
           </div>
           <div className="flex mt-[21px] flex-col md:flex-row gap-6">
             <div className="flex-1">

@@ -9,7 +9,8 @@ import NoTrack from '../../assets/images/no_track.svg';
 import usePagination from '../../hooks/usePaginate';
 import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
-
+import { useLocation } from 'react-router-dom';
+//  
 // Types
 interface SortConfig {
   key: keyof Track | null;
@@ -203,6 +204,8 @@ const ErrorTracksTable: React.FC<TableProps> = ({
   sortConfig,
   onSort,
 }) => {
+  // const navigate = useNavigate();
+
   const sortedTracks = useMemo(() => {
     return [...tracks].sort((a, b) => {
       if (!sortConfig.key) return 0;
@@ -240,14 +243,90 @@ const ErrorTracksTable: React.FC<TableProps> = ({
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
+
+  const truncateText = (text: string, length: number) => {
+    if (text.length <= length) return text;
+    return text.slice(0, length);
+  };
 
   return (
     <>
-      <TrackTable
-        tracks={paginatedItems}
-        sortConfig={sortConfig}
-        onSort={onSort}
-      />
+      <table className="w-full mt-5">
+        <thead>
+          <tr>
+            <th className={ThStyles}>
+              Upload ID
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="uploadId"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Filename
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="filename"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Upload Date
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="createdAt"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Number of Errors
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="errorCount"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>Status</th>
+            {/* <th className={ThStyles}>Error Details</th> */}
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedItems.map((track) => (
+            <tr key={track._id} className="hover:bg-gray-50">
+              <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8 uppercase">
+                <span className="font-inter">#</span>
+                <span className="capilatize">
+                  {truncateText((track.uploadId), 11)}
+                </span>
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {track.filename}
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {new Date(track.createdAt).toLocaleDateString()}
+              </td>
+              <td className="py-4 px-8">
+                <span className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {track.associatedErrors.length}
+                </span>
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {track.status}
+              </td>
+              {/* <td className="py-4 px-8">
+                <button
+                  // onClick={() => navigate(`/error-details/${track._id}`)}
+                  className="text-[#1671D9] hover:text-blue-800 font-inter"
+                >
+                  View
+                </button>
+              </td> */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <div className="flex items-center justify-between lg:mx-8 gap-3 mt-[96px] ">
         <div className="flex gap-3 items-center">
           <p>
@@ -381,7 +460,6 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
 const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   onTabChange,
 }) => {
-  const [activeTab, setActiveTab] = useState<'All' | 'Error'>('All');
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: 'ascending',
@@ -391,7 +469,10 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   const allTracks = dashboardData?.dashboardDetails.totalTracks || [];
   const errorTracks = dashboardData?.profileInfo.uploadErrors || [];
 
-  console.log(errorTracks);
+   const location = useLocation();
+   const [activeTab, setActiveTab] = useState<'All' | 'Error'>(
+     location.state?.activeTab || 'All'
+   );
 
   const handleSort = (key: keyof Track) => {
     setSortConfig((current) => ({

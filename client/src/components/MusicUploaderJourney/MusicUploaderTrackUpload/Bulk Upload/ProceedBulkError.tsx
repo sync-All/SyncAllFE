@@ -27,6 +27,11 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
     navigate('/dashboard/bulk-upload/resolve-errors');
     onClose();
   };
+
+  const handleErrorClick = () => {
+    navigate('/dashboard/tracks', { state: { activeTab: 'Error' } });
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -52,7 +57,9 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
             <>
               <p className="text-[24px] leading-[28px] font-Utile-regular  text-[#013131] tracking-[-0.96px] mt-[23px]">
                 You have{' '}
-                <span className="font-semibold">{uploadStats?.failedUploads}</span>{' '}
+                <span className="font-semibold">
+                  {uploadStats?.failedUploads}
+                </span>{' '}
                 unresolved errors in your upload. Proceeding without fixing
                 these errors may result in incomplete or incorrect uploads. Are
                 you sure you want to continue?
@@ -64,7 +71,10 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
                 >
                   Resolve Errors
                 </button>
-                <button className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] ">
+                <button
+                  className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] "
+                  onClick={handleErrorClick}
+                >
                   Proceed Anyway
                 </button>
               </div>
@@ -73,8 +83,7 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
           {isFromResolve && (
             <>
               <p className="text-[24px] leading-[28px] font-Utile-regular  text-[#013131] tracking-[-0.96px] mt-[23px]">
-                You have{' '}
-                <span className="font-semibold">{errorCount}</span>{' '}
+                You have <span className="font-semibold">{errorCount}</span>{' '}
                 unresolved errors in your upload. Proceeding without fixing
                 these errors may result in incomplete or incorrect uploads. Are
                 you sure you want to continue?
