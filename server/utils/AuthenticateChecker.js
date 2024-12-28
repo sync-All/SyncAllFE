@@ -31,8 +31,42 @@ const checkUser = (req,res,next)=>{
         if (user.role !== 'Music Uploader' || user.role !== "Sync User") {
             return next(new ForbiddenError('Attempt Forbidden'));
         }
+        req.user = user
         return next();
     })(req,res,next)
 }
 
-module.exports = {checkAdmin, checkUser}
+const checkUploader = (req,res,next)=>{
+    passport.authenticate('jwt',{session : false},(err,user,info)=>{
+        if(info && info.name == "TokenExpiredError"){
+           return next(new TokenExpiredError('Session expired, proceed to login'))
+        }
+        if(err || !user){
+            console.log(err)
+            return next(new unauthorizedError('Authentication failed'));
+        }
+        if (user.role !== 'Music Uploader') {
+            return next(new ForbiddenError('Attempt Forbidden'));
+        }
+        req.user = user
+        return next();
+    })(req,res,next)
+}
+
+const checkSyncUser = (req,res,next)=>{
+    passport.authenticate('jwt',{session : false},(err,user,info)=>{
+        if(info && info.name == "TokenExpiredError"){
+           return next(new TokenExpiredError('Session expired, proceed to login'))
+        }
+        if(err || !user){
+            console.log(err)
+            return next(new unauthorizedError('Authentication failed, not Authorized!'));
+        }
+        if (user.role !== "Sync User") {
+            return next(new ForbiddenError('Attempt Forbidden'));
+        }
+        req.user = user
+        return next();
+    })(req,res,next)
+}
+module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser}

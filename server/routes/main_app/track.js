@@ -9,6 +9,7 @@ const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
+const { checkUploader } = require("../../utils/AuthenticateChecker");
 
 
 router.get(
@@ -39,6 +40,7 @@ router.post(
   bulkUpload,
   asyncHandler(trackController.trackBulkUpload)
 );
+
 
 router.get(
   "/allsongs",
