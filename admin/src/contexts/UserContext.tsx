@@ -42,6 +42,14 @@ export interface Track {
   license_type: string;
 }
 
+interface UserDashboard {
+  countryReached: number;
+  earnings: string[];
+  totalTracks: string[];
+  totalQuotesRequested: string[];
+  totalLicensedTracks: string[]
+}
+
 interface Billing {
   amount: number
   plan: string
@@ -70,6 +78,7 @@ export interface User {
   upcomingRenewals: number;
   pendingLicensedTracks: Track[];
   billing: Billing
+  dashboard: UserDashboard
 }
 
 // UserContext.tsx

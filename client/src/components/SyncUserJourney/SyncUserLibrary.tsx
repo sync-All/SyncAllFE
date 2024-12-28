@@ -11,7 +11,6 @@ import Copy from '../../assets/images/copy-link.svg';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import Liked from '../../assets/images/liked.svg';
-import MusicSearch from './MusicSearch';
 import { useSyncUser } from '../../Context/syncUserData';
 import MusicPlayer from '../MusicPlayer';
 import LoadingAnimation from '../../constants/loading-animation';
@@ -80,19 +79,8 @@ const SyncUserLibrary: React.FC = () => {
     return <LoadingAnimation />;
   }
 
-  if (!trackAdded || trackAdded.length === 0) {
-    return (
-      <div className="flex items-center justify-center">
-        <p className="text-[#475367] font-Utile-regular text-[16px] leading-[24px]">
-          You have no liked tracks in your library
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="px-5 xl:px-20 mb-[221px]">
-      <MusicSearch />
       <div>
         <div className="relative mt-[55px]">
           <span className="w-full">
@@ -117,81 +105,89 @@ const SyncUserLibrary: React.FC = () => {
           Tracks List
         </h3>
         <div className="hidden flex-col gap-[56px] lg:flex">
-          {trackAdded.map((detail, index) => (
-            <div key={index} className="flex items-center w-full ">
-              <Link
-                to={`/metadata/${detail?._id}`}
-                className="flex gap-3 w-[25%]"
-              >
-                <img
-                  src={detail.artWork}
-                  alt=""
-                  className="h-[50px] w-[50px] object-cover "
-                />
-                <span>
-                  <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                    {detail.trackTitle}
-                  </h4>
-                  <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                    {detail.mainArtist}
-                  </p>
-                </span>
-              </Link>
-              <MusicPlayer
-                trackLink={detail.trackLink}
-                songId={detail._id}
-                duration={30}
-                containerStyle="mt-0 flex items-center gap-3"
-                buttonStyle="w-4 cursor-pointer"
-                waveStyle="w-[300px]"
-              />
-
-              <span className="flex gap-12 w-[25%] items-start ml-[5%]">
-                <span className="w-[50%]">
-                  <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                    {detail.duration || 'N/A'}
-                  </p>
-                  <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail.producers || 'N/A'}
-                  </p>
-                </span>
-                <span className="w-[50%]">
-                  <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                    {detail.genre}
-                  </p>
-                  <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                    {detail.mood.join(', ')}
-                  </p>
-                </span>
-              </span>
-              <span className="flex gap-6 w-[10%] justify-center">
-                <button
-                  onClick={() => unlike(detail._id)}
-                  className="cursor-pointer"
+          {trackAdded.length > 0 ? (
+            trackAdded.map((detail, index) => (
+              <div key={index} className="flex items-center w-full ">
+                <Link
+                  to={`/metadata/${detail?._id}`}
+                  className="flex gap-3 w-[25%]"
                 >
-                  <img src={Liked} alt="Like" />
-                </button>
-                <img
-                  src={Copy}
-                  onClick={() => handleCopyLink(detail._id)}
-                  alt=""
-                  className="cursor-pointer"
+                  <img
+                    src={detail.artWork}
+                    alt=""
+                    className="h-[50px] w-[50px] object-cover "
+                  />
+                  <span>
+                    <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
+                      {detail.trackTitle}
+                    </h4>
+                    <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
+                      {detail.mainArtist}
+                    </p>
+                  </span>
+                </Link>
+                <MusicPlayer
+                  trackLink={detail.trackLink}
+                  songId={detail._id}
+                  duration={30}
+                  containerStyle="mt-0 flex items-center gap-3"
+                  buttonStyle="w-4 cursor-pointer"
+                  waveStyle="w-[300px]"
                 />
-              </span>
-              <span className="gap-[12px] flex w-[25%] justify-center">
-                <Link to={`/metadata/${detail?._id}`}>
-                  <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    View More
+
+                <span className="flex gap-12 w-[25%] items-start ml-[5%]">
+                  <span className="w-[50%]">
+                    <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
+                      {detail.duration || 'N/A'}
+                    </p>
+                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
+                      {detail.producers || 'N/A'}
+                    </p>
+                  </span>
+                  <span className="w-[50%]">
+                    <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
+                      {detail.genre}
+                    </p>
+                    <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
+                      {detail.mood.join(', ')}
+                    </p>
+                  </span>
+                </span>
+                <span className="flex gap-6 w-[10%] justify-center">
+                  <button
+                    onClick={() => unlike(detail._id)}
+                    className="cursor-pointer"
+                  >
+                    <img src={Liked} alt="Like" />
                   </button>
-                </Link>
-                <Link to={`/quote/${detail._id}`}>
-                  <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                    License
-                  </button>
-                </Link>
-              </span>
+                  <img
+                    src={Copy}
+                    onClick={() => handleCopyLink(detail._id)}
+                    alt=""
+                    className="cursor-pointer"
+                  />
+                </span>
+                <span className="gap-[12px] flex w-[25%] justify-center">
+                  <Link to={`/metadata/${detail?._id}`}>
+                    <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      View More
+                    </button>
+                  </Link>
+                  <Link to={`/quote/${detail._id}`}>
+                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
+                      License
+                    </button>
+                  </Link>
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="flex items-center justify-center">
+              <p className="text-[#475367] font-Utile-regular text-[16px] leading-[24px]">
+                You have no liked tracks in your library
+              </p>
             </div>
-          ))}
+          )}
         </div>
         {/* Mobile */}
         <div className="lg:hidden flex flex-col gap-6">

@@ -5,8 +5,11 @@ import usePagination from '../../../../hooks/usePaginate';
 import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
-import { TrackData } from './ResolveError';
 import React, { useMemo, useState } from 'react';
+import { TrackData } from '../../../../Context/UploadContext';
+// import Download from '../../../../assets/images/download.svg';
+// import Upload from '../../../../assets/images/Upload.svg';
+
 
 // SortButton.tsx
 interface SortButtonProps {
@@ -150,6 +153,7 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
               ))}
             </tbody>
           </table>
+          <div></div>
           <div className="flex items-center  justify-between mx-[25%] gap-3 mt-[196px] ">
             <div className="flex gap-3 items-center">
               <p>
@@ -213,6 +217,26 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
           <p className="font-Utile-medium mt-6 text-[16px] text-[#98A2B3]">
             No duplicate uploads by you found
           </p>
+
+          {/* <div className="text-center mt-6">
+            <div className="flex items-center justify-center space-x-4">
+              <button className="flex items-center text-blue-600 hover:underline">
+                <a href=""></a>
+                Download Error Sheet
+                <img src={Download} alt="" />
+              </button>
+
+              <button className="flex items-center text-gray-900 hover:underline">
+                Re-upload Corrected Sheet
+                <img src={Upload} alt="" />
+              </button>
+            </div>
+
+            <p className="text-gray-600 mt-2 text-sm">
+              Download the sheet to correct invalid Spotify links. Once
+              corrected, upload it here.
+            </p>
+          </div> */}
         </div>
       )}
     </>

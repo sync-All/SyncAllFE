@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-interface Option {
+export interface Option {
   value: string;
   label: string | ReactNode;
 }
@@ -49,7 +49,7 @@ const Dropdown = ({
           w-full flex items-center justify-between px-4 py-2 
           text-left bg-white border rounded-md shadow-sm gap-2
           ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-50'}
-          focus:outline-none focus:ring-2 focus:ring-black
+          focus:outline-none focus:ring-2 focus:ring-grey-300
         `}
       >
         <div className={!selected ? 'text-gray-400' : ''}>
@@ -75,7 +75,7 @@ const Dropdown = ({
                 w-full px-4 py-2 text-left 
                 ${
                   selected?.value === option.value
-                    ? 'bg-blue-50 text-blue-700'
+                    ? 'bg-[#e0b078]'
                     : 'hover:bg-gray-100'
                 }
                 first:rounded-t-md last:rounded-b-md

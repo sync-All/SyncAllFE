@@ -16,6 +16,7 @@ import ProfileMultiStep from '../components/MusicUploaderJourney/MusicUploaderUs
 import MusicUploaderDispute from '../components/MusicUploaderJourney/Dispute/MusicUploaderDispute';
 import BulkUpload from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/BulkUpload';
 import ResolveError from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
+import { UploadProvider } from '../Context/UploadContext';
 
 const DashboardLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -72,9 +73,23 @@ const DashboardLayout = () => {
         <MusicUploaderNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         <Routes>
           <Route index element={<MusicUploaderDashboard />} />
-          <Route path="upload" element={<UploadTrackMultiForm />} />
-          <Route path="bulkupload" element={<BulkUpload />} />
-          <Route path="/bulk-upload/resolve-errors" element={<ResolveError/>}/>
+          <Route path="upload" element={<UploadTrackMultiForm />} />{' '}
+          <Route
+            path="bulkupload"
+            element={
+              <UploadProvider>
+                <BulkUpload />
+              </UploadProvider>
+            }
+          />
+          <Route
+            path="/bulk-upload/resolve-errors"
+            element={
+              <UploadProvider>
+                <ResolveError />
+              </UploadProvider>
+            }
+          />
           <Route
             path="tracks"
             element={<MusicUploaderTracks onTabChange={handleTabChange} />}

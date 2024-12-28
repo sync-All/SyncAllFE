@@ -9,6 +9,8 @@ import LogoutIcon from '../assets/images/Login 2.svg';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
 import Placeholder from '../assets/images/placeholder.png';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { User } from '../contexts/UserContext';
 
 interface AdminDashboardSidebarProps {
   activeItem: string;
@@ -22,11 +24,20 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
   toggleMenu }) => {
   // const profileInfo = useDataContext();
   // const profileDetails = profileInfo.dashboardData?.profileInfo;
+   const [user, setUser] = useState<User | null>(null);
 
   const logout = () => {
     localStorage.clear();
     window.location.href = '/';
   };
+
+
+   useEffect(() => {
+     const userData = localStorage.getItem('adminData');
+     if (userData) {
+       setUser(JSON.parse(userData) as User);
+     }
+   }, []);
 
   const pStyle = (item: string) => ({
     color: item === activeItem ? 'var(--black2)' : 'var(--Grey-500, #667185)',
@@ -94,7 +105,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
             </Link>
           </li> */}
           <Link
-            to="https://airtable.com/verifyEmailAndLogInWithMobileHandoffToken"
+            to="https://airtable.com/appaKCViIID5q3ZBE/tbl1HhPFmva6zI048/viwL0YjZSdLvWFNFX?blocks=hide"
             className="flex gap-4 cursor-pointer pt-4 pl-[33px] pb-4"
             target="_blank"
           >
@@ -135,11 +146,10 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
           </span>
           <span className="ml-2 w-1/2 break-words">
             <p className="font-inter text-[14px] font-medium leading-5">
-              {/* {profileDetails?.username || profileDetails?.representative} */}{' '}
-              Tom
+              {user?.name || 'Admin'}
             </p>
             <p className="font-inter text-[12px] font-regular leading-4 ">
-              {/* {profileDetails?.email} */} Tom
+              {user?.email || 'Admin Email'}
             </p>
           </span>
           <span className="ml-auto cursor-pointer">

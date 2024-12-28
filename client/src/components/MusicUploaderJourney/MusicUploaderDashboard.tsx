@@ -18,6 +18,7 @@ import LoadingAnimation from '../../constants/loading-animation';
 
 const MusicUploaderDashboard = () => {
   const { dashboardData, loading } = useDataContext();
+  console.log(dashboardData);
 
   const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
 

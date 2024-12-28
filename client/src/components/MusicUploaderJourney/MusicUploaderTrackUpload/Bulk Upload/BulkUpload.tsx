@@ -6,63 +6,24 @@ import FileType from '../../../../assets/images/filetype.svg';
 import { useCallback, useState } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import { toast } from 'react-toastify';
-import axios, { AxiosProgressEvent } from 'axios';
 import UploadCompletionModal from './UploadCompletionModal';
+import ProceedBulkError from './ProceedBulkError';
+import { useUpload } from '../../../../Context/UploadContext';
 
 interface UploadProgressProps {
   progress: number;
   fileName: string;
   status: string;
+  currentRow?: number;
+  totalRows?: number;
 }
-
-export interface TrackData {
-  releaseType: string;
-  releaseTitle: string;
-  mainArtist: string;
-  featuredArtist: string;
-  trackTitle: string;
-  upc: string;
-  isrc: string;
-  trackLink: string;
-  genre: string;
-  subGenre: string;
-  claimBasis: string;
-  copyrightName: string;
-  copyrightYear: string;
-  audioLang: string;
-  message?: string;
-  err_type?: string;
-  // ... other fields
-}
-
-// Types for the upload response
-interface UploadResponse {
-  failedCount: number;
-  successCount: number;
-  duplicateData: TrackData[];
-  invalidSpotifyLink: TrackData[];
-}
-
-interface UploadStats {
-  fileName: string;
-  fileSize: string;
-  totalTracks: number;
-  failedUploads: number;
-  successfulUploads: number;
-  errors: {
-    duplicates: TrackData[];
-    invalidLinks: TrackData[];
-  };
-}
-
-// interface ResponseData {
-//   message: string;
-// }
 
 const UploadProgress: React.FC<UploadProgressProps> = ({
   progress,
   fileName,
   status,
+  currentRow,
+  totalRows,
 }) => {
   return (
     <div className="border-2 border-dashed border-green-200 rounded-lg p-8 max-w-md mx-auto">
@@ -70,13 +31,17 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
         {/* CSV Icon */}
         <div className="w-16 h-16 bg-white shadow-sm rounded-lg flex items-center justify-center">
           <img src={FileType} alt="" />
-          <div className="absolute mt-8 text-xs font-medium text-green-600">
-            CSV
-          </div>
         </div>
 
-        {/* Progress percentage */}
-        <div className="text-xl font-medium text-gray-700">{progress}%</div>
+        {/* Progress percentage and fraction */}
+        <div className="flex items-center gap-2 text-xl font-medium text-gray-700">
+          <span>{progress}%</span>
+          {currentRow !== undefined && totalRows !== undefined && (
+            <span className="text-gray-500 text-base">
+              ({currentRow} of {totalRows})
+            </span>
+          )}
+        </div>
 
         {/* Progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-2">
@@ -102,31 +67,59 @@ const BulkUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [showCompletionModal, setShowCompletionModal] = useState(false);
- const [uploadStats, setUploadStats] = useState<UploadStats>({
-   fileName: '',
-   fileSize: '',
-   totalTracks: 0,
-   failedUploads: 0,
-   successfulUploads: 0,
-   errors: {
-     duplicates: [],
-     invalidLinks: [],
-   },
- });
+  const [showConfirmProceedModal, setShowConfirmProceedModal] = useState(false);
+  const [currentRow, setCurrentRow] = useState<number>(0);
+  const [totalRows, setTotalRows] = useState<number>(0);
+
+  const { setUploadStats } = useUpload();
+
+  const resetUploadUI = () => {
+    setFile(null);
+    setIsUploading(false);
+    setUploadProgress(0);
+    setUploadStatus('');
+    setCurrentRow(0);
+    setTotalRows(0);
+    setShowCompletionModal(false);
+  };
+
+  const handleProceed = () => {
+    setShowCompletionModal(false); // Close the first modal
+    setShowConfirmProceedModal(true); // Open the second modal
+  };
+
+  const fileUrl = '../../../../assets/images/testdoc.csv';
+  const fileName = 'testdoc.csv';
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (fileRejections.length > 0) {
-        const rejection = fileRejections[0];
-        if (rejection.errors[0]?.code === 'file-invalid-type') {
-          toast.error('Please upload a CSV file only');
-        } else if (rejection.errors[0]?.code === 'file-too-large') {
-          toast.error('File is too large. Maximum size is 100MB');
-        } else {
-          toast.error('Invalid file. Please try again');
-        }
+        fileRejections.forEach((rejection) => {
+          rejection.errors.forEach((error) => {
+            if (error.code === 'file-invalid-type') {
+              toast.error('Please upload a CSV file only');
+            } else if (error.code === 'file-too-large') {
+              toast.error('File is too large. Maximum size is 100MB');
+            } else {
+              toast.error('Invalid file. Please try again');
+            }
+          });
+        });
         return;
       }
+
+      const formatFileSize = (bytes: number): string => {
+        const kb = bytes / 1024;
+
+        if (kb < 1024) {
+          // If less than 1MB, show in KB
+          return `${Math.round(kb)}KB`;
+        } else {
+          // If 1MB or more, show in MB
+          const mb = kb / 1024;
+          return `${mb.toFixed(1)}MB`;
+        }
+      };
 
       if (acceptedFiles.length > 0) {
         const uploadedFile = acceptedFiles[0];
@@ -139,109 +132,105 @@ const BulkUpload = () => {
         const formData = new FormData();
         formData.append('bulkUpload', uploadedFile);
 
-        const config = {
-          headers: {
-            Authorization: `${token}`,
-          },
-          responseType: 'text' as const,
-          onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const uploadPercentage = progressEvent.total
-              ? (progressEvent.loaded / progressEvent.total) * 50
-              : 0;
-            setUploadProgress(Math.round(uploadPercentage));
-            setUploadStatus('Uploading file...');
-          },
-        };
-
         setIsUploading(true);
-        setUploadProgress(0);
-        setUploadStatus('Preparing upload...');
+        setUploadStatus('Processing file...');
 
         try {
-          const response = await axios.post(apiUrl, formData, config);
-          console.log('Raw response:', response.data);
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              Authorization: `${token}`,
+            },
+            body: formData,
+          });
 
-          if (!response.data) {
-            throw new Error('No response data received');
-          }
+          const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
 
-          const events = response.data.split('\n\n');
-          console.log('Split events:', events);
+          while (reader) {
+            const { value, done } = await reader.read();
+            if (done) break;
 
-          for (const event of events) {
-            if (!event.trim()) continue;
+            buffer += decoder.decode(value, { stream: true });
+            const events = buffer.split('\n\n');
 
-            try {
-              console.log('Processing event:', event);
-              const lines = event.split('\n');
+            for (let i = 0; i < events.length - 1; i++) {
+              const event = events[i];
+              if (!event.trim()) continue;
 
-              // Handle both typed events and direct data events
-              if (event.startsWith('event:')) {
-                // Event with type (like 'total' and 'done')
-                const eventType = lines[0].replace('event: ', '');
-                const dataLine = lines[1].replace('data: ', '');
-                const data = JSON.parse(dataLine);
-
-                switch (eventType) {
-                  case 'total': {
-                    setUploadStatus(`Processing ${data.rowCount} rows...`);
-                    break;
-                  }
-                  case 'done': {
-                    const data = JSON.parse(dataLine) as UploadResponse;
-                    setUploadProgress(100);
-                    setUploadStatus('Upload complete!');
-                    setShowCompletionModal(true);
-                    setUploadStats({
-                      fileName: uploadedFile.name,
-                      fileSize: `${(uploadedFile.size / (1024 * 1024)).toFixed(
-                        1
-                      )}mb`,
-                      totalTracks: data.failedCount + data.successCount,
-                      failedUploads: data.failedCount,
-                      successfulUploads: data.successCount,
-                      errors: {
-                        duplicates: data.duplicateData,
-                        invalidLinks: data.invalidSpotifyLink,
-                      },
-                    });
-                    break;
+              try {
+                // For processing status events
+                if (event.includes('event: processing')) {
+                  const dataLine = event.split('data:')[1]?.trim();
+                  if (dataLine) {
+                    setUploadStatus(dataLine); // Will show "Scanning and Sorting..." or "No Duplicates Found"
                   }
                 }
-              } else if (event.startsWith('data:')) {
-                // Progress update events
-                const data = JSON.parse(event.replace('data: ', ''));
-                if (data.parsedRows && data.rowCount) {
-                  const progressPercentage =
-                    (data.parsedRows / data.rowCount) * 50 + 50;
-                  setUploadProgress(Math.round(progressPercentage));
-                  setUploadStatus(
-                    `Processed ${data.parsedRows} of ${data.rowCount} rows`
-                  );
+                // For progress events with row counts
+                else if (
+                  event.includes('data:') &&
+                  event.includes('parsedRows')
+                ) {
+                  const dataLine = event.split('data:')[1].trim();
+                  const data = JSON.parse(dataLine);
+
+                  if (
+                    data.parsedRows !== undefined &&
+                    data.rowCount !== undefined
+                  ) {
+                    const currentRow = data.parsedRows;
+                    const totalRows = data.rowCount;
+
+                    const percentage = (currentRow / totalRows) * 100;
+                    setUploadProgress(Math.round(percentage));
+                    setUploadStatus(
+                      `Processing ${currentRow} of ${totalRows} rows...`
+                    );
+                    setCurrentRow(currentRow);
+                    setTotalRows(totalRows);
+                  }
                 }
+                // For completion event
+                else if (event.includes('event: done')) {
+                  const dataLine = event.split('data:')[1].trim();
+                  const data = JSON.parse(dataLine);
+
+                  setUploadProgress(100);
+                  setUploadStatus('Upload complete!');
+
+                  setShowCompletionModal(true);
+                  setUploadStats({
+                    fileName: uploadedFile.name,
+                    fileSize: formatFileSize(uploadedFile.size),
+                    totalTracks: data.failedCount + data.successCount,
+                    failedUploads: data.failedCount,
+                    successfulUploads: data.successCount,
+                    errors: {
+                      duplicates: data.duplicateData || [],
+                      invalidLinks: data.invalidSpotifyLink || [],
+                    },
+                  });
+                }
+              } catch (parseError) {
+                console.error('Error processing event:', event);
               }
-            } catch (parseError) {
-              console.error('Error processing event:', parseError);
-              console.error('Problematic event:', event);
             }
+
+            buffer = events[events.length - 1];
           }
-        } catch (error: unknown) {
+        } catch (error) {
           console.error('Upload error:', error);
-          toast.error('An error occurred during upload. Please try again.');
+          toast.error('An error occurred during upload');
           setIsUploading(false);
           setUploadProgress(0);
           setUploadStatus('');
         }
       }
     },
-    [
-      setFile,
-      setUploadProgress,
-      setUploadStatus,
-      setShowCompletionModal,
-      setUploadStats,
-    ]
-  ); // Include all state setters used
+    []
+  );
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -250,6 +239,7 @@ const BulkUpload = () => {
     maxSize: 100 * 1024 * 1024, // 100MB
     multiple: false,
   });
+
   const instructions = [
     'Download the CSV Template: Start by downloading the pre-formatted CSV file to ensure compatibility with our system.',
     'Fill in Track Details: Populate the CSV file with your track details. Required fields include: Track Name, ISRC Code, Spotify Link',
@@ -257,6 +247,7 @@ const BulkUpload = () => {
     'Upload Your CSV File: Drag and drop your completed CSV file into the upload area or click to select your file (max size: 100MB).',
     'Review Errors (if any): After uploading, review any errors that may appear. Suggested actions will be provided for each error type.',
   ];
+
   return (
     <div className="lg:mx-8 ml-5">
       <div className="flex justify-between">
@@ -289,7 +280,8 @@ const BulkUpload = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <a
-                  href="#"
+                  href={fileUrl}
+                  download={fileName}
                   className="text-[#1671D9] hover:text-blue-700 font-medium font-inter"
                 >
                   Download CSV Template
@@ -302,11 +294,14 @@ const BulkUpload = () => {
               Download template if you do not have one, then upload it here when
               you're done filling
             </div>
+
             {isUploading ? (
               <UploadProgress
                 progress={uploadProgress}
                 fileName={file?.name || 'Bulk Uploaded Track.csv'}
                 status={uploadStatus}
+                currentRow={currentRow}
+                totalRows={totalRows}
               />
             ) : (
               <div
@@ -338,11 +333,6 @@ const BulkUpload = () => {
                 </div>
               </div>
             )}
-            {file && (
-              <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-md">
-                File selected: {file.name}
-              </div>
-            )}
           </div>
 
           {/* Right side - Instructions */}
@@ -367,12 +357,16 @@ const BulkUpload = () => {
       </div>
       <UploadCompletionModal
         isOpen={showCompletionModal}
-        onClose={() => setShowCompletionModal(false)}
-        stats={uploadStats}
-        onProceed={() => {
-          // Handle proceed action
+        onClose={() => {
           setShowCompletionModal(false);
+          resetUploadUI();
         }}
+        onProceed={handleProceed}
+      />{' '}
+      <ProceedBulkError
+        isOpen={showConfirmProceedModal}
+        onClose={() => setShowConfirmProceedModal(false)}
+        source="upload"
       />
     </div>
   );
