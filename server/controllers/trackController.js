@@ -138,7 +138,6 @@ const trackBulkUpload = async(req,res,next)=>{
           let confirmTrackUploaded = {}
           try {
             spotifyresponse = await spotifyCheck.spotifyResult(row.trackLink, spotifyToken);
-            confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
           } catch (error) {
             if(error instanceof spotifyError){
               res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
@@ -149,6 +148,7 @@ const trackBulkUpload = async(req,res,next)=>{
             }
             continue;
           }
+          confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
 
           if(confirmTrackUploaded){
             res.write(`event: warning duplicate data\n`);

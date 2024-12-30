@@ -40,9 +40,8 @@ const deezerIsrcSearch = async(isrc)=>{
 
 const spotifyResult = async( trackLink, spotifyToken)=>{
 
-    const trackId = trackLink.split('k/')[1]?.split('?')[0]
-
     try {
+        const trackId = trackLink?.split('k/')[1]?.split('?')[0]
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
     
             headers : {
