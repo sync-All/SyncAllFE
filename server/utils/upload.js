@@ -1,4 +1,8 @@
-const { ForbiddenError } = require("./CustomError")
+const { ForbiddenError, BadRequestError } = require("./CustomError")
+const cloudinary = require("cloudinary").v2
+const Track = require("../models/track.model").track
+const dashboard = require("../models/dashboard.model").dashboard
+const { trackError, uploadErrorHistory } = require("../models/track.model")
 
 function fileFilter (req, file, cb) {
   if(!file){
@@ -27,4 +31,34 @@ const disputeFileFilter = (req, file, cb) => {
     }
 };
 
- module.exports = {fileFilter,disputeFileFilter}
+const trackProcessing = async (songInfo,fileInfo,spotifyresponse,request)=>{
+  try {
+    if(fileInfo){
+      var artWork = await cloudinary.uploader.upload(fileInfo.path,{folder:  "track_artwork"})
+      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : request.user.id, trackLink : spotifyresponse.spotifyLink, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
+      const track = new Track(adjustedsongInfo)
+      const trackInfo = await track.save()
+      await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
+      fs.unlinkSync(fileInfo.path)
+    }else{
+      const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.spotifyLink, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
+      const track = new Track(adjustedsongInfo)
+      const trackInfo = await track.save()
+      await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
+    }
+    return;
+  } catch (err) {
+    console.log(err)
+    throw new BadRequestError(err)
+  }
+
+}
+
+// response.status(200).json({success : true, message : 'Music Information has been successfully added'})
+
+// if(songInfo.err_type && songInfo._id){
+//   await trackError.findByIdAndDelete(songInfo._id)
+//   await uploadErrorHistory.findByIdAndUpdate({user : request.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+// }
+
+module.exports = {fileFilter,disputeFileFilter, trackProcessing}

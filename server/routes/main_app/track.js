@@ -22,11 +22,7 @@ router.get(
 );
 
 router.post(
-  "/trackUpload/",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
+  "/trackUpload/",checkUploader,
   upload,
   asyncHandler(trackController.trackUpload)
 );

@@ -10,6 +10,7 @@ const  {writeToBuffer} = require('@fast-csv/format');
 const mongoose = require('mongoose')
 const { trackError, uploadErrorHistory } = require("../models/track.model")
 const {v4 : uuidv4} = require('uuid')
+const { trackProcessing } = require("../utils/upload")
 require('dotenv').config()
 
 
@@ -27,52 +28,54 @@ const verifyTrackUpload = async(req,res,next)=>{
 }
 
 const trackUpload = async(req,res,next)=>{
-  if(req.user.role == "Music Uploader"){
+  try {
     const {trackLink} = req.body
-    let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
-    const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
-    if(confirmTrackUploaded){
-        res.status(401).json('Track already exists')
-    }else{
-      let songInfo = req.body
-      if(req.file){
-        var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
-        const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
-        const track = new Track(adjustedsongInfo)
-        track.save()
-        .then(async (track)=>{
-          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-          if(songInfo.err_type && songInfo._id){
-            await trackError.findByIdAndDelete(songInfo._id)
-            await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
-          }
-          fs.unlinkSync(req.file.path)
-          res.status(200).json({success : true, message : 'Music Information has been successfully added'})
-        })
-        .catch((err)=>{
-          console.log(err)
-          res.status(401).json(err)
-        })
-      }else{
-        const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
-        const track = new Track(adjustedsongInfo)
-        track.save()
-        .then(async (track)=>{
-          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-          if(songInfo.err_type && songInfo._id){
-            await trackError.findByIdAndDelete(songInfo._id)
-            await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
-          }
-          res.status(200).json({success : true, message : 'Music Information has been successfully added'})
-        })
-        .catch((err)=>{
-          console.log(err)
-          res.status(401).json(err)
-        })
-      }
-    }
-  }else{
-    res.status(401).json('Unauthorized Access, Role not Supported')
+  let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
+  const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
+  if(confirmTrackUploaded){
+    throw new unauthorizedError('Track already exists')
+  }
+  let songInfo = req.body
+  let fileInfo = req.file
+  await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
+  res.status(201).json({success : true, message : 'Music Information has been successfully added'})
+  // if(req.file){
+  //   var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
+  //   const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
+  //   const track = new Track(adjustedsongInfo)
+  //   track.save()
+  //   .then(async (track)=>{
+  //     await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+  //     if(songInfo.err_type && songInfo._id){
+  //       await trackError.findByIdAndDelete(songInfo._id)
+  //       await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+  //     }
+  //     fs.unlinkSync(req.file.path)
+  //     res.status(200).json({success : true, message : 'Music Information has been successfully added'})
+  //   })
+  //   .catch((err)=>{
+  //     console.log(err)
+  //     res.status(401).json(err)
+  //   })
+  // }else{
+  //   const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
+  //   const track = new Track(adjustedsongInfo)
+  //   track.save()
+  //   .then(async (track)=>{
+  //     await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+  //     if(songInfo.err_type && songInfo._id){
+  //       await trackError.findByIdAndDelete(songInfo._id)
+  //       await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+  //     }
+  //     res.status(200).json({success : true, message : 'Music Information has been successfully added'})
+  //   })
+  //   .catch((err)=>{
+  //     console.log(err)
+  //     res.status(401).json(err)
+  //   })
+  // }
+  } catch (error) {
+    throw new BadRequestError(error.message)
   }
 }
 

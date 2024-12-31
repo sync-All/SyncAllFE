@@ -72,11 +72,11 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
 }
 
 const SpotifyPreview = async(res, trackLink)=>{
-    const trackId = trackLink.split('k/')[1]?.split('?')[0]
     // const clientId = process.env.SPOTIFY_CLIENT_ID
     // const clientS = process.env.SPOTIFY_CLIENT_S
 
     try {
+        const trackId = trackLink.split('k/')[1]?.split('?')[0]
 
         const token = await grabSpotifyToken()
 
@@ -87,9 +87,9 @@ const SpotifyPreview = async(res, trackLink)=>{
             }
         })
 
-        if(!trackDetails.data.preview_url){
-            return res.status(422).send('No preview available for this track, Please try again later')
-        }
+        // if(!trackDetails.data.preview_url){
+        //     throw new spotifyError('No preview available for this track, Please try again later')
+        // }
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
         const trackDuration = `${String(minutes)} minutes ${String(seconds)} seconds`;
