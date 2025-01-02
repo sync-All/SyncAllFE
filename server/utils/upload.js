@@ -35,13 +35,13 @@ const trackProcessing = async (songInfo,fileInfo,spotifyresponse,request)=>{
   try {
     if(fileInfo){
       var artWork = await cloudinary.uploader.upload(fileInfo.path,{folder:  "track_artwork"})
-      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : request.user.id, trackLink : spotifyresponse.spotifyLink, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
+      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
       const track = new Track(adjustedsongInfo)
       const trackInfo = await track.save()
       await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
       fs.unlinkSync(fileInfo.path)
     }else{
-      const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.spotifyLink, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
+      const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
       const track = new Track(adjustedsongInfo)
       const trackInfo = await track.save()
       await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()

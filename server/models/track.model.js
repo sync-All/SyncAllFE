@@ -20,8 +20,7 @@ const trackSchema = new Schema({
         },
     trackLink : {
         type : String,
-        required : true
-        },
+    },
     isrc : {
         type : String,
         required : true,

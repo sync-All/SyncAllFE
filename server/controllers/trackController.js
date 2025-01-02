@@ -30,15 +30,15 @@ const verifyTrackUpload = async(req,res,next)=>{
 const trackUpload = async(req,res,next)=>{
   try {
     const {trackLink} = req.body
-  let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
-  const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
-  if(confirmTrackUploaded){
-    throw new unauthorizedError('Track already exists')
-  }
-  let songInfo = req.body
-  let fileInfo = req.file
-  await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
-  res.status(201).json({success : true, message : 'Music Information has been successfully added'})
+    let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
+    const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
+    if(confirmTrackUploaded){
+      throw new unauthorizedError('Track already exists')
+    }
+    let songInfo = req.body
+    let fileInfo = req.file
+    await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
+    res.status(201).json({success : true, message : 'Music Information has been successfully added'})
   // if(req.file){
   //   var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
   //   const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
@@ -76,6 +76,19 @@ const trackUpload = async(req,res,next)=>{
   // }
   } catch (error) {
     throw new BadRequestError(error.message)
+  }
+}
+
+const singleUploadErrorResolution = async(req,res,next)=>{
+  try {
+    const {_id} = req.body
+    
+    // if(songInfo.err_type && songInfo._id){
+//   await trackError.findByIdAndDelete(songInfo._id)
+//   await uploadErrorHistory.findByIdAndUpdate({user : request.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+// }
+  } catch (error) {
+    
   }
 }
 
