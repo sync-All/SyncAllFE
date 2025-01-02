@@ -108,7 +108,6 @@ const ticketSchema = new Schema({
     tickId : {
         type : String
     },
-
     associatedDisputes : [{
         type : Schema.Types.ObjectId,
         ref : 'dispute'

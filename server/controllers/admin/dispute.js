@@ -3,6 +3,7 @@ const { BadRequestError } = require("../../utils/CustomError")
 const { adminActivityLog } = require("../../models/activity.model")
 const Admin = require('../../models/usermodel').admin
 const Dispute = require('../../models/dashboard.model').dispute
+const Ticket = require('../../models/dashboard.model').ticket
 
 const assignAdmin = async(req,res,next)=>{
     const {adminId,disputeId} = req.query
@@ -40,4 +41,20 @@ const setDisputeStatus = async(req,res,next)=>{
     }
 }
 
-module.exports = {assignAdmin, setDisputeStatus}
+const searchTicket = async(req,res,next)=>{
+    try {
+        const {filter} = req.query
+        const regex = new RegExp(filter, 'i')
+        const ticketRes = Ticket.find({$or : [
+            {'user.username' : {$regex : regex}},
+            {'user.name' : {$regex : regex}},
+            {tickId : {$regex : regex}},
+        ]})
+        res.send(ticketRes)
+    }catch (error) {
+        console.log(error)
+        throw new BadRequestError("An error occured, contact dev team")
+    }
+}
+
+module.exports = {assignAdmin, setDisputeStatus,searchTicket}

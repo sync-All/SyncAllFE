@@ -12,4 +12,6 @@ router.get('/all_content',checkAdmin,asynchandler(async(req,res,next)=>{
 }))
 router.get('/manage_content/review',checkAdmin,asynchandler(contentManager.contentReview))
 
+router.get('/manage_content/search',checkAdmin,asynchandler(contentManager.searchContent))
+
 module.exports = router
