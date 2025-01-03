@@ -253,7 +253,7 @@ const getTracksByGenre = async(req,res,next)=>{
 
 const getTracksByInstrument = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({featuredInstrument : {$regex : req.params.instrument, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").where('uploadStatus').equals('Approved').exec()
+      const allTracks = await Track.find({featuredInstrument : {$regex : req.params.instrument, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
