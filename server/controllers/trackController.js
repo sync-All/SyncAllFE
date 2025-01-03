@@ -238,13 +238,13 @@ const trackBulkUpload = async(req,res,next)=>{
 }
 
 const getAllSongs = async(req,res,next)=>{
-    const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers").where('uploadStatus').equals('Approved').exec()
+    const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
     res.json({allTracks})
 }
 
 const getTracksByGenre = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({genre : {$regex : req.params.genre, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").where('uploadStatus').equals('Approved').exec()
+      const allTracks = await Track.find({genre : {$regex : req.params.genre, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -262,7 +262,7 @@ const getTracksByInstrument = async(req,res,next)=>{
 
 const getTracksByMood = async(req,res,next)=>{
     try {
-      const allTracks = await Track.find({mood : {$regex : req.params.mood, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").where('uploadStatus').equals('Approved').exec()
+      const allTracks = await Track.find({mood : {$regex : req.params.mood, $options : 'i'}}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -272,7 +272,7 @@ const getTracksByMood = async(req,res,next)=>{
 const querySongsByIndex = async(req,res,next)=>{
     const query = req.params.queryText
     try {
-      const allTracks = await Track.find({$text : {$search : query}}, "artWork trackTitle mainArtist trackLink duration genre mood producers").where('uploadStatus').equals('Approved').exec()
+      const allTracks = await Track.find({$text : {$search : query}}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
       res.json({allTracks})
     } catch (error) {
       res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
@@ -284,7 +284,7 @@ const queryTrackInfo =async(req,res,next)=>{
   if(req.user.role == "Sync User"){
     try {
       if(req.user.billing.prod_id == "free"){
-        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate").exec()
+        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate spotifyLink").exec()
         console.log(details)
         return res.json({details})
       }else{
