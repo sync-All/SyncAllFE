@@ -44,16 +44,47 @@ const setDisputeStatus = async(req,res,next)=>{
 const searchTicket = async(req,res,next)=>{
     try {
         const {filter} = req.query
-        const regex = new RegExp(filter, 'i')
-        const ticketRes = Ticket.find({$or : [
-            {'user.username' : {$regex : regex}},
-            {'user.name' : {$regex : regex}},
-            {tickId : {$regex : regex}},
-        ]})
-        res.send(ticketRes)
+        if(!filter){
+             throw new BadRequestError('filter parameter missing')
+        }
+        const tickets = await Ticket.aggregate([
+            {
+                $lookup: {
+                    from: "users", // The name of the `user` collection
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $unwind: "$userDetails" // Deconstruct array returned by $lookup
+            },
+            {
+                $match: {
+                    $or: [
+                        { tickId: { $regex: filter, $options: "i" } }, // filter by tickId
+                        { "userDetails.username": { $regex: filter, $options: "i" } }, // filter by username
+                        { "userDetails.name": { $regex: filter, $options: "i" } } // Search by fullname
+                    ]
+                }
+            },
+            {
+                $project: {
+                    tickId: 1,
+                    status: 1,
+                    user: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    "userDetails.username": 1,
+                    "userDetails.name": 1,
+                    "userDetails.email" : 1,
+                }
+            }
+        ]);
+        return res.status(200).json(tickets);
     }catch (error) {
         console.log(error)
-        throw new BadRequestError("An error occured, contact dev team")
+        throw new BadRequestError(error.message)
     }
 }
 
