@@ -9,6 +9,13 @@ import LoadingAnimation from '../constants/loading-animation';
 import { useParams } from 'react-router-dom';
 import MusicPlayer from './MusicPlayer';
 import { Content } from '../contexts/ContentContext';
+import SpotifyHelper from '../helper/spotifyHelper';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+
+interface ResponseData {
+  message?: string;
+}
 
 const ContentReview = () => {
   const { content, loading } = useContent();
@@ -74,6 +81,38 @@ const ContentReview = () => {
     }
   };
 
+  const handleContentReview = async (
+    contentId: string,
+    action: 'Approved' | 'Rejected'
+  ) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/manage_content/review?contentId=${contentId}&actionTaken=${action}`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
+
+    try {
+      await axios.get(apiUrl, config);
+
+      // Show success message
+      toast.success(`Post ${action}ed successfully`);
+
+      // You might want to refresh the content list or update UI
+      // refreshContent();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
+
   return (
     <div className="mx-[31px]">
       <div className="flex justify-between">
@@ -85,28 +124,42 @@ const ContentReview = () => {
           </span>
         </div>
         <div className="flex gap-2 place-items-end">
-          <button
-            className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#D0D5DD] text-[14px]"
-            type="button"
-          >
-            Reject Post
-          </button>
-
-          <button
-            className="bg-[#EFA705] p-[10px] gap-[8px] rounded-[8px] flex text-[14px]"
-            type="button"
-          >
-            Approve Post
-          </button>
+          {contentItem?.uploadStatus !== 'Rejected' && (
+            <button
+              className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#F62C2C] text-[#F62C2C] text-[14px] py-2.5 px-4 font-inter"
+              type="button"
+              onClick={() => {
+                if (contentItem?._id) {
+                  handleContentReview(contentItem._id, 'Rejected');
+                }
+              }}
+            >
+              Reject Post
+            </button>
+          )}
+         
+          {contentItem?.uploadStatus !== 'Approved' && (
+            <button
+              className="bg-[#037847] py-2.5 px-4 gap-[8px] rounded-[8px] flex text-[14px] text-white"
+              type="button"
+              onClick={() => {
+                if (contentItem?._id) {
+                  handleContentReview(contentItem._id, 'Approved');
+                }
+              }}
+            >
+              Approve Post
+            </button>
+          )}
         </div>
       </div>
       <div className="flex flex-col lg:flex-row lg:gap-[50px] mt-12">
         {' '}
-        <div className="lg:min-w-[40%] h-[412px]">
+        <div className="w-[40%] h-[412px]">
           <img
             src={contentItem?.artWork || Background}
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full lg:min-w-[40%] h-full object-cover"
           />
         </div>
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
@@ -121,10 +174,24 @@ const ContentReview = () => {
             </div>
           </div>
           <div className="mt-20">
-            <MusicPlayer
-              trackLink={contentItem?.trackLink}
-              songId={contentItem?._id}
-            />
+            {contentItem?.trackLink ? (
+              <MusicPlayer
+                trackLink={contentItem?.trackLink}
+                songId={contentItem?._id}
+              />
+            ) : (
+              <iframe
+                style={{ borderRadius: '12px' }}
+                src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                  contentItem?.spotifyLink || ''
+                )}?utm_source=generator`}
+                width="100%"
+                height="152"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+              ></iframe>
+            )}
           </div>
         </div>
       </div>

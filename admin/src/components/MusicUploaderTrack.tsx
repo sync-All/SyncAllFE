@@ -10,6 +10,7 @@ import NoTrack from '../assets/images/no_track.svg';
 import usePagination from '../hooks/usePaginate';
 import Left from '../assets/images/left-arrow.svg';
 import Right from '../assets/images/right-arrow.svg';
+import SpotifyHelper from '../helper/spotifyHelper';
 
 interface SortConfig {
   key: keyof Content | null;
@@ -100,7 +101,6 @@ const MusicUploaderTrack = () => {
     return <LoadingAnimation />;
   }
 
-  
   return (
     <div className="mb-[96px]">
       {tracks.length > 0 ? (
@@ -160,21 +160,36 @@ const MusicUploaderTrack = () => {
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {new Date(track.releaseDate).toLocaleDateString()}
                   </td>
-                  <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
+                  <td> <div className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px]  px-2 flex items-center justify-center  rounded-2xl w-fit ">
                     <img src={Dot} alt="Dot" />
                     {track.uploadStatus}
-                  </td>
+                  </div></td>
+                 
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {track.earnings}
                   </td>
-                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    <MusicPlayer
-                      trackLink={track.trackLink}
-                      songId={track._id}
-                      containerStyle="mt-0 flex items-center gap-3"
-                      buttonStyle="w-4 cursor-pointer"
-                      waveStyle="w-[70px]"
-                    />
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8  max-h-5">
+                    {track.trackLink ? (
+                      <MusicPlayer
+                        trackLink={track.spotifyLink}
+                        songId={track._id}
+                        containerStyle="mt-0 flex items-center gap-3"
+                        buttonStyle="w-4 cursor-pointer"
+                        waveStyle="w-[70px]"
+                      />
+                    ) : (
+                      <iframe
+                        style={{ borderRadius: '12px' }}
+                        src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                          track?.spotifyLink || ''
+                        )}?utm_source=generator`}
+                        width="100%"
+                        height="100"
+                        frameBorder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                      ></iframe>
+                    )}
                   </td>
                   <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
                     <Link to={`/admin/manage-contents/${track._id}`}>View</Link>

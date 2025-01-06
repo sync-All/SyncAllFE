@@ -1,54 +1,67 @@
 import React, { useState, useMemo } from 'react';
-// import Filter from '../../assets/images/Filter-lines.svg';
-// import Download from '../../assets/images/download-cloud.svg';
+import { Track, useDataContext } from '../../Context/DashboardDataProvider';
+import MusicPlayer from '../MusicPlayer';
 import Plus from '../../assets/images/plus.svg';
-// import DotMenu from '../../assets/images/threedot.svg';
 import Dot from '../../assets/images/dot.svg';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
-import { useDataContext } from '../../Context/DashboardDataProvider';
-// import { useNavigate } from 'react-router-dom';
-import MusicPlayer from '../MusicPlayer';
-// import { usePDF } from 'react-to-pdf';
 import NoTrack from '../../assets/images/no_track.svg';
+import usePagination from '../../hooks/usePaginate';
+import Left from '../../assets/images/left-arrow.svg';
+import Right from '../../assets/images/right-arrow.svg';
+import { useLocation, useNavigate } from 'react-router-dom';
+import SpotifyHelper from '../../utils/spotifyhelper';
+//
+// Types
+interface SortConfig {
+  key: keyof Track | null;
+  direction: 'ascending' | 'descending';
+}
 
-// Define the prop types
+interface TabButtonProps {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+
+interface TableProps {
+  tracks: Track[];
+  sortConfig: SortConfig;
+  onSort: (key: keyof Track) => void;
+}
+
+interface SortButtonProps {
+  sortConfig: SortConfig;
+  sortKey: keyof Track;
+  onSort: (key: keyof Track) => void;
+}
+
+interface EmptyStateProps {
+  type: 'All' | 'Error';
+}
+
 interface MusicUploaderTracksProps {
   onTabChange: (tab: string) => void;
 }
 
-interface Track {
-  _id: string;
-  trackTitle: string;
-  releaseDate: string;
-  uploadStatus: string;
-  earnings: number;
-  trackLink: string;
-}
-
-interface TableData {
-  _id: string;
-  trackTitle: string;
-  releaseDate: string;
-  uploadStatus: string;
-  earnings: number;
-}
-
-interface SortConfig {
-  key: keyof TableData | null;
-  direction: 'ascending' | 'descending';
-}
-
-const SortButton: React.FC<{
-  sortConfig: SortConfig;
-  sortKey: keyof TableData;
-  onSort: (key: keyof TableData) => void;
-}> = ({ sortConfig, sortKey, onSort }) => (
+// Components
+const TabButton: React.FC<TabButtonProps> = ({ active, onClick, children }) => (
   <button
-    type="button"
-    onClick={() => onSort(sortKey)}
-    aria-label={`Sort by ${sortKey}`}
+    onClick={onClick}
+    className={`px-4 py-2 font-formular-medium ${
+      active ? 'text-black2 border-b-2 border-black2' : 'text-[#667085]'
+    }`}
   >
+    {children}
+  </button>
+);
+
+const SortButton: React.FC<SortButtonProps> = ({
+  sortConfig,
+  sortKey,
+  onSort,
+}) => (
+  <button type="button" onClick={() => onSort(sortKey)} className="ml-2">
     <img
       src={
         sortConfig.key === sortKey && sortConfig.direction === 'ascending'
@@ -56,201 +69,519 @@ const SortButton: React.FC<{
           : ArrowDown
       }
       alt="Sort"
+      className="w-4 h-4"
     />
   </button>
 );
 
+const EmptyState: React.FC<EmptyStateProps> = ({ type }) => (
+  <div className="flex flex-col justify-center items-center mx-auto mt-[195px]">
+    <img src={NoTrack} alt="No Track" />
+    <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
+      {type === 'All' ? 'No Tracks' : 'No Failed Uploads'}
+    </p>
+    <p className="text-[#667085] text-[12px] font-formular-medium leading-4">
+      {type === 'All'
+        ? 'You have not uploaded any track'
+        : 'You have no failed track uploads'}
+    </p>
+  </div>
+);
+
+const AllTracksTable: React.FC<TableProps> = ({
+  tracks,
+  sortConfig,
+  onSort,
+}) => {
+  const active =
+    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+
+  const sortedTracks = useMemo(() => {
+    return [...tracks].sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      const aValue = a[sortConfig.key] ?? '';
+      const bValue = b[sortConfig.key] ?? '';
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'ascending'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      return sortConfig.direction === 'ascending'
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
+    });
+  }, [tracks, sortConfig]);
+
+  const itemsPerPage = 30;
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination(sortedTracks, itemsPerPage);
+
+  const totaltracks = tracks.length;
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+
+  const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+
+  return (
+    <>
+      <TrackTable
+        tracks={paginatedItems}
+        sortConfig={sortConfig}
+        onSort={onSort}
+      />
+      <div className="flex items-center justify-between lg:mx-8 gap-3 mt-[196px] ">
+        <div className="flex gap-3 items-center">
+          <p>
+            {startIndex} - {endIndex} of {totaltracks}
+          </p>
+        </div>
+
+        <div className="flex items-center mx-auto gap-3">
+          <div className="gap-3 flex">
+            {getPaginationRange().map((page, index) =>
+              typeof page === 'number' ? (
+                <div>
+                  <button
+                    key={index}
+                    onClick={() => goToPage(page)}
+                    className={
+                      currentPage === page
+                        ? active
+                        : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
+                    }
+                  >
+                    {page}
+                  </button>
+                </div>
+              ) : (
+                <span key={index}>...</span>
+              )
+            )}
+          </div>
+        </div>
+        <div className="flex gap-[40%] items-center">
+          {' '}
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className={`flex gap-2 text-[14px] font-Utile-medium leading-5 items-center ${
+              currentPage === 1
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-[#5E5E5E]'
+            }`}
+          >
+            <img src={Left} alt="" /> Prev
+          </button>
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className={`flex gap-2 text-[14px] font-Utile-medium leading-5 items-center ${
+              currentPage === totalPages
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-[#5E5E5E]'
+            }`}
+          >
+            Next <img src={Right} alt="" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const ErrorTracksTable: React.FC<TableProps> = ({
+  tracks,
+  sortConfig,
+  onSort,
+}) => {
+  // const navigate = useNavigate();
+
+  const sortedTracks = useMemo(() => {
+    return [...tracks].sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      const aValue = a[sortConfig.key] ?? '';
+      const bValue = b[sortConfig.key] ?? '';
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'ascending'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      return sortConfig.direction === 'ascending'
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
+    });
+  }, [tracks, sortConfig]);
+  const itemsPerPage = 30;
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination(sortedTracks, itemsPerPage);
+
+  const totaltracks = tracks.length;
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+
+  const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+  const active =
+    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
+
+  const truncateText = (text: string, length: number) => {
+    if (text.length <= length) return text;
+    return text.slice(0, length);
+  };
+
+  const navigate = useNavigate();
+
+  const handleViewError = (associatedErrors: Track[]) => {
+    // Group the errors into the expected structure
+    const formattedErrors = {
+      duplicates: associatedErrors.filter(
+        (error) => error.err_type === 'duplicateTrack'
+      ),
+      invalidSpotifyLink: associatedErrors.filter(
+        (error) => error.err_type === 'InvalidSpotifyLink'
+      ),
+    };
+    
+    navigate('/dashboard/bulk-upload/resolve-errors', {
+      state: {
+        errorData: {
+          duplicates: formattedErrors.duplicates,
+          invalidSpotifyLink: formattedErrors.invalidSpotifyLink,
+        },
+      },
+    });
+  };
+
+  return (
+    <>
+      <table className="w-full mt-5">
+        <thead>
+          <tr>
+            <th className={ThStyles}>
+              Upload ID
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="uploadId"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Filename
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="filename"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Upload Date
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="createdAt"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>
+              Number of Errors
+              <SortButton
+                sortConfig={sortConfig}
+                sortKey="errorCount"
+                onSort={onSort}
+              />
+            </th>
+            <th className={ThStyles}>Status</th>
+            <th className={ThStyles}>Error Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedItems.map((track) => (
+            <tr key={track._id} className="hover:bg-gray-50">
+              <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8 uppercase">
+                <span className="font-inter">#</span>
+                <span className="capilatize">
+                  {truncateText(track.uploadId, 11)}
+                </span>
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {track.filename}
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {new Date(track.createdAt).toLocaleDateString()}
+              </td>
+              <td className="py-4 px-8">
+                <span className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                  {track.associatedErrors.length}
+                </span>
+              </td>
+              <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                {track.status}
+              </td>
+              <td className="py-4 px-8">
+                <button
+                  onClick={() => handleViewError(track.associatedErrors)}
+                  className="text-[#1671D9] hover:text-blue-800 font-inter"
+                >
+                  View
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="flex items-center justify-between lg:mx-8 gap-3 mt-[96px] ">
+        <div className="flex gap-3 items-center">
+          <p>
+            {startIndex} - {endIndex} of {totaltracks}
+          </p>
+        </div>
+
+        <div className="flex items-center mx-auto gap-3">
+          <div className="gap-3 flex">
+            {getPaginationRange().map((page, index) =>
+              typeof page === 'number' ? (
+                <div>
+                  <button
+                    key={index}
+                    onClick={() => goToPage(page)}
+                    className={
+                      currentPage === page
+                        ? active
+                        : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
+                    }
+                  >
+                    {page}
+                  </button>
+                </div>
+              ) : (
+                <span key={index}>...</span>
+              )
+            )}
+          </div>
+        </div>
+        <div className="flex gap-[40%] items-center">
+          {' '}
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className={`flex gap-2 text-[14px] font-Utile-medium leading-5 items-center ${
+              currentPage === 1
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-[#5E5E5E]'
+            }`}
+          >
+            <img src={Left} alt="" /> Prev
+          </button>
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className={`flex gap-2 text-[14px] font-Utile-medium leading-5 items-center ${
+              currentPage === totalPages
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-[#5E5E5E]'
+            }`}
+          >
+            Next <img src={Right} alt="" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
+
+  return (
+    <table className="w-full mt-5">
+      <thead>
+        <tr>
+          <th className={ThStyles}>
+            Track Name
+            <SortButton
+              sortConfig={sortConfig}
+              sortKey="trackTitle"
+              onSort={onSort}
+            />
+          </th>
+          <th className={ThStyles}>
+            Release Date
+            <SortButton
+              sortConfig={sortConfig}
+              sortKey="releaseDate"
+              onSort={onSort}
+            />
+          </th>
+          <th className={ThStyles}>Upload Status</th>
+          <th className={ThStyles}>
+            Earning
+            <SortButton
+              sortConfig={sortConfig}
+              sortKey="earnings"
+              onSort={onSort}
+            />
+          </th>
+          <th className={ThStyles}>Play Track</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tracks.map((track) => (
+          <tr key={track._id} className="hover:bg-gray-50">
+            <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+              {track.trackTitle}
+            </td>
+            <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+              {new Date(track.releaseDate).toLocaleDateString()}
+            </td>
+            <td className="py-4 px-8">
+              <span className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center rounded-2xl w-fit">
+                <img src={Dot} alt="Status" className="w-2 h-2" />
+                {track.uploadStatus}
+              </span>
+            </td>
+            <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+              ${track.earnings}
+            </td>
+            <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+              {track.trackLink ? (
+                <MusicPlayer
+                  trackLink={track.trackLink}
+                  containerStyle="mt-0 flex items-center gap-3"
+                  buttonStyle="w-4 cursor-pointer"
+                  songId={track._id}
+                  waveStyle="w-[70px]"
+                />
+              ) : (
+                <iframe
+                  style={{ borderRadius: '12px' }}
+                  src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                    track?.spotifyLink || ''
+                  )}?utm_source=generator`}
+                  width="100%"
+                  height="100"
+                  frameBorder="0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                ></iframe>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
 const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   onTabChange,
 }) => {
-  // const [openDropdowns, setOpenDropdowns] = useState<{
-  //   [key: string]: boolean;
-  // }>({});
-
-  // const toggleDropdown = (id: string) => {
-  //   setOpenDropdowns((prevState) => ({
-  //     ...prevState,
-  //     [id]: !prevState[id],
-  //   }));
-  // };
-
-  // const handleClickOutside = () => {
-  //   setOpenDropdowns({});
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside);
-  //   };
-  // }, []);
-
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: 'ascending',
   });
 
   const { dashboardData } = useDataContext();
-  const myTracks: Track[] = dashboardData?.dashboardDetails.totalTracks || [];
+  const allTracks = dashboardData?.dashboardDetails.totalTracks || [];
+  const errorTracks = dashboardData?.profileInfo.uploadErrors || [];
+  console.table(`errorTracks : ${JSON.stringify(errorTracks)}`);
 
-  const ThStyles =
-    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'All' | 'Error'>(
+    location.state?.activeTab || 'All'
+  );
 
-  const sortedData: Track[] = useMemo(() => {
-    return [...myTracks].sort((a, b) => {
-      if (sortConfig.key === null) return 0;
-      const aValue = a[sortConfig.key as keyof Track];
-      const bValue = b[sortConfig.key as keyof Track];
+  const handleSort = (key: keyof Track) => {
+    setSortConfig((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === 'ascending'
+          ? 'descending'
+          : 'ascending',
+    }));
+  };
 
-      if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
-      return 0;
-    });
-  }, [myTracks, sortConfig]);
-
-  const handleSort = (key: keyof TableData) => {
-    let direction: 'ascending' | 'descending' = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+  const renderContent = () => {
+    if (activeTab === 'All') {
+      return allTracks.length > 0 ? (
+        <AllTracksTable
+          tracks={allTracks}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+        />
+      ) : (
+        <EmptyState type="All" />
+      );
     }
-    setSortConfig({ key, direction });
+    return errorTracks.length > 0 ? (
+      <ErrorTracksTable
+        tracks={errorTracks}
+        sortConfig={sortConfig}
+        onSort={handleSort}
+      />
+    ) : (
+      <EmptyState type="Error" />
+    );
   };
 
   return (
-    <div>
-      {' '}
-      <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
-        <div className="flex justify-between">
-          <div>
-            <span className="flex gap-2">
-              <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
-                Your Music Library
-              </h2>
-              <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
-                Track List
-              </p>
-            </span>
-            <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
-              Manage all your uploaded tracks here.
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* <button className="border rounded-[8px] bg-transparent py-2.5 px-4 flex items-center gap-2">
-              <img src={Download} alt="Download" />
-              <button
-                onClick={() => {
-                  toPDF();
-                }}
-              >
-                Download
-              </button>
-            </button> */}
-            <button
-              className="border-none rounded-[8px] bg-yellow py-2.5 px-4 flex items-center gap-2"
-              onClick={() => onTabChange('Upload Track')}
-            >
-              <img src={Plus} alt="Plus" />
-              <p>Upload New Track</p>
-            </button>
-          </div>
+    <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
+            Your Music Library
+          </h2>
+          <p className="text-[#667085] font-formular-regular text-[14px] leading-5">
+            Manage all your uploaded tracks here.
+          </p>
         </div>
-
-        {myTracks.length > 0 ? (
-          <table className="w-full mt-5">
-            <thead>
-              <tr>
-                <th className={ThStyles}>
-                  Track Name
-                  <SortButton
-                    sortConfig={sortConfig}
-                    sortKey="trackTitle"
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className={ThStyles}>
-                  Release Date
-                  <SortButton
-                    sortConfig={sortConfig}
-                    sortKey="releaseDate"
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6">
-                  Upload Status
-                </th>
-                <th className={ThStyles}>
-                  Earning
-                  <SortButton
-                    sortConfig={sortConfig}
-                    sortKey="earnings"
-                    onSort={handleSort}
-                  />
-                </th>
-                <th className={ThStyles}>Play Track</th>
-                <th className="bg-grey-100 py-3 px-6"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedData.map((track) => (
-                <tr key={track._id} className="items-center relative">
-                  <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                    {track.trackTitle}
-                  </td>
-                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    {new Date(track.releaseDate).toLocaleDateString()}
-                  </td>
-                  <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
-                    <img src={Dot} alt="Dot" />
-                    {track.uploadStatus}
-                  </td>
-                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                    {track.earnings}
-                  </td>
-                  <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                    <MusicPlayer
-                      trackLink={track['trackLink']}
-                      containerStyle="mt-0 flex items-center gap-3"
-                      buttonStyle="w-4 cursor-pointer"
-                      songId={track._id}
-                      waveStyle="w-[70px]"
-                    />
-                  </td>
-                  {/* <td
-                    className={`py-4 px-4 ${
-                      openDropdowns[track._id] ? 'flex' : ''
-                    }`}
-                  >
-                    <span onClick={() => toggleDropdown(track._id)}>
-                      <img src={DotMenu} alt="Dot Menu" />
-                    </span>
-
-                    {openDropdowns[track._id] && (
-                      <div className="absolute z-10 flex flex-col gap-[8px] right-[-55px] rounded-[8px] py-2 px-4">
-                        <button className="text-[#667085] font-formular-medium text-[12px] leading-5 border border-[#E4E7EC] p-2.5 rounded-[8px]">
-                          Edit
-                        </button>
-                        <button className="text-white font-formular-medium text-[12px] leading-5 bg-red-600 border border-[#E4E7EC] p-2.5 rounded-[8px]">
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="flex flex-col justify-center items-center mx-auto mt-[195px]">
-            <img src={NoTrack} alt="No Track" />
-            <p className="text-[#5E5E5E] text-[16px] font-formular-bold tracking-[-0.5px] leading-6 mt-[28px]">
-              No Tracks
-            </p>
-            <p className="text-[#667085] text-[12px] font-formular-medium leading-4">
-              You have not uploaded any track
-            </p>
-          </div>
-        )}
+        <button
+          className="bg-yellow py-2.5 px-4 rounded-[8px] flex items-center gap-2"
+          onClick={() => onTabChange('Upload Track')}
+        >
+          <img src={Plus} alt="Add" className="w-4 h-4" />
+          <span>Upload New Track</span>
+        </button>
       </div>
+
+      <div className="border-b border-[#EAECF0] mb-6">
+        <TabButton
+          active={activeTab === 'All'}
+          onClick={() => setActiveTab('All')}
+        >
+          All Uploads
+        </TabButton>
+        <TabButton
+          active={activeTab === 'Error'}
+          onClick={() => setActiveTab('Error')}
+        >
+          Upload Error History
+        </TabButton>
+      </div>
+
+      {renderContent()}
     </div>
   );
 };

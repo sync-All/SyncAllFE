@@ -27,20 +27,31 @@ const allAdmin = async (req,res,next)=>{
   }
 }
 
-const userFilter = async (req,res,next)=>{
+
+const userSearch = async (req,res,next)=>{
   try {
     const {filter} = req.query
-    console.log(filter)
-    const users = await User.find({$text : {$search : 'ibironketomiwa4@gmail.com'}}).exec()
-    // const users = await Promise.all([User.find({$text : {$search : 'd'}}).populate('dashboard')
-    //   .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
-    // SyncUser.find({$text : {$search : 'd'}}).populate('totalLicensedTracks')
-    // .populate('pendingLicensedTracks').select('-password').exec()])
-    res.send({users})
+    const regex = new RegExp(filter, 'i');
+
+    const users = await Promise.all([User.find({$or : [
+      { username: { $regex: regex } },
+      { email: { $regex: regex } },
+      { name: { $regex: regex } },
+    ]}).populate('dashboard')
+      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+    SyncUser.find({
+      $or : [
+        { username: { $regex: regex } },
+        { email: { $regex: regex } },
+        { name: { $regex: regex } },
+      ]
+    }).populate('totalLicensedTracks')
+    .populate('pendingLicensedTracks').select('-password').exec()])
+    res.send({users : [...users[0], ...users[1]]})
   } catch (error) {
     console.log(error)
     throw new BadRequestError('An error occurred, contact dev team')
   }
 }
 
-module.exports = {allUsers, allAdmin, userFilter}
+module.exports = {allUsers, allAdmin, userSearch}

@@ -10,7 +10,6 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
   const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
-  console.log(details);
 
   return (
     <div className="flex flex-col mt-[60px]">

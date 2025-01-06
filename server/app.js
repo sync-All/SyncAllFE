@@ -25,7 +25,7 @@ const adminManageDispute = require('./routes/admin_routes/dispute')
 
 var app = express();
 
-var allowlist = ['http://localhost:5173', 'https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com']
+var allowlist = ['http://localhost:5173','http://localhost:5174','https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com','https://sync-all-admin-git-development-sync-alls-projects.vercel.app','https://sync-all-fe-git-development-sync-alls-projects.vercel.app']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header('Origin')) !== -1) {

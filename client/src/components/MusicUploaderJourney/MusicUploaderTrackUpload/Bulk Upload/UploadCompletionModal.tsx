@@ -3,45 +3,25 @@ import TotalTracks from '../../../../assets/images/totaltracks.svg';
 import FailedUploads from '../../../../assets/images/failed-uploads.svg';
 import SuccessfulUploads from '../../../../assets/images/successful-uploads.svg';
 import { useNavigate } from 'react-router-dom';
-import { TrackData } from './BulkUpload';
+import { useUpload } from '../../../../Context/UploadContext';
 
 interface UploadCompletionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  stats: {
-    fileName: string;
-    fileSize: string;
-    totalTracks: number;
-    failedUploads: number;
-    successfulUploads: number;
-    errors: {
-      duplicates: TrackData[];
-      invalidLinks: TrackData[];
-    };
-  };
   onProceed: () => void;
 }
 
 const UploadCompletionModal: React.FC<UploadCompletionModalProps> = ({
   isOpen,
   onClose,
-  stats,
   onProceed,
 }) => {
-
+const { uploadStats } = useUpload();
 
   const navigate = useNavigate();
 
   const handleResolveErrors = () => {
-    navigate('/dashboard/bulk-upload/resolve-errors', {
-      state: {
-        errors: {
-          duplicates: stats.errors.duplicates,
-          invalidLinks: stats.errors.invalidLinks,
-        },
-        fileName: stats.fileName,
-      },
-    });
+    navigate('/dashboard/bulk-upload/resolve-errors');
     onClose();
   };  
   
@@ -50,22 +30,22 @@ const UploadCompletionModal: React.FC<UploadCompletionModalProps> = ({
   const uploadStatusData = [
     {
       icon: FileType,
-      label: stats.fileName,
-      value: stats.fileSize,
+      label: uploadStats?.fileName,
+      value: uploadStats?.fileSize,
     },
     {
       icon: TotalTracks,
       label: 'Total Tracks',
-      value: stats.totalTracks,
+      value: uploadStats?.totalTracks,
     },
     {
       label: 'Failed Uploads',
-      value: stats.failedUploads,
+      value: uploadStats?.failedUploads,
       icon: FailedUploads,
     },
     {
       label: 'Successful Uploads',
-      value: stats.successfulUploads,
+      value: uploadStats?.successfulUploads,
       icon: SuccessfulUploads,
     },
   ];

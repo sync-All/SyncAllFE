@@ -1,10 +1,10 @@
-import Notification from '../assets/images/Notification.svg';
+import NotificationBell from '../assets/images/Notification.svg';
 import ArrowDown from '../assets/images/select-input-arrow.svg';
 import Hamburger from '../assets/images/Hambuger.svg';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
 import Placeholder from '../assets/images/placeholder.png';
 import { useState, useEffect, useRef } from 'react';
-// import MusicUploaderNotification from './MusicUploaderNotification';
+import Notification from './Notification';
 
 interface MusicUploaderNavbarProp {
   activeItem: string;
@@ -20,7 +20,7 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
   toggleMenu,
   activeItem,
 }) => {
-  // const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
    const [user, setUser] = useState<User | null>(null);
 
@@ -30,6 +30,11 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
             setUser(JSON.parse(userData) as User);
         }
     }, []);
+
+
+    const toggleModal = () => {
+      setModalIsOpen((prevState) => !prevState);
+    };
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -81,16 +86,16 @@ const AdminDashboardNavbar: React.FC<MusicUploaderNavbarProp> = ({
 
           <div className="flex gap-[17px] items-center">
             <img
-              src={Notification}
+              src={NotificationBell}
               alt=""
               className="self-start mt-2 cursor-pointer"
-              // onClick={toggleModal}
+              onClick={toggleModal}
             />
 
-            {/* <MusicUploaderNotification
+            <Notification
               isOpen={modalIsOpen}
               onRequestClose={toggleModal}
-            /> */}
+            />
 
             <div>
               <div className="flex items-center lg:mx-3">

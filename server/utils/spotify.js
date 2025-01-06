@@ -24,11 +24,24 @@ const grabSpotifyToken = async()=>{
 
 }
 
+const deezerIsrcSearch = async(isrc)=>{
+    try {
+        const details = await axios.get(`https://api.deezer.com/track/isrc:${isrc}`)
+        const previewTrack = details.data.preview
+        if(!previewTrack){
+            throw new spotifyError('No preview track found')
+        }
+        return previewTrack
+    } catch (error) {
+        console.log(error)
+        throw new spotifyError('An error occured while fetch track preview, contact dev team')
+    }
+}
+
 const spotifyResult = async( trackLink, spotifyToken)=>{
 
-    const trackId = trackLink.split('k/')[1]?.split('?')[0]
-
     try {
+        const trackId = trackLink?.split('k/')[1]?.split('?')[0]
         const trackDetails = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
     
             headers : {
@@ -37,14 +50,13 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
         })
 
         if(!trackDetails.data.preview_url){
-            throw new spotifyError('Unavailable Preview Track')
+            trackDetails.data.preview_url = await deezerIsrcSearch(trackDetails.data.external_ids.isrc)
         }
 
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
         const trackDuration = `${String(minutes)} minutes ${String(seconds)} seconds`;
         const artistIds = trackDetails.data.artists.map((item)=> item.id)
-        console.log(trackDetails.data.preview_url)
         return {
             preview_url : trackDetails.data.preview_url,
             isrc : trackDetails.data.external_ids.isrc,
@@ -60,11 +72,11 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
 }
 
 const SpotifyPreview = async(res, trackLink)=>{
-    const trackId = trackLink.split('k/')[1]?.split('?')[0]
     // const clientId = process.env.SPOTIFY_CLIENT_ID
     // const clientS = process.env.SPOTIFY_CLIENT_S
 
     try {
+        const trackId = trackLink.split('k/')[1]?.split('?')[0]
 
         const token = await grabSpotifyToken()
 
@@ -75,9 +87,9 @@ const SpotifyPreview = async(res, trackLink)=>{
             }
         })
 
-        if(!trackDetails.data.preview_url){
-            return res.status(422).send('No preview available for this track, Please try again later')
-        }
+        // if(!trackDetails.data.preview_url){
+        //     throw new spotifyError('No preview available for this track, Please try again later')
+        // }
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
         const trackDuration = `${String(minutes)} minutes ${String(seconds)} seconds`;

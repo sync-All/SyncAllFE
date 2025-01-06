@@ -2,7 +2,8 @@ const Track = require("../models/track.model").track;
 const dashboard = require('../models/dashboard.model').dashboard
 const User = require('../models/usermodel').uploader
 const mongoose = require("mongoose");
-const { grabSpotifyToken, spotifyResult } = require("../utils/spotify")
+const { grabSpotifyToken, spotifyResult } = require("../utils/spotify");
+const { uploadErrorHistory } = require("../models/track.model");
 require('dotenv').config
 
 
@@ -46,22 +47,28 @@ try {
 
 // Utwa()
 
-async function addDashboardToUserSchema(){
+async function toogleTrackUploadStatus(){
   try {
-    const allDashboardDetails = await dashboard.find({}).exec()
-    for(var i = 0; i < allDashboardDetails.length; i++){
-      const updateUserSchema = await User.findByIdAndUpdate(allDashboardDetails[i].user, {dashboard : allDashboardDetails[i]._id}, {new : true})
-      console.log(updateUserSchema)
-    }
+    const {uploadErrors} = await User.findOne({_id : '675824cd97dc98e98eaa6c04'}).exec()
+    await Promise.all(uploadErrors.map(async(history)=>{
+      const result = await uploadErrorHistory.findByIdAndUpdate(history, {user : '675824cd97dc98e98eaa6c04'}, {new : true})
+
+      console.log(result)
+    }))
     return;
   } catch (error) {
     console.log(error)
   }
 }
 
-addDashboardToUserSchema()
+toogleTrackUploadStatus()
 
-
+// async function clearUploadErrors(){
+//   const user = await User.findByIdAndUpdate('675824cd97dc98e98eaa6c04',{$set : {uploadErrors : []}}, {new : true})
+//   console.log(user)
+//   return
+// }
+// clearUploadErrors()
 // async function addFieldToExistingDocuments() {
 //   try {
 //       const result = await dashboard.updateMany(

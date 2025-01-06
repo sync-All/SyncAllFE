@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { User } from '../contexts/UserContext';
 import MusicPlayer from './MusicPlayer';
+import SpotifyHelper from '../helper/spotifyHelper';
 
 interface UserLicensedTracksProps {
   userDetails: User | undefined;
@@ -31,6 +32,7 @@ const UserLicensedTracks: React.FC<UserLicensedTracksProps> = ({
 
   const actions = [Favorite, Copy];
 
+
   return (
     <section className="mt-[63px] relative mb-[485px]">
       <div className=" hidden flex-col gap-[56px] lg:flex">
@@ -53,7 +55,21 @@ const UserLicensedTracks: React.FC<UserLicensedTracksProps> = ({
                 </span>
               </span>
               <div className="items-center flex">
-                <MusicPlayer trackLink={detail?.trackLink} />
+                {detail.trackLink ? (
+                  <MusicPlayer trackLink={detail?.trackLink} />
+                ) : (
+                  <iframe
+                    style={{ borderRadius: '12px' }}
+                    src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                      detail?.spotifyLink || ''
+                    )}?utm_source=generator`}
+                    width="100%"
+                    height="100"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+                )}
               </div>
               <span className="flex gap-12">
                 <span>

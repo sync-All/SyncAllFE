@@ -8,7 +8,6 @@ const Dispute = require('../models/dashboard.model').dispute
 const Ticket = require('../models/dashboard.model').ticket
 const {v4 : uuidv4} = require('uuid')
 const fs = require("node:fs")
-const { request } = require("node:http")
 require('dotenv').config()
 
 cloudinary.config({
@@ -23,7 +22,7 @@ const dashboardcontrol = async (req,res,next)=>{
         try {
             if(req.user.role == "Music Uploader"){
                 const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks')
-                const profileInfo = await User.findById(userId).populate('uploadErrors')
+                const profileInfo = await User.findById(userId).populate('uploadErrors').populate({path : 'uploadErrors', populate : {path : 'associatedErrors', model : 'trackError'}})
                 const transactions = await Transaction.find({user : userId})
                 res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
             }else{

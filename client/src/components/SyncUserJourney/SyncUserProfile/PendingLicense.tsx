@@ -4,6 +4,7 @@ import ArrowUp from '../../../assets/images/up-arrow.svg';
 import React, { useState, useMemo } from 'react';
 import MusicPlayer from '../../MusicPlayer';
 import NoPendingLicense from '../../../assets/images/no_track.svg';
+import SpotifyHelper from '../../../utils/spotifyhelper';
 
 interface SortConfig {
   key: keyof PendingTracks | null;
@@ -124,11 +125,25 @@ const PendingLicense = () => {
 
                 <td className="">
                   <span>
-                    <MusicPlayer
-                      trackLink={track.trackLink}
-                      songId={track._id}
-                      buttonStyle="w-4 cursor-pointer"
-                    />
+                    {track?.trackLink ? (
+                      <MusicPlayer
+                        trackLink={track.trackLink}
+                        songId={track._id}
+                        buttonStyle="w-4 cursor-pointer"
+                      />
+                    ) : (
+                      <iframe
+                        style={{ borderRadius: '12px' }}
+                        src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                          track?.spotifyLink || ''
+                        )}?utm_source=generator`}
+                        width="100%"
+                        height="100"
+                        frameBorder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                      ></iframe>
+                    )}
                   </span>
                 </td>
               </tr>

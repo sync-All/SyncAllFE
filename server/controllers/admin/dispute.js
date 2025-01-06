@@ -2,7 +2,9 @@ const { default: mongoose } = require("mongoose")
 const { BadRequestError } = require("../../utils/CustomError")
 const { adminActivityLog } = require("../../models/activity.model")
 const Admin = require('../../models/usermodel').admin
+const {uploader,syncUser} = require('../../models/usermodel')
 const Dispute = require('../../models/dashboard.model').dispute
+const Ticket = require('../../models/dashboard.model').ticket
 
 const assignAdmin = async(req,res,next)=>{
     const {adminId,disputeId} = req.query
@@ -40,4 +42,75 @@ const setDisputeStatus = async(req,res,next)=>{
     }
 }
 
-module.exports = {assignAdmin, setDisputeStatus}
+const searchTicket = async(req,res,next)=>{
+    try {
+        const {filter} = req.query
+        if(!filter){
+             throw new BadRequestError('filter parameter missing')
+        }
+        const tickets = await Ticket.aggregate([
+            {
+                $lookup: {
+                    from: "users", // The name of the `user` collection
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $unwind: "$userDetails" // Deconstruct array returned by $lookup
+            },
+            {
+                $match: {
+                    $or: [
+                        { tickId: { $regex: filter, $options: "i" } }, // filter by tickId
+                        { "userDetails.username": { $regex: filter, $options: "i" } }, // filter by username
+                        { "userDetails.name": { $regex: filter, $options: "i" } } // Search by fullname
+                    ]
+                }
+            },
+            {
+                $project: {
+                    tickId: 1,
+                    status: 1,
+                    user: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    "userDetails.username": 1,
+                    "userDetails.name": 1,
+                    "userDetails.email" : 1,
+                }
+            }
+        ]);
+        return res.status(200).json(tickets);
+    }catch (error) {
+        console.log(error)
+        throw new BadRequestError(error.message)
+    }
+}
+
+const requestAdditionalDocument = async(req,res,next)=>{
+    try {
+        const {disputeId, userId, userRole} = req.query
+        const acceptedUserRoles = ['Music Uploader', 'Sync User']
+        if(!disputeId || !userId || !acceptedUserRoles.includes(userRole)){
+            throw new BadRequestError('Bad request, missing parameter')
+        }
+        const disputeDetails = await Dispute.findById(disputeId).exec()
+        if(disputeDetails !== 'Pending'){
+            throw new BadRequestError('Action not allowed, dispute already resolved')
+        }
+        let userInfo = {}
+        if(userRole == 'Music Uploader'){
+            userInfo = await uploader.findById(userId).exec()
+        }else if(userRole == 'Sync User'){
+            userInfo = await uploader.findById(userId).exec()
+        }
+
+    } catch (error) {
+        throw new BadRequestError(error.message)
+    }
+
+}
+
+module.exports = {assignAdmin, setDisputeStatus,searchTicket}

@@ -13,7 +13,6 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'uploaderAccountInfo'
     },
-
     countryReached : {
         type : Number,
         default : 0,
@@ -33,6 +32,21 @@ const dashboardSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "user"
     },
+},{timestamps : true})
+dashboardSchema.add({
+    totalQuotesRequested : [
+        {
+            type : Schema.Types.ObjectId,
+            ref : "quote",
+        }
+    ],
+    totalLicensedTracks : [ 
+        {
+            type : Schema.Types.ObjectId,
+            ref : "track_license",
+        }
+        
+    ],
 })
 
 
@@ -94,7 +108,6 @@ const ticketSchema = new Schema({
     tickId : {
         type : String
     },
-
     associatedDisputes : [{
         type : Schema.Types.ObjectId,
         ref : 'dispute'
@@ -118,15 +131,12 @@ const disputeSchema = new Schema({
     issueType : {
         type : String
     },
-
     desc : {
         type : String
     },
-
     supportingDoc : {
         type : Buffer
     },
-
     supportingDocType : {
         type : String
     },
@@ -150,7 +160,6 @@ const disputeSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'user'
     }
-
 },{timestamps : true})
 
 const dashboard = mongoose.model('dashboard',dashboardSchema)

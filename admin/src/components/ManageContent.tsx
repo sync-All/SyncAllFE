@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 // import Filter from '../../assets/images/Filter-lines.svg';
 
 import Dot from '../assets/images/dot.svg';
@@ -13,11 +13,10 @@ import { Content } from '../contexts/ContentContext';
 import { Link } from 'react-router-dom';
 import usePagination from '../hooks/usePaginate';
 import Left from '../assets/images/left-arrow.svg';
-import Right from '../assets/images/right-arrow.svg'; 
-
-// interface ManageContentProps {
-//   onTabChange: (tab: string, content?: Content) => void;
-// }
+import Right from '../assets/images/right-arrow.svg';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import debounce from 'lodash/debounce';
 
 interface TableData {
   _id: string;
@@ -27,6 +26,10 @@ interface TableData {
   role: string;
   name: string;
   img: string;
+}
+
+interface ResponseData {
+  message?: string;
 }
 
 interface SortConfig {
@@ -57,8 +60,67 @@ const SortButton: React.FC<{
 
 const ManageContent = () => {
   const { content, loading } = useContent();
+  const [searchResults, setSearchResults] = useState<Content[]>([]);
+  const [contentSearch, setContentSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  console.log(content);
+  const fetchByUsername = async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/manage_content/search?filter=${searchTerm}`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
+    };
+
+    try {
+      setIsLoading(true);
+      const res = await axios.get(apiUrl, config);
+      if (Array.isArray(res.data)) {
+        setSearchResults(res.data); // Set users data as search results
+      } else {
+        // Handle unexpected response structure
+        setSearchResults([]); // Set an empty array if structure doesn't match
+      }
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const debouncedFetch = debounce(fetchByUsername, 1000);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setContentSearch(value);
+
+    if (!value.trim()) {
+      setSearchResults([]); // Clear search results
+      debouncedFetch.cancel(); // Cancel any pending debounced searches
+      return;
+    }
+
+    debouncedFetch(value);
+  };
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, []);
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
@@ -88,6 +150,9 @@ const ManageContent = () => {
     });
   }, [content, sortConfig]);
 
+  const displayContent =
+    contentSearch.trim() === '' ? sortedData : searchResults;
+
   // Apply pagination on the sorted data
   const itemsPerPage = 30;
 
@@ -99,9 +164,9 @@ const ManageContent = () => {
     goToPreviousPage,
     goToPage,
     getPaginationRange,
-  } = usePagination(sortedData, itemsPerPage);
+  } = usePagination(displayContent, itemsPerPage);
 
-  const totaltracks = sortedData.length;
+  const totaltracks = displayContent.length;
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
 
@@ -139,11 +204,11 @@ const ManageContent = () => {
             <div className="relative w-full flex items-center gap-4 min-w-[320px]">
               <input
                 type="text"
-                placeholder="Search User ID, Title, or Keywords"
+                placeholder="Search Title, or Keywords"
                 className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
                 name="searchWord"
-                // value={searchWord}
-                // onChange={(e) => setSearchWord(e.target.value)}
+                onChange={handleSearch}
+                value={contentSearch}
               />
               <img
                 src={Search}
@@ -155,7 +220,9 @@ const ManageContent = () => {
           </div>
         </div>
 
-        {paginatedItems.length > 0 ? (
+        {isLoading ? (
+          <LoadingAnimation />
+        ) : paginatedItems.length > 0 ? (
           <div>
             {' '}
             <table className="w-full mt-5">
@@ -199,7 +266,7 @@ const ManageContent = () => {
                     </td>
                     <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
                       <img src={Dot} alt="Dot" />
-                      ACTIVE
+                      {content.uploadStatus}
                     </td>
 
                     <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
@@ -281,8 +348,7 @@ const ManageContent = () => {
                       : 'text-[#5E5E5E]'
                   }`}
                 >
-                  Next{' '}
-                  <img src={Right} alt="" />
+                  Next <img src={Right} alt="" />
                 </button>
               </div>
             </div>
