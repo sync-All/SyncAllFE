@@ -47,7 +47,7 @@ interface UploadStats {
   successfulUploads: number;
   errors: {
     duplicates: TrackData[];
-    invalidLinks: TrackData[];
+    invalidSpotifyLink: TrackData[];
   };
 }
 
@@ -66,10 +66,13 @@ export const useUpload = () => {
   return context;
 };
 
+
 export const UploadProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [uploadStats, setUploadStats] = useState<UploadStats | null>(null);
+
+
 
   return (
     <UploadContext.Provider value={{ uploadStats, setUploadStats }}>

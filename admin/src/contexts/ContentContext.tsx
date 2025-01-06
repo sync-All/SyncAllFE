@@ -53,6 +53,7 @@ export interface Content {
   explicitCont: string;
   releaseLabel: string;
   releaseDesc: string;
+  spotifyLink: string;
   user: User;
 }
 

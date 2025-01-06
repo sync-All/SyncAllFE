@@ -9,8 +9,9 @@ import NoTrack from '../../assets/images/no_track.svg';
 import usePagination from '../../hooks/usePaginate';
 import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
-import { useLocation } from 'react-router-dom';
-//  
+import { useLocation, useNavigate } from 'react-router-dom';
+import SpotifyHelper from '../../utils/spotifyhelper';
+//
 // Types
 interface SortConfig {
   key: keyof Track | null;
@@ -251,6 +252,29 @@ const ErrorTracksTable: React.FC<TableProps> = ({
     return text.slice(0, length);
   };
 
+  const navigate = useNavigate();
+
+  const handleViewError = (associatedErrors: Track[]) => {
+    // Group the errors into the expected structure
+    const formattedErrors = {
+      duplicates: associatedErrors.filter(
+        (error) => error.err_type === 'duplicateTrack'
+      ),
+      invalidSpotifyLink: associatedErrors.filter(
+        (error) => error.err_type === 'InvalidSpotifyLink'
+      ),
+    };
+    
+    navigate('/dashboard/bulk-upload/resolve-errors', {
+      state: {
+        errorData: {
+          duplicates: formattedErrors.duplicates,
+          invalidSpotifyLink: formattedErrors.invalidSpotifyLink,
+        },
+      },
+    });
+  };
+
   return (
     <>
       <table className="w-full mt-5">
@@ -289,7 +313,7 @@ const ErrorTracksTable: React.FC<TableProps> = ({
               />
             </th>
             <th className={ThStyles}>Status</th>
-            {/* <th className={ThStyles}>Error Details</th> */}
+            <th className={ThStyles}>Error Details</th>
           </tr>
         </thead>
         <tbody>
@@ -298,7 +322,7 @@ const ErrorTracksTable: React.FC<TableProps> = ({
               <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8 uppercase">
                 <span className="font-inter">#</span>
                 <span className="capilatize">
-                  {truncateText((track.uploadId), 11)}
+                  {truncateText(track.uploadId, 11)}
                 </span>
               </td>
               <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
@@ -315,14 +339,14 @@ const ErrorTracksTable: React.FC<TableProps> = ({
               <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                 {track.status}
               </td>
-              {/* <td className="py-4 px-8">
+              <td className="py-4 px-8">
                 <button
-                  // onClick={() => navigate(`/error-details/${track._id}`)}
+                  onClick={() => handleViewError(track.associatedErrors)}
                   className="text-[#1671D9] hover:text-blue-800 font-inter"
                 >
                   View
                 </button>
-              </td> */}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -442,13 +466,27 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
               ${track.earnings}
             </td>
             <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-              <MusicPlayer
-                trackLink={track.trackLink}
-                containerStyle="mt-0 flex items-center gap-3"
-                buttonStyle="w-4 cursor-pointer"
-                songId={track._id}
-                waveStyle="w-[70px]"
-              />
+              {track.trackLink ? (
+                <MusicPlayer
+                  trackLink={track.trackLink}
+                  containerStyle="mt-0 flex items-center gap-3"
+                  buttonStyle="w-4 cursor-pointer"
+                  songId={track._id}
+                  waveStyle="w-[70px]"
+                />
+              ) : (
+                <iframe
+                  style={{ borderRadius: '12px' }}
+                  src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                    track?.spotifyLink || ''
+                  )}?utm_source=generator`}
+                  width="100%"
+                  height="100"
+                  frameBorder="0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                ></iframe>
+              )}
             </td>
           </tr>
         ))}
@@ -468,11 +506,12 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   const { dashboardData } = useDataContext();
   const allTracks = dashboardData?.dashboardDetails.totalTracks || [];
   const errorTracks = dashboardData?.profileInfo.uploadErrors || [];
+  console.table(`errorTracks : ${JSON.stringify(errorTracks)}`);
 
-   const location = useLocation();
-   const [activeTab, setActiveTab] = useState<'All' | 'Error'>(
-     location.state?.activeTab || 'All'
-   );
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'All' | 'Error'>(
+    location.state?.activeTab || 'All'
+  );
 
   const handleSort = (key: keyof Track) => {
     setSortConfig((current) => ({

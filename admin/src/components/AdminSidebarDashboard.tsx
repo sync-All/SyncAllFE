@@ -90,11 +90,11 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
             </Link>
           </li>
 
-          <li onClick={() => onTabChange('Manage Dispute')}>
-            <Link to="/admin/disputes" style={liStyle('Manage Dispute')}>
+          <li onClick={() => onTabChange('Manage Tickets')}>
+            <Link to="/admin/tickets" style={liStyle('Manage Tickets')}>
               {' '}
               <img src={DisputeIcon} alt="" />
-              <p style={pStyle('Manage Dispute')}>Manage Dispute</p>
+              <p style={pStyle('Manage Tickets')}>Manage Tickets</p>
             </Link>
           </li>
 

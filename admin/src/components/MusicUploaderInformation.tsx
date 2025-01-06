@@ -16,7 +16,6 @@ const MusicUploaderInformation = () => {
 
   const userDetails = getContentById(id || '');
 
-  console.log(userDetails);
 
   if (loading) {
     return <LoadingAnimation />;

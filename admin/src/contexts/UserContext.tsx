@@ -7,6 +7,7 @@ export interface Track {
   releaseTitle: string;
   trackTitle: string;
   trackLink: string;
+  spotifyLink: string;
   upc: string;
   uploadStatus: string;
   earnings: number;

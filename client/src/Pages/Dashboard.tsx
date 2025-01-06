@@ -15,8 +15,8 @@ import MusicUploaderEarnings from '../components/MusicUploaderJourney/MusicUploa
 import ProfileMultiStep from '../components/MusicUploaderJourney/MusicUploaderUserProfile/ProfileMultiStep';
 import MusicUploaderDispute from '../components/MusicUploaderJourney/Dispute/MusicUploaderDispute';
 import BulkUpload from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/BulkUpload';
-import ResolveError from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
 import { UploadProvider } from '../Context/UploadContext';
+import ResolveErrorWrapper from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
 
 const DashboardLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -86,7 +86,7 @@ const DashboardLayout = () => {
             path="/bulk-upload/resolve-errors"
             element={
               <UploadProvider>
-                <ResolveError />
+                <ResolveErrorWrapper />
               </UploadProvider>
             }
           />

@@ -7,6 +7,14 @@ interface ErrorTabsProps {
   invalidSpotifyCount: number;
 }
 
+interface ResolveErrorProps {
+  data: {
+    duplicates: TrackData[];
+    invalidSpotifyLink: TrackData[];
+  };
+  source: 'upload' | 'error_list';
+}
+
 const ErrorTabs: React.FC<ErrorTabsProps> = ({
   activeTab,
   onTabChange,
@@ -49,32 +57,29 @@ const ErrorTabs: React.FC<ErrorTabsProps> = ({
   );
 };
 
-
 // ResolveError.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import DuplicateByYouTab from './DuplicateByYouTab';
 import DuplicateByOtherTab from './DuplicateByOtherTab';
 import InvalidSpotifyTab from './InvalidSpotifyTab';
 import ProceedBulkError from './ProceedBulkError';
 import DuplicateByYouResolveBulkError from './DuplicateByYouResolveBulkError';
 import DuplicateByOthersResolveBulkError from './DuplicateByOthersResolveBulkError';
-import { useUpload } from '../../../../Context/UploadContext';
+import { TrackData, useUpload } from '../../../../Context/UploadContext';
 
-
-const ResolveError = () => {
+const ResolveError: React.FC<ResolveErrorProps> = ({ data, source }) => {
   const [activeTab, setActiveTab] = useState('duplicateByYou');
   const [showProceedModal, setShowProceedModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
   const navigate = useNavigate();
-    const { uploadStats } = useUpload();
-
+  const { uploadStats } = useUpload();
 
   const handleProceed = () => {
     setShowProceedModal(true);
   };
 
-  if (!uploadStats) {
+  if (!data) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <p className="text-gray-600">No error data available</p>
@@ -88,20 +93,31 @@ const ResolveError = () => {
     );
   }
 
+  console.log(data);
+  console.log(data);
 
-  // Filter duplicates based on user and trackOwner from the data
-  const duplicatesByYou = uploadStats.errors.duplicates.filter(
+  const getTitle = () => {
+    return source === 'upload' ? 'Bulk Track Upload' : 'Resolve Upload Errors';
+  };
+
+  const duplicatesByYou = data.duplicates.filter(
     (track) => track.user === track.trackOwner
   );
 
-  const duplicatesByOthers = uploadStats.errors.duplicates.filter(
+  const duplicatesByOthers = data.duplicates.filter(
     (track) => track.user !== track.trackOwner
   );
+
+  const invalidSpotifyLink = data.invalidSpotifyLink || [];
+
+  console.log(invalidSpotifyLink);
 
   // Update counts
   const duplicatesCount = duplicatesByYou.length;
   const duplicatesOtherCount = duplicatesByOthers.length;
-  const invalidLinksCount = uploadStats?.errors.invalidLinks.length || 0;
+  const invalidLinksCount = uploadStats?.errors.invalidSpotifyLink.length || invalidSpotifyLink.length;
+
+  console.log(invalidLinksCount);
 
   const errorCount = duplicatesCount + duplicatesOtherCount + invalidLinksCount;
 
@@ -112,7 +128,7 @@ const ResolveError = () => {
       case 'duplicateByOther':
         return <DuplicateByOtherTab tracks={duplicatesByOthers} />;
       case 'invalidSpotify':
-        return <InvalidSpotifyTab tracks={uploadStats.errors.invalidLinks || []} />;
+        return <InvalidSpotifyTab tracks={invalidSpotifyLink} />;
       default:
         return null;
     }
@@ -145,7 +161,7 @@ const ResolveError = () => {
         <div>
           <span className="flex gap-2">
             <h2 className="text-[#101828] text-[18px] font-formular-medium leading-[28px]">
-              Bulk Track Upload
+              {getTitle()}
             </h2>
             <p className="text-black2 text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#ECF7F7] rounded-2xl">
               Track Details
@@ -196,4 +212,24 @@ const ResolveError = () => {
   );
 };
 
-export default ResolveError;
+const ResolveErrorWrapper: React.FC = () => {
+  const { uploadStats } = useUpload();
+  const location = useLocation();
+  const errorData = location.state?.errorData;
+
+  console.log(errorData);
+  // If coming from error list
+  if (errorData) {
+    return <ResolveError data={errorData} source="error_list" />;
+  }
+
+  // If coming from bulk upload
+  if (uploadStats?.errors) {
+    return <ResolveError data={uploadStats.errors} source="upload" />;
+  }
+
+  // If no data available
+  return <Navigate to="/dashboard" replace />;
+};
+
+export default ResolveErrorWrapper;

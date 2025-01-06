@@ -11,7 +11,6 @@ const applyLabelStyles =
 const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 
 const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
-  console.log(details);
   return (
     <div className="flex flex-col mt-[60px]">
       <div className={applyFormDiv}>

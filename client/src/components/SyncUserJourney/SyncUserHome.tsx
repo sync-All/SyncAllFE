@@ -20,6 +20,7 @@ import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
 import LoadingAnimation from '../../constants/loading-animation';
 import usePagination from '../../hooks/usePaginate';
+import SpotifyHelper from '../../utils/spotifyhelper';
 
 interface TrackDetails {
   producers: string;
@@ -34,6 +35,7 @@ interface TrackDetails {
   mood: string[];
   actions: string[];
   artWork: string;
+  spotifyLink: string;
 }
 
 
@@ -179,6 +181,8 @@ const SyncUserHome = () => {
     return text;
   };
 
+  console.log(paginatedItems);
+
   return (
     <div className="relative">
       <div
@@ -236,14 +240,29 @@ const SyncUserHome = () => {
                       </span>
                     </Link>
 
-                    <MusicPlayer
-                      trackLink={detail.trackLink}
-                      songId={detail._id}
-                      duration={10}
-                      containerStyle="mt-0 flex items-center gap-3"
-                      buttonStyle="w-4 cursor-pointer"
-                      waveStyle="w-[300px]"
-                    />
+                    {detail.trackLink ? (
+                      <MusicPlayer
+                        trackLink={detail.trackLink}
+                        songId={detail._id}
+                        duration={10}
+                        containerStyle="mt-0 flex items-center gap-3"
+                        buttonStyle="w-4 cursor-pointer"
+                        waveStyle="w-[300px]"
+                      />
+                    ) : (
+                      <iframe
+                        style={{ borderRadius: '12px' }}
+                        src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                          detail?.spotifyLink || ''
+                        )}?utm_source=generator`}
+                        width="300"
+                        height="100"
+                        frameBorder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                      ></iframe>
+                    )}
+
                     <span className="flex gap-12 w-[25%] items-start ml-[5%]">
                       <span className="w-[50%]">
                         <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">

@@ -9,13 +9,13 @@ import React, {
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
-
 export interface Dispute {
   _id: string;
   tickId: string;
   associatedDisputes: AssociatedDispute[];
   status: string;
   user: User;
+  userDetails: User;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -33,15 +33,15 @@ interface Activity {
 }
 
 interface Assign {
-  email: string
-  name: string
-  role: string
+  email: string;
+  name: string;
+  role: string;
 }
 
 export interface AssociatedDispute {
   _id: string;
   activityLog: Activity[];
-  assignedTo: Assign
+  assignedTo: Assign;
   nameOfTrack: string;
   issueType: string;
   desc: string;
@@ -60,8 +60,6 @@ export interface User {
   email: string;
   userType: string;
 }
-
-
 
 interface DisputeContextProps {
   dispute: Dispute[];
@@ -85,14 +83,16 @@ export const useDispute = () => {
   return context;
 };
 
-export const DisputeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const DisputeProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [dispute, setDispute] = useState<Dispute[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchContent = useCallback(async () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/dispute/all_tickets`;
+    const apiUrl = `${urlVar}/ticket/all_tickets`;
     const config = {
       headers: {
         Authorization: `${token}`,

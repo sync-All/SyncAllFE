@@ -93,10 +93,10 @@ const AdminDashboard = () => {
               />
 
               <Route
-                path="disputes"
+                path="tickets"
                 element={
                   <ProtectedRoute
-                    path="disputes"
+                    path="tickets"
                     element={
                       <DisputeProvider>
                         <DisputeTicket />

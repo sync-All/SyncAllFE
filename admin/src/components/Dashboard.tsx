@@ -109,7 +109,6 @@ const Dashboard = () => {
         setLoading(true);
         const res = await axios.get(apiUrl, config);
         setKpiData(res.data.kpiDetails);
-        console.log(res.data.kpiDetails);
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
