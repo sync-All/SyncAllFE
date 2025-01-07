@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
-const path = require('path')
+const path = require('path');
+const { BadRequestError } = require('./CustomError');
 require('dotenv').config()
 
 // Create a transporter
@@ -208,7 +209,7 @@ function informQuoteRequest(email, name){
   });
 }
 
-function additionalDocRequest(email, name){
+function additionalDocRequest(email, name,ticketId){
   const transporter = nodemailer.createTransport({
     service : "Gmail",
     auth: {
@@ -217,11 +218,11 @@ function additionalDocRequest(email, name){
     },
   });
 
-  const pathToEjsTemp = path.join(__dirname, '..', '/views/')
-  ejs.renderFile(pathToEjsTemp,{name}, (err, renderedHtml) => {
+  const pathToEjsTemp = path.join(__dirname, '..', '/views/reqAddtionalDoc.ejs')
+  ejs.renderFile(pathToEjsTemp,{name,ticketId}, (err, renderedHtml) => {
     if (err) {
       console.error('Error rendering EJS template:', err);
-      return;
+      throw new BadRequestError('Error rendering EJS template')
     }
 
     // Compose email options
@@ -236,6 +237,7 @@ function additionalDocRequest(email, name){
     transporter.sendMail(mainOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
+        throw new BadRequestError('Error sending email:')
       } else {
         console.log('Email sent successfully!');
       }
@@ -244,4 +246,4 @@ function additionalDocRequest(email, name){
 }
 
 
-module.exports = {sendConfirmationMail, requestForgotPassword, informQuoteRequest}
+module.exports = {sendConfirmationMail, requestForgotPassword, informQuoteRequest,additionalDocRequest}
