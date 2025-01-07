@@ -3,10 +3,10 @@ import Search from '../../assets/images/search-1.svg';
 import LoadingAnimation from '../../constants/loading-animation';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
-import Dot from '../../assets/images/dot.svg';
 import NoDispute from '../../assets/images/no_track.svg';
 import { Link, useParams } from 'react-router-dom';
 import { AssociatedDispute, useDispute } from '../../contexts/DisputeContext';
+import getStatusColors from '../../helper/getStatusColors';
 
 interface SortConfig {
   key: keyof AssociatedDispute | null;
@@ -186,10 +186,19 @@ const TicketDIsputes = () => {
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {dispute.issueType}
                   </td>
-                  <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
-                    <img src={Dot} alt="Dot" />
-                    {dispute.status}
-                    {/* {track.uploadStatus} */}
+                  <td className="py-4 px-8">
+                    <span
+                      className={`${getStatusColors(dispute.status).text} ${
+                        getStatusColors(dispute.status).bg
+                      } font-inter font-medium text-[12px] leading-[18px] gap-[6px] px-[6px] flex items-center justify-center rounded-2xl w-fit`}
+                    >
+                      <div
+                        className={`${
+                          getStatusColors(dispute.status).dot
+                        } w-2 h-2 rounded-full`}
+                      ></div>
+                      {dispute.status}
+                    </span>
                   </td>
                   <td>
                     {' '}

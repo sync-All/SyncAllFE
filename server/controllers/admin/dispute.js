@@ -3,6 +3,7 @@ const { BadRequestError } = require("../../utils/CustomError")
 const { adminActivityLog } = require("../../models/activity.model")
 const Admin = require('../../models/usermodel').admin
 const {uploader,syncUser} = require('../../models/usermodel')
+const { additionalDocRequest } = require("../../utils/mailer")
 const Dispute = require('../../models/dashboard.model').dispute
 const Ticket = require('../../models/dashboard.model').ticket
 
@@ -91,26 +92,24 @@ const searchTicket = async(req,res,next)=>{
 
 const requestAdditionalDocument = async(req,res,next)=>{
     try {
-        const {disputeId, userId, userRole} = req.query
-        const acceptedUserRoles = ['Music Uploader', 'Sync User']
-        if(!disputeId || !userId || !acceptedUserRoles.includes(userRole)){
+        const {tickId,disputeId} = req.query
+        if(!tickId || !disputeId){
             throw new BadRequestError('Bad request, missing parameter')
         }
+        const TicketDetails = await Ticket.findOne({associatedDisputes : {$in : [disputeId]}}).where('tickId').equals(tickId).populate('user').exec()
+        if(!TicketDetails){
+            throw new BadRequestError('Bad request, invalid parameters')
+        }
         const disputeDetails = await Dispute.findById(disputeId).exec()
-        if(disputeDetails !== 'Pending'){
+        if(disputeDetails.status !== 'Pending'){
             throw new BadRequestError('Action not allowed, dispute already resolved')
         }
-        let userInfo = {}
-        if(userRole == 'Music Uploader'){
-            userInfo = await uploader.findById(userId).exec()
-        }else if(userRole == 'Sync User'){
-            userInfo = await uploader.findById(userId).exec()
-        }
-
+        additionalDocRequest(TicketDetails.user.email, TicketDetails.user.name, tickId)
+        res.status(201).send('Email sent successfully')
     } catch (error) {
         throw new BadRequestError(error.message)
     }
 
 }
 
-module.exports = {assignAdmin, setDisputeStatus,searchTicket}
+module.exports = {assignAdmin, setDisputeStatus,searchTicket,requestAdditionalDocument}

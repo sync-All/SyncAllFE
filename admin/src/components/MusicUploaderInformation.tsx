@@ -32,7 +32,7 @@ const MusicUploaderInformation = () => {
       image: Earning,
       title: 'Total Earnings',
       dollar: '$',
-      value: userDetails?.dashboard.earnings.length || 0,
+      value: userDetails?.dashboard.earnings?.length || 0,
       color: '#f62c2c',
     },
     {

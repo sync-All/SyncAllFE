@@ -13,6 +13,7 @@ import debounce from 'lodash/debounce';
 import usePagination from '../../hooks/usePaginate';
 import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
+import getStatusColors from '../../helper/getStatusColors';
 
 interface SortConfig {
   key: keyof Dispute | null;
@@ -296,17 +297,19 @@ const DisputeTicket = () => {
                       {new Date(ticket.updatedAt).toLocaleDateString()}
                     </td>
 
-                    <td className="text-[#F3A218] bg-[#FEF6E7] font-inter font-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
+                    <td className="py-4 px-8">
+                      <span
+                        className={`${getStatusColors(ticket.status).text} ${
+                          getStatusColors(ticket.status).bg
+                        } font-inter font-medium text-[12px] leading-[18px] gap-[6px] px-[6px] flex items-center justify-center rounded-2xl w-fit`}
                       >
-                        <circle cx="4" cy="4" r="3" fill="#F3A218" />
-                      </svg>
-                      {ticket.status}
+                        <div
+                          className={`${
+                            getStatusColors(ticket.status).dot
+                          } w-2 h-2 rounded-full`}
+                        ></div>
+                        {ticket.status}
+                      </span>
                     </td>
                     <td>
                       <Link
