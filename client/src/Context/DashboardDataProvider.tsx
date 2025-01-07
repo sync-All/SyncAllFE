@@ -60,8 +60,9 @@ export interface Track {
   uploadId: string;
   filename: string;
   errorCount: number;
-  associatedErrors: string[];
-  status: string
+  associatedErrors: Track[];
+  status: string;
+  spotifyLink: string;
 }
 
 interface Earnings {

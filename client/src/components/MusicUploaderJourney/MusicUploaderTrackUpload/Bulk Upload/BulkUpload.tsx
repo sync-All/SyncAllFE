@@ -208,9 +208,12 @@ const BulkUpload = () => {
                     successfulUploads: data.successCount,
                     errors: {
                       duplicates: data.duplicateData || [],
-                      invalidLinks: data.invalidSpotifyLink || [],
+                      invalidSpotifyLink: data.invalidSpotifyLink || [],
                     },
+                    
                   });
+
+                
                 }
               } catch (parseError) {
                 console.error('Error processing event:', event);
@@ -230,6 +233,7 @@ const BulkUpload = () => {
     },
     []
   );
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

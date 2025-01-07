@@ -333,14 +333,16 @@ const Pricing = () => {
             ) : (
               plan.name !== 'Basic' && (
                 <div
-                  className={clsx('w-fit cursor-pointer py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6', userPlan == plan.name && 'inactive')}
+                  className={clsx(
+                    'w-fit cursor-pointer py-2 px-4 bg-transparent rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium  text-[15px] leading-[20px] my-6',
+                    userPlan == plan.name && 'inactive'
+                  )}
                   style={{
                     backgroundColor: plan.btnBg,
                     color: plan.pricebtntext,
                   }}
-                  onClick={()=>{
-                    handleSelectPlan(plan.planInfo, plan.name, plan.amount)
-                    ;
+                  onClick={() => {
+                    handleSelectPlan(plan.planInfo, plan.name, plan.amount);
                   }}
                 >
                   {userPlan == plan.name &&
@@ -502,7 +504,7 @@ const Pricing = () => {
             Contact Us
           </h2>
           <p className="text-[#1B2128] font-Utile-regular text-[24px] leading-[52px] tracking-[-0.48px] ">
-            Send an email to <b>enterpriserequest@syncall.com</b>{' '}
+            Send an email to <b>enterpriserequest@syncallmusic.com</b>{' '}
           </p>
         </div>
       </section>

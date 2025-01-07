@@ -89,8 +89,7 @@ const ManageUsers = () => {
        setSearchResults(res.data.users); // Set users data as search results
      } else {
        // Handle unexpected response structure
-       console.error('Unexpected response structure:', res.data);
-       setSearchResults([]); // Set an empty array if structure doesn't match
+       setSearchResults([]);
      }
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
@@ -159,7 +158,6 @@ const ManageUsers = () => {
     return <LoadingAnimation />;
   }
 
-  console.log(searchResults);
 
    const displayData = username.trim() === '' ? sortedData : searchResults;
   return (

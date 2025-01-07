@@ -20,6 +20,7 @@ export interface TracklistDetails {
   countryOfRelease: string;
   lyrics: string;
   trackLink: string;
+  spotifyLink: string;
   artWork: string;
   audioLang: string;
   claimBasis: string;
@@ -61,6 +62,7 @@ export interface PendingTracks {
   license_status: string;
   amount: string;
   trackLink: string;
+  spotifyLink: string;
   quote_id: string;
   quote_type: string;
   sync_user_info: string;

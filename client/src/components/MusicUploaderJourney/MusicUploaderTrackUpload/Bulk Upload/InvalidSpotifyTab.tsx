@@ -42,6 +42,11 @@ const SortButton: React.FC<SortButtonProps> = ({
 );
 
 const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
+
+
+
+
+
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -94,6 +99,8 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
   const totaltracks = sortedTracks.length;
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+
+  console.log(tracks);
 
   return (
     <>

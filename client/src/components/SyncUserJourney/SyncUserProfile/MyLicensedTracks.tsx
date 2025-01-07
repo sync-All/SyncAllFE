@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useSyncUser } from '../../../Context/syncUserData';
 import MusicPlayer from '../../MusicPlayer';
+import SpotifyHelper from '../../../utils/spotifyhelper';
 
 const MyLicensedTracks = () => {
   const { user } = useSyncUser();
@@ -51,7 +52,24 @@ const MyLicensedTracks = () => {
                 </span>
               </span>
               <div className="items-center flex">
-                <MusicPlayer trackLink={detail?.trackLink} />
+                {detail?.trackLink ? (
+                  <MusicPlayer
+                    trackLink={detail?.trackLink}
+                    songId={detail?._id}
+                  />
+                ) : (
+                  <iframe
+                    style={{ borderRadius: '12px' }}
+                    src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                      detail?.spotifyLink || ''
+                    )}?utm_source=generator`}
+                    width="100%"
+                    height="100"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+                )}
               </div>
               <span className="flex gap-12">
                 <span>

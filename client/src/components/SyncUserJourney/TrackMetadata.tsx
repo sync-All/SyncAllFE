@@ -12,6 +12,7 @@ import MusicPlayer from '../MusicPlayer';
 import { useSyncUser } from '../../Context/syncUserData';
 import useLoading from '../../constants/loading';
 import LoadingAnimation from '../../constants/loading-animation';
+import SpotifyHelper from '../../utils/spotifyhelper';
 
 const TrackMetadata = () => {
   const track = useSyncUser();
@@ -70,6 +71,7 @@ const TrackMetadata = () => {
     user: string;
     writers: string[];
     duration: string[];
+    spotifyLink: string;
   }
 
   useEffect(() => {
@@ -154,6 +156,8 @@ const TrackMetadata = () => {
     return <LoadingAnimation />;
   }
 
+console.table(trackDetails);
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:gap-16 mx-5 lg:mx-20">
@@ -196,19 +200,33 @@ const TrackMetadata = () => {
             </div>
           </div>
           <div className="mt-20">
-            <MusicPlayer
-              trackLink={trackDetails?.trackLink}
-              songId={trackDetails?._id}
-            />
+            {trackDetails?.trackLink ? (
+              <MusicPlayer
+                trackLink={trackDetails?.trackLink}
+                songId={trackDetails?._id}
+              />
+            ) : (
+              <iframe
+                style={{ borderRadius: '12px' }}
+                src={`https://open.spotify.com/embed/track/${SpotifyHelper(
+                  trackDetails?.spotifyLink || ''
+                )}?utm_source=generator`}
+                width="100%"
+                height="152"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+              ></iframe>
+            )}
           </div>
 
-          <div className="mt-[93px] mb-[163px]">
+          <div className="mt-[93px] mb-[163px] w-full">
             <h4 className="font-formular-regular text-[24px] leading-6 text-[#344054] mb-2 ">
               Track Details
             </h4>
             <hr />
-            <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between">
-              <div className="flex flex-col gap-8 lg:gap-6 min-w-[300px]">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 justify-between ">
+              <div className="flex flex-col gap-8 lg:gap-6 ">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Genre</p>
                   <p className="text-[#475367]">
@@ -230,7 +248,7 @@ const TrackMetadata = () => {
                   </p>
                 </span>
               </div>
-              <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
+              <div className="flex flex-col justify-between gap-8 lg:gap-6 ">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Mood</p>
                   <p className="text-[#475367]">
@@ -252,7 +270,7 @@ const TrackMetadata = () => {
                   </p>
                 </span>
               </div>
-              <div className="flex  flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
+              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Produced by</p>
                   <p className="text-[#475367]">
@@ -311,9 +329,9 @@ const TrackMetadata = () => {
                     </p>
                   </>
                 )}
-                <div className="mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10 justify-between ">
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 justify-between ">
                   {/* First Column */}
-                  <div className="flex flex-col gap-8 lg:gap-6 min-w-[300px]">
+                  <div className="flex flex-col gap-8 lg:gap-6 ">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Country of Recording</p>
                       <p className="text-[#475367]">
@@ -367,7 +385,7 @@ const TrackMetadata = () => {
                   </div>
 
                   {/* Second Column */}
-                  <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
+                  <div className="flex flex-col justify-between gap-8 lg:gap-6 ">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Copyright Name</p>
                       <p className="text-[#475367]">
@@ -418,7 +436,7 @@ const TrackMetadata = () => {
                   </div>
 
                   {/* Third Column */}
-                  <div className="flex flex-col justify-between gap-8 lg:gap-6 min-w-[300px]">
+                  <div className="flex flex-col justify-between gap-8 lg:gap-6">
                     <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                       <p>Publishers</p>
                       <p className="text-[#475367]">
