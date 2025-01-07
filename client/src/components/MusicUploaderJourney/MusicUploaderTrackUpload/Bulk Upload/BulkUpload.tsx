@@ -88,8 +88,8 @@ const BulkUpload = () => {
     setShowConfirmProceedModal(true); // Open the second modal
   };
 
-  const fileUrl = '../../../../assets/images/testdoc.csv';
-  const fileName = 'testdoc.csv';
+  const fileUrl = '../../../../assets/images/CSV Template.csv';
+  const fileName = 'CSV Template.csv';
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -282,15 +282,16 @@ const BulkUpload = () => {
           {/* Left side - Upload area */}
           <div className="max-w-[509px] space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div>
                 <a
                   href={fileUrl}
                   download={fileName}
-                  className="text-[#1671D9] hover:text-blue-700 font-medium font-inter"
+                  className="text-[#1671D9] hover:text-blue-700 font-medium font-inter flex gap-2 items-center"
                 >
                   Download CSV Template
+                  <img src={Download} alt="" />
                 </a>
-                <img src={Download} alt="" />
+                
               </div>
             </div>
 
