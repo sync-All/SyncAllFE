@@ -83,6 +83,8 @@ interface Earnings {
 interface DashboardDetails {
   _id: string;
   totalTracks: [];
+  totalLicensedTracks: Track[];
+  totalQuotesRequested: Track[];
   earnings: Earnings;
   totalEarnings: number;
   countryReached: number;

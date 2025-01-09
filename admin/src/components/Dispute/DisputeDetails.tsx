@@ -2,9 +2,7 @@ import { ReactNode, useCallback, useEffect, useState } from 'react';
 import Dropdown from '../../constants/Dropdown';
 import DisputeResolve from '../../modals/DisputeResolve';
 import ConfirmTransferOwnership from '../../modals/ConfirmTransferOwnership';
-import {
-  useDispute,
-} from '../../contexts/DisputeContext';
+import { useDispute } from '../../contexts/DisputeContext';
 import { useParams } from 'react-router-dom';
 import LoadingAnimation from '../../constants/loading-animation';
 import { toast } from 'react-toastify';
@@ -27,7 +25,6 @@ interface Admin {
   email: string;
   role: string;
 }
-
 
 const DisputeDetails = () => {
   const { id } = useParams();
@@ -142,8 +139,6 @@ const DisputeDetails = () => {
     }
   };
 
-  
-
   const fetchAdmins = useCallback(async () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -190,6 +185,27 @@ const DisputeDetails = () => {
     }
   };
 
+  // const requestAddtionalInfo = async (tickId: string, disputeId: string) => {
+  //   const token = localStorage.getItem('token');
+  //   const urlVar = import.meta.env.VITE_APP_API_URL;
+  //   const apiUrl = `${urlVar}/dispute/requestAdditionalDocument?tickId=${tickId}&disputeId=${disputeId}`;
+
+  //   try {
+  //     await axios.get(apiUrl, {
+  //       headers: { Authorization: `${token}` },
+  //     });
+  //     toast.success('Additional info requested successfully');
+  //   } catch (error: unknown) {
+  //     const axiosError = error as AxiosError<ResponseData>;
+  //     toast.error(
+  //       (axiosError.response && axiosError.response.data
+  //         ? axiosError.response.data.message || axiosError.response.data
+  //         : axiosError.message || 'An error occurred'
+  //       ).toString()
+  //     );
+  //   }
+  // };
+
   const handleAdminChange = (option: Option) => {
     assignDispute(option.value);
   };
@@ -215,10 +231,10 @@ const DisputeDetails = () => {
     return <LoadingAnimation />;
   }
 
- const truncateText = (text: string, length: number) => {
-   if (text.length <= length) return text;
-   return text.slice(0, length);
- };
+  const truncateText = (text: string, length: number) => {
+    if (text.length <= length) return text;
+    return text.slice(0, length);
+  };
 
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
@@ -441,7 +457,12 @@ const DisputeDetails = () => {
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">
-          <button className="px-4 py-2 border rounded-md font-inter text-[#101828] hover:bg-gray-50">
+          <button
+            className="px-4 py-2 border rounded-md font-inter text-[#101828] hover:bg-gray-50"
+            // onClick={() =>
+            //   requestAddtionalInfo(disputeData._id, disputeData.)
+            // }
+          >
             Request Additional Document
           </button>
           <button

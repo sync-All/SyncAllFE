@@ -59,16 +59,17 @@ const MusicUploaderDashboard = () => {
     {
       image: Earth,
       title: 'Total Tracks Licensed',
-      value: `${dashboardDetails?.countryReached || 0}`,
+      value: `${dashboardDetails?.totalLicensedTracks.length || 0}`,
       color: '#064e3b',
     },
     {
       image: Stream,
-      title: 'Total Plays',
-      value: `${dashboardDetails?.totalPlays || 0}`,
+      title: 'Total Quotes Requested',
+      value: `${dashboardDetails?.totalQuotesRequested.length || 0}`,
       color: '#064e3b',
     },
   ];
+
 
   if (loading) {
     return <LoadingAnimation />;
