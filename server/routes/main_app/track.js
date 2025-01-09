@@ -26,6 +26,11 @@ router.post(
   upload,
   asyncHandler(trackController.trackUpload)
 );
+router.post(
+  "/single_upload_error_resolution/",checkUploader,
+  upload,
+  asyncHandler(trackController.singleUploadErrorResolution)
+);
 
 router.post(
   "/trackBulkUpload/",

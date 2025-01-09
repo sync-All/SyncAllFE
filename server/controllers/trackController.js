@@ -39,41 +39,6 @@ const trackUpload = async(req,res,next)=>{
     let fileInfo = req.file
     await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
     res.status(201).json({success : true, message : 'Music Information has been successfully added'})
-  // if(req.file){
-  //   var artWork = await cloudinary.uploader.upload(req.file.path,{folder:  "track_artwork"})
-  //   const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds}
-  //   const track = new Track(adjustedsongInfo)
-  //   track.save()
-  //   .then(async (track)=>{
-  //     await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-  //     if(songInfo.err_type && songInfo._id){
-  //       await trackError.findByIdAndDelete(songInfo._id)
-  //       await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
-  //     }
-  //     fs.unlinkSync(req.file.path)
-  //     res.status(200).json({success : true, message : 'Music Information has been successfully added'})
-  //   })
-  //   .catch((err)=>{
-  //     console.log(err)
-  //     res.status(401).json(err)
-  //   })
-  // }else{
-  //   const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : req.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
-  //   const track = new Track(adjustedsongInfo)
-  //   track.save()
-  //   .then(async (track)=>{
-  //     await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-  //     if(songInfo.err_type && songInfo._id){
-  //       await trackError.findByIdAndDelete(songInfo._id)
-  //       await uploadErrorHistory.findByIdAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
-  //     }
-  //     res.status(200).json({success : true, message : 'Music Information has been successfully added'})
-  //   })
-  //   .catch((err)=>{
-  //     console.log(err)
-  //     res.status(401).json(err)
-  //   })
-  // }
   } catch (error) {
     throw new BadRequestError(error.message)
   }
@@ -81,14 +46,41 @@ const trackUpload = async(req,res,next)=>{
 
 const singleUploadErrorResolution = async(req,res,next)=>{
   try {
-    const {_id} = req.body
+    const {_id, trackLink} = req.body
+    if(!_id || !trackLink){
+      throw new BadRequestError('Bad request, missing parameter')
+    }
+
+    const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
+    console.log(trackData)
+
+    if(!uploadHistory){
+      throw new BadRequestError('Bad request, Error track not found')
+    }
+
+    let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
+    const confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).exec()
+
+    if(confirmTrackUploaded){
+      throw new unauthorizedError('Track already exists')
+    }
+
+    let songInfo = req.body
+    let fileInfo = req.file
+
+    await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
+    const newuploadHistory = await uploadErrorHistory.findOneAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'},{new : true})
+    if(newuploadHistory.associatedErrors.length < 1){
+      await uploadErrorHistory.findOneAndUpdate({user : req.user._id},{status : 'Processed'},{new : true})
+      .then(async({_id})=>{
+        await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : _id}},{new : true})
+      })
+    }
+
+    res.send('Track successfully uploaded and error resolved.')
     
-    // if(songInfo.err_type && songInfo._id){
-//   await trackError.findByIdAndDelete(songInfo._id)
-//   await uploadErrorHistory.findByIdAndUpdate({user : request.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
-// }
   } catch (error) {
-    
+    throw new BadRequestError(error.message)
   }
 }
 
@@ -299,4 +291,4 @@ const queryTrackInfo =async(req,res,next)=>{
   res.status(400).send("Bad request")
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,singleUploadErrorResolution}
