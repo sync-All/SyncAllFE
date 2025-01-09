@@ -46,16 +46,18 @@ const trackUpload = async(req,res,next)=>{
 
 const singleUploadErrorResolution = async(req,res,next)=>{
   try {
-    const {_id, trackLink} = req.body
-    if(!_id || !trackLink){
+    const {_id, trackLink, err_type} = req.body
+    if(!_id || !trackLink || err_type){
       throw new BadRequestError('Bad request, missing parameter')
     }
 
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
-    console.log(trackData)
 
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
+    }
+    if(err_type != 'InvalidSpotifyLink'){
+      throw new BadRequestError('Only SpotifyLink Fixes are allowed for now, checkout documentation for the updated version')
     }
 
     let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
