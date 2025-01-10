@@ -44,20 +44,20 @@ const trackUpload = async(req,res,next)=>{
   }
 }
 
-const singleUploadErrorResolution = async(req,res,next)=>{
+const invalidSpotifyResolution = async(req,res,next)=>{
   try {
     const {_id, trackLink, err_type} = req.body
     if(!_id || !trackLink || err_type){
       throw new BadRequestError('Bad request, missing parameter')
     }
-
+    const trackDetails = await trackError.findById(_id).exec()
+    if(trackDetails.err_type != 'InvalidSpotifyLink'){
+      throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
+    }
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
 
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
-    }
-    if(err_type != 'InvalidSpotifyLink'){
-      throw new BadRequestError('Only SpotifyLink Fixes are allowed for now, checkout documentation for the updated version')
     }
 
     let spotifyresponse = await spotifyCheck.SpotifyPreview(res, trackLink)
@@ -72,6 +72,7 @@ const singleUploadErrorResolution = async(req,res,next)=>{
 
     await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
     const newuploadHistory = await uploadErrorHistory.findOneAndUpdate({user : req.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'},{new : true})
+    trackError.findByIdAndDelete(songInfo._id).exec()
     if(newuploadHistory.associatedErrors.length < 1){
       await uploadErrorHistory.findOneAndUpdate({user : req.user._id},{status : 'Processed'},{new : true})
       .then(async({_id})=>{
@@ -293,4 +294,4 @@ const queryTrackInfo =async(req,res,next)=>{
   res.status(400).send("Bad request")
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,singleUploadErrorResolution}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution}

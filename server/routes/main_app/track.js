@@ -27,9 +27,9 @@ router.post(
   asyncHandler(trackController.trackUpload)
 );
 router.post(
-  "/single_upload_error_resolution/",checkUploader,
+  "/invalid_spotify_resolution/",checkUploader,
   upload,
-  asyncHandler(trackController.singleUploadErrorResolution)
+  asyncHandler(trackController.invalidSpotifyResolution)
 );
 
 router.post(
