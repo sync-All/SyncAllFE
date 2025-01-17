@@ -21,7 +21,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <input
             type="text"
             name="mainArtist"
-            disabled
+            
             placeholder={details?.mainArtist}
             className={applyInputStyles}
           />
@@ -32,7 +32,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           </label>
           <input
             name="featuredArtist"
-            disabled
+            
             placeholder={Array.isArray(details?.featuredArtist)? details.featuredArtist.join(', ') : ''}
             className={applyInputStyles}
           />
@@ -45,7 +45,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           </label>
           <input
             name="releaseType"
-            disabled
+            
             placeholder={details?.releaseType}
             className={applyInputStyles}
           ></input>
@@ -56,7 +56,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           </label>
           <input
             name="releaseTitle"
-            disabled
+            
             placeholder={details?.releaseTitle}
             className={applyInputStyles}
           ></input>
@@ -70,7 +70,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <input
             type="text"
             name="trackTitle"
-            disabled
+            
             placeholder={details?.trackTitle}
             className={applyInputStyles}
           />
@@ -82,7 +82,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <input
             type="text"
             name="trackLink"
-            disabled
+            
             placeholder={details?.trackLink}
             className={applyInputStyles}
           />
@@ -121,7 +121,7 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           </label>
           <input
             name="genre"
-            disabled
+            
             placeholder={details?.genre}
             className={applyInputStyles}
           ></input>

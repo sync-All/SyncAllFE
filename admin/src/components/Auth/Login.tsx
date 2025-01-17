@@ -16,8 +16,6 @@ const SigninSchema = Yup.object().shape({
     .required('Password is required'),
 });
 
-
-
 interface ResponseData {
   message?: string;
   role?: { userType: string };
@@ -26,6 +24,8 @@ interface ResponseData {
 const Login = () => {
   const { loading, setLoading } = useLoading();
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleNavigationTODashboard = () => {
@@ -137,14 +137,23 @@ const Login = () => {
                       >
                         Password*
                       </label>
-                      <Field
-                        type="password"
-                        name="password"
-                        id="password"
-                        placeholder="Enter password"
-                        required
-                        className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 placeholder-black placeholder-opacity-70"
-                      />
+                      <div className="relative w-full">
+                        <Field
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          id="password"
+                          placeholder="Enter password"
+                          required
+                          className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 placeholder-black placeholder-opacity-70"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-black"
+                        >
+                          {showPassword ? 'Hide' : 'Show'}
+                        </button>
+                      </div>
                       <ErrorMessage
                         name="password"
                         component="div"

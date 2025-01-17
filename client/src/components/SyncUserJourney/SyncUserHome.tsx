@@ -38,38 +38,35 @@ interface TrackDetails {
   spotifyLink: string;
 }
 
-
-
 const SyncUserHome = () => {
   const { user, loading } = useSyncUser();
   const track = user;
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
   const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const { id } = useParams();
   const [tracksLoading, setTracksLoading] = useState<boolean>(false);
+  const [displayedTracks, setDisplayedTracks] = useState<TrackDetails[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [originalTracks, setOriginalTracks] = useState<TrackDetails[]>([]);
 
   const itemsPerPage = 30; // Can be dynamic as needed
-    const {
-      currentPage,
-      totalPages,
-      paginatedItems,
-      goToNextPage,
-      goToPreviousPage,
-      goToPage,
-      getPaginationRange,
-    } = usePagination<TrackDetails>(musicDetails, itemsPerPage);
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination<TrackDetails>(displayedTracks, itemsPerPage);
 
-
-  const totaltracks = musicDetails.length;
+  const totaltracks = displayedTracks.length;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-
-  
 
   const closeMenu = () => setMenuOpen(!menuOpen);
 
@@ -131,36 +128,50 @@ const SyncUserHome = () => {
     message?: string;
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/allSongs`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
+  const fetchData = async () => {
+    if (isSearching) return; // Don't fetch if we're showing search results
 
-      try {
-        setTracksLoading(true);
-        const res = await axios.get(apiUrl, config);
-        setMusicDetails(res.data.allTracks);
-      } catch (error: unknown) {
-        const axiosError = error as AxiosError<ResponseData>;
-
-        toast.error(
-          (axiosError.response && axiosError.response.data
-            ? axiosError.response.data.message || axiosError.response.data
-            : axiosError.message || 'An error occurred'
-          ).toString()
-        );
-      } finally {
-        setTracksLoading(false);
-      }
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/allSongs`;
+    const config = {
+      headers: {
+        Authorization: `${token}`,
+      },
     };
+
+    try {
+      setTracksLoading(true);
+      const res = await axios.get(apiUrl, config);
+      setDisplayedTracks(res.data.allTracks);
+      setOriginalTracks(res.data.allTracks);
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    } finally {
+      setTracksLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [id, setTracksLoading]);
+  }, [id, setTracksLoading, isSearching]);
+
+  const handleSearchResults = (results: TrackDetails[]) => {
+    setIsSearching(true);
+    setDisplayedTracks(results);
+  };
+
+  const handleResetSearch = () => {
+    setIsSearching(false);
+    setDisplayedTracks(originalTracks);
+    fetchData();
+  };
 
   if (tracksLoading) {
     return <LoadingAnimation />;
@@ -182,6 +193,7 @@ const SyncUserHome = () => {
   };
 
   console.log(paginatedItems);
+  console.log(isSearching);
 
   return (
     <div className="relative">
@@ -191,7 +203,10 @@ const SyncUserHome = () => {
         }`}
       >
         <section>
-          <MusicSearch />
+          <MusicSearch
+            onSearchResults={handleSearchResults}
+            onResetSearch={handleResetSearch}
+          />
           <div className="relative mt-[55px]">
             <div className="flex gap-2 w-full py-6 pl-6 bg-cover min-h-[371px] md:min-h-full lg:pl-16 lg:py-[56px] bg-no-repeat flex-col bg-syncUserBg md:bg-desktopSyncUserBg border rounded-[10px]">
               <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
@@ -208,7 +223,7 @@ const SyncUserHome = () => {
           <div className="flex justify-between items-center">
             {' '}
             <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
-              Browse Songs
+              {isSearching ? 'Search Results' : 'Browse Songs'}
             </h3>
             <div className="text-[12px] font-formular-regular">
               Showing<span className="font-Utile-regular">:</span> {endIndex} of{' '}
