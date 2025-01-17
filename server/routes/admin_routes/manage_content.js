@@ -14,4 +14,6 @@ router.get('/manage_content/review',checkAdmin,asynchandler(contentManager.conte
 
 router.get('/manage_content/search',checkAdmin,asynchandler(contentManager.searchContent))
 
+router.post('/manage_content/trackupdate',checkAdmin,asynchandler(contentManager.contentUpdate))
+
 module.exports = router

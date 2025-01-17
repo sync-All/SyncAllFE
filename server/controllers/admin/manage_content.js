@@ -43,4 +43,15 @@ const searchContent = async(req,res,next)=>{
     }
     
 }
-module.exports = {contentReview, searchContent}
+
+const contentUpdate = async(req,res,next)=>{
+    try {
+        const {_id} = req.body
+        await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
+        res.send("TrackDetails uploaded successfully")
+    } catch (error) {
+        console.log(error)
+        throw new BadRequestError("Bad request, please check documentation")
+    }
+}
+module.exports = {contentReview, searchContent, contentUpdate}
