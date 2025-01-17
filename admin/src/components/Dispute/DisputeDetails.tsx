@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import axios, { AxiosError } from 'axios';
 import Dot from '../../assets/images/dot.svg';
 import { downloadFile } from '../../utils/filedownloader';
+import getStatusColors from '../../helper/getStatusColors';
 
 interface ResponseData {
   message: string;
@@ -38,6 +39,7 @@ const DisputeDetails = () => {
   const parentDispute = dispute.find((d) =>
     d.associatedDisputes.some((ad) => ad._id === id)
   );
+
   const associatedDispute = parentDispute?.associatedDisputes.find(
     (ad) => ad._id === id
   );
@@ -46,6 +48,8 @@ const DisputeDetails = () => {
     ...associatedDispute,
     ...user,
   };
+  console.log(`assciate : ${associatedDispute?._id}`);
+  console.log(`parent : ${parentDispute?.tickId}`);
 
   const formatDate = (dateString: string | undefined): string => {
     if (!dateString) return 'N/A';
@@ -185,26 +189,26 @@ const DisputeDetails = () => {
     }
   };
 
-  // const requestAddtionalInfo = async (tickId: string, disputeId: string) => {
-  //   const token = localStorage.getItem('token');
-  //   const urlVar = import.meta.env.VITE_APP_API_URL;
-  //   const apiUrl = `${urlVar}/dispute/requestAdditionalDocument?tickId=${tickId}&disputeId=${disputeId}`;
+  const requestAddtionalInfo = async (tickId: string, disputeId: string) => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/dispute/requestAdditionalDocument?tickId=${tickId}&disputeId=${disputeId}`;
 
-  //   try {
-  //     await axios.get(apiUrl, {
-  //       headers: { Authorization: `${token}` },
-  //     });
-  //     toast.success('Additional info requested successfully');
-  //   } catch (error: unknown) {
-  //     const axiosError = error as AxiosError<ResponseData>;
-  //     toast.error(
-  //       (axiosError.response && axiosError.response.data
-  //         ? axiosError.response.data.message || axiosError.response.data
-  //         : axiosError.message || 'An error occurred'
-  //       ).toString()
-  //     );
-  //   }
-  // };
+    try {
+      await axios.get(apiUrl, {
+        headers: { Authorization: `${token}` },
+      });
+      toast.success('Additional info requested successfully');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    }
+  };
 
   const handleAdminChange = (option: Option) => {
     assignDispute(option.value);
@@ -236,6 +240,8 @@ const DisputeDetails = () => {
     return text.slice(0, length);
   };
 
+  console.log(disputeData.status);
+
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
       <div className="flex items-center justify-between ">
@@ -246,17 +252,17 @@ const DisputeDetails = () => {
               D{truncateText(disputeData._id ?? '', 6)}
             </span>
           </h1>
-          <span className="text-[#F3A218] text-[12px] font-formular-medium py-[2px] px-[8px] items-center flex bg-[#FEF6E7] rounded-2xl w-fit gap-[6px]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="8"
-              height="8"
-              viewBox="0 0 8 8"
-              fill="none"
-            >
-              <circle cx="4" cy="4" r="3" fill="#F3A218" />
-            </svg>{' '}
-            Pending
+          <span
+            className={`${getStatusColors(disputeData.status || '').text} ${
+              getStatusColors(disputeData.status || '').bg
+            } font-inter font-medium text-[12px] leading-[18px] gap-[6px] px-[6px] flex items-center justify-center rounded-2xl w-fit`}
+          >
+            <div
+              className={`${
+                getStatusColors(disputeData.status || '').dot
+              } w-2 h-2 rounded-full`}
+            ></div>
+            {disputeData.status}
           </span>
         </div>
         <div className="flex items-center gap-6 ">
@@ -459,9 +465,16 @@ const DisputeDetails = () => {
         <div className="flex justify-end gap-3">
           <button
             className="px-4 py-2 border rounded-md font-inter text-[#101828] hover:bg-gray-50"
-            // onClick={() =>
-            //   requestAddtionalInfo(disputeData._id, disputeData.)
-            // }
+            onClick={() => {
+              if (associatedDispute?._id && parentDispute?.tickId) {
+                requestAddtionalInfo(
+                  parentDispute.tickId,
+                  associatedDispute?._id
+                );
+              } else {
+                toast.error('Dispute ID or Ticket ID is missing');
+              }
+            }}
           >
             Request Additional Document
           </button>

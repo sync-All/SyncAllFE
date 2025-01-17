@@ -21,7 +21,7 @@ const CopyrightOwnerClaim: React.FC<CopyrightOwnerClaimProps> = ({
           </label>
           <input
             name="claimBasis"
-            disabled
+            
             placeholder={details?.claimBasis}
             className={applyInputStyles}
           />
@@ -33,7 +33,7 @@ const CopyrightOwnerClaim: React.FC<CopyrightOwnerClaimProps> = ({
           <input
             type="text"
             name="claimingUser"
-            disabled
+            
             placeholder={details?.claimingUser}
             className={applyInputStyles}
           />
@@ -46,7 +46,7 @@ const CopyrightOwnerClaim: React.FC<CopyrightOwnerClaimProps> = ({
           </label>
           <input
             name="role"
-            disabled
+            
             placeholder={details?.role}
             className={applyInputStyles}
           />
@@ -58,7 +58,7 @@ const CopyrightOwnerClaim: React.FC<CopyrightOwnerClaimProps> = ({
           <input
             type="number"
             name="percentClaim"
-            disabled
+            
             placeholder={
               details?.percentClaim?.toString() || 'Composition and/or Masters'
             }

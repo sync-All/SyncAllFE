@@ -137,7 +137,7 @@ const ContentReview = () => {
               Reject Post
             </button>
           )}
-         
+
           {contentItem?.uploadStatus !== 'Approved' && (
             <button
               className="bg-[#037847] py-2.5 px-4 gap-[8px] rounded-[8px] flex text-[14px] text-white"
@@ -255,6 +255,14 @@ const ContentReview = () => {
               className={controlBtn}
             >
               Next
+            </div>
+          )}
+          {currentSection == 'Release Information' && (
+            <div
+              onClick={() => setCurrentSection(nextSection(currentSection))}
+              className={controlBtn}
+            >
+              Save changes{' '}
             </div>
           )}
         </div>

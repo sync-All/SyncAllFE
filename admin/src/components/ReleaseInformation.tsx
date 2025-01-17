@@ -20,7 +20,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="copyrightName"
-            disabled
+            
             placeholder={details?.copyrightName}
             className={applyInputStyles}
           />
@@ -32,7 +32,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <input
             type="number"
             name="copyrightYear"
-            disabled
+            
             placeholder={details?.copyrightYear?.toString()}
             className={applyInputStyles}
           />
@@ -46,7 +46,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <input
         
             name="releaseDate"
-            disabled
+            
             placeholder={new Date(details?.releaseDate ?? '').toLocaleDateString()}
             className={applyInputStyles}
           />
@@ -57,7 +57,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="countryOfRelease"
-            disabled
+            
             placeholder={details?.countryOfRelease}
             className={applyInputStyles}
           />
@@ -70,7 +70,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="mood"
-            disabled
+            
             placeholder={
               Array.isArray(details?.mood) ? details?.mood.join(', ') : ''
             }
@@ -83,7 +83,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="tag"
-            disabled
+            
             placeholder={
               Array.isArray(details?.tag) ? details?.tag.join(', ') : ''
             }
@@ -98,7 +98,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="lyrics"
-            disabled
+            
             placeholder={details?.lyrics || 'add lyrics'}
             className={applyInputStyles}
           />
@@ -109,7 +109,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="audioLang"
-            disabled
+            
             placeholder={details?.audioLang}
             className={applyInputStyles}
           />
@@ -122,7 +122,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           </label>
           <input
             name="explicitCont"
-            disabled
+            
             placeholder={details?.explicitCont}
             className={applyInputStyles}
           />
@@ -134,7 +134,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <input
             type="text"
             name="releaseLabel"
-            disabled
+            
             placeholder={details?.releaseLabel}
             className={applyInputStyles}
           />
@@ -148,7 +148,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <input
             type="text"
             name="releaseDesc"
-            disabled
+            
             placeholder={details?.releaseDesc}
             className={applyInputStyles}
           />

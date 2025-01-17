@@ -24,7 +24,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <input
             type="text"
             name="recordingVersion"
-            disabled
+            
             placeholder={
               details?.recordingVersion
             }
@@ -38,7 +38,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <input
             className={applyInputStyles}
             name="featuredInstrument"
-            disabled
+            
             placeholder={
               details?.featuredInstrument?.join(', ')
             }
@@ -52,7 +52,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <input
             name="producers"
-            disabled
+            
             placeholder={
               details?.producers?.join(', ') 
             }
@@ -66,7 +66,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <input
             
             name="recordingDate"
-            disabled
+            
             placeholder={new Date(details?.recordingDate ?? '').toLocaleDateString()}
             className={applyInputStyles}
           />
@@ -79,7 +79,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <input
             name="countryOfRecording"
-            disabled
+            
             placeholder={details?.countryOfRecording}
             className={applyInputStyles}
           />
@@ -90,7 +90,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <input
             name="writers"
-            disabled
+            
             placeholder={
               details?.writers?.join(', ')
             }
@@ -105,7 +105,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <input
             name="composers"
-            disabled
+            
             placeholder={
               details?.composers?.join(', ')
             }
@@ -118,7 +118,7 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <input
             name="publishers"
-            disabled
+            
             placeholder={
               details?.publishers?.join(', ')
             }
