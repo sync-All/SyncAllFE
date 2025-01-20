@@ -14,7 +14,7 @@ const mongoTestString = process.env.MONGO_TEST_CONNECT_STRING
 try {
     main()
   } catch (error) {
-    console.log(err)
+    console.log(error)
   }
   
   async function main(){
