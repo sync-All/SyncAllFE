@@ -19,6 +19,7 @@ const Interpolation = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_attachments, setAttachments] = useState<File[]>([]);
 
+
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
   const applyLabelStyles =
@@ -84,7 +85,7 @@ const Interpolation = () => {
     portion_to_be_sampled: '',
     intended_usage: [],
     territories: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     media_formats: [],
     samples_of_other_songs: '',
     additional_info: '',
@@ -142,6 +143,10 @@ const Interpolation = () => {
     navigate(-1);
   };
 
+   const navigateToPendingLicense = () => {
+     navigate('/myAccount?section=Pending%20License');
+   };
+
   const handleSubmission = async (
     values: FormData,
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
@@ -178,7 +183,7 @@ const Interpolation = () => {
       await axios.post(apiUrl, formData, config);
       toast.success('Interpolation quote sent successfully');
       await delay(5000);
-      handleNavigateBack();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       const errorMessage = (
@@ -386,7 +391,7 @@ const Interpolation = () => {
                         <Field
                           name="license_duration"
                           type="text"
-                          disabled
+                          
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />

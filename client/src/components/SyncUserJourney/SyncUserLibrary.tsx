@@ -191,8 +191,7 @@ const SyncUserLibrary: React.FC = () => {
                   </Link>
                   <Link to={`/quote/${detail._id}`}>
                     <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                      License
-                    </button>
+Get Quote                    </button>
                   </Link>
                 </span>
               </div>

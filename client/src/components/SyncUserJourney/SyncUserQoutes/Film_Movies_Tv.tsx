@@ -24,6 +24,10 @@ const FilmMoviesTv = () => {
     navigate(-1);
   };
 
+   const navigateToPendingLicense = () => {
+     navigate('/myAccount?section=Pending%20License');
+   };
+
   const applyInputStyles =
     'shadow appearance-none border border-[#D7DCE0] rounded-[4px] w-full py-2 px-3 focus:bg-[#F4F5F6] focus:outline-transparent focus:shadow-outline text-[#98A2B3] font-inter font-normal leading-4 tracking-[0.4px] text-[16px]';
   const applyLabelStyles =
@@ -88,7 +92,7 @@ const FilmMoviesTv = () => {
     length: '',
     territories: [],
     media: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     attachments: null as FileList | null,
     additional_info: '',
     role_type: 'Film/Movie/TV Series',
@@ -174,7 +178,7 @@ const FilmMoviesTv = () => {
       await axios.post(apiUrl, formData, config);
       toast.success('Sampling quote sent successfully');
       await delay(5000);
-      handleBackBtn();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       const errorMessage = (
@@ -450,7 +454,7 @@ const FilmMoviesTv = () => {
                         <Field
                           name="license_duration"
                           type="text"
-                          disabled
+                          
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />

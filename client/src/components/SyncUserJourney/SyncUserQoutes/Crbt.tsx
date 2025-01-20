@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import InputField from '../../InputField';
-
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import useLoading from '../../../constants/loading';
@@ -46,7 +45,7 @@ const Crbt = () => {
     duration: '',
     distribution: [],
     territories: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     media: '',
     additional_info: '',
     role_type: 'CRBT',
@@ -75,6 +74,10 @@ const Crbt = () => {
     navigate(-1);
   };
 
+    const navigateToPendingLicense = () => {
+      navigate('/myAccount?section=Pending%20License');
+    };
+
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -97,7 +100,7 @@ const Crbt = () => {
       await axios.post(apiUrl, value, config);
       toast.success('CRBT quote sent successfully');
       await delay(5000);
-      handleNavigateBack();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
@@ -251,7 +254,7 @@ const Crbt = () => {
                         name="license_duration"
                         type="text"
                         placeholder="e.g., One-time, Perpetual"
-                        disabled
+                        
                         className={applyInputStyles}
                       />
                       <ErrorMessage

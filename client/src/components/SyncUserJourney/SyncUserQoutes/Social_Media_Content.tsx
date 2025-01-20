@@ -54,7 +54,7 @@ const SocialMediaContent = () => {
     distribution: [],
     length: '',
     territories: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     media: '',
     additional_info: '',
     role_type: 'Social Media Content',
@@ -83,6 +83,10 @@ const SocialMediaContent = () => {
       navigate(-1);
     };
 
+     const navigateToPendingLicense = () => {
+       navigate('/myAccount?section=Pending%20License');
+     };
+
     function delay(ms: number) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
@@ -105,7 +109,7 @@ const SocialMediaContent = () => {
         await axios.post(apiUrl, value, config);
         toast.success('Social media content quote sent successfully');
         await delay(5000);
-        handleNavigateBack();
+        navigateToPendingLicense();
       } catch (error: unknown) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
@@ -254,7 +258,7 @@ const SocialMediaContent = () => {
                         name="license_duration"
                         type="text"
                         placeholder="e.g., One-time, Perpetual"
-                        disabled
+                        
                         className={applyInputStyles}
                       />
                       <ErrorMessage
