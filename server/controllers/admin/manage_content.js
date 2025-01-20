@@ -47,8 +47,8 @@ const searchContent = async(req,res,next)=>{
 const contentUpdate = async(req,res,next)=>{
     try {
         const {_id} = req.body
-        await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
-        res.send("TrackDetails uploaded successfully")
+        const trackDetails = await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
+        res.send({message : "TrackDetails uploaded successfully", trackDetails},)
     } catch (error) {
         console.log(error)
         throw new BadRequestError("Bad request, please check documentation")
