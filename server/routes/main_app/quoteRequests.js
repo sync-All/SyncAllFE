@@ -8,7 +8,7 @@ const upload = multer({ dest: "uploads/" }).array("attachments", 5);
 const cloudinary = require("cloudinary").v2;
 const fs = require("node:fs");
 const { syncUser } = require("../../models/usermodel");
-const { trackLicense } = require("../../models/dashboard.model");
+const { trackLicense } = require("../../models/track.model");
 const {
   createFmtRecord,
   createTVARecord,
