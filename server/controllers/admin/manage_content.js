@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
 const { track } = require("../../models/track.model")
 const { BadRequestError, unauthorizedError } = require("../../utils/CustomError")
@@ -47,11 +48,14 @@ const searchContent = async(req,res,next)=>{
 const contentUpdate = async(req,res,next)=>{
     try {
         const {_id} = req.body
+        if(!mongoose.Types.ObjectId.isValid()){
+            throw new BadRequestError("Track not available")
+        }
         const trackDetails = await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
         res.send({message : "TrackDetails uploaded successfully", trackDetails},)
     } catch (error) {
         console.log(error)
-        throw new BadRequestError("Bad request, please check documentation")
+        throw new BadRequestError(error.message)
     }
 }
 module.exports = {contentReview, searchContent, contentUpdate}
