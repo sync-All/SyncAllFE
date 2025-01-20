@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Track, useDataContext } from '../../Context/DashboardDataProvider';
 import MusicPlayer from '../MusicPlayer';
 import Plus from '../../assets/images/plus.svg';
-import Dot from '../../assets/images/dot.svg';
 import ArrowDown from '../../assets/images/arrowdown.svg';
 import ArrowUp from '../../assets/images/up-arrow.svg';
 import NoTrack from '../../assets/images/no_track.svg';
@@ -11,6 +10,7 @@ import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SpotifyHelper from '../../utils/spotifyhelper';
+import getStatusColors from '../../utils/getStatusColors';
 //
 // Types
 interface SortConfig {
@@ -264,7 +264,7 @@ const ErrorTracksTable: React.FC<TableProps> = ({
         (error) => error.err_type === 'InvalidSpotifyLink'
       ),
     };
-    
+
     navigate('/dashboard/bulk-upload/resolve-errors', {
       state: {
         errorData: {
@@ -415,6 +415,8 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
 
+ 
+
   return (
     <table className="w-full mt-5">
       <thead>
@@ -457,11 +459,20 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
               {new Date(track.releaseDate).toLocaleDateString()}
             </td>
             <td className="py-4 px-8">
-              <span className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center rounded-2xl w-fit">
-                <img src={Dot} alt="Status" className="w-2 h-2" />
+              <span
+                className={`${getStatusColors(track.uploadStatus).text} ${
+                  getStatusColors(track.uploadStatus).bg
+                } font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center rounded-2xl w-fit`}
+              >
+                <div
+                  className={`${
+                    getStatusColors(track.uploadStatus).dot
+                  } w-2 h-2 rounded-full`}
+                ></div>
                 {track.uploadStatus}
               </span>
             </td>
+
             <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
               ${track.earnings}
             </td>

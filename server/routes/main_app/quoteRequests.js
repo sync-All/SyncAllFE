@@ -18,7 +18,7 @@ const {
   createCRBTRecord,
   createSMCRecord,
 } = require("../../utils/createAirTable");
-const Track = require("../../models/dashboard.model").track;
+const Track = require("../../models/track.model").track;
 const fmtRequest = require("../../models/quote.model").fmtRequest;
 const tvaRequest = require("../../models/quote.model").tvaRequest;
 const videoGamesRequest = require("../../models/quote.model").videoGamesRequest;
@@ -516,9 +516,7 @@ router.post(
       const userId = req.user._id;
       const trackId = req.body.track_info;
       try {
-        const trackDetails = await Track.findOne({ _id: trackId })
-          .populate("user")
-          .exec();
+        const trackDetails = await Track.findOne({ _id: trackId }).populate("user").exec();
         if (!trackDetails) {
           throw new BadRequestError("Track does not exists");
         }

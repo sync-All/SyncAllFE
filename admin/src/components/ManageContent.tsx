@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 // import Filter from '../../assets/images/Filter-lines.svg';
-
-import Dot from '../assets/images/dot.svg';
 import ArrowDown from '../assets/images/arrowdown.svg';
 import ArrowUp from '../assets/images/up-arrow.svg';
 
@@ -17,6 +15,7 @@ import Right from '../assets/images/right-arrow.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import debounce from 'lodash/debounce';
+import getStatusColors from '../helper/getStatusColors';
 
 interface TableData {
   _id: string;
@@ -264,9 +263,19 @@ const ManageContent = () => {
                     <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                       {content.user.name}
                     </td>
-                    <td className="text-[#037847] bg-[#ECFDF3] font-formular-medium text-[14px] leading-5 gap-[6px] px-2 flex items-center justify-center my-6 mx-6 rounded-2xl w-fit">
-                      <img src={Dot} alt="Dot" />
-                      {content.uploadStatus}
+                    <td className="py-4 px-8">
+                      <span
+                        className={`${getStatusColors(content.uploadStatus).text} ${
+                          getStatusColors(content.uploadStatus).bg
+                        } font-inter font-medium text-[12px] leading-[18px] gap-[6px] px-[6px] flex items-center justify-center rounded-2xl w-fit`}
+                      >
+                        <div
+                          className={`${
+                            getStatusColors(content.uploadStatus).dot
+                          } w-2 h-2 rounded-full`}
+                        ></div>
+                        {content.uploadStatus}
+                      </span>
                     </td>
 
                     <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
