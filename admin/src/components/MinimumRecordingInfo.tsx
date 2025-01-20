@@ -1,4 +1,6 @@
+import { ErrorMessage, Field } from 'formik';
 import { Content } from '../contexts/ContentContext';
+import InputField from './InputField';
 
 interface MinRecInfoProps {
   details?: Content;
@@ -10,6 +12,8 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
   const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
+  const applyErrorStyles = 'italic text-red-600';
+
 
   return (
     <div className="flex flex-col mt-[60px]">
@@ -18,23 +22,33 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <label htmlFor="mainArtist" className={applyLabelStyles}>
             Main Artist
           </label>
-          <input
+          <Field
             type="text"
             name="mainArtist"
-            
             placeholder={details?.mainArtist}
             className={applyInputStyles}
           />
+          <ErrorMessage
+            name="mainArtist"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="featuredArtist" className={applyLabelStyles}>
-            Featured Artist{' '}
-          </label>
-          <input
+          <InputField
+            label="Featured Artist"
             name="featuredArtist"
-            
-            placeholder={Array.isArray(details?.featuredArtist)? details.featuredArtist.join(', ') : ''}
+            placeholder={
+              Array.isArray(details?.featuredArtist)
+                ? details.featuredArtist.join(', ')
+                : ''
+            }
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="featuredArtist"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -43,23 +57,31 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <label htmlFor="releaseType" className={applyLabelStyles}>
             Release Type
           </label>
-          <input
+          <Field
             name="releaseType"
-            
             placeholder={details?.releaseType}
             className={applyInputStyles}
-          ></input>
+          />
+          <ErrorMessage
+            name="releaseType"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="releaseTitle" className={applyLabelStyles}>
             Release Title
           </label>
-          <input
+          <Field
             name="releaseTitle"
-            
             placeholder={details?.releaseTitle}
             className={applyInputStyles}
-          ></input>
+          />
+          <ErrorMessage
+            name="releaseTitle"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
       </div>
       <div className={applyFormDiv}>
@@ -67,24 +89,32 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <label htmlFor="trackTitle" className={applyLabelStyles}>
             Track Title
           </label>
-          <input
+          <Field
             type="text"
             name="trackTitle"
-            
             placeholder={details?.trackTitle}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="trackTitle"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="trackLink" className={applyLabelStyles}>
             Track Link
           </label>
-          <input
+          <Field
             type="text"
             name="trackLink"
-            
             placeholder={details?.trackLink}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="trackLink"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -93,24 +123,34 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <label htmlFor="upc" className={applyLabelStyles}>
             UPC
           </label>
-          <input
+          <Field
             type="number"
             name="upc"
             disabled
             placeholder={details?.upc}
             className={applyInputStyles}
           />
+          <ErrorMessage
+            name="upc"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
           <label htmlFor="isrc" className={applyLabelStyles}>
             ISRC
           </label>
-          <input
+          <Field
             type="text"
             name="isrc"
             placeholder={details?.isrc}
             className={applyInputStyles}
             disabled
+          />
+          <ErrorMessage
+            name="isrc"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -119,12 +159,16 @@ const MinimumRecordingInfo: React.FC<MinRecInfoProps> = ({ details }) => {
           <label htmlFor="genre" className={applyLabelStyles}>
             Genre
           </label>
-          <input
+          <Field
             name="genre"
-            
             placeholder={details?.genre}
             className={applyInputStyles}
-          ></input>
+          />
+          <ErrorMessage
+            name="genre"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
       </div>
     </div>

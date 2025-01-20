@@ -1,6 +1,4 @@
-// MusicSearch.tsx
-import React from 'react';
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Search from '../../assets/images/search-1.svg';
 import Genre from '../../constants/genre';
 import Mood from '../../constants/mood';
@@ -8,9 +6,13 @@ import Instrument from '../../constants/instrument';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
+interface SearchState {
+  type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+  query: string;
+}
+
 interface ResponseData {
-  message?: string;
-  spotifyLink: string;
+  message: string;
 }
 
 interface TrackDetails {
@@ -30,38 +32,47 @@ interface TrackDetails {
 }
 
 interface MusicSearchProps {
-  onSearchResults: (results: TrackDetails[]) => void;
+  onSearch: (results: TrackDetails[], searchState: SearchState) => void;
   onResetSearch: () => void;
 }
 
 const MusicSearch: React.FC<MusicSearchProps> = ({
-  onSearchResults,
+  onSearch,
   onResetSearch,
 }) => {
-  const [selectedInstrument, setSelectedInstrument] = useState<string | null>(
-    null
-  );
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [searchWord, setSearchWord] = useState<string>('');
+  const [searchState, setSearchState] = useState<SearchState>({
+    type: null,
+    query: '',
+  });
+
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
 
   const performSearch = useCallback(
-    async (endpoint: string, query: string) => {
+    async (
+      endpoint: string,
+      query: string,
+      searchType: SearchState['type']
+    ) => {
+      if (!query.trim()) {
+        onResetSearch();
+        return;
+      }
+
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
       const apiUrl = `${urlVar}/${endpoint}/${query}`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
 
       try {
-        const res = await axios.get(apiUrl, config);
-        onSearchResults(res.data.allTracks);
+        const response = await axios.get(apiUrl, {
+          headers: { Authorization: token },
+        });
+
+        onSearch(response.data.allTracks, {
+          type: searchType,
+          query: query.trim(),
+        });
       } catch (error) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(
@@ -72,81 +83,59 @@ const MusicSearch: React.FC<MusicSearchProps> = ({
         );
       }
     },
-    [onSearchResults]
+    [onSearch, onResetSearch]
   );
 
-  const debouncedSearch = (endpoint: string, query: string) => {
+  const debouncedSearch = (
+    endpoint: string,
+    query: string,
+    searchType: SearchState['type']
+  ) => {
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
 
     const timeoutId = setTimeout(() => {
-      performSearch(endpoint, query);
+      performSearch(endpoint, query, searchType);
     }, 300);
 
     setSearchTimeout(timeoutId);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTextSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchWord(value);
 
-    // Clear other filters
-    setSelectedGenre(null);
-    setSelectedMood(null);
-    setSelectedInstrument(null);
+    setSearchState({
+      type: 'text',
+      query: value,
+    });
 
-    if (value) {
-      debouncedSearch('querySongs', value);
+    if (value.trim()) {
+      debouncedSearch('querySongs', value, 'text');
     } else {
       onResetSearch();
     }
   };
 
-  const handleGenreSelect = (genre: string) => {
-    const genreValue = genre.toLowerCase();
-    const newGenre = genreValue === selectedGenre ? null : genreValue;
-    setSelectedGenre(newGenre);
-    setSearchWord('');
-    setSelectedMood(null);
-    setSelectedInstrument(null);
+  const handleFilterSelect = (
+    value: string,
+    type: 'genre' | 'mood' | 'instrument',
+    endpoint: string
+  ) => {
+    const newQuery = value.toLowerCase();
 
-    if (newGenre) {
-      performSearch('getTrackByGenre', newGenre);
-    } else {
+    if (searchState.type === type && searchState.query === newQuery) {
+      setSearchState({ type: null, query: '' });
       onResetSearch();
+      return;
     }
-  };
 
-  const handleMoodSelect = (mood: string) => {
-    const moodValue = mood.toLowerCase();
-    const newMood = moodValue === selectedMood ? null : moodValue;
-    setSelectedMood(newMood);
-    setSearchWord('');
-    setSelectedGenre(null);
-    setSelectedInstrument(null);
+    setSearchState({
+      type,
+      query: newQuery,
+    });
 
-    if (newMood) {
-      performSearch('getTrackByMood', newMood);
-    } else {
-      onResetSearch();
-    }
-  };
-
-  const handleInstrumentSelect = (instrument: string) => {
-    const instrumentValue = instrument.toLowerCase();
-    const newInstrument =
-      instrumentValue === selectedInstrument ? null : instrumentValue;
-    setSelectedInstrument(newInstrument);
-    setSearchWord('');
-    setSelectedGenre(null);
-    setSelectedMood(null);
-
-    if (newInstrument) {
-      performSearch('getTrackByInstrument', newInstrument);
-    } else {
-      onResetSearch();
-    }
+    performSearch(endpoint, newQuery, type);
   };
 
   return (
@@ -156,9 +145,8 @@ const MusicSearch: React.FC<MusicSearchProps> = ({
           type="text"
           placeholder="Search for music, genres, moods, keywords or lyrics"
           className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
-          name="searchWord"
-          value={searchWord}
-          onChange={handleInputChange}
+          value={searchState.type === 'text' ? searchState.query : ''}
+          onChange={handleTextSearch}
         />
         <img
           src={Search}
@@ -169,13 +157,29 @@ const MusicSearch: React.FC<MusicSearchProps> = ({
       <div className="mt-[32px]">
         <ul className="flex gap-[35px] relative">
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-            <Genre onSelect={handleGenreSelect} />
+            <Genre
+              onSelect={(genre) =>
+                handleFilterSelect(genre, 'genre', 'getTrackByGenre')
+              }
+            />
           </li>
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-            <Mood onSelect={handleMoodSelect} />
+            <Mood
+              onSelect={(mood) =>
+                handleFilterSelect(mood, 'mood', 'getTrackByMood')
+              }
+            />
           </li>
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
-            <Instrument onSelect={handleInstrumentSelect} />
+            <Instrument
+              onSelect={(instrument) =>
+                handleFilterSelect(
+                  instrument,
+                  'instrument',
+                  'getTrackByInstrument'
+                )
+              }
+            />
           </li>
         </ul>
       </div>

@@ -8,8 +8,8 @@ import Copy from '../../assets/images/copy-link.svg';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
-import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
@@ -38,20 +38,41 @@ interface TrackDetails {
   spotifyLink: string;
 }
 
+interface ResponseData {
+  message: string;
+}
+
+interface SearchState {
+  type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+  query: string;
+}
+
 const SyncUserHome = () => {
   const { user, loading } = useSyncUser();
   const track = user;
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
-  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
-  const { id } = useParams();
-  const [tracksLoading, setTracksLoading] = useState<boolean>(false);
+  // Track state
   const [displayedTracks, setDisplayedTracks] = useState<TrackDetails[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [originalTracks, setOriginalTracks] = useState<TrackDetails[]>([]);
+  const [tracksLoading, setTracksLoading] = useState(false);
 
-  const itemsPerPage = 30; // Can be dynamic as needed
+  // Search state
+  const [searchState, setSearchState] = useState<{
+    isSearching: boolean;
+    type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+    query: string;
+  }>({
+    isSearching: false,
+    type: null,
+    query: '',
+  });
+
+  // UI state
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
+
+  const itemsPerPage = 30;
   const {
     currentPage,
     totalPages,
@@ -83,23 +104,17 @@ const SyncUserHome = () => {
   const handleLikes = async (trackId: string) => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/liketrack/${trackId}`;
-    const config = {
-      headers: {
-        Authorization: `${token}`,
-      },
-    };
-
     try {
-      const res = await axios.get(apiUrl, config);
+      const res = await axios.get(`${urlVar}/liketrack/${trackId}`, {
+        headers: { Authorization: token },
+      });
       toast.success(res.data);
-      setLikedTrack((prevState) => ({
-        ...prevState,
+      setLikedTrack((prev) => ({
+        ...prev,
         [trackId]: true,
       }));
     } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
-
       toast.error(
         (axiosError.response && axiosError.response.data
           ? axiosError.response.data.message || axiosError.response.data
@@ -109,43 +124,19 @@ const SyncUserHome = () => {
     }
   };
 
-  useEffect(() => {
-    const trackAdded = track?.user.tracklist || [];
-
-    // Create a map of track IDs to their liked status
-    const likedTracksFromApi = trackAdded.reduce(
-      (acc: { [key: string]: boolean }, trackItem) => {
-        acc[trackItem._id] = true; // Mark each track as liked
-        return acc;
-      },
-      {}
-    );
-
-    setLikedTrack(likedTracksFromApi);
-  }, [id, track]);
-
-  interface ResponseData {
-    message?: string;
-  }
-
-  const fetchData = async () => {
-    if (isSearching) return; // Don't fetch if we're showing search results
-
+  const fetchTracks = useCallback(async () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/allSongs`;
-    const config = {
-      headers: {
-        Authorization: `${token}`,
-      },
-    };
 
     try {
       setTracksLoading(true);
-      const res = await axios.get(apiUrl, config);
-      setDisplayedTracks(res.data.allTracks);
-      setOriginalTracks(res.data.allTracks);
-    } catch (error: unknown) {
+      const response = await axios.get(`${urlVar}/allSongs`, {
+        headers: { Authorization: token },
+      });
+
+      setDisplayedTracks(response.data.allTracks);
+      setOriginalTracks(response.data.allTracks);
+    } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
         (axiosError.response && axiosError.response.data
@@ -156,34 +147,60 @@ const SyncUserHome = () => {
     } finally {
       setTracksLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [id, setTracksLoading, isSearching]);
+    fetchTracks();
+  }, [fetchTracks]);
 
-  const handleSearchResults = (results: TrackDetails[]) => {
-    setIsSearching(true);
+  useEffect(() => {
+    const trackAdded = track?.user.tracklist || [];
+    const likedTracksFromApi = trackAdded.reduce(
+      (acc: { [key: string]: boolean }, trackItem) => {
+        acc[trackItem._id] = true;
+        return acc;
+      },
+      {}
+    );
+    setLikedTrack(likedTracksFromApi);
+  }, [track]);
+
+  const handleSearch = (
+    results: TrackDetails[],
+    newSearchState: SearchState
+  ) => {
+    setSearchState({
+      isSearching: true,
+      type: newSearchState.type,
+      query: newSearchState.query,
+    });
     setDisplayedTracks(results);
   };
 
-  const handleResetSearch = () => {
-    setIsSearching(false);
+  const handleResetSearch = useCallback(() => {
+    setSearchState({
+      isSearching: false,
+      type: null,
+      query: '',
+    });
     setDisplayedTracks(originalTracks);
-    fetchData();
+  }, [originalTracks]);
+
+  const getHeaderText = () => {
+    if (!searchState.isSearching) return 'Browse Songs';
+
+    if (searchState.type === 'text') {
+      return `Search Results for "${searchState.query}"`;
+    }
+
+    if (searchState.type) {
+      return `${
+        searchState.type.charAt(0).toUpperCase() + searchState.type.slice(1)
+      } Results: ${searchState.query}`;
+    }
+
+    return 'Search Results';
   };
-
-  if (tracksLoading) {
-    return <LoadingAnimation />;
-  }
-
-  if (loading) {
-    return <LoadingAnimation />;
-  }
-
-  // if (!musicDetails || musicDetails.length === 0) {
-  //   return <p>No Track available.</p>;
-  // }
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -192,19 +209,20 @@ const SyncUserHome = () => {
     return text;
   };
 
-  console.log(paginatedItems);
-  console.log(isSearching);
+  if (loading || tracksLoading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div className="relative">
       <div
-        className={`px-5 xl:px-20 mb-[331px] transition-all duration-300 ${
+        className={`px-5 xl:px-20 mb-[331px] ${
           menuOpen ? 'overflow-hidden' : ''
         }`}
       >
         <section>
           <MusicSearch
-            onSearchResults={handleSearchResults}
+            onSearch={handleSearch}
             onResetSearch={handleResetSearch}
           />
           <div className="relative mt-[55px]">
@@ -219,11 +237,11 @@ const SyncUserHome = () => {
             </div>
           </div>
         </section>
+
         <section className="mt-[63px] relative">
           <div className="flex justify-between items-center">
-            {' '}
             <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
-              {isSearching ? 'Search Results' : 'Browse Songs'}
+              {getHeaderText()}
             </h3>
             <div className="text-[12px] font-formular-regular">
               Showing<span className="font-Utile-regular">:</span> {endIndex} of{' '}
@@ -231,6 +249,7 @@ const SyncUserHome = () => {
             </div>
           </div>
 
+          {/* Desktop View */}
           <section>
             {paginatedItems && paginatedItems.length > 0 ? (
               <div className="hidden flex-col gap-[56px] lg:flex">
@@ -324,6 +343,8 @@ const SyncUserHome = () => {
                     </span>
                   </div>
                 ))}
+
+                {/* Pagination */}
                 <div className="flex items-center mx-auto gap-3 mt-5">
                   <button
                     onClick={goToPreviousPage}
@@ -334,9 +355,8 @@ const SyncUserHome = () => {
                   <div className="gap-3 flex">
                     {getPaginationRange().map((page, index) =>
                       typeof page === 'number' ? (
-                        <div>
+                        <div key={index}>
                           <button
-                            key={index}
                             onClick={() => goToPage(page)}
                             className={
                               currentPage === page
@@ -352,7 +372,6 @@ const SyncUserHome = () => {
                       )
                     )}
                   </div>
-
                   <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
@@ -366,7 +385,7 @@ const SyncUserHome = () => {
             )}
           </section>
 
-          {/* Mobile */}
+          {/* Mobile View */}
           <div className="lg:hidden flex flex-col gap-6">
             {paginatedItems.map((detail, index) => (
               <div
@@ -395,6 +414,8 @@ const SyncUserHome = () => {
                 </span>
               </div>
             ))}
+
+            {/* Mobile Pagination */}
             <div className="flex items-center mx-auto gap-3 mt-5">
               <button onClick={goToPreviousPage} disabled={currentPage === 1}>
                 Prev
@@ -402,9 +423,8 @@ const SyncUserHome = () => {
               <div className="gap-3 flex">
                 {getPaginationRange().map((page, index) =>
                   typeof page === 'number' ? (
-                    <div>
+                    <div key={index}>
                       <button
-                        key={index}
                         onClick={() => goToPage(page)}
                         className={
                           currentPage === page
@@ -420,7 +440,6 @@ const SyncUserHome = () => {
                   )
                 )}
               </div>
-
               <button
                 onClick={goToNextPage}
                 disabled={currentPage === totalPages}

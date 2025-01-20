@@ -6,16 +6,53 @@ import AdditionalRecordingInfo from './AdditionalRecordingInfo';
 import MinimumRecordingInfo from './MinimumRecordingInfo';
 import { useContent } from '../contexts/ContentContext';
 import LoadingAnimation from '../constants/loading-animation';
-import { useParams } from 'react-router-dom';
 import MusicPlayer from './MusicPlayer';
 import { Content } from '../contexts/ContentContext';
 import SpotifyHelper from '../helper/spotifyHelper';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { Formik, Form } from 'formik'; // Import Form from Formik
+import { useParams } from 'react-router-dom';
 
 interface ResponseData {
   message?: string;
 }
+
+const getInitialFormData = (contentItem: Content | undefined) => ({
+  mainArtist: contentItem?.mainArtist || '',
+  featuredArtist: contentItem?.featuredArtist || [],
+  releaseType: contentItem?.releaseType || '',
+  releaseTitle: contentItem?.releaseTitle || '',
+  trackTitle: contentItem?.trackTitle || '',
+  trackLink: contentItem?.trackLink || '',
+  upc: contentItem?.upc || '',
+  isrc: contentItem?.isrc || '',
+  genre: contentItem?.genre || '',
+  artWork: contentItem?.artWork || null,
+  recordingVersion: contentItem?.recordingVersion || '',
+  featuredInstrument: contentItem?.featuredInstrument || [],
+  producers: contentItem?.producers || [],
+  recordingDate: contentItem?.recordingDate || null,
+  countryOfRecording: contentItem?.countryOfRecording || '',
+  writers: contentItem?.writers || [],
+  composers: contentItem?.composers || [],
+  publishers: contentItem?.publishers || [],
+  claimBasis: contentItem?.claimBasis || '',
+  claimingUser: contentItem?.claimingUser || '',
+  role: contentItem?.role || '',
+  percentClaim: contentItem?.percentClaim || 0,
+  copyrightName: contentItem?.copyrightName || '',
+  copyrightYear: contentItem?.copyrightYear || null,
+  releaseDate: contentItem?.releaseDate || null,
+  countryOfRelease: contentItem?.countryOfRelease || '',
+  mood: contentItem?.mood || [],
+  tag: contentItem?.tag || [],
+  lyrics: contentItem?.lyrics || '',
+  audioLang: contentItem?.audioLang || '',
+  explicitCont: contentItem?.explicitCont || false,
+  releaseLabel: contentItem?.releaseLabel || '',
+  releaseDesc: contentItem?.releaseDesc || '',
+});
 
 const ContentReview = () => {
   const { content, loading } = useContent();
@@ -29,6 +66,8 @@ const ContentReview = () => {
   };
 
   const contentItem = getContentById(id || '');
+
+  console.log(content);
 
   if (loading) {
     return <LoadingAnimation />;
@@ -239,33 +278,78 @@ const ContentReview = () => {
             </li>
           </ul>
         </nav>
-        {renderSection()}
-        <div className="buttons flex justify-between my-4 pr-2 ">
-          {currentSection !== 'Minimum Recording Information' && (
-            <div
-              onClick={() => setCurrentSection(previousSection(currentSection))}
-              className={controlBtn}
-            >
-              Previous
+        <Formik
+          initialValues={getInitialFormData(contentItem)}
+          enableReinitialize
+          // validationSchema={validationSchema}
+          onSubmit={async (values, { validateForm }) => {
+            // setLoading(true);
+            const token = localStorage.getItem('token');
+            const urlVar = import.meta.env.VITE_APP_API_URL;
+            const apiUrl = `${urlVar}/manage_content/trackupdate`;
+            const config = {
+              headers: {
+                Authorization: `${token}`,
+              },
+            };
+
+            const errors = await validateForm(values);
+
+            if (Object.keys(errors).length) {
+              // Iterate over the errors object and toast each error message
+              Object.values(errors).forEach((error) => {
+                if (typeof error === 'string') {
+                  toast.error(error);
+                }
+              });
+              return; // Prevent form submission if there are errors
+            }
+
+            console.log(values);
+
+            try {
+              await axios.post(apiUrl, values, config);
+              toast.success('Changes saved successfully');
+            } catch (error: unknown) {
+              const axiosError = error as AxiosError<ResponseData>;
+              toast.error(
+                (axiosError.response && axiosError.response.data
+                  ? axiosError.response.data.message || axiosError.response.data
+                  : axiosError.message || 'An error occurred'
+                ).toString()
+              );
+            }
+          }}
+        >
+          <Form>
+            {renderSection()}
+            <div className="buttons flex justify-between my-4 pr-2 ">
+              {currentSection !== 'Minimum Recording Information' && (
+                <div
+                  onClick={() =>
+                    setCurrentSection(previousSection(currentSection))
+                  }
+                  className={controlBtn}
+                >
+                  Previous
+                </div>
+              )}
+              {currentSection !== 'Release Information' && (
+                <div
+                  onClick={() => setCurrentSection(nextSection(currentSection))}
+                  className={controlBtn}
+                >
+                  Next
+                </div>
+              )}
+              {currentSection === 'Release Information' && (
+                <button type="submit" className={controlBtn} disabled={loading}>
+                  {loading ? 'Uploading...' : 'Upload Track'}
+                </button>
+              )}
             </div>
-          )}
-          {currentSection !== 'Release Information' && (
-            <div
-              onClick={() => setCurrentSection(nextSection(currentSection))}
-              className={controlBtn}
-            >
-              Next
-            </div>
-          )}
-          {currentSection == 'Release Information' && (
-            <div
-              onClick={() => setCurrentSection(nextSection(currentSection))}
-              className={controlBtn}
-            >
-              Save changes{' '}
-            </div>
-          )}
-        </div>
+          </Form>
+        </Formik>
       </div>
     </div>
   );
