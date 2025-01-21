@@ -1,4 +1,6 @@
+import { ErrorMessage, Field } from 'formik';
 import { Content } from '../contexts/ContentContext';
+import InputField from './InputField';
 
 interface AdditionalRecordingInfoProps {
   details?: Content;
@@ -10,6 +12,7 @@ const applyInputStyles =
 const applyLabelStyles =
   'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
 const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
+const applyErrorStyles = 'italic text-red-600';
 
 const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
   details,
@@ -21,41 +24,38 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <label htmlFor="recordingVersion" className={applyLabelStyles}>
             Recording Version
           </label>
-          <input
+          <Field
             type="text"
             name="recordingVersion"
-            disabled
-            placeholder={
-              details?.recordingVersion
-            }
+            placeholder={details?.recordingVersion}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="recordingVersion"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="featuredInstrument" className={applyLabelStyles}>
-            Featured Instrument
-          </label>
-          <input
+          <InputField
             className={applyInputStyles}
+            label="Featured Instrument"
             name="featuredInstrument"
-            disabled
-            placeholder={
-              details?.featuredInstrument?.join(', ')
-            }
+            placeholder={details?.featuredInstrument?.join(', ') || ''}
+          />
+          <ErrorMessage
+            name="featuredInstrument"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="producers" className={applyLabelStyles}>
-            Producer(s)
-          </label>
-          <input
+          <InputField
+            label="producers(s)"
             name="producers"
-            disabled
-            placeholder={
-              details?.producers?.join(', ') 
-            }
+            placeholder={details?.producers?.join(', ') || ''}
             className={applyInputStyles}
           />
         </div>
@@ -63,12 +63,17 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <label htmlFor="recordingDate" className={applyLabelStyles}>
             Recording Date
           </label>
-          <input
-            
+          <Field
             name="recordingDate"
-            disabled
-            placeholder={new Date(details?.recordingDate ?? '').toLocaleDateString()}
+            placeholder={new Date(
+              details?.recordingDate ?? ''
+            ).toLocaleDateString()}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="recordingDate"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
@@ -77,52 +82,56 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           <label htmlFor="countryOfRecording" className={applyLabelStyles}>
             Country of Recording
           </label>
-          <input
+          <Field
             name="countryOfRecording"
-            disabled
             placeholder={details?.countryOfRecording}
             className={applyInputStyles}
           />
+          <ErrorMessage
+            name="countryOfRecording"
+            component="div"
+            className={applyErrorStyles}
+          />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="writers" className={applyLabelStyles}>
-            Writer(s)
-          </label>
-          <input
+          <InputField
+            label="writers(s)"
             name="writers"
-            disabled
-            placeholder={
-              details?.writers?.join(', ')
-            }
+            placeholder={details?.writers?.join(', ') || ''}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="writers"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>
       <div className={applyFormDiv}>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="composers" className={applyLabelStyles}>
-            Composer(s)
-          </label>
-          <input
+          <InputField
+            label="composers(s)"
             name="composers"
-            disabled
-            placeholder={
-              details?.composers?.join(', ')
-            }
+            placeholder={details?.composers?.join(', ') || ''}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="composers"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
         <div className="w-[367px] flex flex-col gap-2 mb-4">
-          <label htmlFor="publishers" className={applyLabelStyles}>
-            Publisher(s)
-          </label>
-          <input
+          <InputField
+            label="publishers(s)"
             name="publishers"
-            disabled
-            placeholder={
-              details?.publishers?.join(', ')
-            }
+            placeholder={details?.publishers?.join(', ') || ''}
             className={applyInputStyles}
+          />
+          <ErrorMessage
+            name="publishers"
+            component="div"
+            className={applyErrorStyles}
           />
         </div>
       </div>

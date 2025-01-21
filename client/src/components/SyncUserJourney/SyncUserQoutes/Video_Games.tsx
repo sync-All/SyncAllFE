@@ -73,7 +73,7 @@ const VideoGames = () => {
     territories: [],
     usage: [],
     media_format: '',
-    license_duration: 'Yearly',
+    license_duration: '',
     attachments: null,
     additional_info: '',
     role_type: 'Video Games',
@@ -123,6 +123,10 @@ const VideoGames = () => {
     navigate(-1);
   };
 
+   const navigateToPendingLicense = () => {
+     navigate('/myAccount?section=Pending%20License');
+   };
+
   const handleSubmission = async (
     values: FormData,
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
@@ -159,7 +163,7 @@ const VideoGames = () => {
       await axios.post(apiUrl, formData, config);
       toast.success('Video game quote sent successfully');
       await delay(5000);
-      handleNavigateBack();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       const errorMessage = (
@@ -383,7 +387,7 @@ const VideoGames = () => {
                         <Field
                           name="license_duration"
                           type="text"
-                          disabled
+                          
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />

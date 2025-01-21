@@ -8,8 +8,8 @@ import Copy from '../../assets/images/copy-link.svg';
 import Menu from '../../assets/menu-dot-square.svg';
 import ViewMore from '../../assets/images/round-arrow-right-up.svg';
 import getQuote from '../../assets/images/document-add.svg';
-import { useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
 import Closemenu from '../../assets/images/close-circle.svg';
 import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
@@ -38,38 +38,56 @@ interface TrackDetails {
   spotifyLink: string;
 }
 
+interface ResponseData {
+  message: string;
+}
 
+interface SearchState {
+  type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+  query: string;
+}
 
 const SyncUserHome = () => {
   const { user, loading } = useSyncUser();
   const track = user;
 
+  // Track state
+  const [displayedTracks, setDisplayedTracks] = useState<TrackDetails[]>([]);
+  const [originalTracks, setOriginalTracks] = useState<TrackDetails[]>([]);
+  const [tracksLoading, setTracksLoading] = useState(false);
+
+  // Search state
+  const [searchState, setSearchState] = useState<{
+    isSearching: boolean;
+    type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+    query: string;
+  }>({
+    isSearching: false,
+    type: null,
+    query: '',
+  });
+
+  // UI state
   const [menuOpen, setMenuOpen] = useState(false);
-  const [musicDetails, setMusicDetails] = useState<TrackDetails[]>([]);
-  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
-  const { id } = useParams();
-  const [tracksLoading, setTracksLoading] = useState<boolean>(false);
+  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
-  const itemsPerPage = 30; // Can be dynamic as needed
-    const {
-      currentPage,
-      totalPages,
-      paginatedItems,
-      goToNextPage,
-      goToPreviousPage,
-      goToPage,
-      getPaginationRange,
-    } = usePagination<TrackDetails>(musicDetails, itemsPerPage);
+  const itemsPerPage = 30;
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination<TrackDetails>(displayedTracks, itemsPerPage);
 
-
-  const totaltracks = musicDetails.length;
+  const totaltracks = displayedTracks.length;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-
-  
 
   const closeMenu = () => setMenuOpen(!menuOpen);
 
@@ -86,23 +104,17 @@ const SyncUserHome = () => {
   const handleLikes = async (trackId: string) => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/liketrack/${trackId}`;
-    const config = {
-      headers: {
-        Authorization: `${token}`,
-      },
-    };
-
     try {
-      const res = await axios.get(apiUrl, config);
+      const res = await axios.get(`${urlVar}/liketrack/${trackId}`, {
+        headers: { Authorization: token },
+      });
       toast.success(res.data);
-      setLikedTrack((prevState) => ({
-        ...prevState,
+      setLikedTrack((prev) => ({
+        ...prev,
         [trackId]: true,
       }));
     } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
-
       toast.error(
         (axiosError.response && axiosError.response.data
           ? axiosError.response.data.message || axiosError.response.data
@@ -112,67 +124,83 @@ const SyncUserHome = () => {
     }
   };
 
+  const fetchTracks = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+
+    try {
+      setTracksLoading(true);
+      const response = await axios.get(`${urlVar}/allSongs`, {
+        headers: { Authorization: token },
+      });
+
+      setDisplayedTracks(response.data.allTracks);
+      setOriginalTracks(response.data.allTracks);
+    } catch (error) {
+      const axiosError = error as AxiosError<ResponseData>;
+      toast.error(
+        (axiosError.response && axiosError.response.data
+          ? axiosError.response.data.message || axiosError.response.data
+          : axiosError.message || 'An error occurred'
+        ).toString()
+      );
+    } finally {
+      setTracksLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTracks();
+  }, [fetchTracks]);
+
   useEffect(() => {
     const trackAdded = track?.user.tracklist || [];
-
-    // Create a map of track IDs to their liked status
     const likedTracksFromApi = trackAdded.reduce(
       (acc: { [key: string]: boolean }, trackItem) => {
-        acc[trackItem._id] = true; // Mark each track as liked
+        acc[trackItem._id] = true;
         return acc;
       },
       {}
     );
-
     setLikedTrack(likedTracksFromApi);
-  }, [id, track]);
+  }, [track]);
 
-  interface ResponseData {
-    message?: string;
-  }
+  const handleSearch = (
+    results: TrackDetails[],
+    newSearchState: SearchState
+  ) => {
+    setSearchState({
+      isSearching: true,
+      type: newSearchState.type,
+      query: newSearchState.query,
+    });
+    setDisplayedTracks(results);
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/allSongs`;
-      const config = {
-        headers: {
-          Authorization: `${token}`,
-        },
-      };
+  const handleResetSearch = useCallback(() => {
+    setSearchState({
+      isSearching: false,
+      type: null,
+      query: '',
+    });
+    setDisplayedTracks(originalTracks);
+  }, [originalTracks]);
 
-      try {
-        setTracksLoading(true);
-        const res = await axios.get(apiUrl, config);
-        setMusicDetails(res.data.allTracks);
-      } catch (error: unknown) {
-        const axiosError = error as AxiosError<ResponseData>;
+  const getHeaderText = () => {
+    if (!searchState.isSearching) return 'Browse Songs';
 
-        toast.error(
-          (axiosError.response && axiosError.response.data
-            ? axiosError.response.data.message || axiosError.response.data
-            : axiosError.message || 'An error occurred'
-          ).toString()
-        );
-      } finally {
-        setTracksLoading(false);
-      }
-    };
-    fetchData();
-  }, [id, setTracksLoading]);
+    if (searchState.type === 'text') {
+      return `Search Results for "${searchState.query}"`;
+    }
 
-  if (tracksLoading) {
-    return <LoadingAnimation />;
-  }
+    if (searchState.type) {
+      return `${
+        searchState.type.charAt(0).toUpperCase() + searchState.type.slice(1)
+      } Results: ${searchState.query}`;
+    }
 
-  if (loading) {
-    return <LoadingAnimation />;
-  }
-
-  // if (!musicDetails || musicDetails.length === 0) {
-  //   return <p>No Track available.</p>;
-  // }
+    return 'Search Results';
+  };
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -181,17 +209,22 @@ const SyncUserHome = () => {
     return text;
   };
 
-  console.log(paginatedItems);
+  if (loading || tracksLoading) {
+    return <LoadingAnimation />;
+  }
 
   return (
     <div className="relative">
       <div
-        className={`px-5 xl:px-20 mb-[331px] transition-all duration-300 ${
+        className={`px-5 xl:px-20 mb-[331px] ${
           menuOpen ? 'overflow-hidden' : ''
         }`}
       >
         <section>
-          <MusicSearch />
+          <MusicSearch
+            onSearch={handleSearch}
+            onResetSearch={handleResetSearch}
+          />
           <div className="relative mt-[55px]">
             <div className="flex gap-2 w-full py-6 pl-6 bg-cover min-h-[371px] md:min-h-full lg:pl-16 lg:py-[56px] bg-no-repeat flex-col bg-syncUserBg md:bg-desktopSyncUserBg border rounded-[10px]">
               <h2 className="text-[40px] lg:text-[64px] leading-[45px] lg:leading-[56px] xl:leading-[78px] font-gitSans font-normal text-grey-100">
@@ -204,11 +237,11 @@ const SyncUserHome = () => {
             </div>
           </div>
         </section>
+
         <section className="mt-[63px] relative">
           <div className="flex justify-between items-center">
-            {' '}
             <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
-              Browse Songs
+              {getHeaderText()}
             </h3>
             <div className="text-[12px] font-formular-regular">
               Showing<span className="font-Utile-regular">:</span> {endIndex} of{' '}
@@ -216,6 +249,7 @@ const SyncUserHome = () => {
             </div>
           </div>
 
+          {/* Desktop View */}
           <section>
             {paginatedItems && paginatedItems.length > 0 ? (
               <div className="hidden flex-col gap-[56px] lg:flex">
@@ -309,6 +343,8 @@ const SyncUserHome = () => {
                     </span>
                   </div>
                 ))}
+
+                {/* Pagination */}
                 <div className="flex items-center mx-auto gap-3 mt-5">
                   <button
                     onClick={goToPreviousPage}
@@ -319,9 +355,8 @@ const SyncUserHome = () => {
                   <div className="gap-3 flex">
                     {getPaginationRange().map((page, index) =>
                       typeof page === 'number' ? (
-                        <div>
+                        <div key={index}>
                           <button
-                            key={index}
                             onClick={() => goToPage(page)}
                             className={
                               currentPage === page
@@ -337,7 +372,6 @@ const SyncUserHome = () => {
                       )
                     )}
                   </div>
-
                   <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
@@ -351,7 +385,7 @@ const SyncUserHome = () => {
             )}
           </section>
 
-          {/* Mobile */}
+          {/* Mobile View */}
           <div className="lg:hidden flex flex-col gap-6">
             {paginatedItems.map((detail, index) => (
               <div
@@ -380,6 +414,8 @@ const SyncUserHome = () => {
                 </span>
               </div>
             ))}
+
+            {/* Mobile Pagination */}
             <div className="flex items-center mx-auto gap-3 mt-5">
               <button onClick={goToPreviousPage} disabled={currentPage === 1}>
                 Prev
@@ -387,9 +423,8 @@ const SyncUserHome = () => {
               <div className="gap-3 flex">
                 {getPaginationRange().map((page, index) =>
                   typeof page === 'number' ? (
-                    <div>
+                    <div key={index}>
                       <button
-                        key={index}
                         onClick={() => goToPage(page)}
                         className={
                           currentPage === page
@@ -405,7 +440,6 @@ const SyncUserHome = () => {
                   )
                 )}
               </div>
-
               <button
                 onClick={goToNextPage}
                 disabled={currentPage === totalPages}

@@ -207,10 +207,15 @@ trackLink : {
 isrc : {
     type : String,
     required : false
-    }, message : String, user : {
+    }, 
+    message : String, 
+    user : {
         type : Schema.Types.ObjectId,
         ref : "user"
-    }, err_type : String, 
+    }, 
+    err_type : {
+        type : String
+    }, 
     trackOwner : {
         type : Schema.Types.ObjectId,
         ref : "user"

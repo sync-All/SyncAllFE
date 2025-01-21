@@ -26,6 +26,11 @@ router.post(
   upload,
   asyncHandler(trackController.trackUpload)
 );
+router.post(
+  "/invalid_spotify_resolution/",checkUploader,
+  upload,
+  asyncHandler(trackController.invalidSpotifyResolution)
+);
 
 router.post(
   "/trackBulkUpload/",

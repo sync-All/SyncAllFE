@@ -1,5 +1,5 @@
 import { Formik, Field, ErrorMessage, Form } from 'formik';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import * as Yup from 'yup';
 import syncLogo from '../../assets/logo-black.png';
 import LoginImg from '../../assets/images/email-confirmation-img.png';
@@ -32,6 +32,7 @@ interface ResponseData {
 const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const { loading, setLoading } = useLoading();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleNavigationTODashboard = (spotifyLink: string) => {
     if (!spotifyLink) {
@@ -111,12 +112,11 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
     const userInfo = getAdditionalUserInfo(response);
     // COlate values and assign to their proper fields
     const values = {
-        name: userInfo?.profile?.name,
-        email: userInfo?.profile?.email,
-        img: userInfo?.profile?.picture,
-        emailConfirmedStatus: userInfo?.profile?.verified_email,
-        newUser: userInfo?.isNewUser,
-
+      name: userInfo?.profile?.name,
+      email: userInfo?.profile?.email,
+      img: userInfo?.profile?.picture,
+      emailConfirmedStatus: userInfo?.profile?.verified_email,
+      newUser: userInfo?.isNewUser,
     };
     // POst request to server to validate user
     await axios
@@ -225,14 +225,23 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
                       >
                         Password*
                       </label>
-                      <Field
-                        type="password"
-                        name="password"
-                        id="password"
-                        placeholder="Enter password"
-                        required
-                        className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 placeholder-black placeholder-opacity-70"
-                      />
+                      <div className="relative w-full">
+                        <Field
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          id="password"
+                          placeholder="Enter password"
+                          required
+                          className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 placeholder-black placeholder-opacity-70"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-black"
+                        >
+                          {showPassword ? 'Hide' : 'Show'}
+                        </button>
+                      </div>
                       <ErrorMessage
                         name="password"
                         component="div"

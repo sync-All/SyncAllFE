@@ -1,142 +1,143 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Search from '../../assets/images/search-1.svg';
 import Genre from '../../constants/genre';
 import Mood from '../../constants/mood';
 import Instrument from '../../constants/instrument';
-import { Link } from 'react-router-dom';
-// import AddMusic from '../../assets/images/add-music.svg';
-import Favorite from '../../assets/images/favorite.svg';
-import Copy from '../../assets/images/copy-link.svg';
-// import musicWave from '../../assets/images/musicwave.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-import Liked from '../../assets/images/liked.svg';
-import usePagination from '../../hooks/usePaginate';
 
-interface ResponseData {
-  message?: string;
+interface SearchState {
+  type: 'text' | 'genre' | 'mood' | 'instrument' | null;
+  query: string;
 }
 
-const MusicSearch = () => {
-  const [selectedInstrument, setSelectedInstrument] = useState<string | null>(
+interface ResponseData {
+  message: string;
+}
+
+interface TrackDetails {
+  producers: string;
+  trackTitle: string;
+  _id: string;
+  trackLink: string;
+  mainArtist: string;
+  musicWaves: string[];
+  duration: string;
+  writers: string;
+  genre: string;
+  mood: string[];
+  actions: string[];
+  artWork: string;
+  spotifyLink: string;
+}
+
+interface MusicSearchProps {
+  onSearch: (results: TrackDetails[], searchState: SearchState) => void;
+  onResetSearch: () => void;
+}
+
+const MusicSearch: React.FC<MusicSearchProps> = ({
+  onSearch,
+  onResetSearch,
+}) => {
+  const [searchState, setSearchState] = useState<SearchState>({
+    type: null,
+    query: '',
+  });
+
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [searchWord, setSearchWord] = useState<string>('');
-  const [results, setResults] = useState<TrackDetails[]>([]);
-  const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
-  interface TrackDetails {
-    trackTitle: string;
-    _id: string;
-    trackLink: string;
-    mainArtist: string;
-    musicWaves: string[];
-    duration: string;
-    writers: string;
-    genre: string;
-    mood: string[];
-    actions: string[];
-    artWork: string;
-    producers: string;
-  }
+  const performSearch = useCallback(
+    async (
+      endpoint: string,
+      query: string,
+      searchType: SearchState['type']
+    ) => {
+      if (!query.trim()) {
+        onResetSearch();
+        return;
+      }
 
-const active =
-  'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/${endpoint}/${query}`;
 
-  const useSearch = (
+      try {
+        const response = await axios.get(apiUrl, {
+          headers: { Authorization: token },
+        });
+
+        onSearch(response.data.allTracks, {
+          type: searchType,
+          query: query.trim(),
+        });
+      } catch (error) {
+        const axiosError = error as AxiosError<ResponseData>;
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      }
+    },
+    [onSearch, onResetSearch]
+  );
+
+  const debouncedSearch = (
     endpoint: string,
-    query: string | null,
-    setResults: React.Dispatch<React.SetStateAction<TrackDetails[]>>
+    query: string,
+    searchType: SearchState['type']
   ) => {
-    useEffect(() => {
-      if (!query) return;
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
 
-      const search = async () => {
-        const token = localStorage.getItem('token');
-        const urlVar = import.meta.env.VITE_APP_API_URL;
-        const apiUrl = `${urlVar}/${endpoint}/${query}`;
-        const config = {
-          headers: {
-            Authorization: `${token}`,
-          },
-        };
+    const timeoutId = setTimeout(() => {
+      performSearch(endpoint, query, searchType);
+    }, 300);
 
-        try {
-          const res = await axios.get(apiUrl, config);
-          setResults(res.data.allTracks);
-        } catch (error) {
-          const axiosError = error as AxiosError<ResponseData>;
-
-          toast.error(
-            (axiosError.response && axiosError.response.data
-              ? axiosError.response.data.message || axiosError.response.data
-              : axiosError.message || 'An error occurred'
-            ).toString()
-          );
-        }
-      };
-
-      search();
-    }, [endpoint, query, setResults]);
+    setSearchTimeout(timeoutId);
   };
 
-  const handleLikes = async (trackId: string) => {
-    const token = localStorage.getItem('token');
-    const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/liketrack/${trackId}`;
-    const config = {
-      headers: {
-        Authorization: `${token}`,
-      },
-    };
+  const handleTextSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
 
-    try {
-      const res = await axios.get(apiUrl, config);
-      toast.success(res.data);
-      setLikedTrack((prevState) => ({
-        ...prevState,
-        [trackId]: true,
-      }));
-    } catch (error) {
-      const axiosError = error as AxiosError<ResponseData>;
+    setSearchState({
+      type: 'text',
+      query: value,
+    });
 
-      toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message || axiosError.response.data
-          : axiosError.message || 'An error occurred'
-        ).toString()
-      );
+    if (value.trim()) {
+      debouncedSearch('querySongs', value, 'text');
+    } else {
+      onResetSearch();
     }
   };
 
-  const handleCopyLink = (id: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/metadata/${id}`);
-    toast.success('Link copied to clipboard');
+  const handleFilterSelect = (
+    value: string,
+    type: 'genre' | 'mood' | 'instrument',
+    endpoint: string
+  ) => {
+    const newQuery = value.toLowerCase();
+
+    if (searchState.type === type && searchState.query === newQuery) {
+      setSearchState({ type: null, query: '' });
+      onResetSearch();
+      return;
+    }
+
+    setSearchState({
+      type,
+      query: newQuery,
+    });
+
+    performSearch(endpoint, newQuery, type);
   };
 
-  useSearch('getTrackByInstrument', selectedInstrument, setResults);
-  useSearch('getTrackByGenre', selectedGenre, setResults);
-  useSearch('getTrackByMood', selectedMood, setResults);
-  useSearch('querySongs', searchWord, setResults);
-
-  const itemsPerPage = 30;
-
-  const {
-    currentPage,
-    totalPages,
-    paginatedItems,
-    goToNextPage,
-    goToPreviousPage,
-    goToPage,
-    getPaginationRange,
-  } = usePagination(results, itemsPerPage);
-
-  const noResults =
-    results.length === 0 &&
-    (selectedInstrument || selectedGenre || selectedMood || searchWord);
   return (
     <div>
       <div className="relative w-full my-24px">
@@ -144,166 +145,43 @@ const active =
           type="text"
           placeholder="Search for music, genres, moods, keywords or lyrics"
           className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
-          name="searchWord"
-          value={selectedInstrument || selectedGenre || selectedMood || searchWord}
-          onChange={(e) => setSearchWord(e.target.value)}
+          value={searchState.type === 'text' ? searchState.query : ''}
+          onChange={handleTextSearch}
         />
         <img
           src={Search}
           alt="Search"
           className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
         />
-        {}
       </div>
       <div className="mt-[32px]">
-        <ul className="flex gap-[35px] relative ">
+        <ul className="flex gap-[35px] relative">
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Genre
-              onSelect={(genre) => setSelectedGenre(`${genre.toLowerCase()}`)}
+              onSelect={(genre) =>
+                handleFilterSelect(genre, 'genre', 'getTrackByGenre')
+              }
             />
           </li>
-          <li className="flex gap-[7px]   uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
+          <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Mood
-              onSelect={(mood) => setSelectedMood(`${mood.toLowerCase()}`)}
+              onSelect={(mood) =>
+                handleFilterSelect(mood, 'mood', 'getTrackByMood')
+              }
             />
           </li>
           <li className="flex gap-[7px] uppercase font-formular-bold text-[14px] text-[#475367] leading-[18.729px] tracking-[0.271px">
             <Instrument
               onSelect={(instrument) =>
-                setSelectedInstrument(`${instrument.toLowerCase()}`)
+                handleFilterSelect(
+                  instrument,
+                  'instrument',
+                  'getTrackByInstrument'
+                )
               }
             />
           </li>
         </ul>
-      </div>
-      <div className="mt-[32px]">
-        {paginatedItems.length > 0 ? (
-          <div>
-            <h2 className="text-[18px] font-bold mb-[16px]">
-              Search Results for{' '}
-              {searchWord ||
-                selectedGenre ||
-                selectedInstrument ||
-                selectedMood}
-              :
-            </h2>
-            <ul className="flex flex-col gap-2">
-              {paginatedItems.map((result, index) => (
-                <div key={index} className="flex items-center w-full ">
-                  <Link
-                    to={`/metadata/${result?._id}`}
-                    className="flex gap-3 w-[25%]"
-                  >
-                    <img
-                      src={result?.artWork}
-                      alt=""
-                      className="h-[50px] w-[50px] object-cover"
-                    />
-                    <span>
-                      <h4 className="font-Utile-bold text-[#475367] leading-6 text-[14px]">
-                        {result.trackTitle}
-                      </h4>
-                      <p className="font-Utile-regular text-[#475367] leading-4 text-[12px]">
-                        {result.mainArtist}
-                      </p>
-                    </span>
-                  </Link>
-
-                  <span className="hidden lg:flex gap-12 w-[25%] items-start ml-[5%]">
-                    <span>
-                      <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                        {result.duration || 'N/A'}
-                      </p>
-                      <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                        {result.producers || 'N/A'}
-                      </p>
-                    </span>
-                    <span>
-                      <p className="font-Utile-bold text-[#475367] leading-4 text-[12px]">
-                        {result.genre}
-                      </p>
-                      <p className="font-Utile-regular text-[#98A2B3] leading-4 text-[12px]">
-                        {result.mood.join(', ')}
-                      </p>
-                    </span>
-                  </span>
-                  <span className="hidden lg:flex gap-6 w-[10%] justify-center">
-                    <img
-                      src={likedTrack[result._id] ? Liked : Favorite}
-                      alt=""
-                      onClick={() => handleLikes(result._id)}
-                      className="cursor-pointer"
-                    />
-                    {/* <img src={AddMusic} alt="" /> */}
-                    <img
-                      src={Copy}
-                      alt=""
-                      onClick={() => handleCopyLink(result._id)}
-                    />
-                  </span>
-                  <span className="gap-[12px] hidden lg:flex w-[25%] justify-center">
-                    <Link to={`/metadata/${result?._id}`}>
-                      <button className="text-[#27282A] font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                        View More
-                      </button>
-                    </Link>
-                    <Link to={`/quote/${result?._id}`}>
-                      <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px]">
-                        Get Quote
-                      </button>
-                    </Link>
-                  </span>
-                </div>
-              ))}
-            </ul>
-            <div className="flex items-center mx-auto gap-3 justify-center mt-5">
-              <button onClick={goToPreviousPage} disabled={currentPage === 1}>
-                Prev
-              </button>
-              <div className="gap-3 flex">
-                {getPaginationRange().map((page, index) =>
-                  typeof page === 'number' ? (
-                    <div>
-                      <button
-                        key={index}
-                        onClick={() => goToPage(page)}
-                        className={
-                          currentPage === page
-                            ? active
-                            : 'flex items-center flex-col h-8 w-8 border border-[#DADCE0] rounded-[4px] p-1'
-                        }
-                      >
-                        {page}
-                      </button>
-                    </div>
-                  ) : (
-                    <span key={index}>...</span>
-                  )
-                )}
-              </div>
-
-              <button
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        ) : (
-          noResults && (
-            <p>
-              No results found for{' '}
-              <strong>
-                {' '}
-                {searchWord ||
-                  selectedGenre ||
-                  selectedInstrument ||
-                  selectedMood}
-              </strong>{' '}
-            </p>
-          )
-        )}
       </div>
     </div>
   );

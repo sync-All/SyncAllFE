@@ -1,6 +1,5 @@
 import Check from '../../assets/images/check.svg';
 import X from '../../assets/images/xOutline.svg';
-import { currencies } from '../../constants/currency';
 import TooltipImg from '../../assets/images/tooltip-info.svg';
 import WhiteCheck from '../../assets/images/white-check.svg';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -263,7 +262,7 @@ const Pricing = () => {
 
   return (
     <div>
-      <div className="my-[90px] text-center">
+      {/* <div className="text-center">
         <select name="" id="" className="w-fit">
           <option value="">Select Country</option>
           {currencies.map((country, index) => (
@@ -272,8 +271,8 @@ const Pricing = () => {
             </option>
           ))}
         </select>
-      </div>
-      <div className="text-center">
+      </div> */}
+      <div className="text-center my-[90px] ">
         <h1 className="text-[#1B2128] font-formular-bold text-[64px] leading-[68px] tracking-[-1.28px]">
           Our Pricing Plans
         </h1>
@@ -281,7 +280,7 @@ const Pricing = () => {
           Choose the best plan that fits your needs.
         </p>
       </div>
-      <div>
+      {/* <div>
         <span className="flex justify-center w-full items-center gap-3 lg:gap-[36px] my-12 flex-wrap">
           <p className="bg-[#EBF8F3] text-[#1C7272] w-fit py-[15px] px-3 lg:px-[26px] rounded-full text-[10px] lg:text-[18px] font-formular-medium tracking-6">
             Monthly
@@ -293,7 +292,7 @@ const Pricing = () => {
             Bi-Annually
           </p>
         </span>
-      </div>
+      </div> */}
 
       <section className="flex flex-col md:grid md:grid-cols-2 md:gap-3 md:mx-auto md:w-[824px]  items-center justify-center gap-6 min-h-full">
         {pricingPlans.map((plan, index) => (
@@ -319,7 +318,10 @@ const Pricing = () => {
               </small>
             </h2>
             {plan.name === 'Enterprise' ? (
-              <a className="min-w-full" href="mailto:info@syncallmusic.com">
+              <a
+                className="min-w-full"
+                href="mailto:enterpriserequest@syncallmusic.com"
+              >
                 <div
                   className=" py-2 px-4 rounded-[8px] border border-[#495A6E] text-[#1B2128] font-formular-medium text-[15px] leading-[20px] text-center"
                   style={{
@@ -440,7 +442,7 @@ const Pricing = () => {
                       <a
                         data-tooltip-id="my-tooltip"
                         data-tooltip-content={feature.tooltip}
-                        data-tooltip-place="right"
+                        data-tooltip-place="left"
                       >
                         <img src={TooltipImg} alt="" />
                       </a>

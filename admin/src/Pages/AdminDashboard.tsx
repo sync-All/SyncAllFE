@@ -44,7 +44,7 @@ const AdminDashboard = () => {
       <div className="flex-grow lg:ml-[16.67%] lg:h-screen lg:overflow-auto">
         <AdminDashboardNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         <UserProvider>
-          <ContentProvider>
+         
             <Routes>
               <Route
                 path="dashboard"
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
                 element={
                   <ProtectedRoute
                     path="manage-contents"
-                    element={<ManageContent />}
+                    element={ <ContentProvider><ManageContent /></ContentProvider>}
                   />
                 }
               />
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
                 element={
                   <ProtectedRoute
                     path="manage-contents/:id"
-                    element={<ContentReview />}
+                    element={ <ContentProvider><ContentReview /></ContentProvider>}
                   />
                 }
               />
@@ -141,7 +141,6 @@ const AdminDashboard = () => {
                 }
               /> */}
             </Routes>
-          </ContentProvider>
         </UserProvider>
       </div>
     </div>

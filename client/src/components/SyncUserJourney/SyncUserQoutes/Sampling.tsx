@@ -83,7 +83,7 @@ const Sampling = () => {
     portion_to_be_sampled: '',
     intended_usage: [],
     territories: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     media_formats: [],
     samples_of_other_songs: '',
     additional_info: '',
@@ -141,6 +141,10 @@ const Sampling = () => {
     navigate(-1);
   };
 
+   const navigateToPendingLicense = () => {
+     navigate('/myAccount?section=Pending%20License');
+   };
+
   const handleSubmission = async (
     values: FormData,
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
@@ -177,7 +181,7 @@ const Sampling = () => {
       await axios.post(apiUrl, formData, config);
       toast.success('Sampling quote sent successfully');
       await delay(5000);
-      handleNavigateBack();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       const errorMessage = (
@@ -221,7 +225,7 @@ const Sampling = () => {
                           htmlFor="project_title"
                           className={applyLabelStyles}
                         >
-                          Project Title:
+                          Project Title*
                         </label>
                         <Field
                           name="project_title"
@@ -237,7 +241,7 @@ const Sampling = () => {
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Genre:"
+                          label="Genre of the project*"
                           name="genre"
                           placeholder="Genre of the Project (e.g., Hip Hop)"
                         />
@@ -253,7 +257,7 @@ const Sampling = () => {
                       {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Artist or Group:"
+                          label="Artist or Group requesting this sample*"
                           name="artists_or_group"
                           placeholder="Name of the Artist or Group"
                         />
@@ -269,7 +273,7 @@ const Sampling = () => {
                           htmlFor="release_date"
                           className={applyLabelStyles}
                         >
-                          Release Date:
+                          Planned release date*
                         </label>
                         <Field
                           name="release_date"
@@ -290,7 +294,7 @@ const Sampling = () => {
                           htmlFor="artist_name"
                           className={applyLabelStyles}
                         >
-                          Artist Name:
+                          Artist name (original song)*
                         </label>
                         <Field
                           className={applyInputStyles}
@@ -310,7 +314,7 @@ const Sampling = () => {
                           htmlFor="original_song"
                           className={applyLabelStyles}
                         >
-                          Original Song:
+                          Original song title*
                         </label>
                         <Field
                           name="original_song"
@@ -330,7 +334,7 @@ const Sampling = () => {
                         htmlFor="portion_to_be_sampled"
                         className={applyLabelStyles}
                       >
-                        Portion to Be Sampled:
+                        Portion to Be Sampled*
                       </label>
                       <Field
                         name="portion_to_be_sampled"
@@ -348,7 +352,7 @@ const Sampling = () => {
                       {' '}
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Intended Usage:"
+                          label="Intended Usage*"
                           name="intended_usage"
                           placeholder="e.g., Hook, Verse, Bridge"
                         />
@@ -361,7 +365,7 @@ const Sampling = () => {
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Territories: "
+                          label="Territories*"
                           name="territories"
                           placeholder="Where the Project Will Be Distributed"
                         />
@@ -379,13 +383,12 @@ const Sampling = () => {
                           htmlFor="license_duration"
                           className={applyLabelStyles}
                         >
-                          License Duration:
+                          License Duration*
                         </label>
                         <Field
                           name="license_duration"
                           type="text"
-                          placeholder="Yearly"
-                          disabled
+                          placeholder="Monthly, Quarterly, Yearly...."
                           className={applyInputStyles}
                         />
                         <ErrorMessage
@@ -396,7 +399,7 @@ const Sampling = () => {
                       </span>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Media Formats:"
+                          label="Media Formats*"
                           name="media_formats"
                           placeholder="e.g., Digital, Physical"
                         />
@@ -413,7 +416,7 @@ const Sampling = () => {
                         htmlFor="samples_of_other_songs"
                         className={applyLabelStyles}
                       >
-                        Does this contain any other uses or samples of songs?
+                        Does this contain any other uses or samples of songs?*
                       </label>
                       <Field
                         name="samples_of_other_songs"
@@ -449,7 +452,7 @@ const Sampling = () => {
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <InputField
-                          label="Distribution Channels: "
+                          label="Distribution Channels* "
                           name="distribution_channels"
                           placeholder="e.g., Streaming Services, Physical Copies"
                         />
