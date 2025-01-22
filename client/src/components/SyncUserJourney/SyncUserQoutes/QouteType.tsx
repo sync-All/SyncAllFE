@@ -59,6 +59,7 @@ const QouteType = () => {
   const handleBackBtn = () => {
     navigate(-1);
   };
+  
 
   const radioOptions = [
     {

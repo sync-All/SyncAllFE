@@ -75,7 +75,7 @@ const TvCommercialAds = () => {
     duration_of_music_usage: '',
     intended_usage: [],
     territories: [],
-    license_duration: 'Yearly',
+    license_duration: '',
     media: '',
     attachments: null as FileList | null,
     additional_info: '',
@@ -126,6 +126,10 @@ const TvCommercialAds = () => {
     navigate(-1);
   };
 
+   const navigateToPendingLicense = () => {
+     navigate('/myAccount?section=Pending%20License');
+   };
+
   const handleSubmission = async (
     values: FormData,
     { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
@@ -162,7 +166,7 @@ const TvCommercialAds = () => {
       await axios.post(apiUrl, formData, config);
       toast.success('Tv commercial/ Ads quote sent successfully');
       await delay(5000);
-      handleNavigateBack();
+      navigateToPendingLicense();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       const errorMessage = (
@@ -359,7 +363,6 @@ const TvCommercialAds = () => {
                         </label>
                         <Field
                           name="license_duration"
-                          disabled
                           type="text"
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}

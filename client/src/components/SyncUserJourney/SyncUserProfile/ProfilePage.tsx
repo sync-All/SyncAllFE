@@ -6,13 +6,16 @@ import AccountSetting from './AccountSetting';
 import PlansBillings from './Plans_Billings';
 import { useSyncUser } from '../../../Context/syncUserData';
 import PendingLicense from './PendingLicense';
+import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { user } = useSyncUser();
-  const [activeSection, setActiveSection] = useState('Account Overview');
- 
-  const userDetails = user?.user; 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const section = queryParams.get('section') || 'Account Overview';
+  const [activeSection, setActiveSection] = useState(section);
 
+  const userDetails = user?.user;
 
   const liClass =
     'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
@@ -34,7 +37,6 @@ const ProfilePage = () => {
         return null;
     }
   };
-
 
   return (
     <div className="mx-8 lg:mx-[284px]">
