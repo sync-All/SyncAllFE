@@ -26,6 +26,7 @@ async function createFmtRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }
@@ -68,6 +69,7 @@ async function createTVARecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }
@@ -109,6 +111,7 @@ async function createVideoGamesRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }
@@ -152,6 +155,7 @@ async function createSampleRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }
@@ -195,6 +199,7 @@ async function createInterpolationRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }
@@ -233,6 +238,7 @@ async function createCRBTRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       status : 'pending'
     }
   }
@@ -272,6 +278,7 @@ async function createSMCRecord(formfields, extrainfo, syncEmail){
       'Uploader Email' : extrainfo.user.email,
       'Sync_User Email' : syncEmail,
       createdAt : formfields.createdAt,
+      budget : formfields.budget,
       attachments : formfields.attachments.join(),
       status : 'pending'
     }

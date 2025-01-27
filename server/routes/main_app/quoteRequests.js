@@ -46,7 +46,7 @@ router.post(
         if (!trackDetails) {
           throw new BadRequestError("Track does not exists");
         }
-        if (req.files) {
+        if(req.files) {
           const attachments = [...req.files];
           let attachmentUrlList = [];
           await Promise.all(
