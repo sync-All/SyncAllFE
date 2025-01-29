@@ -98,7 +98,7 @@ const fmtSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
@@ -182,7 +182,7 @@ const tvaSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
@@ -266,7 +266,7 @@ const videosGamesSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
@@ -365,7 +365,7 @@ const samplingSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
@@ -460,7 +460,7 @@ const interpolationSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     track_info : {
@@ -529,7 +529,7 @@ const crbtSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
@@ -603,7 +603,7 @@ const smcSchema = new Schema({
         required : true
     },
     budget : {
-        reuired : true,
+        required : true,
         type : String
     },
     user_info : {
