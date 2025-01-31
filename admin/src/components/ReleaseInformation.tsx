@@ -2,7 +2,6 @@ import { ErrorMessage, Field } from 'formik';
 import { Content } from '../contexts/ContentContext';
 import InputField from './InputField';
 
-
 interface ReleaseInformationProps {
   details?: Content;
 }
@@ -14,8 +13,7 @@ const applyLabelStyles =
 const applyFormDiv = 'flex flex-col lg:flex-row items-center mb-4 gap-8';
 const applyErrorStyles = 'italic text-red-600';
 
-
-const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
+const ReleaseInformation: React.FC<ReleaseInformationProps> = () => {
   return (
     <div className="flex flex-col mt-[60px]">
       <div className={applyFormDiv}>
@@ -23,11 +21,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="copyrightName" className={applyLabelStyles}>
             Copyright Name
           </label>
-          <Field
-            name="copyrightName"
-            placeholder={details?.copyrightName}
-            className={applyInputStyles}
-          />
+          <Field name="copyrightName" className={applyInputStyles} />
           <ErrorMessage
             name="copyrightName"
             component="div"
@@ -41,7 +35,6 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <Field
             type="number"
             name="copyrightYear"
-            placeholder={details?.copyrightYear?.toString()}
             className={applyInputStyles}
           />
           <ErrorMessage
@@ -56,13 +49,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="releaseDate" className={applyLabelStyles}>
             Release Date
           </label>
-          <Field
-            name="releaseDate"
-            placeholder={new Date(
-              details?.releaseDate ?? ''
-            ).toLocaleDateString()}
-            className={applyInputStyles}
-          />
+          <Field name="releaseDate" className={applyInputStyles} />
 
           <ErrorMessage
             name="releaseDate"
@@ -74,11 +61,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="countryOfRelease" className={applyLabelStyles}>
             Country Of Release
           </label>
-          <Field
-            name="countryOfRelease"
-            placeholder={details?.countryOfRelease}
-            className={applyInputStyles}
-          />
+          <Field name="countryOfRelease" className={applyInputStyles} />
           <ErrorMessage
             name="countryOfRelease"
             component="div"
@@ -91,9 +74,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <InputField
             name="mood"
             label="Mood"
-            placeholder={
-              Array.isArray(details?.mood) ? details?.mood.join(', ') : ''
-            }
+            placeholder=""
             className={applyInputStyles}
           />
           <ErrorMessage
@@ -106,9 +87,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <InputField
             name="tag"
             label="Tags"
-            placeholder={
-              Array.isArray(details?.tag) ? details?.tag.join(', ') : ''
-            }
+            placeholder=""
             className={applyInputStyles}
           />
           <ErrorMessage
@@ -123,11 +102,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="lyrics" className={applyLabelStyles}>
             Lyrics
           </label>
-          <Field
-            name="lyrics"
-            placeholder={details?.lyrics || 'add lyrics'}
-            className={applyInputStyles}
-          />
+          <Field name="lyrics" className={applyInputStyles} />
           <ErrorMessage
             name="lyrics"
             component="div"
@@ -138,11 +113,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="audioLang" className={applyLabelStyles}>
             Audio Language
           </label>
-          <Field
-            name="audioLang"
-            placeholder={details?.audioLang}
-            className={applyInputStyles}
-          />
+          <Field name="audioLang" className={applyInputStyles} />
           <ErrorMessage
             name="audioLang"
             component="div"
@@ -155,11 +126,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="explicitCont" className={applyLabelStyles}>
             Explicit Content
           </label>
-          <Field
-            name="explicitCont"
-            placeholder={details?.explicitCont}
-            className={applyInputStyles}
-          />
+          <Field name="explicitCont" className={applyInputStyles} />
           <ErrorMessage
             name="explicitCont"
             component="div"
@@ -170,12 +137,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="releaseLabel" className={applyLabelStyles}>
             Release Label
           </label>
-          <Field
-            type="text"
-            name="releaseLabel"
-            placeholder={details?.releaseLabel}
-            className={applyInputStyles}
-          />
+          <Field type="text" name="releaseLabel" className={applyInputStyles} />
           <ErrorMessage
             name="releaseLabel"
             component="div"
@@ -188,12 +150,7 @@ const ReleaseInformation: React.FC<ReleaseInformationProps> = ({ details }) => {
           <label htmlFor="releaseDesc" className={applyLabelStyles}>
             Release Description
           </label>
-          <Field
-            type="text"
-            name="releaseDesc"
-            placeholder={details?.releaseDesc}
-            className={applyInputStyles}
-          />
+          <Field type="text" name="releaseDesc" className={applyInputStyles} />
           <ErrorMessage
             name="releaseDesc"
             component="div"

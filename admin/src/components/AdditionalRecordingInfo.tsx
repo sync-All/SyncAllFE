@@ -4,7 +4,6 @@ import InputField from './InputField';
 
 interface AdditionalRecordingInfoProps {
   details?: Content;
-  
 }
 
 const applyInputStyles =
@@ -65,9 +64,11 @@ const AdditionalRecordingInfo: React.FC<AdditionalRecordingInfoProps> = ({
           </label>
           <Field
             name="recordingDate"
-            placeholder={new Date(
-              details?.recordingDate ?? ''
-            ).toLocaleDateString()}
+            placeholder={
+              details?.recordingDate
+                ? new Date(details.recordingDate).toLocaleDateString()
+                : ''
+            }
             className={applyInputStyles}
           />
           <ErrorMessage

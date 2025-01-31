@@ -62,6 +62,7 @@ const ManageUsers = () => {
   const [username, setUsername] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]); 
   const [isLoading, setIsLoading] = useState(false);
+  
 
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 '

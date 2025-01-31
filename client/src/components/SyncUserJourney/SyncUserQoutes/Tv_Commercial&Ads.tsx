@@ -59,6 +59,7 @@ const TvCommercialAds = () => {
     additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track information is required'),
+    budget: Yup.string().required('License budget is required'),
   });
 
   interface ResponseData {
@@ -81,6 +82,7 @@ const TvCommercialAds = () => {
     additional_info: '',
     role_type: 'TV Commercial/Ads',
     track_info: id || '',
+    budget: '',
   };
 
   interface FormData {
@@ -99,6 +101,7 @@ const TvCommercialAds = () => {
     additional_info: string;
     role_type: string;
     track_info: string;
+    budget: string;
   }
 
   const handleFileChange = (
@@ -374,6 +377,7 @@ const TvCommercialAds = () => {
                         />
                       </span>
                     </span>
+
                     <span className={applyFormDiv}>
                       <span className="w-[367px] flex flex-col gap-2 mb-4">
                         <label htmlFor="media" className={applyLabelStyles}>
@@ -391,6 +395,7 @@ const TvCommercialAds = () => {
                           className={applyErrorStyles}
                         />
                       </span>
+
                       <div className="w-[367px] flex flex-col gap-2 mb-4">
                         <label
                           htmlFor="attachments"
@@ -423,6 +428,24 @@ const TvCommercialAds = () => {
                           className={applyErrorStyles}
                         />
                       </div>
+                    </span>
+                    <span className={applyFormDiv}>
+                      <span className="w-[367px] flex flex-col gap-2 mb-4">
+                        <label htmlFor="budget" className={applyLabelStyles}>
+                          License Budget:
+                        </label>
+                        <Field
+                          name="budget"
+                          type="number"
+                          placeholder="What's your license budget in $"
+                          className={applyInputStyles}
+                        />
+                        <ErrorMessage
+                          name="budget"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </span>
                     </span>
                     <div className="flex flex-col justify-center items-center">
                       <div className="flex flex-col gap-2 mb-16 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
