@@ -294,7 +294,7 @@ const queryTrackInfo =async(req,res,next)=>{
   res.status(400).send("Bad request")
 }
 
-const freequerySong =async(req,res,next)=>{
+const freequerySong = async(req,res,next)=>{
   const query = req.params.queryText
   const regex = new RegExp(query, 'i');
   try {
