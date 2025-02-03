@@ -50,6 +50,7 @@ const FilmMoviesTv = () => {
       .of(Yup.string())
       .min(1, 'At least one cast member is required'),
     production_budget: Yup.string().required('Production budget is required'),
+    budget: Yup.string().required('License budget is required'),
     production_synopsis: Yup.string().required(
       'Production synopsis is required'
     ),
@@ -84,6 +85,7 @@ const FilmMoviesTv = () => {
     project_producer: '',
     project_cast: [],
     production_budget: '',
+    budget: '',
     production_synopsis: '',
     scene_synopsis: '',
     distributor: '',
@@ -119,6 +121,7 @@ const FilmMoviesTv = () => {
     additional_info: string;
     role_type: string;
     track_info: string;
+    budget: string;
   }
 
   const handleFileChange = (
@@ -325,6 +328,25 @@ const FilmMoviesTv = () => {
                         />
                       </span>
                     </span>
+                    <span className={applyFormDiv}>
+                      <span className="w-[367px] flex flex-col gap-2 mb-4">
+                        <label htmlFor="budget" className={applyLabelStyles}>
+                          License Budget:
+                        </label>
+                        <Field
+                          name="budget"
+                          type="number"
+                          placeholder="What's your license budget in $"
+                          className={applyInputStyles}
+                        />
+                        <ErrorMessage
+                          name="budget"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </span>
+                    </span>
+
                     <div className="flex flex-col justify-center items-center">
                       {' '}
                       <div className="flex flex-col gap-2 mb-8 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
@@ -454,7 +476,6 @@ const FilmMoviesTv = () => {
                         <Field
                           name="license_duration"
                           type="text"
-                          
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />

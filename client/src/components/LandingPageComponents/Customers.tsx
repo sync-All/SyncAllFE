@@ -35,12 +35,12 @@ const Customers = () => {
                             <h1 className="drop-shadow-sm font-Utile-light text-sm md:text-base lg:text-[clamp(24px,2.5vw,36px)] lg:leading-10 prev ">
                             {saying.comment}
                             </h1>
-                            <p className="text-sm lg:text-base font-Utile-bold drop-shadow-sm pt-3 lg:pt-4 pb-1">
+                            {/* <p className="text-sm lg:text-base font-Utile-bold drop-shadow-sm pt-3 lg:pt-4 pb-1">
                             {saying.author}
                             </p>
                             <p className="text-sm font-Utile-light drop-shadow-sm">
                             {saying.position}
-                            </p>
+                            </p> */}
                         </SwiperSlide>
                         ))
                        }

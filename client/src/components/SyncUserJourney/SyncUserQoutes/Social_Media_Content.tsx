@@ -45,6 +45,7 @@ const SocialMediaContent = () => {
     additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track info is required'),
+    budget: Yup.string().required('License budget is required'),
   });
 
   const initialValues: FormData = {
@@ -59,6 +60,7 @@ const SocialMediaContent = () => {
     additional_info: '',
     role_type: 'Social Media Content',
     track_info: id || '',
+    budget: '',
   };
 
   interface FormData {
@@ -73,6 +75,7 @@ const SocialMediaContent = () => {
     additional_info: string;
     role_type: string;
     track_info: string;
+    budget: string;
   }
 
     interface ResponseData {
@@ -258,7 +261,6 @@ const SocialMediaContent = () => {
                         name="license_duration"
                         type="text"
                         placeholder="e.g., One-time, Perpetual"
-                        
                         className={applyInputStyles}
                       />
                       <ErrorMessage
@@ -283,7 +285,24 @@ const SocialMediaContent = () => {
                         className={applyErrorStyles}
                       />
                     </span>
+                  </span> <span className={applyFormDiv}>
+                  <span className="w-[367px] flex flex-col gap-2 mb-4">
+                    <label htmlFor="budget" className={applyLabelStyles}>
+                      License Budget:
+                    </label>
+                    <Field
+                      name="budget"
+                      type="number"
+                      placeholder="What's your license budget in $"
+                      className={applyInputStyles}
+                    />
+                    <ErrorMessage
+                      name="budget"
+                      component="span"
+                      className={applyErrorStyles}
+                    />
                   </span>
+                </span>
                   <div className="flex flex-col justify-center items-center">
                     <div className="flex flex-col gap-2 mb-16 w-[376px] mx-2.5 lg:mx-0 lg:w-full">
                       <label
@@ -306,6 +325,7 @@ const SocialMediaContent = () => {
                     </div>
                   </div>
                 </div>{' '}
+               
                 <div className="flex gap-6 lg:justify-end mx-auto items-center mt-12 lg:w-full w-[367px] lg:mx-0">
                   <div
                     className="w-[176px] px-4 py-2.5 border border-black2 rounded-[8px] text-black2 font-formular-medium text-[14px] leading-5 text-center"

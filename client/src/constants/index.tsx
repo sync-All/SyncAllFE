@@ -56,20 +56,28 @@ export const playTrackInfo = [
 
 
 export const customerSaid = [
-    {
-        comment : '“Syncall has the best sounds hands-down. The quality and diversity are overwhelmingly better than any other source.”',
-        author : "Joel Edwards",
-        position : "President, Evolv Studio"
-    },
-    {
-        comment : '“Syncall has the best sounds hands-down. The quality and diversity are overwhelmingly better than any other source.”',
-        author : "Joel Edwards",
-        position : "President, Evolv Studio"
-    },
-    {
-        comment : '“Syncall has the best sounds hands-down. The quality and diversity are overwhelmingly better than any other source.”',
-        author : "Joel Edwards",
-        position : "President, Evole Studio"
-    },
-
-]
+  {
+    comment:
+      "“Licensing music used to be such a headache. SyncAll has completely streamlined the process. I can browse their extensive library, find the perfect track, and license it swiftly. It's incredibly efficient and saves me tons of time.”",
+    // author: 'Joel Edwards',
+    // position: 'President, Evolv Studio',
+  },
+  {
+    comment:
+      '“The amount of metadata provided for each track is invaluable. I can quickly filter by mood, tempo, genre, instruments, and even vocal style. This level of detail makes it easy to find the exact song I need for my project and saves me from listening through hundreds of tracks.”',
+    // author: 'Joel Edwards',
+    // position: 'President, Evolv Studio',
+  },
+  {
+    comment:
+      '“The entire licensing process is swift and efficient. Everything is streamlined and easy to navigate from initial search to final approval. SyncAll has significantly improved my workflow and made me more productive.”',
+    // author: 'Joel Edwards',
+    // position: 'President, Evole Studio',
+  },
+  {
+    comment:
+      '“Using SyncAll gives me peace of mind, knowing I\'m legally using music. The platform handles all the necessary copyright clearances, so I don\'t have to worry about any legal issues down the line.”',
+    // author: 'Joel Edwards',
+    // position: 'President, Evole Studio',
+  },
+];

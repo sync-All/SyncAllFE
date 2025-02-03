@@ -44,103 +44,111 @@ const AdminDashboard = () => {
       <div className="flex-grow lg:ml-[16.67%] lg:h-screen lg:overflow-auto">
         <AdminDashboardNavbar activeItem={activeTab} toggleMenu={toggleMenu} />
         <UserProvider>
-         
-            <Routes>
-              <Route
-                path="dashboard"
-                element={
-                  <ProtectedRoute path="dashboard" element={<Dashboard />} />
-                }
-              />
-              <Route
-                path="manage-users"
-                element={
-                  <ProtectedRoute
-                    path="manage-users"
-                    element={<ManageUsers />}
-                  />
-                }
-              />
+          <Routes>
+            <Route
+              path="dashboard"
+              element={
+                <ProtectedRoute path="dashboard" element={<Dashboard />} />
+              }
+            />
+            <Route
+              path="manage-users"
+              element={
+                <ProtectedRoute path="manage-users" element={<ManageUsers />} />
+              }
+            />
 
-              <Route
-                path="manage-users/:id"
-                element={
-                  <ProtectedRoute
-                    path="manage-users/:id"
-                    element={<SingleUserPage />}
-                  />
-                }
-              />
+            <Route
+              path="manage-users/:id"
+              element={
+                <ProtectedRoute
+                  path="manage-users/:id"
+                  element={
+                    <ContentProvider>
+                      <SingleUserPage />
+                    </ContentProvider>
+                  }
+                />
+              }
+            />
 
-              <Route
-                path="manage-contents"
-                element={
-                  <ProtectedRoute
-                    path="manage-contents"
-                    element={ <ContentProvider><ManageContent /></ContentProvider>}
-                  />
-                }
-              />
+            <Route
+              path="manage-contents"
+              element={
+                <ProtectedRoute
+                  path="manage-contents"
+                  element={
+                    <ContentProvider>
+                      <ManageContent />
+                    </ContentProvider>
+                  }
+                />
+              }
+            />
 
-              <Route
-                path="manage-contents/:id"
-                element={
-                  <ProtectedRoute
-                    path="manage-contents/:id"
-                    element={ <ContentProvider><ContentReview /></ContentProvider>}
-                  />
-                }
-              />
+            <Route
+              path="manage-contents/:id"
+              element={
+                <ProtectedRoute
+                  path="manage-contents/:id"
+                  element={
+                    <ContentProvider>
+                      <ContentReview />
+                    </ContentProvider>
+                  }
+                />
+              }
+            />
 
-              <Route
-                path="tickets"
-                element={
-                  <ProtectedRoute
-                    path="tickets"
-                    element={
-                      <DisputeProvider>
-                        <DisputeTicket />
-                      </DisputeProvider>
-                    }
-                  />
-                }
-              />
+            <Route
+              path="tickets"
+              element={
+                <ProtectedRoute
+                  path="tickets"
+                  element={
+                    <DisputeProvider>
+                      <DisputeTicket />
+                    </DisputeProvider>
+                  }
+                />
+              }
+            />
 
-              <Route
-                path="dispute-tick/:id"
-                element={
-                  <ProtectedRoute
-                    path="dispute-tick/:id"
-                    element={
-                      <DisputeProvider>
-                        <TicketDIsputes />
-                      </DisputeProvider>
-                    }
-                  />
-                }
-              />
+            <Route
+              path="dispute-tick/:id"
+              element={
+                <ProtectedRoute
+                  path="dispute-tick/:id"
+                  element={
+                    <DisputeProvider>
+                      <TicketDIsputes />
+                    </DisputeProvider>
+                  }
+                />
+              }
+            />
 
-              <Route
-                path="dispute-tick/details/:id"
-                element={
-                  <ProtectedRoute
-                    path="dispute-tick/details/:id"
-                    element={
-                      <DisputeProvider>
-                        <DisputeDetails />
-                      </DisputeProvider>
-                    }
-                  />
-                }
-              />
+            <Route
+              path="dispute-tick/details/:id"
+              element={
+                <ProtectedRoute
+                  path="dispute-tick/details/:id"
+                  element={
+                    <DisputeProvider>
+                      <DisputeDetails />
+                    </DisputeProvider>
+                  }
+                />
+              }
+            />
 
-              {/* <Route
+            {/* <Route
                 path="music-quotes"
                 element={
                   <ProtectedRoute path="music-quotes" element={<Quotes />} />
                 }
               /> */}
-            </Routes>
+          </Routes>
         </UserProvider>
       </div>
     </div>
