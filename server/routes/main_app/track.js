@@ -87,6 +87,10 @@ router.get(
   }),
   asyncHandler(trackController.querySongsByIndex)
 );
+router.get(
+  "/freequery/:queryText",
+  asyncHandler(trackController.freequerySong)
+);
 
 router.get(
   "/queryTrackInfo/:trackId",
