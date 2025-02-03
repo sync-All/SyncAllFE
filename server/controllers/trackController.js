@@ -233,8 +233,8 @@ const trackBulkUpload = async(req,res,next)=>{
 }
 
 const getAllSongs = async(req,res,next)=>{
-    const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
-    res.json({allTracks})
+  const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
+  res.json({allTracks})
 }
 
 const getTracksByGenre = async(req,res,next)=>{

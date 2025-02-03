@@ -18,6 +18,11 @@ const checkAdmin = (req,res,next)=>{
     })(req,res,next)
 }
 
+const allowUnauthentication = (req,res,next)=>{
+req.allowUnauthentication = true
+next()
+}
+
 const checkUser = (req,res,next)=>{
     passport.authenticate('jwt',{session : false},(err,user,info)=>{
         console.log({info})
@@ -42,7 +47,9 @@ const checkUploader = (req,res,next)=>{
            return next(new TokenExpiredError('Session expired, proceed to login'))
         }
         if(err || !user){
-            console.log(err)
+            if(req.allowUnauthentication){
+                return next()
+            }
             return next(new unauthorizedError('Authentication failed'));
         }
         if (user.role !== 'Music Uploader') {
@@ -69,4 +76,4 @@ const checkSyncUser = (req,res,next)=>{
         return next();
     })(req,res,next)
 }
-module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser}
+module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser,allowUnauthentication}

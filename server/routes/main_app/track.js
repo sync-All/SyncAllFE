@@ -9,7 +9,7 @@ const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
-const { checkUploader } = require("../../utils/AuthenticateChecker");
+const { checkUploader, allowUnauthentication } = require("../../utils/AuthenticateChecker");
 
 
 router.get(
@@ -42,15 +42,14 @@ router.post(
   asyncHandler(trackController.trackBulkUpload)
 );
 
-
 router.get(
-  "/allsongs",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
+  "/allsongs",allowUnauthentication,checkUploader,
   asyncHandler(trackController.getAllSongs)
 );
+
+router.get('/test', allowUnauthentication,checkUploader, (req,res,next)=>{
+  console.log(req.allowUnauthentication)
+})
 
 router.get(
   "/getTrackByGenre/:genre",
