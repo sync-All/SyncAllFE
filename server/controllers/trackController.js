@@ -266,9 +266,13 @@ const getTracksByMood = async(req,res,next)=>{
 
 const querySongsByIndex = async(req,res,next)=>{
   const query = req.params.queryText
+  const regex = new RegExp(query, 'i');
   try {
-    const allTracks = await Track.find({$text : {$search : query}}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
-    res.json({allTracks})
+    const tracks =  await Track.find({$or : [
+      {trackTitle : {$regex : regex}},
+      {mainArtist : {$regex : regex}},
+    ]},"artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
+    res.json({tracks})
   } catch (error) {
     res.status(404).json({message : ' Looks like we dont have any music that fits this category'})
   }

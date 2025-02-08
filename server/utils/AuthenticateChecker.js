@@ -66,7 +66,9 @@ const checkSyncUser = (req,res,next)=>{
            return next(new TokenExpiredError('Session expired, proceed to login'))
         }
         if(err || !user){
-            console.log(err)
+            if(req.allowUnauthentication){
+                return next()
+            }
             return next(new unauthorizedError('Authentication failed, not Authorized!'));
         }
         if (user.role !== "Sync User") {
