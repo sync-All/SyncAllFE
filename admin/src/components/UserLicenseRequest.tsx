@@ -116,7 +116,7 @@ const UserLicenseRequest: React.FC<UserLicenseRequestProps> = ({
           <tbody>
             {sortedData.map((track) => (
               <tr key={track._id}>
-                <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+                <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8">
                   {track.trackTitle}
                 </td>
 

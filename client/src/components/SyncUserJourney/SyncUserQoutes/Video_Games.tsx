@@ -56,6 +56,7 @@ const VideoGames = () => {
     additional_info: Yup.string(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track information is required'),
+    budget: Yup.string().required('License budget is required'),
   });
 
   interface ResponseData {
@@ -78,6 +79,7 @@ const VideoGames = () => {
     additional_info: '',
     role_type: 'Video Games',
     track_info: id || '',
+    budget: '',
   };
 
   interface FormData {
@@ -96,6 +98,7 @@ const VideoGames = () => {
     additional_info: string;
     role_type: string;
     track_info: string;
+    budget: string;
   }
 
   const handleFileChange = (
@@ -123,9 +126,9 @@ const VideoGames = () => {
     navigate(-1);
   };
 
-   const navigateToPendingLicense = () => {
-     navigate('/myAccount?section=Pending%20License');
-   };
+  const navigateToPendingLicense = () => {
+    navigate('/myAccount?section=Pending%20License');
+  };
 
   const handleSubmission = async (
     values: FormData,
@@ -387,7 +390,6 @@ const VideoGames = () => {
                         <Field
                           name="license_duration"
                           type="text"
-                          
                           placeholder="e.g., One-time, Perpetual"
                           className={applyInputStyles}
                         />
@@ -429,6 +431,24 @@ const VideoGames = () => {
                           className={applyErrorStyles}
                         />
                       </div>
+                    </span>
+                    <span className={applyFormDiv}>
+                      <span className="w-[367px] flex flex-col gap-2 mb-4">
+                        <label htmlFor="budget" className={applyLabelStyles}>
+                          License Budget:
+                        </label>
+                        <Field
+                          name="budget"
+                          type="number"
+                          placeholder="What's your license budget in $"
+                          className={applyInputStyles}
+                        />
+                        <ErrorMessage
+                          name="budget"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </span>
                     </span>
                     <div className="flex flex-col gap-2 mb-16">
                       <label

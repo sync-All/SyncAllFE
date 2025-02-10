@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-// import Filter from '../../assets/images/Filter-lines.svg';
 import ArrowDown from '../assets/images/arrowdown.svg';
 import ArrowUp from '../assets/images/up-arrow.svg';
-
 import NoTrack from '../assets/images/no_track.svg';
 import LoadingAnimation from '../constants/loading-animation';
 import Search from '../assets/images/search-1.svg';
@@ -25,6 +23,7 @@ interface TableData {
   role: string;
   name: string;
   img: string;
+  mainArtist: string;
 }
 
 interface ResponseData {
@@ -63,6 +62,10 @@ const ManageContent = () => {
   const [contentSearch, setContentSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // New states for filter dropdown
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+
   const fetchByUsername = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
@@ -82,10 +85,9 @@ const ManageContent = () => {
       setIsLoading(true);
       const res = await axios.get(apiUrl, config);
       if (Array.isArray(res.data)) {
-        setSearchResults(res.data); // Set users data as search results
+        setSearchResults(res.data); // Set content data as search results
       } else {
-        // Handle unexpected response structure
-        setSearchResults([]); // Set an empty array if structure doesn't match
+        setSearchResults([]); // Unexpected structure: reset search results
       }
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
@@ -108,13 +110,14 @@ const ManageContent = () => {
     setContentSearch(value);
 
     if (!value.trim()) {
-      setSearchResults([]); // Clear search results
-      debouncedFetch.cancel(); // Cancel any pending debounced searches
+      setSearchResults([]);
+      debouncedFetch.cancel();
       return;
     }
 
     debouncedFetch(value);
   };
+
   useEffect(() => {
     return () => {
       debouncedFetch.cancel();
@@ -132,14 +135,13 @@ const ManageContent = () => {
     direction: 'ascending',
   });
 
-  // Change to sort the full content data
+  // Sort the full content data (from context)
   const sortedData = useMemo(() => {
     if (!Array.isArray(content) || content.length === 0) return [];
 
     return [...content].sort((a, b) => {
       if (sortConfig.key === null) return 0;
 
-      // Use nullish coalescing to provide fallback values for comparison
       const aValue = a[sortConfig.key as keyof Content] ?? '';
       const bValue = b[sortConfig.key as keyof Content] ?? '';
 
@@ -149,12 +151,21 @@ const ManageContent = () => {
     });
   }, [content, sortConfig]);
 
-  const displayContent =
-    contentSearch.trim() === '' ? sortedData : searchResults;
+  // Decide base content: either the sorted content (for browsing) or the search results.
+  const baseContent = contentSearch.trim() === '' ? sortedData : searchResults;
 
-  // Apply pagination on the sorted data
+  // Filter content based on the selected status.
+  // (Ensure the property name matches what you have in your content items.)
+  const finalContent = selectedFilter
+    ? baseContent.filter(
+        (item) =>
+          (item.uploadStatus?.toLowerCase() || '') ===
+          selectedFilter.toLowerCase()
+      )
+    : baseContent;
+
+  // Apply pagination on the filtered content.
   const itemsPerPage = 30;
-
   const {
     currentPage,
     totalPages,
@@ -163,11 +174,11 @@ const ManageContent = () => {
     goToPreviousPage,
     goToPage,
     getPaginationRange,
-  } = usePagination(displayContent, itemsPerPage);
+  } = usePagination(finalContent, itemsPerPage);
 
-  const totaltracks = displayContent.length;
+  const totalTracks = finalContent.length;
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+  const endIndex = Math.min(currentPage * itemsPerPage, totalTracks);
 
   if (loading) {
     return <LoadingAnimation />;
@@ -183,7 +194,6 @@ const ManageContent = () => {
 
   return (
     <div>
-      {' '}
       <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
         <div className="flex justify-between">
           <div>
@@ -199,8 +209,8 @@ const ManageContent = () => {
               Review and manage user-generated content
             </p>
           </div>
-          <div>
-            <div className="relative w-full flex items-center gap-4 min-w-[320px]">
+          <div className="flex items-center gap-4 min-w-[320px]">
+            <div className="relative flex-grow">
               <input
                 type="text"
                 placeholder="Search Title, or Keywords"
@@ -214,7 +224,60 @@ const ManageContent = () => {
                 alt="Search"
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
               />
-              {}
+            </div>
+            {/* Filter dropdown button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFilterDropdown((prev) => !prev)}
+                className="flex items-center border rounded-lg px-4 py-2 text-gray-500"
+              >
+                <span>{selectedFilter ? selectedFilter : 'Filter'}</span>
+                <img
+                  src={showFilterDropdown ? ArrowUp : ArrowDown}
+                  alt="Dropdown"
+                  className="ml-2 w-4 h-4"
+                />
+              </button>
+              {showFilterDropdown && (
+                <ul className="absolute right-0 mt-1 w-full bg-white shadow-md rounded-lg z-10">
+                  <li
+                    onClick={() => {
+                      setSelectedFilter('pending');
+                      setShowFilterDropdown(false);
+                    }}
+                    className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                  >
+                    Pending
+                  </li>
+                  <li
+                    onClick={() => {
+                      setSelectedFilter('approved');
+                      setShowFilterDropdown(false);
+                    }}
+                    className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                  >
+                    Approved
+                  </li>
+                  <li
+                    onClick={() => {
+                      setSelectedFilter('rejected');
+                      setShowFilterDropdown(false);
+                    }}
+                    className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                  >
+                    Rejected
+                  </li>
+                  <li
+                    onClick={() => {
+                      setSelectedFilter('');
+                      setShowFilterDropdown(false);
+                    }}
+                    className="cursor-pointer hover:bg-gray-200 px-4 py-2"
+                  >
+                    Clear Filter
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -223,7 +286,6 @@ const ManageContent = () => {
           <LoadingAnimation />
         ) : paginatedItems.length > 0 ? (
           <div>
-            {' '}
             <table className="w-full mt-5">
               <thead>
                 <tr>
@@ -232,6 +294,14 @@ const ManageContent = () => {
                     <SortButton
                       sortConfig={sortConfig}
                       sortKey="trackTitle"
+                      onSort={handleSort}
+                    />
+                  </th>
+                  <th className={ThStyles}>
+                    Main Artist
+                    <SortButton
+                      sortConfig={sortConfig}
+                      sortKey="mainArtist"
                       onSort={handleSort}
                     />
                   </th>
@@ -246,79 +316,60 @@ const ManageContent = () => {
                   <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6">
                     Status
                   </th>
-
                   <th className={ThStyles}>Actions</th>
                   <th className="bg-grey-100 py-3 px-6"></th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedItems.map((content) => (
+                {paginatedItems.map((item) => (
                   <tr
-                    key={content.user._id}
-                    className="items-center relative border border-r-0 border-l-0 "
+                    key={item.user._id}
+                    className="items-center relative border border-r-0 border-l-0"
                   >
-                    <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                      {content.trackTitle}
+                    <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8">
+                      {item.trackTitle}
                     </td>
                     <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                      {content.user.name}
+                      {item.mainArtist}
+                    </td>
+                    <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                      {item.user.name}
                     </td>
                     <td className="py-4 px-8">
                       <span
-                        className={`${getStatusColors(content.uploadStatus).text} ${
-                          getStatusColors(content.uploadStatus).bg
+                        className={`${
+                          getStatusColors(item.uploadStatus).text
+                        } ${
+                          getStatusColors(item.uploadStatus).bg
                         } font-inter font-medium text-[12px] leading-[18px] gap-[6px] px-[6px] flex items-center justify-center rounded-2xl w-fit`}
                       >
                         <div
                           className={`${
-                            getStatusColors(content.uploadStatus).dot
+                            getStatusColors(item.uploadStatus).dot
                           } w-2 h-2 rounded-full`}
                         ></div>
-                        {content.uploadStatus}
+                        {item.uploadStatus}
                       </span>
                     </td>
-
                     <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
-                      <Link to={content._id}>Review</Link>
+                      <Link to={item._id}>Review</Link>
                     </td>
-                    {/* <td
-                    className={`py-4 px-4 ${
-                      openDropdowns[track._id] ? 'flex' : ''
-                    }`}
-                  >
-                    <span onClick={() => toggleDropdown(track._id)}>
-                      <img src={DotMenu} alt="Dot Menu" />
-                    </span>
-
-                    {openDropdowns[track._id] && (
-                      <div className="absolute z-10 flex flex-col gap-[8px] right-[-55px] rounded-[8px] py-2 px-4">
-                        <button className="text-[#667085] font-formular-medium text-[12px] leading-5 border border-[#E4E7EC] p-2.5 rounded-[8px]">
-                          Edit
-                        </button>
-                        <button className="text-white font-formular-medium text-[12px] leading-5 bg-red-600 border border-[#E4E7EC] p-2.5 rounded-[8px]">
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td> */}
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="flex items-center justify-between mx-[25%] gap-3 mt-5 ">
+            <div className="flex items-center justify-between mx-[25%] gap-3 mt-5">
               <div className="flex gap-3 items-center">
                 <p>
-                  {startIndex} - {endIndex} of {totaltracks}
+                  {startIndex} - {endIndex} of {totalTracks}
                 </p>
               </div>
-
               <div className="flex items-center mx-auto gap-3">
                 <div className="gap-3 flex">
                   {getPaginationRange().map((page, index) =>
                     typeof page === 'number' ? (
-                      <div>
+                      <div key={index}>
                         <button
-                          key={index}
                           onClick={() => goToPage(page)}
                           className={
                             currentPage === page
@@ -336,7 +387,6 @@ const ManageContent = () => {
                 </div>
               </div>
               <div className="flex gap-[40%] items-center">
-                {' '}
                 <button
                   onClick={goToPreviousPage}
                   disabled={currentPage === 1}

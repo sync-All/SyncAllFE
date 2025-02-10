@@ -160,7 +160,7 @@ const TrackMetadata = () => {
     return <LoadingAnimation />;
   }
 
-console.table(trackDetails);
+  console.table(trackDetails);
 
   return (
     <div>
@@ -175,7 +175,7 @@ console.table(trackDetails);
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
           <div className="flex justify-between flex-col  md:flex-row">
             <div className="flex flex-col gap-2 lg:gap-4 w-full">
-              <p className="text-[#475367] text-[32px] lg:text-[56px] font-formular-bold ">
+              <p className="text-[#475367] text-[32px] lg:text-[56px] font-inter font-bold ">
                 {trackDetails?.trackTitle || 'No Title Available'}
               </p>
               <p className="text-[#667185] text-[16px] lg:text-[24px] font-Utile-regular  ">
@@ -270,7 +270,7 @@ console.table(trackDetails);
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Release date</p>
-                                   <p className="text-[#475367]">
+                  <p className="text-[#475367]">
                     {trackDetails?.releaseDate
                       ? new Date(trackDetails.releaseDate).toLocaleDateString()
                       : 'N/A'}
@@ -309,7 +309,6 @@ console.table(trackDetails);
                         : undefined
                     }
                   >
-                    
                     {trackDetails?.producers.join(', ') || 'N/A'}
                   </p>
                 </span>

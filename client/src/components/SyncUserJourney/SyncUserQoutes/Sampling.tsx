@@ -70,6 +70,7 @@ const Sampling = () => {
     attachments: Yup.mixed().nullable(),
     role_type: Yup.string().required('Role type is required'),
     track_info: Yup.string().required('Track info is required'),
+    budget: Yup.string().required('License budget is required'),
   });
 
   const initialValues: FormData = {
@@ -90,6 +91,7 @@ const Sampling = () => {
     attachments: null as FileList | null,
     role_type: 'Sampling',
     track_info: id || '',
+    budget: '',
   };
 
   interface FormData {
@@ -110,6 +112,7 @@ const Sampling = () => {
     attachments: FileList | null;
     role_type: string;
     track_info: string;
+    budget: string;
   }
 
   interface ResponseData {
@@ -324,6 +327,24 @@ const Sampling = () => {
                         />
                         <ErrorMessage
                           name="original_song"
+                          component="span"
+                          className={applyErrorStyles}
+                        />
+                      </span>
+                    </span>
+                    <span className={applyFormDiv}>
+                      <span className="w-[367px] flex flex-col gap-2 mb-4">
+                        <label htmlFor="budget" className={applyLabelStyles}>
+                          License Budget:
+                        </label>
+                        <Field
+                          name="budget"
+                          type="number"
+                          placeholder="What's your license budget in $"
+                          className={applyInputStyles}
+                        />
+                        <ErrorMessage
+                          name="budget"
                           component="span"
                           className={applyErrorStyles}
                         />

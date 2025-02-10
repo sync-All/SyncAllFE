@@ -1,5 +1,5 @@
 import {Footer, Navbar} from "../components"
-import { Authentic, PartnersPerks, Customers, Play, Modal } from "../components/LandingPageComponents"
+import { Authentic, PartnersPerks, Customers, Play, Modal, SearchMusic } from "../components/LandingPageComponents"
 import  { ModalProvider } from "../Context/ModatContext"
 
 const Landing = () => {
@@ -12,6 +12,7 @@ const Landing = () => {
       <Authentic/>
       <Play/>
       <PartnersPerks />
+      <SearchMusic/>
       <Customers/>
       <Footer/>
       <Modal />

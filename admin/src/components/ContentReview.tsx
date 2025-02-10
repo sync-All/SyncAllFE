@@ -13,18 +13,20 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Formik, Form } from 'formik'; // Import Form from Formik
 import { useParams } from 'react-router-dom';
+import RejectPostModal from '../modals/RejectPostModal';
 
 interface ResponseData {
   message?: string;
 }
 
 const getInitialFormData = (contentItem: Content | undefined) => ({
+  _id: contentItem?._id || '',
   mainArtist: contentItem?.mainArtist || '',
   featuredArtist: contentItem?.featuredArtist || [],
   releaseType: contentItem?.releaseType || '',
   releaseTitle: contentItem?.releaseTitle || '',
   trackTitle: contentItem?.trackTitle || '',
-  trackLink: contentItem?.trackLink || '',
+  trackLink: contentItem?.trackLink || contentItem?.spotifyLink || '',
   upc: contentItem?.upc || '',
   isrc: contentItem?.isrc || '',
   genre: contentItem?.genre || '',
@@ -60,6 +62,8 @@ const ContentReview = () => {
   const [currentSection, setCurrentSection] = useState<string>(
     'Minimum Recording Information'
   );
+  const [updating, setUpdating] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 
   const getContentById = (id: string): Content | undefined => {
     return content.find((item) => item._id === id);
@@ -136,11 +140,7 @@ const ContentReview = () => {
     try {
       await axios.get(apiUrl, config);
 
-      // Show success message
-      toast.success(`Post ${action}ed successfully`);
-
-      // You might want to refresh the content list or update UI
-      // refreshContent();
+      toast.success(`Post ${action} successfully`);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
@@ -167,11 +167,7 @@ const ContentReview = () => {
             <button
               className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#F62C2C] text-[#F62C2C] text-[14px] py-2.5 px-4 font-inter"
               type="button"
-              onClick={() => {
-                if (contentItem?._id) {
-                  handleContentReview(contentItem._id, 'Rejected');
-                }
-              }}
+              onClick={() => {setIsRejectModalOpen(true)}}
             >
               Reject Post
             </button>
@@ -204,7 +200,7 @@ const ContentReview = () => {
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
           <div className="flex justify-between flex-col  md:flex-row">
             <div className="flex flex-col gap-2 lg:gap-4 w-full">
-              <p className="text-[#475367] text-[32px] lg:text-[56px] font-formular-bold ">
+              <p className="text-[#475367] text-[32px] lg:text-[56px] font-inter font-bold ">
                 {contentItem?.trackTitle || 'No Title Available'}
               </p>
               <p className="text-[#667185] text-[16px] lg:text-[24px] font-Utile-regular  ">
@@ -282,8 +278,8 @@ const ContentReview = () => {
           initialValues={getInitialFormData(contentItem)}
           enableReinitialize
           // validationSchema={validationSchema}
-          onSubmit={async (values, { validateForm }) => {
-            // setLoading(true);
+          onSubmit={async (values, { setFieldValue, validateForm }) => {
+            setUpdating(true);
             const token = localStorage.getItem('token');
             const urlVar = import.meta.env.VITE_APP_API_URL;
             const apiUrl = `${urlVar}/manage_content/trackupdate`;
@@ -296,19 +292,19 @@ const ContentReview = () => {
             const errors = await validateForm(values);
 
             if (Object.keys(errors).length) {
-              // Iterate over the errors object and toast each error message
               Object.values(errors).forEach((error) => {
                 if (typeof error === 'string') {
                   toast.error(error);
                 }
               });
-              return; // Prevent form submission if there are errors
+              return;
             }
 
-            console.log(values);
-
             try {
-              await axios.post(apiUrl, values, config);
+              const res = await axios.post(apiUrl, values, config);
+              setFieldValue('updatedValues', res.data.trackDetails);
+              console.log(res.data.trackDetails);
+              console.log(content);
               toast.success('Changes saved successfully');
             } catch (error: unknown) {
               const axiosError = error as AxiosError<ResponseData>;
@@ -318,6 +314,8 @@ const ContentReview = () => {
                   : axiosError.message || 'An error occurred'
                 ).toString()
               );
+            } finally {
+              setUpdating(false);
             }
           }}
         >
@@ -343,14 +341,26 @@ const ContentReview = () => {
                 </div>
               )}
               {currentSection === 'Release Information' && (
-                <button type="submit" className={controlBtn} disabled={loading}>
-                  {loading ? 'Uploading...' : 'Upload Track'}
+                <button
+                  type="submit"
+                  className={controlBtn}
+                  disabled={updating}
+                >
+                  {updating ? 'Updating...' : 'Update Track'}
                 </button>
               )}
             </div>
           </Form>
         </Formik>
       </div>
+
+      {isRejectModalOpen && (
+        <RejectPostModal
+          isOpen={isRejectModalOpen}
+          onClose={() => setIsRejectModalOpen(false)}
+          contentId={contentItem?._id || ''}
+        />
+      )}
     </div>
   );
 };

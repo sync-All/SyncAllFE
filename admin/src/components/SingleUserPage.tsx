@@ -10,11 +10,14 @@ import UserLicenseRequest from './UserLicenseRequest';
 import UserLicensedTracks from './UserLicensedTracks';
 import MusicUploaderInfromation from './MusicUploaderInformation';
 import MusicUploaderTrack from './MusicUploaderTrack';
+import EmailModal from '../modals/EmailModal';
+import SuspendAccountModal from '../modals/SuspendAccountModal';
 
 const SingleUserPage = () => {
   const { users, loading } = useUsers();
   const { id } = useParams();
-
+ const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
   const getContentById = (id: string): User | undefined => {
     return users.find((item) => item._id === id);
   };
@@ -83,6 +86,8 @@ const SingleUserPage = () => {
 
   const MusicUploaderSingleUser = () => {
     const [activeSection, setActiveSection] = useState('User Information');
+     
+
 
     const liClass =
       'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
@@ -148,18 +153,18 @@ const SingleUserPage = () => {
           </span>
         </div>
         <div className="flex gap-2 place-items-end">
-          <a href={`mailto:${userDetails?.email}`}>
-            {' '}
-            <button
-              className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#D0D5DD]"
-              type="button"
-            >
-              Send Email
-            </button>
-          </a>{' '}
+          {' '}
+          <button
+            className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#D0D5DD]"
+            type="button"
+            onClick={() => setIsEmailModalOpen(true)}
+          >
+            Send Email
+          </button>
           <button
             className="bg-[#F62C2C] text-white p-[10px] gap-[8px] rounded-[8px] flex"
             type="button"
+            onClick={() => setIsSuspendModalOpen(true)}
           >
             Suspend Account
           </button>
@@ -169,6 +174,21 @@ const SingleUserPage = () => {
         <MusicUploaderSingleUser />
       ) : (
         <SyncUserSingleUser />
+      )}
+
+      {isEmailModalOpen && (
+        <EmailModal
+          isOpen={isEmailModalOpen}
+          onClose={() => setIsEmailModalOpen(false)}
+          recipient={userDetails?.email || ''}
+        />
+      )}
+      {isSuspendModalOpen && (
+        <SuspendAccountModal
+          isOpen={isSuspendModalOpen}
+          onClose={() => setIsSuspendModalOpen(false)}
+          recipient={userDetails?.email || ''}
+        />
       )}
     </div>
   );

@@ -97,6 +97,10 @@ const fmtSchema = new Schema({
         ref : "track",
         required : true
     },
+    budget : {
+        required : true,
+        type : String
+    },
     user_info : {
         type : Schema.Types.ObjectId,
         ref : "syncUser"
@@ -177,6 +181,10 @@ const tvaSchema = new Schema({
         ref : "track",
         required : true
     },
+    budget : {
+        required : true,
+        type : String
+    },
     user_info : {
         type : Schema.Types.ObjectId,
         ref : "syncUser",
@@ -256,6 +264,10 @@ const videosGamesSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "track",
         required : true
+    },
+    budget : {
+        required : true,
+        type : String
     },
     user_info : {
         type : Schema.Types.ObjectId,
@@ -352,6 +364,10 @@ const samplingSchema = new Schema({
         ref : "track",
         required : true
     },
+    budget : {
+        required : true,
+        type : String
+    },
     user_info : {
         type : Schema.Types.ObjectId,
         ref : "syncUser",
@@ -443,6 +459,10 @@ const interpolationSchema = new Schema({
         default : 'Interpolation',
         required : true
     },
+    budget : {
+        required : true,
+        type : String
+    },
     track_info : {
         type : Schema.Types.ObjectId,
         ref : "track",
@@ -507,6 +527,10 @@ const crbtSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "track",
         required : true
+    },
+    budget : {
+        required : true,
+        type : String
     },
     user_info : {
         type : Schema.Types.ObjectId,
@@ -578,13 +602,16 @@ const smcSchema = new Schema({
         ref : "track",
         required : true
     },
+    budget : {
+        required : true,
+        type : String
+    },
     user_info : {
         type : Schema.Types.ObjectId,
         ref : "syncUser",
         required : true
     }
 }, {timestamps : true})
-
 
 
 const tvaRequest = mongoose.model('tva-license-request',tvaSchema)

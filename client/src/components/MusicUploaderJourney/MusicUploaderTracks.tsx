@@ -452,7 +452,7 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
       <tbody>
         {tracks.map((track) => (
           <tr key={track._id} className="hover:bg-gray-50">
-            <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-4 px-8">
+            <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8">
               {track.trackTitle}
             </td>
             <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">

@@ -46,7 +46,7 @@ router.post(
         if (!trackDetails) {
           throw new BadRequestError("Track does not exists");
         }
-        if (req.files) {
+        if(req.files) {
           const attachments = [...req.files];
           let attachmentUrlList = [];
           await Promise.all(
@@ -88,7 +88,7 @@ router.post(
             const license = new trackLicense({
               track_name: trackDetails.trackTitle,
               amount: "N/A",
-              trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+              trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
               quote_id: uploadResponse._id,
               quote_type: "tvaRequest",
               sync_user_info: userId,
@@ -178,7 +178,7 @@ router.post(
             const license = new trackLicense({
               track_name: trackDetails.trackTitle,
               amount: "N/A",
-              trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+              trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
               quote_id: uploadResponse._id,
               quote_type: "fmtRequest",
               sync_user_info: userId,
@@ -254,7 +254,7 @@ router.post(
             const license = new trackLicense({
               track_name: trackDetails.trackTitle,
               amount: "N/A",
-              trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+              trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
               quote_id: uploadResponse._id,
               quote_type: "videoGamesRequest",
               sync_user_info: userId,
@@ -452,7 +452,7 @@ router.post(
             const license = new trackLicense({
               track_name: trackDetails.trackTitle,
               amount: "N/A",
-              trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+              trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
               quote_id: uploadResponse._id,
               quote_type: "interpolationRequest",
               sync_user_info: userId,
@@ -528,7 +528,7 @@ router.post(
           const license = new trackLicense({
             track_name: trackDetails.trackTitle,
             amount: "N/A",
-            trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+            trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
             quote_id: uploadResponse._id,
             quote_type: "crbtRequest",
             sync_user_info: userId,
@@ -593,7 +593,7 @@ router.post(
             const license = new trackLicense({
               track_name: trackDetails.trackTitle,
               amount: "N/A",
-              trackLink: trackDetails.trackLink ?? trackDetails.spotifyLink,
+              trackLink: trackDetails.trackLink || trackDetails.spotifyLink,
               quote_id: uploadResponse._id,
               quote_type: "smcRequest",
               sync_user_info: userId,
