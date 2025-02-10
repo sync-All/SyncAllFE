@@ -1,6 +1,5 @@
 // import { useContext } from 'react';
 import syncLogo from '../assets/logo.svg';
-import { PrimaryButton } from '../components';
 // import ModalContext from '../Context/ModatContext';
 import { useNavigate } from 'react-router-dom';
 const Navbar = () => {
@@ -20,14 +19,47 @@ const Navbar = () => {
       <div>
         <img src={syncLogo} alt="" />
       </div>
-      <div className=" flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         <button
-          className="bg-transparent border border-yellow font-inter text-yellow hover:text-yellow hover:bg-black px-3 py-2 md:px-6 md:py-4 text-sm font-semibold md:text-base transition-all duration-500 rounded-md disabled:bg-amber-200"
+          className="py-3 px-4 md:py-4 md:px-6 border     h-12 md:h-[56px]  min-w-[100px] md:w-[172px] hover:bg-white/10 transition-all
+  "
           onClick={handleNavToSignIn}
         >
-          Sign In
+          <p
+            className="
+      text-sm md:text-[16px] 
+      font-inter font-semibold 
+      text-white 
+      truncate
+    "
+          >
+            Log in
+          </p>
         </button>
-        <PrimaryButton text="Get Started" onClick={handleNavToSignUp} />
+
+        <button
+          className="
+    py-3 px-4 md:py-4 md:px-6 
+    bg-yellow 
+    flex justify-center items-center 
+    h-12 md:h-[56px] 
+    min-w-[120px] md:w-[172px]
+    hover:bg-yellow/90
+    transition-all
+  "
+          onClick={handleNavToSignUp}
+        >
+          <p
+            className="
+      text-sm md:text-[16px] 
+      font-inter font-semibold 
+      text-black 
+      truncate
+    "
+          >
+            Get Started
+          </p>
+        </button>
       </div>
     </div>
   );

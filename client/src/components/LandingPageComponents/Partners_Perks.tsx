@@ -15,14 +15,10 @@ import MusicEclipse2 from '../../assets/images/music-cover-ellipse-2.svg';
 import MusicEclipse3 from '../../assets/images/music-cover-ellipse-3.svg';
 import MusicEclipse4 from '../../assets/images/music-cover-ellipse-4.svg';
 import Search from '../../assets/images/search-1.svg';
-import Background from '../../assets/images/Background.svg';
-import Album1 from '../../assets/images/album-1.png';
-import Album2 from '../../assets/images/album-2.png';
-import Album3 from '../../assets/images/album-3.png';
-import Album4 from '../../assets/images/album-4.png';
-import Album5 from '../../assets/images/album-5.png';
+
 
 const PartnersPerks = () => {
+
   return (
     <section className="text-white mt-[228px] ">
       <section>
@@ -262,47 +258,7 @@ const PartnersPerks = () => {
           </ul>
         </div>
       </section>
-      <section
-        className="bg-no-repeat bg-center bg-cover mt-[24px] xl:w-[1254px] mx-auto rounded-[20px] "
-        style={{ backgroundImage: `url(${Background})` }}
-      >
-        <div className="pt-[100px] ">
-          {' '}
-          <h3 className="text-[#EFA605] text-[18px] md:text-[24px] text-center font-formular-regular uppercase ">
-            IT WORKS TOO WELL
-          </h3>
-          <h1 className="font-gitSans font-[400] text-[40px] xl:text-[80px] text-center leading-[46px] xl:leading-[96px] text-grey-100 mt-[24px] lg:max-w-[868px] mx-auto ">
-            Search by artist, keyword, genre, mood – whatever
-          </h1>
-        </div>
-        <div className="flex justify-between items-center mt-[65px] text-center gap-[6px] pb-[26px] max-w-[755px] mx-auto">
-          <div className="flex gap-[6px] mx-auto">
-            <p className="p-[11.4px] bg-[#FFF0E9] rounded-[22.8px] text-black2 text-[16.11px] font-Utile-regular leading-[18.29px]">
-              #calm
-            </p>
-            <p className="p-[11.4px] bg-[#FFF0E9] rounded-[22.8px] text-black2 text-[16.11px] font-Utile-regular leading-[18.29px]">
-              #cinematic
-            </p>
-            <p className="p-[11.4px] bg-[#FFF0E9] rounded-[22.8px] text-black2 text-[16.11px] font-Utile-regular leading-[18.29px]">
-              #action
-            </p>
-            <span className="inline-block border-l-2 h-8 align-middle animate-pulse"></span>
-          </div>
-          <img src={Search} alt="" className="h-[35px]" />
-        </div>
-        <div className=" border-b-[1px] max-w-[755px] text-center mx-auto"></div>
-        <div className="flex justify-center overflow-hidden max-w-[1069px] mx-auto mt-[75px] pb-[100px] ">
-          <img src={Album1} alt="" className="hidden xl:block" />
-          <img src={Album2} alt="" className="ml-[15px]" />
-          <img
-            src={Album3}
-            alt=""
-            className="xl:max-h-[349px] transform hover:scale-120 transition-transform duration-300"
-          />
-          <img src={Album4} alt="" className="mr-[15px] " />
-          <img src={Album5} alt="" className="hidden xl:block" />
-        </div>
-      </section>
+      
     </section>
   );
 };

@@ -175,7 +175,7 @@ const TrackMetadata = () => {
         <div className="flex flex-col mt-11 lg:mt-0 lg:w-[60%]">
           <div className="flex justify-between flex-col  md:flex-row">
             <div className="flex flex-col gap-2 lg:gap-4 w-full">
-              <p className="text-[#475367] text-[32px] lg:text-[56px] font-formular-bold ">
+              <p className="text-[#475367] text-[32px] lg:text-[56px] font-inter font-bold ">
                 {trackDetails?.trackTitle || 'No Title Available'}
               </p>
               <p className="text-[#667185] text-[16px] lg:text-[24px] font-Utile-regular  ">

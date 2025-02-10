@@ -34,6 +34,7 @@ import SocialMediaContent from './components/SyncUserJourney/SyncUserQoutes/Soci
 import PaymentStatus from './Pages/PaymentStatus';
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
 import DashboardLayout from './Pages/Dashboard';
+import ExplorePage from './components/LandingPageComponents/ExplorePage';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -49,6 +50,7 @@ function App() {
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path='/explore-sounds' element={<ExplorePage/>}></Route>
           <Route
             path="/register1"
             element={<RegisterUserRole setSelectedRole={setSelectedRole} />}

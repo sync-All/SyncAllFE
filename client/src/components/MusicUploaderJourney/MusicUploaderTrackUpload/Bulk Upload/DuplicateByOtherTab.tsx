@@ -127,7 +127,7 @@ const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
             <tbody>
               {paginatedItems.map((track, index) => (
                 <tr key={index} className="border-b border-[#EAECF0]">
-                  <td className="text-[#101828] font-formular-medium text-[14px] leading-5 py-3 px-6">
+                  <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-3 px-6">
                     {track.trackTitle}
                   </td>
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-3 px-6">

@@ -79,7 +79,7 @@ const VideoGames = () => {
     additional_info: '',
     role_type: 'Video Games',
     track_info: id || '',
-    budget: ''
+    budget: '',
   };
 
   interface FormData {
@@ -126,9 +126,9 @@ const VideoGames = () => {
     navigate(-1);
   };
 
-   const navigateToPendingLicense = () => {
-     navigate('/myAccount?section=Pending%20License');
-   };
+  const navigateToPendingLicense = () => {
+    navigate('/myAccount?section=Pending%20License');
+  };
 
   const handleSubmission = async (
     values: FormData,
