@@ -4,6 +4,7 @@ const User = require('../models/usermodel').uploader
 const mongoose = require("mongoose");
 const { grabSpotifyToken, spotifyResult } = require("../utils/spotify");
 const { uploadErrorHistory } = require("../models/track.model");
+const { dispute } = require("../models/dashboard.model");
 require('dotenv').config
 
 
@@ -12,15 +13,15 @@ const mongoString = process.env.MONGO_CONNECT_STRING
 const mongoTestString = process.env.MONGO_TEST_CONNECT_STRING
 
 try {
-    main()
-  } catch (error) {
-    console.log(error)
-  }
-  
-  async function main(){
-    await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
-    return
-  }
+  main()
+} catch (error) {
+  console.log(error)
+}
+
+async function main(){
+  await mongoose.connect( process.env.NODE_ENV == 'development' ? mongoTestString :  mongoString)
+  return
+}
 
 // const Utwa = async()=> {
 //     const allSongData = await Track.find({}).exec()
@@ -47,37 +48,44 @@ try {
 
 // Utwa()
 
-async function toogleTrackUploadStatus(){
-  try {
-    const {uploadErrors} = await User.findOne({_id : '675824cd97dc98e98eaa6c04'}).exec()
-    await Promise.all(uploadErrors.map(async(history)=>{
-      const result = await uploadErrorHistory.findByIdAndUpdate(history, {user : '675824cd97dc98e98eaa6c04'}, {new : true})
+const duplicateList = [
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+]
 
-      console.log(result)
-    }))
-    return;
-  } catch (error) {
-    console.log(error)
-  }
+const testing = async()=>{
+  const duplicateList = [
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+  {
+    trackTitle : 'unrverve',
+    isrc : '12ed2324g34h4gw'
+  },
+]
+  const savedData = duplicateList.map((track)=>{
+    return {
+      nameOfTrack : track.trackTitle,
+      issueType : 'claimRights',
+      isrc : track.isrc
+    }
+    
+  })
+  console.log(savedData)
 }
-
-toogleTrackUploadStatus()
-
-// async function clearUploadErrors(){
-//   const user = await User.findByIdAndUpdate('675824cd97dc98e98eaa6c04',{$set : {uploadErrors : []}}, {new : true})
-//   console.log(user)
-//   return
-// }
-// clearUploadErrors()
-// async function addFieldToExistingDocuments() {
-//   try {
-//       const result = await dashboard.updateMany(
-//           { accountInfo: { $exists: false } }, // Only update if the field doesn't exist
-//       );
-//       console.log(`Updated ${result.modifiedCount} documents with newField.`);
-//   } catch (error) {
-//       console.error("Error updating documents:", error);
-//   }
-// }
-
-// addFieldToExistingDocuments()
+testing()
