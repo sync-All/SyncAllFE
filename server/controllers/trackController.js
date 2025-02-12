@@ -1,7 +1,6 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/track.model").track
 const User = require('../models/usermodel').uploader
-const cloudinary = require("cloudinary").v2
 const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
@@ -11,6 +10,8 @@ const mongoose = require('mongoose')
 const { trackError, uploadErrorHistory } = require("../models/track.model")
 const {v4 : uuidv4} = require('uuid')
 const { trackProcessing } = require("../utils/upload")
+const Ticket = require("../models/dashboard.model").ticket
+const Dispute = require("../models/dashboard.model").dispute
 require('dotenv').config()
 
 
@@ -87,148 +88,244 @@ const invalidSpotifyResolution = async(req,res,next)=>{
   }
 }
 
-const trackBulkUpload = async(req,res,next)=>{
-  if(req.user.role == "Music Uploader"){
-    if(!req.file){
-      throw new ForbiddenError('Kindly input a valid file type')
+const ignoreBulkResolution = async(req,res,next)=>{
+  try {
+    const {bulkErrorId} = req.query
+    const uploadHistory = await uploadErrorHistory.findOne({_id : bulkErrorId}).where('user').equals(req.user._id)
+    if(!uploadHistory){
+      throw new BadRequestError('Bad request, Error track not found')
     }
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders();
+    await Promise.all(uploadHistory.associatedErrors.map(async (trackErrorInfo)=>{
+      await trackError.findOneAndDelete({_id : trackErrorInfo})
+    }))
+    await uploadErrorHistory.findOneAndDelete({associatedErrors : bulkErrorId}).exec()
+    await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+    res.send('Errors cleared successfully')
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError('Bad request, invalid parameters')
+  }
+}
+const ignoreSingleResolution = async(req,res,next)=>{
+  try {
+    const {errorId} = req.query
+    await trackError.findByIdAndDelete(errorId).exec()
+    const newuploadHistory = await uploadErrorHistory.findOneAndUpdate({associatedErrors : {$in : [errorId]}}, {$pull : {associatedErrors : errorId}},{new : true}).where('user').equals(req.user._id)
+    if(newuploadHistory.associatedErrors.length < 1){
+      await uploadErrorHistory.findByIdAndUpdate(newuploadHistory._id,{status : 'Processed'},{new : true})
+      .then(async(item)=>{
+        console.log(item._id)
+        const newDetails = await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : item._id}},{new : true})
+        console.log(newDetails);
+      })
+    }
+    res.send('Track disposed successfully')
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError('Bad request, invalid parameters')
+  }
+}
+const bulkUploadFileDispute = async(req,res,next)=>{
+  try {
+    const {errorId, disputeType} = req.query
+  const allowedDisputeTypes = ['single','bulk']
+  let savedDispute;
+  if(!errorId || !allowedDisputeTypes.includes(disputeType)){
+    throw new BadRequestError('Missing or invalid Parameters')
+  }
+  if(disputeType == 'single'){
+    const errorExist = await trackError.findById(errorId).where('user').equals(req.user._id)
+    console.log(errorExist)
+    if(!errorExist || errorExist.err_type != 'duplicateTrackByAnother'){
+      throw new BadRequestError('Error Track not found')
+    }
+    let newDispute = new Dispute({
+      nameOfTrack : errorExist.trackTitle,
+      issueType : 'claimRights',
+      desc : 'Filed due to duplicity of track info after a bulk upload error occured',
+      isrc : errorExist.isrc,
+      user : req.user.id
+    })
+    savedDispute = [await newDispute.save()]
+    const newuploadHistory = await uploadErrorHistory.findOneAndUpdate({associatedErrors : {$in : [errorId]}}, {$pull : {associatedErrors : errorId}},{new : true}).where('user').equals(req.user._id)
+    if(newuploadHistory.associatedErrors.length < 1){
+      await uploadErrorHistory.findByIdAndUpdate(newuploadHistory._id,{status : 'Processed'},{new : true})
+      .then(async(item)=>{
+        const newDetails = await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : item._id}},{new : true})
+        console.log(newDetails);
+      })
+    }
+  }else{
+    const errorHistory = await uploadErrorHistory.findById(errorId).populate('associatedErrors').where('user').equals(req.user._id).exec()
+    const duplicateList = errorHistory.associatedErrors.filter((item)=>item.err_type == "duplicateTrackByAnother")
+    const disputes = duplicateList.map((track)=>{
+      return{
+        nameOfTrack : track.trackTitle,
+        issueType : 'claimRights',
+        desc : 'Filed due to duplicity of track info after a bulk upload error occured',
+        isrc : track.isrc,
+        user : req.user.id
+      }
+    })
+    savedDispute = await Dispute.insertMany(disputes)
+  }
+  const disputesIds = savedDispute.map(item => item._id)
+  let newTicket = new Ticket({
+    tickId : `Tick_${uuidv4()}`,
+    user : req.user.id,
+    associatedDisputes : disputesIds
+  })
+  await newTicket.save()
+  await uploadErrorHistory.findByIdAndDelete(errorId).where('user').equals(req.user._id)
+  await User.findByIdAndUpdate(req.user.id,{$pull : {uploadErrors : errorId}})
+  res.status(200).json('Dispute Filed Successfully')
+  }catch (error) {
+    console.log(error)
+    throw new BadRequestError('Bad request, try again later')
+  }
+}
 
-    let newMuiscData = []
-    let duplicateData = []
-    let invalidSpotifyLink = []
-    let sortedMusicData = []
-    let rowCount = 0
-    let parsedRows = 0
-    let failedCount = 0
-    let successCount = 0
-    const seen = new Set();
-    const duplicates = new Set();
-    const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
-    fs.createReadStream(req.file.path)
-    .pipe(csv.parse({ignoreEmpty : true, headers : allowedHeaders, renameHeaders: true }))
-    .on('data', (data) => {
+const trackBulkUpload = async(req,res,next)=>{
+  if(!req.file){
+    throw new ForbiddenError('Kindly input a valid file type')
+  }
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  let newMuiscData = []
+  let duplicateData = []
+  let invalidSpotifyLink = []
+  let sortedMusicData = []
+  let rowCount = 0
+  let parsedRows = 0
+  let failedCount = 0
+  let successCount = 0
+  const seen = new Set();
+  const duplicates = new Set();
+  const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
+  fs.createReadStream(req.file.path)
+  .pipe(csv.parse({ignoreEmpty : true, headers : allowedHeaders, renameHeaders: true }))
+  .on('data', (data) => {
+    res.write(`event: processing\n`);
+    res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
+    const fieldValue = data['isrc'];
+    if (fieldValue){
+      if (seen.has(fieldValue)){
+        duplicates.add(fieldValue);
+      }else if(!seen.has(fieldValue)){
+        rowCount++
+        newMuiscData.push(data);
+        seen.add(fieldValue);
+      }
+    }
+  })
+  .on('error', (err) => {
+    res.status(400).write(`event: error\n`);
+    res.status(400).write(`data: ${JSON.stringify({ error: err.message})}\n\n`);
+    fs.unlinkSync(req.file.path)
+    res.status(400).end()
+
+  })
+  .on('end', async () => {
+    if (duplicates.size > 0) {
       res.write(`event: processing\n`);
-      res.write(`data: Scanning and Sorting for duplicate entries\n\n`);
-      const fieldValue = data['isrc'];
-      if (fieldValue){
-        if (seen.has(fieldValue)){
-          duplicates.add(fieldValue);
-        }else if(!seen.has(fieldValue)){
-          rowCount++
-          newMuiscData.push(data);
-          seen.add(fieldValue);
-        }
-      }
-    })
-    .on('error', (err) => {
-      res.status(400).write(`event: error\n`);
-      res.status(400).write(`data: ${JSON.stringify({ error: err.message})}\n\n`);
-      fs.unlinkSync(req.file.path)
-      res.status(400).end()
-
-    })
-    .on('end', async () => {
-      if (duplicates.size > 0) {
-        res.write(`event: processing\n`);
-        res.write(`data: ${Array.from(duplicates)} duplicate fields found and have been filtered\n\n`);
-      } else {
-        res.write(`event: processing\n`);
-        res.write(`data: No Duplicates Found\n\n`);
-      }
-      res.write(`event: total\n`);
-      res.write(`data: ${JSON.stringify({rowCount})}\n\n`);
-      try {
-        const spotifyToken = await spotifyCheck.grabSpotifyToken()
-        for(const row of newMuiscData){
-          parsedRows++;
-          let spotifyresponse = {}
-          let confirmTrackUploaded = {}
-          try {
-            spotifyresponse = await spotifyCheck.spotifyResult(row.trackLink, spotifyToken);
-          } catch (error) {
-            if(error instanceof spotifyError){
-              res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
-              failedCount++
-              invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id})
-            }else if (error instanceof mongoose.MongooseError){
-              console.log('here')
-            }
-            continue;
-          }
-          confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
-
-          if(confirmTrackUploaded){
-            res.write(`event: warning duplicate data\n`);
+      res.write(`data: ${Array.from(duplicates)} duplicate fields found and have been filtered\n\n`);
+    } else {
+      res.write(`event: processing\n`);
+      res.write(`data: No Duplicates Found\n\n`);
+    }
+    res.write(`event: total\n`);
+    res.write(`data: ${JSON.stringify({rowCount})}\n\n`);
+    try {
+      const spotifyToken = await spotifyCheck.grabSpotifyToken()
+      for(const row of newMuiscData){
+        parsedRows++;
+        let spotifyresponse = {}
+        let confirmTrackUploaded = {}
+        try {
+          spotifyresponse = await spotifyCheck.spotifyResult(row.trackLink, spotifyToken);
+        } catch (error) {
+          if(error instanceof spotifyError){
             res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
             failedCount++
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
-            continue;
+            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id})
+          }else if (error instanceof mongoose.MongooseError){
+            console.log('here')
           }
-          res.write(`event: progress\n`);
+          continue;
+        }
+        confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
+
+        if(confirmTrackUploaded){
+          res.write(`event: warning duplicate data\n`);
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
-
-          row.spotifyLink = spotifyresponse.spotifyLink
-          row.user = req.user.id
-          row.trackLink = spotifyresponse.preview_url
-          row.artWork = spotifyresponse.artwork
-          row.duration = spotifyresponse.duration
-          successCount++
-          sortedMusicData.push(row)
-        }
-        const uploadedTracks = await Track.insertMany(sortedMusicData)
-        await Promise.all(uploadedTracks.map(async (track)=>{
-          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-        }))
-        let fileBuffer;
-        if(invalidSpotifyLink.length > 0 || duplicateData.length > 0){
-          if(invalidSpotifyLink.length > 0){
-            let errorFile = [
-              [...allowedHeaders, 'message', 'err_type', 'user'],
-              ...invalidSpotifyLink
-            ]
-            fileBuffer = await writeToBuffer(errorFile)
+          failedCount++
+          if(confirmTrackUploaded.user._id == req.user_id){
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
+          }else{
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
           }
-          res.write(`event: progress\n`);
-          res.write(`data: Cleaning up\n\n`);
-          const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
-          const errorIds = errorRes.map((error)=> error._id)
-          const uploadHistory = new uploadErrorHistory({
-            uploadId : `UI_${uuidv4()}`,
-            associatedErrors : errorIds,
-            filename : req.file.originalname,
-            fileBuffer,
-            user : req.user._id
-          })
-          await uploadHistory.save().then(async(res)=>{
-            await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()
-          })
+          continue;
         }
+        res.write(`event: progress\n`);
+        res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
-        const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
-
-        res.write(`event: done\n`);
-        res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink, errorCsv })}\n\n`);
-
-        fs.unlinkSync(req.file.path)
-        res.end();
-    
-      } catch (error) {
-        if(error.name == 'MongoBulkWriteError'){
-          res.status(400).write(`event: error\n`);
-          res.end()
-        }
-        console.log(error)
-        fs.unlinkSync(req.file.path)
+        row.spotifyLink = spotifyresponse.spotifyLink
+        row.user = req.user.id
+        row.trackLink = spotifyresponse.preview_url
+        row.artWork = spotifyresponse.artwork
+        row.duration = spotifyresponse.duration
+        successCount++
+        sortedMusicData.push(row)
       }
-    });
-    
-  }else{
-    throw new unauthorizedError('Unauthorized User')
-  }
+      const uploadedTracks = await Track.insertMany(sortedMusicData)
+      await Promise.all(uploadedTracks.map(async (track)=>{
+        await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
+      }))
+      let fileBuffer;
+      if(invalidSpotifyLink.length > 0 || duplicateData.length > 0){
+        if(invalidSpotifyLink.length > 0){
+          let errorFile = [
+            [...allowedHeaders, 'message', 'err_type', 'user'],
+            ...invalidSpotifyLink
+          ]
+          fileBuffer = await writeToBuffer(errorFile)
+        }
+        res.write(`event: progress\n`);
+        res.write(`data: Cleaning up\n\n`);
+        const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        const errorIds = errorRes.map((error)=> error._id)
+        const uploadHistory = new uploadErrorHistory({
+          uploadId : `UI_${uuidv4()}`,
+          associatedErrors : errorIds,
+          filename : req.file.originalname,
+          fileBuffer,
+          user : req.user._id
+        })
+        await uploadHistory.save().then(async(res)=>{
+          await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()
+        })
+      }
+
+      const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
+
+      res.write(`event: done\n`);
+      res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink, errorCsv })}\n\n`);
+
+      fs.unlinkSync(req.file.path)
+      res.end();
+  
+    } catch (error) {
+      if(error.name == 'MongoBulkWriteError'){
+        res.status(400).write(`event: error\n`);
+        res.end()
+      }
+      console.log(error)
+      fs.unlinkSync(req.file.path)
+    }
+  });
   
 }
 
@@ -312,4 +409,4 @@ const freequerySong = async(req,res,next)=>{
   }
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute}
