@@ -31,13 +31,23 @@ router.post(
   upload,
   asyncHandler(trackController.invalidSpotifyResolution)
 );
+router.get(
+  "/ignore_bulk_resolution/",checkUploader,
+  asyncHandler(trackController.ignoreBulkResolution)
+);
+router.get(
+  "/ignore_single_resolution/",checkUploader,
+  asyncHandler(trackController.ignoreSingleResolution)
+);
+
+router.get(
+  "/bulkUploadFileDispute/",checkUploader,
+  asyncHandler(trackController.bulkUploadFileDispute)
+);
 
 router.post(
   "/trackBulkUpload/",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
+  checkUploader,
   bulkUpload,
   asyncHandler(trackController.trackBulkUpload)
 );

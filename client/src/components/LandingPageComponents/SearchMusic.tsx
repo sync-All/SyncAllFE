@@ -3,41 +3,40 @@ import { toast } from 'react-toastify';
 import Background from '../../assets/images/Background.svg';
 import Search from '../../assets/images/search-1.svg';
 import SpotifyHelper from '../../utils/spotifyhelper';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { TracklistDetails } from '../../Context/syncUserData';
 import LoadingAnimation from '../../constants/loading-animation';
 import { useNavigate } from 'react-router-dom';
+import _ from 'lodash';
 
 interface ResponseData {
   message: string;
 }
 
 const SearchMusic = () => {
-  // State for the sliced (displayed) search results.
   const [searchData, setSearchData] = useState<TracklistDetails[]>([]);
-  // State for the full response data (to be passed to another page).
   const [fullData, setFullData] = useState<TracklistDetails[]>([]);
   const [loading, setLoading] = useState(false);
-  // State for the search query so that it can be used later.
   const [query, setQuery] = useState('');
 
   const navigate = useNavigate();
 
   const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setSearchData([]);
+      setFullData([]);
+      return;
+    }
+
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/freequery/${searchQuery}`;
 
     try {
       setLoading(true);
       const response = await axios.get(apiUrl);
-
-      // Store the full list of tracks for later use.
       setFullData(response.data.tracks);
-      // Slice the response to only show the first 3 items.
       setSearchData(response.data.tracks?.slice(0, 3));
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
         (axiosError.response && axiosError.response.data
@@ -45,7 +44,31 @@ const SearchMusic = () => {
           : axiosError.message || 'An error occurred'
         ).toString()
       );
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Create a debounced version of handleSearch
+  const debouncedSearch = useCallback(
+    _.debounce((searchQuery: string) => {
+      handleSearch(searchQuery);
+    }, 500), // 500ms delay
+    [] // Empty dependency array as we don't want to recreate the debounced function
+  );
+
+  // Cleanup debounce on component unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    debouncedSearch(newQuery);
   };
 
   return (
@@ -68,13 +91,9 @@ const SearchMusic = () => {
           type="text"
           name="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleInputChange}
           className="w-full h-[50px] bg-transparent border-b-[1px] focus:outline-none focus:border-b-[2px] border-transparent border-b-white text-center"
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              handleSearch(query);
-            }
-          }}
+          placeholder="Start typing to search..."
         />
         <img
           src={Search}
@@ -83,14 +102,14 @@ const SearchMusic = () => {
         />
       </div>
 
-      {/* Loading animation appears below the search input */}
+      {/* Loading animation */}
       {loading && (
         <div className="flex justify-center mt-4">
           <LoadingAnimation />
         </div>
       )}
 
-      {/* Display search results if not loading */}
+      {/* Display search results */}
       {!loading && searchData.length > 0 && (
         <div className="flex justify-center gap-6 overflow-hidden max-w-[1069px] mx-auto mt-[45px]">
           {searchData.map((search, key) => (
@@ -128,12 +147,18 @@ const SearchMusic = () => {
         </div>
       )}
 
-      {/* Show a message when there are no results (and not loading) */}
-      {!loading && searchData.length === 0 && (
-        <p className="text-center text-gray-400 py-8">Search for results.</p>
+      {/* No results message */}
+      {!loading && searchData.length === 0 && query && (
+        <p className="text-center text-gray-400 py-8">No results found.</p>
       )}
 
-      {/* Explore More Button - passes the full response and search query */}
+      {!loading && searchData.length === 0 && !query && (
+        <p className="text-center text-gray-400 py-8">
+          Start typing to search...
+        </p>
+      )}
+
+      {/* Explore More Button */}
       {!loading && searchData.length > 0 && (
         <span className="flex justify-center items-center w-full mt-4 pb-[100px]">
           <button

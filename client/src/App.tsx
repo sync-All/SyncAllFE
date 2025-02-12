@@ -35,6 +35,8 @@ import PaymentStatus from './Pages/PaymentStatus';
 import MusicUploaderCompanyAuthProfileSetup from './components/MusicUploaderJourney/MusicUploaderCompanyAuthProfileSetup';
 import DashboardLayout from './Pages/Dashboard';
 import ExplorePage from './components/LandingPageComponents/ExplorePage';
+import TermsOfService from './components/TermsOfService';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 function App() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -50,7 +52,7 @@ function App() {
         <ToastContainer />
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path='/explore-sounds' element={<ExplorePage/>}></Route>
+          <Route path="/explore-sounds" element={<ExplorePage />}></Route>
           <Route
             path="/register1"
             element={<RegisterUserRole setSelectedRole={setSelectedRole} />}
@@ -72,6 +74,10 @@ function App() {
             path="/login"
             element={<SignIn setGoogleAuthData={setGoogleAuthData} />}
           />
+
+          <Route path="/termsOfService" element={<TermsOfService />}></Route>
+          <Route path="/privacyPolicy" element={<PrivacyPolicy />}></Route>
+
           <Route path="/email-confirmation" element={<ConfirmEmail />} />
           <Route
             path="/onboarding-details"
@@ -106,7 +112,7 @@ function App() {
               <DashboardDataProvider>
                 <ProtectedRoute
                   path="/dashboard/*"
-                   element={<DashboardLayout />}
+                  element={<DashboardLayout />}
                 />
               </DashboardDataProvider>
             }

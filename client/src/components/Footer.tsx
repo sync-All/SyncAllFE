@@ -52,17 +52,18 @@ const Footer = () => {
                   <Link to="#" className="hover:text-yellow">Help</Link>
                   </div>
                 </div> */}
-          {/* <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8">
                   <h4 className="text-[rgba(255,255,255,0.60)] font-semibold text-xs">
                   OTHER
                   </h4>
                   <div className="text-white flex flex-col text-sm gap-5">
-                  <Link to="#" className="hover:text-yellow">Legal Information</Link>
-                  <Link to="#" className="hover:text-yellow">Privacy</Link>
-                  <Link to="#" className="hover:text-yellow">Cookie</Link>
-                  <Link to="#" className="hover:text-yellow">Languages</Link>
+                  {/* <Link to="#" className="hover:text-yellow">Legal Information</Link> */}
+                  <Link to="/termsOfService" className="hover:text-yellow">Terms of Use</Link>
+                  <Link to="/privacyPolicy" className="hover:text-yellow">Privacy</Link>
+                  {/* <Link to="#" className="hover:text-yellow">Cookie</Link>
+                  <Link to="#" className="hover:text-yellow">Languages</Link> */}
                   </div>
-                </div> */}
+                </div>
         </section>
       </section>
       <section className="text-white pt-14 flex flex-col lg:flex-row gap-6 justify-between">

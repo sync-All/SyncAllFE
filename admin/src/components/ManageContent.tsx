@@ -1,45 +1,52 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import ArrowDown from '../assets/images/arrowdown.svg';
-import ArrowUp from '../assets/images/up-arrow.svg';
-import NoTrack from '../assets/images/no_track.svg';
-import LoadingAnimation from '../constants/loading-animation';
-import Search from '../assets/images/search-1.svg';
-import { useContent } from '../contexts/ContentContext';
-import { Content } from '../contexts/ContentContext';
 import { Link } from 'react-router-dom';
-import usePagination from '../hooks/usePaginate';
-import Left from '../assets/images/left-arrow.svg';
-import Right from '../assets/images/right-arrow.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import debounce from 'lodash/debounce';
+import { useContent } from '../contexts/ContentContext';
+import usePagination from '../hooks/usePaginate';
+import ArrowDown from '../assets/images/arrowdown.svg';
+import ArrowUp from '../assets/images/up-arrow.svg';
+import NoTrack from '../assets/images/no_track.svg';
+import Search from '../assets/images/search-1.svg';
+import Left from '../assets/images/left-arrow.svg';
+import Right from '../assets/images/right-arrow.svg';
+import LoadingAnimation from '../constants/loading-animation';
 import getStatusColors from '../helper/getStatusColors';
 
-interface TableData {
+interface Content {
   _id: string;
   trackTitle: string;
-  email: string;
-  status: string;
-  role: string;
-  name: string;
-  img: string;
   mainArtist: string;
+  uploadStatus: string;
+  user: {
+    _id: string;
+    name: string;
+  };
 }
 
-interface ResponseData {
-  message?: string;
-}
+// Remove duplicate TableData interface since we're not using its additional fields
+type TableData = Content;
+
+// Define sortable fields
+type SortableFields = 'trackTitle' | 'mainArtist' | 'name';
 
 interface SortConfig {
-  key: keyof TableData | null;
+  key: SortableFields | null;
   direction: 'ascending' | 'descending';
 }
 
-const SortButton: React.FC<{
+interface SortButtonProps {
   sortConfig: SortConfig;
-  sortKey: keyof TableData;
-  onSort: (key: keyof TableData) => void;
-}> = ({ sortConfig, sortKey, onSort }) => (
+  sortKey: SortableFields;
+  onSort: (key: SortableFields) => void;
+}
+
+const SortButton: React.FC<SortButtonProps> = ({
+  sortConfig,
+  sortKey,
+  onSort,
+}) => (
   <button
     type="button"
     onClick={() => onSort(sortKey)}
@@ -56,15 +63,78 @@ const SortButton: React.FC<{
   </button>
 );
 
+const ITEMS_PER_PAGE = 30;
+
 const ManageContent = () => {
   const { content, loading } = useContent();
-  const [searchResults, setSearchResults] = useState<Content[]>([]);
+  const [searchResults, setSearchResults] = useState<TableData[]>([]);
   const [contentSearch, setContentSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // New states for filter dropdown
   const [selectedFilter, setSelectedFilter] = useState('');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: null,
+    direction: 'ascending',
+  });
+
+  // First determine base data (search results or main content)
+  const baseData = useMemo(() => {
+    return contentSearch.trim() === '' ? content : searchResults;
+  }, [content, searchResults, contentSearch]);
+
+  // Update sort function with proper typing
+  const sortedData = useMemo(() => {
+    if (!Array.isArray(baseData) || !baseData.length || !sortConfig.key) {
+      return baseData;
+    }
+
+    return [...baseData].sort((a, b) => {
+      const key = sortConfig.key; // Extract key to ensure it's not null
+      if (!key) return 0; // TypeScript now knows key isn't null
+
+      let aValue: string;
+      let bValue: string;
+
+      // Handle nested user.name property separately
+      if (key === 'name') {
+        aValue = a.user?.name || '';
+        bValue = b.user?.name || '';
+      } else {
+        // Now TypeScript knows key is either 'trackTitle' or 'mainArtist'
+        aValue = a[key]?.toString() || '';
+        bValue = b[key]?.toString() || '';
+      }
+
+      return sortConfig.direction === 'ascending'
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    });
+  }, [baseData, sortConfig]);
+
+  // Then apply filtering
+  const filteredData = useMemo(() => {
+    if (!selectedFilter) return sortedData;
+    return sortedData.filter(
+      (item) =>
+        item.uploadStatus?.toLowerCase() === selectedFilter.toLowerCase()
+    );
+  }, [sortedData, selectedFilter]);
+
+  // Finally apply pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems,
+    goToNextPage,
+    goToPreviousPage,
+    goToPage,
+    getPaginationRange,
+  } = usePagination(filteredData, ITEMS_PER_PAGE);
+
+  // Calculate pagination info
+  const totalItems = filteredData.length;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
 
   const fetchByUsername = async (searchTerm: string) => {
     if (!searchTerm.trim()) {
@@ -75,27 +145,19 @@ const ManageContent = () => {
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/manage_content/search?filter=${searchTerm}`;
-    const config = {
-      headers: {
-        Authorization: `${token}`,
-      },
-    };
 
     try {
       setIsLoading(true);
-      const res = await axios.get(apiUrl, config);
-      if (Array.isArray(res.data)) {
-        setSearchResults(res.data); // Set content data as search results
-      } else {
-        setSearchResults([]); // Unexpected structure: reset search results
-      }
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<ResponseData>;
+      const response = await axios.get<TableData[]>(apiUrl, {
+        headers: { Authorization: token },
+      });
+      setSearchResults(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
       toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message || axiosError.response.data
-          : axiosError.message || 'An error occurred'
-        ).toString()
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'An error occurred'
       );
       setSearchResults([]);
     } finally {
@@ -118,79 +180,31 @@ const ManageContent = () => {
     debouncedFetch(value);
   };
 
+  const handleSort = (key: SortableFields) => {
+    setSortConfig((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === 'ascending'
+          ? 'descending'
+          : 'ascending',
+    }));
+  };
+
   useEffect(() => {
     return () => {
       debouncedFetch.cancel();
     };
   }, []);
 
-  const ThStyles =
-    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
-
-  const active =
-    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-
-  const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: null,
-    direction: 'ascending',
-  });
-
-  // Sort the full content data (from context)
-  const sortedData = useMemo(() => {
-    if (!Array.isArray(content) || content.length === 0) return [];
-
-    return [...content].sort((a, b) => {
-      if (sortConfig.key === null) return 0;
-
-      const aValue = a[sortConfig.key as keyof Content] ?? '';
-      const bValue = b[sortConfig.key as keyof Content] ?? '';
-
-      if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
-      return 0;
-    });
-  }, [content, sortConfig]);
-
-  // Decide base content: either the sorted content (for browsing) or the search results.
-  const baseContent = contentSearch.trim() === '' ? sortedData : searchResults;
-
-  // Filter content based on the selected status.
-  // (Ensure the property name matches what you have in your content items.)
-  const finalContent = selectedFilter
-    ? baseContent.filter(
-        (item) =>
-          (item.uploadStatus?.toLowerCase() || '') ===
-          selectedFilter.toLowerCase()
-      )
-    : baseContent;
-
-  // Apply pagination on the filtered content.
-  const itemsPerPage = 30;
-  const {
-    currentPage,
-    totalPages,
-    paginatedItems,
-    goToNextPage,
-    goToPreviousPage,
-    goToPage,
-    getPaginationRange,
-  } = usePagination(finalContent, itemsPerPage);
-
-  const totalTracks = finalContent.length;
-  const startIndex = (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = Math.min(currentPage * itemsPerPage, totalTracks);
-
   if (loading) {
     return <LoadingAnimation />;
   }
 
-  const handleSort = (key: keyof TableData) => {
-    let direction: 'ascending' | 'descending' = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
+
+  const active =
+    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
 
   return (
     <div>
@@ -313,17 +327,14 @@ const ManageContent = () => {
                       onSort={handleSort}
                     />
                   </th>
-                  <th className="text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6">
-                    Status
-                  </th>
+                  <th className={ThStyles}>Status</th>
                   <th className={ThStyles}>Actions</th>
-                  <th className="bg-grey-100 py-3 px-6"></th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedItems.map((item) => (
                   <tr
-                    key={item.user._id}
+                    key={item._id}
                     className="items-center relative border border-r-0 border-l-0"
                   >
                     <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-4 px-8">
@@ -347,21 +358,23 @@ const ManageContent = () => {
                           className={`${
                             getStatusColors(item.uploadStatus).dot
                           } w-2 h-2 rounded-full`}
-                        ></div>
+                        />
                         {item.uploadStatus}
                       </span>
                     </td>
-                    <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8 cursor-pointer">
+                    <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8">
                       <Link to={item._id}>Review</Link>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination section */}
             <div className="flex items-center justify-between mx-[25%] gap-3 mt-5">
               <div className="flex gap-3 items-center">
                 <p>
-                  {startIndex} - {endIndex} of {totalTracks}
+                  {startIndex} - {endIndex} of {totalItems}
                 </p>
               </div>
               <div className="flex items-center mx-auto gap-3">
