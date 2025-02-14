@@ -85,6 +85,9 @@ const usePagination = <T>(items: T[], itemsPerPage: number) => {
     return Array.from(new Set(range));
   };
 
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
   return {
     currentPage,
     totalPages,
@@ -93,6 +96,9 @@ const usePagination = <T>(items: T[], itemsPerPage: number) => {
     goToPreviousPage,
     goToPage,
     getPaginationRange,
+    startIndex,
+    endIndex,
+    totalItems,
   };
 };
 

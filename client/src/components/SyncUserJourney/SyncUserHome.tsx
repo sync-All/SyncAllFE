@@ -72,6 +72,9 @@ const SyncUserHome = () => {
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
+  const validDisplayedTracks = Array.isArray(displayedTracks) ? displayedTracks : [];
+
+
   const itemsPerPage = 30;
   const {
     currentPage,
@@ -81,10 +84,10 @@ const SyncUserHome = () => {
     goToPreviousPage,
     goToPage,
     getPaginationRange,
-  } = usePagination<TrackDetails>(displayedTracks, itemsPerPage);
-
-  const totaltracks = displayedTracks.length;
-  const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+    totalItems,
+    endIndex,
+  } = usePagination<TrackDetails>(validDisplayedTracks, itemsPerPage);
+  
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
@@ -136,6 +139,7 @@ const SyncUserHome = () => {
 
       setDisplayedTracks(response.data.allTracks);
       setOriginalTracks(response.data.allTracks);
+
     } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
@@ -175,6 +179,8 @@ const SyncUserHome = () => {
       query: newSearchState.query,
     });
     setDisplayedTracks(results);
+   
+
   };
 
   const handleResetSearch = useCallback(() => {
@@ -245,7 +251,7 @@ const SyncUserHome = () => {
             </h3>
             <div className="text-[12px] font-formular-regular">
               Showing<span className="font-Utile-regular">:</span> {endIndex} of{' '}
-              {totaltracks}
+              {totalItems}
             </div>
           </div>
 

@@ -162,18 +162,18 @@ const PrivacyPolicy = () => {
   return (
     <div className="bg-black text-white">
       <Navbar />
-      <div className="w-full flex items-center justify-center text-white pb-[250px]">
-        <div className="w-full max-w-[800px] mt-[146px]">
+      <div className="w-full flex items-center justify-center text-white pb-[100px] px-4 md:px-8 lg:px-16">
+        <div className="w-full max-w-[800px] mt-[60px] md:mt-[80px] lg:mt-[100px]">
           <div className="flex gap-6 flex-col">
-            <h2 className="text-[64px] font-semibold font-inter leading-[80px] tracking-[-2.7px] uppercase text-[#F0F2F5]">
+            <h2 className="text-[32px] md:text-[48px] lg:text-[64px] font-semibold font-inter leading-[40px] md:leading-[60px] lg:leading-[80px] tracking-[-1.5px] md:tracking-[-2px] lg:tracking-[-2.7px] uppercase text-[#F0F2F5]">
               PRIVACY POLICY
             </h2>
-            <p className="font-inter text-[20px] leading-[32px] tracking-[-0.86px] text-[#CED2DA]">
+            <p className="font-inter text-[16px] md:text-[18px] lg:text-[20px] leading-[24px] md:leading-[28px] lg:leading-[32px] tracking-[-0.5px] md:tracking-[-0.7px] lg:tracking-[-0.86px] text-[#CED2DA]">
               Effective date: 01/03/2025
             </p>
           </div>
 
-          <div className="my-20 font-inter text-[24px] leading-[32px] tracking-[-0.86px] text-[#CED2DA]">
+          <div className="my-10 md:my-16 lg:my-20 font-inter text-[16px] md:text-[20px] lg:text-[24px] leading-[24px] md:leading-[28px] lg:leading-[32px] tracking-[-0.5px] md:tracking-[-0.7px] lg:tracking-[-0.86px] text-[#CED2DA]">
             Welcome to Syncall! Your privacy is important to us. This Privacy
             Policy outlines how we collect, use, disclose, and safeguard your
             personal information when you use our website and services. By
@@ -184,10 +184,10 @@ const PrivacyPolicy = () => {
           <ul className="list-none mb-8">
             {privacyPolicyMap.map((term, index) => (
               <li key={index} className="mb-6">
-                <h3 className="font-inter text-[24px] font-bold leading-[32px] tracking-[-0.86px] text-[#CED2DA]">
+                <h3 className="font-inter text-[16px] md:text-[20px] lg:text-[24px] font-bold leading-[24px] md:leading-[28px] lg:leading-[32px] tracking-[-0.5px] md:tracking-[-0.7px] lg:tracking-[-0.86px] text-[#CED2DA]">
                   {term.number}. {term.title}
                 </h3>
-                <ul className="font-inter text-[24px] leading-[32px] tracking-[-0.86px] text-[#CED2DA] ml-8 mt-6">
+                <ul className="font-inter text-[16px] md:text-[20px] lg:text-[24px] leading-[24px] md:leading-[28px] lg:leading-[32px] tracking-[-0.5px] md:tracking-[-0.7px] lg:tracking-[-0.86px] text-[#CED2DA] ml-4 md:ml-6 lg:ml-8 mt-4 md:mt-5 lg:mt-6">
                   {term.content.map((point, index) => (
                     <li
                       key={index}
@@ -195,7 +195,7 @@ const PrivacyPolicy = () => {
                         point.startsWith('A.') ||
                         point.startsWith('B.') ||
                         point.startsWith('C.')
-                          ? 'list-none font-bold my-6 ml-[-24px]'
+                          ? 'list-none font-bold my-4 md:my-5 lg:my-6 ml-[-16px] md:ml-[-20px] lg:ml-[-24px]'
                           : 'list-disc'
                       }
                     >
@@ -206,7 +206,7 @@ const PrivacyPolicy = () => {
               </li>
             ))}
           </ul>
-          <p className="font-inter text-[24px] leading-[32px] tracking-[-0.86px] text-[#CED2DA] list-disc mt-6">
+          <p className="font-inter text-[16px] md:text-[20px] lg:text-[24px] leading-[24px] md:leading-[28px] lg:leading-[32px] tracking-[-0.5px] md:tracking-[-0.7px] lg:tracking-[-0.86px] text-[#CED2DA] list-disc mt-4 md:mt-5 lg:mt-6">
             Thank you for using Syncall!
           </p>
         </div>
