@@ -213,6 +213,9 @@ const syncAdminSchema = new Schema({
         required : true,
         type : String
     },
+    username : {
+        type : String
+    },
     email : {
         required : true,
         type : String

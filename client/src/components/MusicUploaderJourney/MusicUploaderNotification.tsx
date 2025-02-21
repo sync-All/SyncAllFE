@@ -20,9 +20,6 @@ const MusicUploaderNotification: React.FC<MusicUploaderNotificationProps> = ({
       style={{
         content: {
           maxWidth: '515px',
-          
-          
-
           marginTop: 'auto',
           marginLeft: 'auto',
           marginRight: 'auto',

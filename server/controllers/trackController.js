@@ -52,7 +52,7 @@ const invalidSpotifyResolution = async(req,res,next)=>{
       throw new BadRequestError('Bad request, missing parameter')
     }
     const trackDetails = await trackError.findById(_id).exec()
-    if(trackDetails.err_type != 'InvalidSpotifyLink'){
+    if(!trackDetails || trackDetails.err_type != 'InvalidSpotifyLink'){
       throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
     }
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)

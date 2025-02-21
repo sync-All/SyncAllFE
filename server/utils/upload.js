@@ -3,6 +3,7 @@ const cloudinary = require("cloudinary").v2
 const Track = require("../models/track.model").track
 const dashboard = require("../models/dashboard.model").dashboard
 const { trackError, uploadErrorHistory } = require("../models/track.model")
+const fs = require('fs')
 
 function fileFilter (req, file, cb) {
   if(!file){
