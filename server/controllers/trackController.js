@@ -48,7 +48,7 @@ const trackUpload = async(req,res,next)=>{
 const invalidSpotifyResolution = async(req,res,next)=>{
   try {
     const {_id, trackLink, err_type} = req.body
-    if(!_id || !trackLink || err_type){
+    if(!_id || !trackLink || !err_type){
       throw new BadRequestError('Bad request, missing parameter')
     }
     const trackDetails = await trackError.findById(_id).exec()
