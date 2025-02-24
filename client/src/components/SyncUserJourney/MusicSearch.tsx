@@ -68,8 +68,9 @@ const MusicSearch: React.FC<MusicSearchProps> = ({
         const response = await axios.get(apiUrl, {
           headers: { Authorization: token },
         });
+        
 
-        onSearch(response.data.allTracks, {
+        onSearch(response.data.tracks, {
           type: searchType,
           query: query.trim(),
         });

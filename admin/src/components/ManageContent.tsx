@@ -224,28 +224,15 @@ const ManageContent = () => {
             </p>
           </div>
           <div className="flex items-center gap-4 min-w-[320px]">
-            <div className="relative flex-grow">
-              <input
-                type="text"
-                placeholder="Search Title, or Keywords"
-                className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
-                name="searchWord"
-                onChange={handleSearch}
-                value={contentSearch}
-              />
-              <img
-                src={Search}
-                alt="Search"
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
-              />
-            </div>
             {/* Filter dropdown button */}
             <div className="relative">
               <button
                 onClick={() => setShowFilterDropdown((prev) => !prev)}
-                className="flex items-center border rounded-lg px-4 py-2 text-gray-500"
+                className="flex items-center border rounded-lg pl-4 pr-4 py-4 text-gray-500"
               >
-                <span>{selectedFilter ? selectedFilter : 'Filter'}</span>
+                <span className="capitalize">
+                  {selectedFilter ? selectedFilter : 'Filter'}
+                </span>
                 <img
                   src={showFilterDropdown ? ArrowUp : ArrowDown}
                   alt="Dropdown"
@@ -292,6 +279,21 @@ const ManageContent = () => {
                   </li>
                 </ul>
               )}
+            </div>
+            <div className="relative flex-grow">
+              <input
+                type="text"
+                placeholder="Search Title, or Keywords"
+                className="pl-10 pr-4 py-4 border rounded-lg text-gray-500 text-[16px] font-Utile-medium leading-[21.33px] focus:outline-none focus:bg-[#E4E7EC] w-full"
+                name="searchWord"
+                onChange={handleSearch}
+                value={contentSearch}
+              />
+              <img
+                src={Search}
+                alt="Search"
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 w-6 h-6"
+              />
             </div>
           </div>
         </div>

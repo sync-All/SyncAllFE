@@ -20,8 +20,8 @@ const adminActivityLogSchema = new Schema({
         required : true
     },
     performedBy : {
-        type : String,
-        required : true
+        type : Schema.Types.ObjectId,
+        ref : 'admin'
     }
 }, {timestamps : true})
 
