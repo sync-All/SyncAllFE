@@ -56,7 +56,7 @@ const invalidSpotifyResolution = async(req,res,next)=>{
       throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
     }
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
-
+    console.log({uploadHistory})
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
     }
@@ -84,6 +84,7 @@ const invalidSpotifyResolution = async(req,res,next)=>{
     res.send('Track successfully uploaded and error resolved.')
     
   } catch (error) {
+    console.log({error})
     throw new BadRequestError(error.message)
   }
 }
