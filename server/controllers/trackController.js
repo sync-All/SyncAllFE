@@ -55,6 +55,7 @@ const invalidSpotifyResolution = async(req,res,next)=>{
     if(!trackDetails || trackDetails.err_type != 'InvalidSpotifyLink'){
       throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
     }
+    console.log({itemId : _id, userId1 : req.user.id, userId2 : req.user._id})
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
     console.log({uploadHistory})
     if(!uploadHistory){
