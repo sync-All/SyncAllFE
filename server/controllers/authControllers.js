@@ -1,6 +1,6 @@
 const confirmEmail = require('../utils/mailer');
 const issueJwt = require('../utils/issueJwt')
-const EmailDomain = require('../utils/grabUserEmailDomain')
+const EmailDomain = require('../utils/userUtils').grabEmailDomain
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;
@@ -11,6 +11,7 @@ const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
 const fs = require('node:fs');
 const { BadRequestError } = require('../utils/CustomError');
+const { getUserInfo, createNewSyncUser, attachNewNotification } = require('./userControllers');
 require('dotenv').config()
 
 
@@ -23,156 +24,130 @@ cloudinary.config({
 
 
 const signup = async function(req, res) {
-    const {name, email, password, role, userType} = req.body
-    if(!name || !email || !password || !role || !userType){
-      if(!name){
-        return res.status(401).json({success: false , message : "Name Field Missing, please review input"})
-      }else if(!email){
-        return res.status(401).json({success : false, message : "Email Field Missing, please review input"})
-      }else if(!password){
-        return res.status(401).json({success : false, message : "Password Field Missing, please review input"})
-      }else if(!role){
-        return res.status(401).json({success : false, message : "Role Field Missing, please review input"})
-      }else if(!userType){
-        return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
-      }
+  const {name, email, password, role, userType} = req.body
+  if(!name || !email || !password || !role || !userType){
+    if(!name){
+      return res.status(401).json({success: false , message : "Name Field Missing, please review input"})
+    }else if(!email){
+      return res.status(401).json({success : false, message : "Email Field Missing, please review input"})
+    }else if(!password){
+      return res.status(401).json({success : false, message : "Password Field Missing, please review input"})
+    }else if(!role){
+      return res.status(401).json({success : false, message : "Role Field Missing, please review input"})
+    }else if(!userType){
+      return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
+    }
+  }else{
+    const userInfo = await getUserInfo({email : email.toLowerCase()})
+    if(userInfo){
+      res.status(401).json({success: false, message : "Email Already in use"})
     }else{
-      const getUploaderIdentity = await User.findOne({ email : email.toLowerCase()}).exec()
-      const getSyncUserIdentity = await SyncUser.findOne({ email : email.toLowerCase()}).exec()
-      if(getUploaderIdentity || getSyncUserIdentity){
-        res.status(401).json({success: false, message : "Email Already in use"})
-      }else{
-        if(role == "Music Uploader"){
-          bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
-            const users = new User({
-              name,
-              email : email.toLowerCase(),
-              password,
-              role,
-              userType,
-            })
-            users.save()
-            .then(async (users)=> {
-                const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
-                const grabber = EmailDomain.grabEmailDomain(users)
-                await confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
-                 const dashboard = new Dashboard({
-                  user : users._id
-                })
-                await dashboard.save()
-                await User.findByIdAndUpdate(users.id, {dashboard : dashboard._id})
-                res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
-            })
-            .catch(err => {
-              console.log(err)
-              res.status(400).send('An Error Occured, Invalid Input')
-            })
+      if(role == "Music Uploader"){
+        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+          const newUserData = await createNewMusicUploader({name,email,password,role,userType})
+          const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
+          const grabber = EmailDomain.grabEmailDomain(newUserData)
+          await confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
+          const dashboard = new Dashboard({
+          user : newUserData._id
           })
-        }else {
-          bcrypt.hash(password, Number(process.env.SALT_ROUNDS), function(err, password){
-            const users = new SyncUser({
-              name,
-              email : email.toLowerCase(),
-              password,
-              role,
-              userType,
-            })
-            users.save()
-            .then((users)=> {
-                  const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(users)
-                 const grabber = EmailDomain.grabEmailDomain(users)
-                 confirmEmail.sendConfirmationMail(users,toBeIssuedJwt.token)
-                res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
-            })
-            .catch(err => {
-              console.log(err)
-              res.status(400).send('An Error Occured, Invalid Input')
-            })
-          })
-        }
-        
-      }
-    }
-  }
-
-  const signin = async(req,res,next)=> {
-    const {email,password} = req.body
-    const user = await User.findOne({email : email.toLowerCase()}).exec()
-    const syncUser = await SyncUser.findOne(({email : email.toLowerCase()})).exec()
-    let item = user || syncUser
-    if(!item){
-      return res.status(401).json({success : false, message : "User doesn't Exists"})
-    }
-    if(!item.password){
-      return res.status(401).json({success : false, message : "Invalid Email or Password, Try another sign in option"})
-    }
-    const match = await bcrypt.compare(password, item.password);
-
-    if(!match){
-      return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
-    }else if(!item.emailConfirmedStatus){
-      const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(user ||  syncUser)
-      confirmEmail.sendConfirmationMail(user ||  syncUser,toBeIssuedJwt.token)
-      return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
-    }else{
-      const toBeIssuedJwt = issueJwt.issueJwtLogin(user || syncUser)
-      const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').populate('uploadErrors').exec()
-
-      const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').exec()
-
-      res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-    }
- 
-  }
-
-  const googleAuth = async(req,res,next)=>{
-    try {
-      const user = await User.findOne({email : req.body.email}).exec() 
-      const syncUser = await SyncUser.findOne({email : req.body.email}).exec()
-      let item = user || syncUser
-      if (!item){
-        if(req.body.role){
-          const {userType} = EmailDomain.grabEmailDomain(req.body)
-          if(req.body.role == "Music Uploader"){
-            const user = new User({...req.body,authSource : 'googleAuth', userType})
-            var newUser = await user.save()
-            const dashboard = new Dashboard({
-              user : newUser._id
-            })
-            await dashboard.save()
-            newUser = newUser.toObject()
-            delete newUser.password
-          }else{
-            const user = new SyncUser({...req.body,authSource : 'googleAuth', userType})
-            var newSyncUser = await user.save()
-            newSyncUser = newSyncUser.toObject()
-            delete newSyncUser.password
-          }
-          item = newUser || newSyncUser
-          let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-          res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-        }else{
-          return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
-        }
-        
-      }else{
-        let toBeIssuedJwt = issueJwt.issueJwtLogin(item)
-
-        res.status(200).json({success : true, user : item, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+          await dashboard.save()
+          await User.findByIdAndUpdate(newUserData.id, {dashboard : dashboard._id})
+          res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
+        })
+      }else {
+        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
+          const newUserData = await createNewSyncUser({name,email,password,role,userType})
+          const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
+          const grabber = EmailDomain.grabEmailDomain(newUserData)
+          confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
+          res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
+        })
       }
       
-    } catch (error) {
-      console.log(error)
-      res.status(401).send(error)
     }
-        
+  }
+}
+
+const signin = async(req,res,next)=> {
+  let {email,password} = req.body
+  email = email.toLowerCase()
+  const userInfo = await getUserInfo({email})
+  if(!userInfo){
+    return res.status(401).json({success : false, message : "User doesn't Exists"})
+  }
+  if(!userInfo.password){
+    return res.status(401).json({success : false, message : "Invalid Email or Password, Try another sign in option"})
+    
+  }
+  const match = await bcrypt.compare(password, userInfo.password);
+  if(!match){
+    return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
+  }else if(!userInfo.emailConfirmedStatus){
+    const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(userInfo)
+    confirmEmail.sendConfirmationMail(userInfo,toBeIssuedJwt.token)
+    return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
+  }else{
+    const toBeIssuedJwt = issueJwt.issueJwtLogin(userInfo)
+    const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').populate('uploadErrors notifications').exec()
+
+    const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').populate('notifications').exec()
+
+
+    res.status(200).json({success : true, user : userDetails ||  syncUserDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+  }
+
+}
+
+const googleAuth = async(req,res,next)=>{
+  try {
+    const userInfo = await getUserInfo({email : req.body.email.toLowerCase()},{select : '-password'})
+    if (!userInfo){
+      let newUser;
+      if(req.body.role){
+        const {userType} = EmailDomain.grabEmailDomain(req.body)
+        if(req.body.role == "Music Uploader"){
+          newUser = new User({...req.body,authSource : 'googleAuth', userType})
+          await newUser.save()
+          const dashboard = new Dashboard({
+            user : newUser._id
+          })
+          await dashboard.save()
+        }else{
+          newUser = new SyncUser({...req.body,authSource : 'googleAuth', userType})
+          await newUser.save()
+        }
+        newUser = newUser.toObject()
+        delete newUser.password
+        let toBeIssuedJwt = issueJwt.issueJwtLogin(newUser)
+
+        res.status(200).json({success : true, user : newUser, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+      }else{
+        return res.status(302).json({success : false, message : "You are yet to Identify with a role", path : '/selectRole'})
+      }
+      
+    }else{
+      let toBeIssuedJwt = issueJwt.issueJwtLogin(userInfo)
+
+      res.status(200).json({success : true, user : userInfo, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
+    }
+    
+  } catch (error) {
+    console.log(error)
+    res.status(401).send(error)
+  }
+      
 }
 
 const getsyncuserinfo = async (req,res,next)=>{
-  const userId = req.user._id
-  const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").populate('pendingLicensedTracks').select('-password').exec()
-  res.send({user : details, success : true})
+  try {
+    const userId = req.user._id
+    const details = await SyncUser.findOne({_id : userId}).populate('tracklist', "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").populate('pendingLicensedTracks').select('-password').exec()
+    res.send({user : details, success : true})
+  } catch (error) {
+    throw new BadRequestError('Error Fetching user data')
+  }
+ 
 }
 
 const profilesetup = async (req, res, next) => {

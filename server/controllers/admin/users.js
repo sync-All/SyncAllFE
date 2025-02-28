@@ -1,21 +1,23 @@
-const { admin } = require('../../models/usermodel');
+const { adminActivityLog } = require('../../models/activity.model');
+const { admin, suspendedAccount } = require('../../models/usermodel');
 const { BadRequestError } = require('../../utils/CustomError');
+const { findUserAndUpdate, attachNewNotification } = require('../userControllers');
 
 const User = require('../../models/usermodel').uploader;
 const SyncUser = require('../../models/usermodel').syncUser;
 const Admin = require('../../models/usermodel').admin
 
 const allUsers = async (req,res,next) =>{
-    const [Users1, Users2] = await Promise.all([User.find().populate('dashboard')
-      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
-    SyncUser.find().populate('totalLicensedTracks')
-    .populate('pendingLicensedTracks').select('-password').exec()])
-    const allusers = [...Users1, ...Users2]
-    if(allusers){
-      res.json({success : true, message : allusers})
-    }else{
-      res.json({success : false, message : "Error fetching users"})
-    }
+  const [Users1, Users2] = await Promise.all([User.find().populate('dashboard')
+    .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+  SyncUser.find().populate('totalLicensedTracks')
+  .populate('pendingLicensedTracks').select('-password').exec()])
+  const allusers = [...Users1, ...Users2]
+  if(allusers){
+    res.json({success : true, message : allusers})
+  }else{
+    res.json({success : false, message : "Error fetching users"})
+  }
 }
 
 const allAdmin = async (req,res,next)=>{
@@ -54,4 +56,56 @@ const userSearch = async (req,res,next)=>{
   }
 }
 
-module.exports = {allUsers, allAdmin, userSearch}
+const suspendUser = async(req,res,next)=>{
+  try {
+    const {reason, userId} = req.query
+    const accountDetails = await suspendedAccount.findOne({userId})
+    if(accountDetails){
+      throw new BadRequestError("Duplicate action rejected, User account is already suspended")
+    }
+    if(!reason){
+      throw new BadRequestError("Provide a valid reason for suspension")
+    }
+
+    const adminActivity =   new adminActivityLog({
+      action_taken : "Suspended user account",
+      performedBy : req.user.id
+    })
+    adminActivity.save()
+    const update = await findUserAndUpdate({_id : userId}, {accountStatus : 'Inactive'})
+    new suspendedAccount({
+      userId,
+      role : update.role,
+      reason,
+      performedBy : req.user.id
+    }).save()
+    await attachNewNotification({title : "Account Suspended", message : "Due to the nature of activities, your account has been suspended pending further review, kindly contact support", userId})
+    res.send('Account has been suspended')
+  } catch (error) {
+    throw new BadRequestError(error.message || 'An error occured, try agani later')
+  }
+}
+
+const activateUser = async(req,res,next)=>{
+  try {
+    const {userId} = req.query
+    const accountDetails = await suspendedAccount.findOne({userId})
+    if(!accountDetails){
+      throw new BadRequestError('Action not allowed!, User account is already active')
+    }
+    const adminActivity =   new adminActivityLog({
+      action_taken : "Activated user account",
+      performedBy : req.user.id
+    })
+    adminActivity.save()
+    await findUserAndUpdate({_id : userId}, {accountStatus : 'Active'})
+    await suspendedAccount.findOneAndDelete({userId})
+    await attachNewNotification({title : "Account activated", message : "After reviewing your activities on our platform, your account has been activated. You can go ahead to perform all actions normally", userId})
+    res.send('Account activated')
+  } catch (error) {
+    throw new BadRequestError(error.message || 'An error occured, try agani later')
+  }
+}
+
+
+module.exports = {allUsers, allAdmin, userSearch, suspendUser,activateUser}

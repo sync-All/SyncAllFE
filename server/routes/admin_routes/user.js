@@ -20,6 +20,8 @@ router.get('/get_key_metrics/', passport.authenticate('jwt',{session : false, fa
 router.get('/allusers',checkAdmin, asynchandler(userControllers.allUsers));
 
 router.get('/userSearch', checkAdmin, asynchandler(userControllers.userSearch))
+router.put('/suspenduser', checkAdmin, asynchandler(userControllers.suspendUser))
+router.put('/activateuser', checkAdmin, asynchandler(userControllers.suspendUser))
 
 router.get('/allAdmins',checkAdmin, asynchandler(userControllers.allAdmin))
 
