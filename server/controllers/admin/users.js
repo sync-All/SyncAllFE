@@ -107,5 +107,17 @@ const activateUser = async(req,res,next)=>{
   }
 }
 
+const sendUserEmail = async(req,res,next)=>{
+  const { content, subject, userEmail } = req.body;
+  if(!content || !subject || !userEmail){
+    throw new BadRequestError('Missing Parameters, please try again')
+  }
+  const files = req.files;
+  const attachments = files.map((file) => ({
+    filename: file.originalname,
+    path: file.path,
+  }));
+}
+
 
 module.exports = {allUsers, allAdmin, userSearch, suspendUser,activateUser}

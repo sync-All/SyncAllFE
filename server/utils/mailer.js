@@ -16,93 +16,87 @@ const pathtoMessageIcon = path.join(__dirname, '..', '/public/images/message.png
 const pathtoLinkIcon = path.join(__dirname, '..', '/public/images/link.png')
 const pathtoCallIcon = path.join(__dirname, '..', '/public/images/call.png')
 let envi = process.env.NODE_ENV
- 
-async function sendConfirmationMail(user, issuedJwt){
-  const transporter = nodemailer.createTransport({
-    service : "Gmail",
+
+const transporter = nodemailer.createTransport({
+  service : "Gmail",
   auth: {
     user: 'info@syncallmusic.com',
     pass: process.env.GMAIL_PASS,
   },
 });
+async function sendConfirmationMail(user, issuedJwt){
+  
 
-const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
+  const pathtofile = path.join(__dirname, '..', '/views/confirmEmail.ejs')
 
-await ejs.renderFile(pathtofile,{ link : envi == 'development' ? `https://syncall-testserver.onrender.com/verifyEmail/?token=${issuedJwt}` : `https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
-  if (err) {
-    console.error('Error rendering EJS template:', err);
-    return;
-  }
-
-  // Compose email options
-  const mainOptions = {
-    from: '"Syncall Team"info@syncallmusic.com',
-    to: user.email,
-    subject: 'Hello, Sync User',
-    html: renderedHtml,
-    attachments: [{
-      filename: 'headerLogo.png',
-      path: pathtoheaderLogo,
-      cid: 'headerLogo' //same cid value as in the html img src
-    },
-    {
-      filename: 'footerLogo.png',
-      path: pathtofooterLogo,
-      cid: 'footerLogo' //same cid value as in the html img src
-    },
-    {
-      filename: 'ig.svg',
-      path: pathtoIgLogo,
-      cid: 'ig' //same cid value as in the html img src
-    },
-    {
-      filename: 'ln.png',
-      path: pathtoLnLogo,
-      cid: 'ln' //same cid value as in the html img src
-    },
-    {
-      filename: 'twitter.png',
-      path: pathtoXLogo,
-      cid: 'twitter' //same cid value as in the html img src
-    },
-    {
-      filename: 'message.png',
-      path: pathtoMessageIcon,
-      cid: 'message' //same cid value as in the html img src
-    },
-    {
-      filename: 'link.png',
-      path: pathtoLinkIcon,
-      cid: 'link' //same cid value as in the html img src
-    },
-    {
-      filename: 'call.png',
-      path: pathtoCallIcon,
-      cid: 'call' //same cid value as in the html img src
-    },
-    ]
-  };
-
-  // Send the email
-transporter.sendMail(mainOptions,(error, info) => {
-    if (error) {
-       console.error('Error sending email:', error);
+  await ejs.renderFile(pathtofile,{ link : envi == 'development' ? `https://syncall-testserver.onrender.com/verifyEmail/?token=${issuedJwt}` : `https://syncallfe.onrender.com/verifyEmail/?token=${issuedJwt}`}, async (err, renderedHtml) => {
+    if (err) {
+      console.error('Error rendering EJS template:', err);
+      return;
     }
-    else{
-      console.error('Mail Sent Successfully');
-    }
+
+    // Compose email options
+    const mainOptions = {
+      from: '"Syncall Team"info@syncallmusic.com',
+      to: user.email,
+      subject: 'Hello, Sync User',
+      html: renderedHtml,
+      attachments: [{
+        filename: 'headerLogo.png',
+        path: pathtoheaderLogo,
+        cid: 'headerLogo' //same cid value as in the html img src
+      },
+      {
+        filename: 'footerLogo.png',
+        path: pathtofooterLogo,
+        cid: 'footerLogo' //same cid value as in the html img src
+      },
+      {
+        filename: 'ig.svg',
+        path: pathtoIgLogo,
+        cid: 'ig' //same cid value as in the html img src
+      },
+      {
+        filename: 'ln.png',
+        path: pathtoLnLogo,
+        cid: 'ln' //same cid value as in the html img src
+      },
+      {
+        filename: 'twitter.png',
+        path: pathtoXLogo,
+        cid: 'twitter' //same cid value as in the html img src
+      },
+      {
+        filename: 'message.png',
+        path: pathtoMessageIcon,
+        cid: 'message' //same cid value as in the html img src
+      },
+      {
+        filename: 'link.png',
+        path: pathtoLinkIcon,
+        cid: 'link' //same cid value as in the html img src
+      },
+      {
+        filename: 'call.png',
+        path: pathtoCallIcon,
+        cid: 'call' //same cid value as in the html img src
+      },
+      ]
+    };
+
+    // Send the email
+    transporter.sendMail(mainOptions,(error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      }
+      else{
+        console.error('Mail Sent Successfully');
+      }
+    });
   });
-});
 }
 
 function requestForgotPassword(user, issuedJwt){
-  const transporter = nodemailer.createTransport({
-    service : "Gmail",
-    auth: {
-      user: 'info@syncallmusic.com',
-      pass: process.env.GMAIL_PASS,
-    },
-  });
 
 const pathtofile = path.join(__dirname, '..', '/views/forgotPassword.ejs')
 
@@ -210,13 +204,6 @@ function informQuoteRequest(email, name){
 }
 
 function additionalDocRequest(email, name,ticketId){
-  const transporter = nodemailer.createTransport({
-    service : "Gmail",
-    auth: {
-      user: 'info@syncallmusic.com',
-      pass: process.env.GMAIL_PASS,
-    },
-  });
 
   const pathToEjsTemp = path.join(__dirname, '..', '/views/reqAddtionalDoc.ejs')
   ejs.renderFile(pathToEjsTemp,{name,ticketId}, (err, renderedHtml) => {
@@ -245,5 +232,34 @@ function additionalDocRequest(email, name,ticketId){
   });
 }
 
+function sendUserAnEmail(email, subject, content, attachments){
+  const pathToEjsTemp = path.join(__dirname, '..', '/views/genericEmail.ejs')
+  ejs.renderFile(pathToEjsTemp,{content}, (err, renderedHtml) => {
+    if (err) {
+      console.error('Error rendering EJS template:', err);
+      throw new BadRequestError('Error rendering EJS template')
+    }
 
-module.exports = {sendConfirmationMail, requestForgotPassword, informQuoteRequest,additionalDocRequest}
+    // Compose email options
+    const mainOptions = {
+      from: '"Team Syncall"info@syncallmusic.com',
+      to: email,
+      subject,
+      html: renderedHtml,
+      attachments
+    };
+
+    // Send the email
+    transporter.sendMail(mainOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        throw new BadRequestError('Error sending email:')
+      } else {
+        console.log('Email sent successfully!');
+      }
+    });
+  });
+}
+
+
+module.exports = {sendConfirmationMail, requestForgotPassword, informQuoteRequest,additionalDocRequest, sendUserAnEmail}
