@@ -31,11 +31,11 @@ router.post(
   upload,
   asyncHandler(trackController.invalidSpotifyResolution)
 );
-router.get(
+router.delete(
   "/ignore_bulk_resolution/",checkUploader,
   asyncHandler(trackController.ignoreBulkResolution)
 );
-router.get(
+router.delete(
   "/ignore_single_resolution/",checkUploader,
   asyncHandler(trackController.ignoreSingleResolution)
 );
