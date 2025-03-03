@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 const path = require('path');
 const { BadRequestError } = require('./CustomError');
+const fs = require('fs')
 require('dotenv').config()
 
 // Create a transporter
@@ -232,12 +233,20 @@ function additionalDocRequest(email, name,ticketId){
   });
 }
 
-function sendUserAnEmail(email, subject, content, attachments){
+async function sendUserAnEmail(email, subject, content,files){
   const pathToEjsTemp = path.join(__dirname, '..', '/views/genericEmail.ejs')
-  ejs.renderFile(pathToEjsTemp,{content}, (err, renderedHtml) => {
+  await ejs.renderFile(pathToEjsTemp,{content}, async(err, renderedHtml) => {
     if (err) {
       console.error('Error rendering EJS template:', err);
       throw new BadRequestError('Error rendering EJS template')
+    }
+    // arrange and identify attachments
+    let attachments = []
+    if (files){
+      attachments = files.map((file) => ({
+        filename: file.originalname,
+        path: file.path,
+      }));
     }
 
     // Compose email options
@@ -250,14 +259,22 @@ function sendUserAnEmail(email, subject, content, attachments){
     };
 
     // Send the email
-    transporter.sendMail(mainOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-        throw new BadRequestError('Error sending email:')
-      } else {
-        console.log('Email sent successfully!');
-      }
-    });
+    try {
+      transporter.sendMail(mainOptions, (error, info) => {
+        if(files){
+          files.forEach((file) => fs.unlinkSync(file.path));
+        }
+        if (error) {
+          console.error('Error sending email:', error);
+          throw new BadRequestError('Error sending email:', error)
+        } else {
+          console.log('Email sent successfully!');   
+        }
+      });
+    } catch (error) {
+      throw new BadRequestError(error.message)
+    }
+    
   });
 }
 

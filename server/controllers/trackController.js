@@ -92,17 +92,25 @@ const invalidSpotifyResolution = async(req,res,next)=>{
 
 const ignoreBulkResolution = async(req,res,next)=>{
   try {
-    const {bulkErrorId} = req.query
-    const uploadHistory = await uploadErrorHistory.findOne({_id : bulkErrorId}).where('user').equals(req.user._id)
+    const {bulkErrorId, errorType} = req.query
+    const allowedErrorType = ['duplicateTrackByAnother','InvalidSpotifyLink', 'duplicateTrack']
+    if(!allowedErrorType.includes(errorType)){
+      throw new BadRequestError('Invalid error type parameter')
+    }
+    const uploadHistory = await uploadErrorHistory.findOne({_id : bulkErrorId}).populate('associatedErrors').where('user').equals(req.user._id)
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
     }
-    await Promise.all(uploadHistory.associatedErrors.map(async (trackErrorInfo)=>{
-      await trackError.findOneAndDelete({_id : trackErrorInfo})
+    await Promise.all(uploadHistory.associatedErrors.filter((trackErrorInfo)=> trackErrorInfo.err_type === errorType ).map(async (trackErrorInfo)=>{
+      await trackError.findOneAndDelete({_id : trackErrorInfo._id})
+      await uploadErrorHistory.findByIdAndUpdate(bulkErrorId, {$pull : {associatedErrors : trackErrorInfo._id}, status : 'Partially Processed'}).exec()
     }))
-    await uploadErrorHistory.findOneAndDelete({associatedErrors : bulkErrorId}).exec()
-    await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
-    res.send('Errors cleared successfully')
+    const errorHistory = await uploadErrorHistory.findById(bulkErrorId).populate('associatedErrors').exec()
+    if(errorHistory.associatedErrors.length < 1){
+      await uploadErrorHistory.findByIdAndDelete(bulkErrorId).exec()
+      await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+    }
+    res.send({message : 'Errors cleared successfully',errorHistory})
   } catch (error) {
     console.log(error)
     throw new BadRequestError('Bad request, invalid parameters')

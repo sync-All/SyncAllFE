@@ -1,6 +1,7 @@
 const { adminActivityLog } = require('../../models/activity.model');
 const { admin, suspendedAccount } = require('../../models/usermodel');
 const { BadRequestError } = require('../../utils/CustomError');
+const { sendUserAnEmail } = require('../../utils/mailer');
 const { findUserAndUpdate, attachNewNotification } = require('../userControllers');
 
 const User = require('../../models/usermodel').uploader;
@@ -108,16 +109,23 @@ const activateUser = async(req,res,next)=>{
 }
 
 const sendUserEmail = async(req,res,next)=>{
-  const { content, subject, userEmail } = req.body;
-  if(!content || !subject || !userEmail){
-    throw new BadRequestError('Missing Parameters, please try again')
+  try {
+    const { content, subject, userEmail } = req.body;
+    if(!content || !subject || !userEmail){
+      throw new BadRequestError('Missing Parameters, please try again')
+    }
+    const files = req.files;
+    await sendUserAnEmail(userEmail, subject,content,files)
+    const adminActivity =   new adminActivityLog({
+      action_taken : "Sent a user an email",
+      performedBy : req.user.id
+    })
+    adminActivity.save()
+    res.send("Mail sent successfully")
+  } catch (error) {
+    throw new BadRequestError(error.message)
   }
-  const files = req.files;
-  const attachments = files.map((file) => ({
-    filename: file.originalname,
-    path: file.path,
-  }));
 }
 
 
-module.exports = {allUsers, allAdmin, userSearch, suspendUser,activateUser}
+module.exports = {allUsers, allAdmin, userSearch, suspendUser,activateUser, sendUserEmail}
