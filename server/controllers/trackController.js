@@ -306,7 +306,9 @@ const trackBulkUpload = async(req,res,next)=>{
         }
         res.write(`event: progress\n`);
         res.write(`data: Cleaning up\n\n`);
-        const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        invalidSpotifyLink = await trackError.insertMany(invalidSpotifyLink)
+        duplicateData = await trackError.insertMany(duplicateData)
+        const errorRes = [...invalidSpotifyLink, ...duplicateData]
         const errorIds = errorRes.map((error)=> error._id)
         const uploadHistory = new uploadErrorHistory({
           uploadId : `UI_${uuidv4()}`,
@@ -339,6 +341,14 @@ const trackBulkUpload = async(req,res,next)=>{
     }
   });
   
+}
+const getUploadErrorHistory = async(req,res,next)=>{
+  try {
+    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
+    res.send({errorHistory})
+  } catch (error) {
+    throw new BadRequestError('An error occured while  fetching error history')
+  }
 }
 
 const getAllSongs = async(req,res,next)=>{
@@ -421,4 +431,4 @@ const freequerySong = async(req,res,next)=>{
   }
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute, getUploadErrorHistory}

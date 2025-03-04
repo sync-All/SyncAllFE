@@ -12,45 +12,18 @@ const trackController = require("../../controllers/trackController");
 const { checkUploader, allowUnauthentication, checkSyncUser } = require("../../utils/AuthenticateChecker");
 
 
-router.get(
-  "/verifyTrackUploaded/",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
-  asyncHandler(trackController.verifyTrackUpload)
-);
+router.get("/verifyTrackUploaded/",checkUploader,asyncHandler(trackController.verifyTrackUpload));
 
-router.post(
-  "/trackUpload/",checkUploader,
-  upload,
-  asyncHandler(trackController.trackUpload)
-);
-router.post(
-  "/invalid_spotify_resolution/",checkUploader,
-  upload,
-  asyncHandler(trackController.invalidSpotifyResolution)
-);
-router.delete(
-  "/ignore_bulk_resolution/",checkUploader,
-  asyncHandler(trackController.ignoreBulkResolution)
-);
-router.delete(
-  "/ignore_single_resolution/",checkUploader,
-  asyncHandler(trackController.ignoreSingleResolution)
-);
+router.post("/trackUpload/",checkUploader,upload,asyncHandler(trackController.trackUpload));
+router.post("/invalid_spotify_resolution/",checkUploader,upload,asyncHandler(trackController.invalidSpotifyResolution));
+router.delete("/ignore_bulk_resolution/",checkUploader,asyncHandler(trackController.ignoreBulkResolution));
+router.delete("/ignore_single_resolution/",checkUploader,asyncHandler(trackController.ignoreSingleResolution));
 
-router.get(
-  "/bulkUploadFileDispute/",checkUploader,
-  asyncHandler(trackController.bulkUploadFileDispute)
-);
+router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));
 
-router.post(
-  "/trackBulkUpload/",
-  checkUploader,
-  bulkUpload,
-  asyncHandler(trackController.trackBulkUpload)
-);
+router.post("/trackBulkUpload/",checkUploader,bulkUpload,asyncHandler(trackController.trackBulkUpload));
+
+router.get("/get-upload-error-history", checkUploader, asyncHandler(trackController.getUploadErrorHistory))
 
 router.get(
   "/allsongs",allowUnauthentication,checkSyncUser,

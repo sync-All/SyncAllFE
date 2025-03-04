@@ -260,6 +260,12 @@ const notificationSchema = new Schema({
         }
     }
 },{timestamps : true})
+notificationSchema.add({
+    read : {
+        type: Boolean,
+        required : true
+    }
+})
 
 const adminNotificationSchema = new Schema({
     title : {
