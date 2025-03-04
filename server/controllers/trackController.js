@@ -212,6 +212,7 @@ const trackBulkUpload = async(req,res,next)=>{
   let parsedRows = 0
   let failedCount = 0
   let successCount = 0
+  let errorRes = []
   const seen = new Set();
   const duplicates = new Set();
   const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
@@ -305,7 +306,7 @@ const trackBulkUpload = async(req,res,next)=>{
         }
         res.write(`event: progress\n`);
         res.write(`data: Cleaning up\n\n`);
-        const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
         const errorIds = errorRes.map((error)=> error._id)
         const uploadHistory = new uploadErrorHistory({
           uploadId : `UI_${uuidv4()}`,
@@ -322,7 +323,7 @@ const trackBulkUpload = async(req,res,next)=>{
       const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
 
       res.write(`event: done\n`);
-      res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink, errorCsv })}\n\n`);
+      res.write(`data: ${JSON.stringify({failedCount, errorData : errorRes, errorCsv })}\n\n`);
 
       fs.unlinkSync(req.file.path)
       res.end();
