@@ -62,13 +62,16 @@ const contentUpdate = async(req,res,next)=>{
             throw new BadRequestError("Track not available")
         }
         const trackDetails = await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
+        if(!trackDetails){
+            throw new BadRequestError("Track could not be updated, contact dev team")
+        }
         const activityLog = new adminActivityLog({
             activityDate : Date.now(),
             action_taken : `Updated trackTitle : ${trackDetails.trackTitle}, `,
             performedBy : req.user.id
         })
         await activityLog.save()
-        res.send({message : "TrackDetails uploaded successfully", trackDetails},)
+        res.send({message : "TrackDetails uploaded successfully", trackDetails})
     } catch (error) {
         console.log(error)
         throw new BadRequestError(error.message)

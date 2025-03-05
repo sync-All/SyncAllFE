@@ -3,6 +3,7 @@ const asynchandler = require("express-async-handler");
 const authcontroller = require("../../controllers/authControllers");
 const passport = require("passport");
 const multer = require("multer");
+const { testUpdate } = require("../../controllers/admin/users");
 const uploadProfileImg = multer({ dest: "uploads/" }).single("img");
 var router = express.Router();
 
