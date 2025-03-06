@@ -183,6 +183,22 @@ const trackSchema = new Schema({
     },
 },{timestamps : true})
 
+const rejectedTrackSchema = new Schema({
+    contentId : {
+        type : Schema.Types.ObjectId,
+        ref : "track"
+    },
+    reason : {
+        type : String,
+        required : true
+    },
+    performedBy : {
+        type : Schema.Types.ObjectId,
+        ref : 'admin'
+    }
+
+},{timestamps : true})
+
 const trackErrorSchema = new Schema()
 trackErrorSchema.add(trackSchema).add({mainArtist : {
     type : String,
@@ -299,5 +315,6 @@ const track = mongoose.model('track', trackSchema)
 const trackError = mongoose.model('trackError', trackErrorSchema)
 const uploadErrorHistory = mongoose.model('uploadErrorHistory', uploadErrorHistorySchema)
 const trackLicense = mongoose.model('track_license', trackLicenseSchema)
+const rejectedTrack = mongoose.model('rejectedTrack', rejectedTrackSchema)
 
-module.exports = {track, trackLicense, trackError, uploadErrorHistory}
+module.exports = {track, trackLicense, trackError, uploadErrorHistory, rejectedTrack}

@@ -12,16 +12,15 @@ const userActivitySchema = new Schema({
 const adminActivityLogSchema = new Schema({
     activityDate : {
         type : Date,
-        default : Date.now(),
-        required : true
+        default : Date.now()
     },
     action_taken : {
         type : String,
         required : true
     },
     performedBy : {
-        type : String,
-        required : true
+        type : Schema.Types.ObjectId,
+        ref : 'admin'
     }
 }, {timestamps : true})
 

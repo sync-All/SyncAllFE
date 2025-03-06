@@ -14,12 +14,11 @@ const assignAdmin = async(req,res,next)=>{
     }
     try {
        const adminInfo = await Admin.findById(adminId).exec()
-       const disputeInfo = await Dispute.findById(disputeId).exec()
-       const newActivity = new adminActivityLog({action_taken : `Dispute assigned to ${adminInfo.name}`, performedBy : req.user.name,})
+       await Dispute.findById(disputeId).exec()
+       const newActivity = new adminActivityLog({action_taken : `Dispute assigned to ${adminInfo.name}`, performedBy : req.user.id,})
         await newActivity.save()
         const updateDispute =
          await Dispute.findByIdAndUpdate(disputeId,{assignedTo : adminId, $push : {activityLog : newActivity._id}}).exec()
-        console.log(updateDispute)
         res.send(`Dispute successfully assigned to ${adminInfo.name}`)
        
     } catch (error) {
@@ -105,6 +104,9 @@ const requestAdditionalDocument = async(req,res,next)=>{
             throw new BadRequestError('Action not allowed, dispute already resolved')
         }
         additionalDocRequest(TicketDetails.user.email, TicketDetails.user.name, tickId)
+        const newActivity = new adminActivityLog({action_taken : `Request for additional documents`, performedBy : req.user.id,})
+        await newActivity.save()
+        await Dispute.findByIdAndUpdate(disputeId,{$push : {activityLog : newActivity._id}}).exec()
         res.status(201).send('Email sent successfully')
     } catch (error) {
         throw new BadRequestError(error.message)

@@ -1,31 +1,40 @@
 const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
-const { track } = require("../../models/track.model")
-const { BadRequestError, unauthorizedError } = require("../../utils/CustomError")
+const { track, rejectedTrack } = require("../../models/track.model")
+const { BadRequestError } = require("../../utils/CustomError")
 
 const contentReview = async(req,res,next)=>{
     try {
-        const {actionTaken, contentId} = req.query
+        const {actionTaken,contentId,reason} = req.query
         const allowedActions = ['Rejected', 'Approved']
         if(!allowedActions.includes(actionTaken)){
             throw new BadRequestError('Invalid action taken')
         }
         const trackDetails = await track.findById(contentId).populate('user').exec()
-        console.log(trackDetails)
         if(trackDetails.uploadStatus == actionTaken){
             throw new BadRequestError('Action has already been taken previously')
+        }
+        if(actionTaken === 'Rejected'){
+            if(!reason){
+                throw new BadRequestError('No reason attached for rejection, kindly review')
+            }
+            const newRejectedTack = new rejectedTrack({
+                contentId,
+                reason,
+                performedBy : req.user.id
+            })
+            await newRejectedTack.save()
         }
         updateTrack = track.findByIdAndUpdate(contentId, {uploadStatus : actionTaken}).exec()
         const activityLog = new adminActivityLog({
             activityDate : Date.now(),
             action_taken : `${actionTaken} trackTitle : ${trackDetails.trackTitle}, which was uploaded by ${trackDetails.user.email}`,
-            performedBy : req.user.name
+            performedBy : req.user.id
         })
         await activityLog.save()
         res.status(201).send(`Post has been ${actionTaken} successfully`)
     } catch (error) {
-        throw new BadRequestError(error.message)
-        
+        throw new BadRequestError(error.message) 
     }
 }
 
@@ -47,12 +56,22 @@ const searchContent = async(req,res,next)=>{
 
 const contentUpdate = async(req,res,next)=>{
     try {
+        console.log(req.body)
         const {_id} = req.body
         if(!mongoose.Types.ObjectId.isValid(_id)){
             throw new BadRequestError("Track not available")
         }
         const trackDetails = await track.findByIdAndUpdate(_id,{...req.body},{new : true}).exec()
-        res.send({message : "TrackDetails uploaded successfully", trackDetails},)
+        if(!trackDetails){
+            throw new BadRequestError("Track could not be updated, contact dev team")
+        }
+        const activityLog = new adminActivityLog({
+            activityDate : Date.now(),
+            action_taken : `Updated trackTitle : ${trackDetails.trackTitle}, `,
+            performedBy : req.user.id
+        })
+        await activityLog.save()
+        res.send({message : "TrackDetails uploaded successfully", trackDetails})
     } catch (error) {
         console.log(error)
         throw new BadRequestError(error.message)

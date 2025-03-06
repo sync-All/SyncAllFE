@@ -48,15 +48,16 @@ const trackUpload = async(req,res,next)=>{
 const invalidSpotifyResolution = async(req,res,next)=>{
   try {
     const {_id, trackLink, err_type} = req.body
-    if(!_id || !trackLink || err_type){
+    if(!_id || !trackLink || !err_type){
       throw new BadRequestError('Bad request, missing parameter')
     }
     const trackDetails = await trackError.findById(_id).exec()
-    if(trackDetails.err_type != 'InvalidSpotifyLink'){
+    if(!trackDetails || trackDetails.err_type != 'InvalidSpotifyLink'){
       throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
     }
+    console.log({itemId : _id, userId1 : req.user.id, userId2 : req.user._id})
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
-
+    console.log({uploadHistory})
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
     }
@@ -84,23 +85,32 @@ const invalidSpotifyResolution = async(req,res,next)=>{
     res.send('Track successfully uploaded and error resolved.')
     
   } catch (error) {
+    console.log({error})
     throw new BadRequestError(error.message)
   }
 }
 
 const ignoreBulkResolution = async(req,res,next)=>{
   try {
-    const {bulkErrorId} = req.query
-    const uploadHistory = await uploadErrorHistory.findOne({_id : bulkErrorId}).where('user').equals(req.user._id)
+    const {bulkErrorId, errorType} = req.query
+    const allowedErrorType = ['duplicateTrackByAnother','InvalidSpotifyLink', 'duplicateTrack']
+    if(!allowedErrorType.includes(errorType)){
+      throw new BadRequestError('Invalid error type parameter')
+    }
+    const uploadHistory = await uploadErrorHistory.findOne({_id : bulkErrorId}).populate('associatedErrors').where('user').equals(req.user._id)
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
     }
-    await Promise.all(uploadHistory.associatedErrors.map(async (trackErrorInfo)=>{
-      await trackError.findOneAndDelete({_id : trackErrorInfo})
+    await Promise.all(uploadHistory.associatedErrors.filter((trackErrorInfo)=> trackErrorInfo.err_type === errorType ).map(async (trackErrorInfo)=>{
+      await trackError.findOneAndDelete({_id : trackErrorInfo._id})
+      await uploadErrorHistory.findByIdAndUpdate(bulkErrorId, {$pull : {associatedErrors : trackErrorInfo._id}, status : 'Partially Processed'}).exec()
     }))
-    await uploadErrorHistory.findOneAndDelete({associatedErrors : bulkErrorId}).exec()
-    await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
-    res.send('Errors cleared successfully')
+    const errorHistory = await uploadErrorHistory.findById(bulkErrorId).populate('associatedErrors').exec()
+    if(errorHistory.associatedErrors.length < 1){
+      await uploadErrorHistory.findByIdAndDelete(bulkErrorId).exec()
+      await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+    }
+    res.send({message : 'Errors cleared successfully',errorHistory})
   } catch (error) {
     console.log(error)
     throw new BadRequestError('Bad request, invalid parameters')
@@ -202,6 +212,7 @@ const trackBulkUpload = async(req,res,next)=>{
   let parsedRows = 0
   let failedCount = 0
   let successCount = 0
+  let uploadErrorId = ''
   const seen = new Set();
   const duplicates = new Set();
   const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
@@ -295,7 +306,9 @@ const trackBulkUpload = async(req,res,next)=>{
         }
         res.write(`event: progress\n`);
         res.write(`data: Cleaning up\n\n`);
-        const errorRes = await trackError.insertMany([...invalidSpotifyLink, ...duplicateData])
+        invalidSpotifyLink = await trackError.insertMany(invalidSpotifyLink)
+        duplicateData = await trackError.insertMany(duplicateData)
+        const errorRes = [...invalidSpotifyLink, ...duplicateData]
         const errorIds = errorRes.map((error)=> error._id)
         const uploadHistory = new uploadErrorHistory({
           uploadId : `UI_${uuidv4()}`,
@@ -305,6 +318,7 @@ const trackBulkUpload = async(req,res,next)=>{
           user : req.user._id
         })
         await uploadHistory.save().then(async(res)=>{
+          uploadErrorId = res._id
           await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()
         })
       }
@@ -312,7 +326,7 @@ const trackBulkUpload = async(req,res,next)=>{
       const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
 
       res.write(`event: done\n`);
-      res.write(`data: ${JSON.stringify({failedCount, successCount, duplicateData, invalidSpotifyLink, errorCsv })}\n\n`);
+      res.write(`data: ${JSON.stringify({failedCount, errorData : {uploadErrorId,invalidSpotifyLink, duplicateData}, errorCsv })}\n\n`);
 
       fs.unlinkSync(req.file.path)
       res.end();
@@ -327,6 +341,14 @@ const trackBulkUpload = async(req,res,next)=>{
     }
   });
   
+}
+const getUploadErrorHistory = async(req,res,next)=>{
+  try {
+    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
+    res.send({errorHistory})
+  } catch (error) {
+    throw new BadRequestError('An error occured while  fetching error history')
+  }
 }
 
 const getAllSongs = async(req,res,next)=>{
@@ -380,7 +402,7 @@ const queryTrackInfo =async(req,res,next)=>{
   if(req.user.role == "Sync User"){
     try {
       if(req.user.billing.prod_id == "free"){
-        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate spotifyLink").exec()
+        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate spotifyLink featuredArtist").exec()
         console.log(details)
         return res.json({details})
       }else{
@@ -409,4 +431,4 @@ const freequerySong = async(req,res,next)=>{
   }
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute, getUploadErrorHistory}

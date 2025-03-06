@@ -213,6 +213,9 @@ const syncAdminSchema = new Schema({
         required : true,
         type : String
     },
+    username : {
+        type : String
+    },
     email : {
         required : true,
         type : String
@@ -245,18 +248,24 @@ const notificationSchema = new Schema({
         type : String,
         required : true
     },
-    userType : {
+    userRole : {
         type : String,
-        enum : ['uploader', 'syncuser'],
+        enum : ['Music Uploader', 'Sync User'],
         required : true
     },
     user : {
         type : mongoose.Schema.Types.ObjectId,
         ref : function(){
-            this.userType == 'uploader' ? 'user' : 'syncUser'
+            this.userRole == 'Music Uploader' ? 'user' : 'syncUser'
         }
     }
 },{timestamps : true})
+notificationSchema.add({
+    read : {
+        type: Boolean,
+        required : true
+    }
+})
 
 const adminNotificationSchema = new Schema({
     title : {
@@ -273,6 +282,26 @@ const adminNotificationSchema = new Schema({
     }
 },{timestamps : true})
 
+const suspendedAccountSchema = new Schema({
+    role : {
+        type : String
+    },
+    userId : {
+        type  : mongoose.Types.ObjectId,
+        ref : function(){
+            this.role == 'uploader' ? 'user' : 'syncUser'
+        }
+    },
+    reason : {
+        type : String,
+        required : true
+    },
+    performedBy : {
+        type  : mongoose.Types.ObjectId,
+        ref : 'admin'
+    }
+},{timestamps :  true})
+
 
 
 const admin = mongoose.model('admin',syncAdminSchema)
@@ -282,6 +311,7 @@ const uploader = mongoose.model('user',userSchema)
 const syncUser = mongoose.model('syncUser',syncUserSchema)
 
 const notification = mongoose.model('notification',notificationSchema)
+const suspendedAccount = mongoose.model('suspendedAccount',suspendedAccountSchema)
 
-module.exports = {uploader, syncUser, admin, notification}
+module.exports = {uploader, syncUser, admin, notification, suspendedAccount}
 
