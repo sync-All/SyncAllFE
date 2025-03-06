@@ -63,7 +63,7 @@ const SortButton: React.FC<SortButtonProps> = ({
   </button>
 );
 
-const ITEMS_PER_PAGE = 30;
+const ITEMS_PER_PAGE = 100;
 
 const ManageContent = () => {
   const { content, loading } = useContent();

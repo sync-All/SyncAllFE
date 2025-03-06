@@ -141,6 +141,7 @@ const ContentReview = () => {
       await axios.get(apiUrl, config);
 
       toast.success(`Post ${action} successfully`);
+      window.location.reload();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
@@ -167,7 +168,9 @@ const ContentReview = () => {
             <button
               className="bg-transparent p-[10px] gap-[8px] rounded-[8px] flex border border-[#F62C2C] text-[#F62C2C] text-[14px] py-2.5 px-4 font-inter"
               type="button"
-              onClick={() => {setIsRejectModalOpen(true)}}
+              onClick={() => {
+                setIsRejectModalOpen(true);
+              }}
             >
               Reject Post
             </button>
@@ -303,9 +306,8 @@ const ContentReview = () => {
             try {
               const res = await axios.post(apiUrl, values, config);
               setFieldValue('updatedValues', res.data.trackDetails);
-              console.log(res.data.trackDetails);
-              console.log(content);
               toast.success('Changes saved successfully');
+              window.location.reload();
             } catch (error: unknown) {
               const axiosError = error as AxiosError<ResponseData>;
               toast.error(
