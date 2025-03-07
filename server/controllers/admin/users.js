@@ -60,6 +60,9 @@ const userSearch = async (req,res,next)=>{
 const suspendUser = async(req,res,next)=>{
   try {
     const {reason, userId} = req.query
+    if(!reason || !userId){
+      throw new BadRequestError("Bad request, invalid parameters")
+    }
     const accountDetails = await suspendedAccount.findOne({userId})
     if(accountDetails){
       throw new BadRequestError("Duplicate action rejected, User account is already suspended")
@@ -90,6 +93,9 @@ const suspendUser = async(req,res,next)=>{
 const activateUser = async(req,res,next)=>{
   try {
     const {userId} = req.query
+    if(!userId){
+      throw new BadRequestError("Bad request, invalid parameters")
+    }
     const accountDetails = await suspendedAccount.findOne({userId})
     if(!accountDetails){
       throw new BadRequestError('Action not allowed!, User account is already active')
