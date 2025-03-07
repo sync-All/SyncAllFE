@@ -73,7 +73,8 @@ const attachNewNotification = async({title, message, userId})=>{
             title,
             message,
             userRole : userInfo.role,
-            user : userInfo.Id
+            user : userInfo.Id,
+            read : false
         })
         await newNotifs.save()
         const doc = await findUserAndUpdate({_id : userId}, {$push : {notifications : newNotifs._id}})
