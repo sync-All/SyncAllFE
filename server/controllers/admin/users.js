@@ -60,6 +60,7 @@ const userSearch = async (req,res,next)=>{
 const suspendUser = async(req,res,next)=>{
   try {
     const {reason, userId} = req.body
+    console.log("request body:",req.body)
     if(!reason || !userId){
       throw new BadRequestError("Bad request, invalid parameters")
     }
