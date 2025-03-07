@@ -2,8 +2,12 @@ const passport = require('passport');
 const { unauthorizedError, ForbiddenError, TokenExpiredError } = require('./CustomError');
 
 const checkAdmin = (req,res,next)=>{
+    console.log("Authorization Header:", req.headers.authorization);
     passport.authenticate('jwt',{session : false},(err,user,info)=>{
-        console.log(user)
+        console.log("User:", user);
+        console.log("Error:", err);
+        console.log("Info:", info);
+
         if(info && info.name == "TokenExpiredError"){
            return next(new TokenExpiredError('Session expired, proceed to login'))
         }
