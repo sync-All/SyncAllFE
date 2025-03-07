@@ -59,7 +59,7 @@ const userSearch = async (req,res,next)=>{
 
 const suspendUser = async(req,res,next)=>{
   try {
-    const {reason, userId} = req.query
+    const {reason, userId} = req.body
     if(!reason || !userId){
       throw new BadRequestError("Bad request, invalid parameters")
     }
@@ -92,7 +92,7 @@ const suspendUser = async(req,res,next)=>{
 
 const activateUser = async(req,res,next)=>{
   try {
-    const {userId} = req.query
+    const {userId} = req.body
     if(!userId){
       throw new BadRequestError("Bad request, invalid parameters")
     }

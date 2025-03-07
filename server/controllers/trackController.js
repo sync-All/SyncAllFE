@@ -347,7 +347,7 @@ const getUploadErrorHistory = async(req,res,next)=>{
     const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
     res.send({errorHistory})
   } catch (error) {
-    throw new BadRequestError('An error occured while  fetching error history')
+    throw new BadRequestError('An error occured while fetching error history')
   }
 }
 
