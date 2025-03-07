@@ -11,6 +11,11 @@ const cron = require('node-cron')
 /**
  * Get port from environment and store in Express.
  */
+if (process.env.NODE_ENV === "production") {
+  console.log = function () {}; // Disable console.log
+  // console.error = function () {}; // Optionally disable errors
+  // console.warn = function () {}; // Optionally disable warnings
+}
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
@@ -31,15 +36,7 @@ server.on('listening', onListening);
 
 
 
-// cron.schedule('*/10 * * * *', () => {
-//   https.get('https://enoverlab.com',async (res) => {
-//     await console.log(`Pinged server with status code: ${res.statusCode}`);
-//     return
-//   }).on('error', async(e) => {
-//     await console.error(`Got error enover: ${e.message}`);
-//     return
-//   });
-// });
+
 
 /**
  * Normalize a port into a number, string, or false.
