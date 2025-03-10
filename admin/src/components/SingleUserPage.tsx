@@ -36,18 +36,27 @@ const SingleUserPage = () => {
     try {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-      const apiUrl = `${urlVar}/activateuser?userId=${userDetails?._id}`;
+      const apiUrl = `${urlVar}/activateuser`;
+
       const config = {
         headers: {
           Authorization: `${token}`,
+          'Content-Type': 'application/json',
         },
       };
 
-      console.log(config.headers.Authorization);
+      const requestData = {
+        userId: userDetails?._id, // Pass the user ID in the request body
+      };
 
-      const response = await axios.put(apiUrl, config);
+      console.log('Request Headers:', config.headers);
+      console.log('Request Data:', requestData);
 
-      setSuccess(response.data || 'Account has been suspended');
+      const response = await axios.put(apiUrl, requestData, config);
+
+      setSuccess(response.data || 'Account has been activated');
+      toast.success('Account has been activated');
+      window.location.reload();
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message: string }>;
       toast.error(
@@ -59,6 +68,7 @@ const SingleUserPage = () => {
       setIsLoading(false);
     }
   };
+
 
   if (loading || isloading) {
     return <LoadingAnimation />;

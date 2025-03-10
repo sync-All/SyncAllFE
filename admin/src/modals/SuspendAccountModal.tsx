@@ -23,47 +23,48 @@ const SuspendAccountModal: React.FC<SuspendAccountModalProps> = ({
 
   console.log(recipient);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!reason.trim()) {
-    setError('Please provide a reason for suspension.');
-    return;
-  }
+    if (!reason.trim()) {
+      setError('Please provide a reason for suspension.');
+      return;
+    }
 
-  setLoading(true);
-  setError(null);
-  setSuccess(null);
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
 
-  try {
-    const token = localStorage.getItem('token');
-    const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/suspenduser`;
-    const payload = { userId: recipient, reason };
+    try {
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/suspenduser`;
+      const payload = { userId: recipient, reason };
 
-    const config = {
-      headers: {
-        Authorization: token || '',
-        'Content-Type': 'application/json',
-      },
-    };
+      const config = {
+        headers: {
+          Authorization: token || '',
+          'Content-Type': 'application/json',
+        },
+      };
 
-    const response = await axios.put(apiUrl, payload, config);
+      const response = await axios.put(apiUrl, payload, config);
 
-    setSuccess(response.data || 'Account has been suspended');
-    setReason('');
-  } catch (error: unknown) {
-    const axiosError = error as AxiosError<{ message: string }>;
-    toast.error(
-      axiosError.response?.data?.message ||
-        axiosError.message ||
-        'An error occurred'
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
+      setSuccess(response.data || 'Account has been suspended');
+      setReason('');
+      toast.success('Account has been suspended');
+      window.location.reload();
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'An error occurred'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal
