@@ -12,21 +12,59 @@ import MusicUploaderInfromation from './MusicUploaderInformation';
 import MusicUploaderTrack from './MusicUploaderTrack';
 import EmailModal from '../modals/EmailModal';
 import SuspendAccountModal from '../modals/SuspendAccountModal';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 const SingleUserPage = () => {
   const { users, loading } = useUsers();
   const { id } = useParams();
- const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
+
+  const [isloading, setIsLoading] = useState(false);
+
+  const [success, setSuccess] = useState<string | null>(null);
   const getContentById = (id: string): User | undefined => {
     return users.find((item) => item._id === id);
   };
 
   const userDetails = getContentById(id || '');
 
-  if (loading) {
+  const handleActivateAccount = async () => {
+    setIsLoading(true);
+    setSuccess(null);
+    try {
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/activateuser?userId=${userDetails?._id}`;
+      const config = {
+        headers: {
+          Authorization: `${token}`,
+        },
+      };
+
+      console.log(config.headers.Authorization);
+
+      const response = await axios.put(apiUrl, config);
+
+      setSuccess(response.data || 'Account has been suspended');
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'An error occurred'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (loading || isloading) {
     return <LoadingAnimation />;
   }
+
+  console.log(success);
 
   const SyncUserSingleUser = () => {
     const [activeSection, setActiveSection] = useState('Account Overview');
@@ -86,8 +124,6 @@ const SingleUserPage = () => {
 
   const MusicUploaderSingleUser = () => {
     const [activeSection, setActiveSection] = useState('User Information');
-     
-
 
     const liClass =
       'text-[#81909D] font-formular-regular text-[14px] font-normal font-medium leading-[16px] tracking-[0.028px] py-4 cursor-pointer transition-all ease-in-out duration-300';
@@ -161,13 +197,23 @@ const SingleUserPage = () => {
           >
             Send Email
           </button>
-          <button
-            className="bg-[#F62C2C] text-white p-[10px] gap-[8px] rounded-[8px] flex"
-            type="button"
-            onClick={() => setIsSuspendModalOpen(true)}
-          >
-            Suspend Account
-          </button>
+          {userDetails?.accountStatus === 'Inactive' ? (
+            <button
+              className="bg-[#037847] text-white p-[10px] gap-[8px] rounded-[8px] flex"
+              type="button"
+              onClick={() => handleActivateAccount()}
+            >
+              Acivate Account{' '}
+            </button>
+          ) : (
+            <button
+              className="bg-[#F62C2C] text-white p-[10px] gap-[8px] rounded-[8px] flex"
+              type="button"
+              onClick={() => setIsSuspendModalOpen(true)}
+            >
+              Suspend Account
+            </button>
+          )}
         </div>
       </div>
       {userDetails?.role === 'Music Uploader' ? (
@@ -187,7 +233,7 @@ const SingleUserPage = () => {
         <SuspendAccountModal
           isOpen={isSuspendModalOpen}
           onClose={() => setIsSuspendModalOpen(false)}
-          recipient={userDetails?.email || ''}
+          recipient={userDetails?._id || ''}
         />
       )}
     </div>

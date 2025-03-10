@@ -1,18 +1,42 @@
 import React from 'react';
 import Modal from 'react-modal';
 import Warning from '../../../../assets/images/warning.svg';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 interface DuplicateByYouResolveBulkErrorProps {
   isOpen: boolean;
   onClose: () => void;
   errorCount: number;
+  uploadId: string;
 }
 
 
 
 const DuplicateByYouResolveBulkError: React.FC<
   DuplicateByYouResolveBulkErrorProps
-> = ({ isOpen, onClose, errorCount }) => {
+> = ({ isOpen, onClose, errorCount, uploadId }) => {
+  const handleBulkResolution = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      // Endpoint sample: api/v1/ignore_single_resolution?errorId=...
+      const apiUrl = `${urlVar}/ignore_bulk_resolution?bulkErrorId=${uploadId}&errorType=duplicateTrack`;
+      await axios.delete(apiUrl, { headers: { Authorization: token || '' } });
+      toast.success('Error ignored successfully');
+      onClose();
+      window.location.reload()
+      // Optionally refresh or update the list here.
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'An error occurred'
+      );
+    }
+  };
+  
   Modal.setAppElement('#root');
   return (
     <Modal
@@ -42,14 +66,14 @@ const DuplicateByYouResolveBulkError: React.FC<
           </p>
           <div className="flex space-x-4 mt-[56px]">
             <button
-              onClick={onClose}
+              onClick={() => handleBulkResolution()}
               className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]"
             >
               Ignore All
             </button>
-            <button className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] ">
+            {/* <button className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] ">
               Replace All
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

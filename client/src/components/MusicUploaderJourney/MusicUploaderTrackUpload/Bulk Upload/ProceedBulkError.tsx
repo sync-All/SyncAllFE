@@ -4,11 +4,13 @@ import Warning from '../../../../assets/images/warning.svg';
 import { useNavigate } from 'react-router-dom';
 import { useUpload } from '../../../../Context/UploadContext';
 
+
 interface ProceedBulkErrorProps {
   isOpen: boolean;
   onClose: () => void;
   errorCount?: number;
   source: 'upload' | 'resolve';
+  uploadId?: string;
 }
 
 const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
@@ -31,6 +33,8 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
   const handleErrorClick = () => {
     navigate('/dashboard/tracks', { state: { activeTab: 'Error' } });
   };
+
+
 
   return (
     <Modal
@@ -90,8 +94,8 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
               </p>
               <div className="flex space-x-4 mt-[56px]">
                 <button
-                  onClick={onClose}
                   className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]"
+                  
                 >
                   Resolve Errors
                 </button>

@@ -239,7 +239,9 @@ const TrackMetadata = () => {
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Duration</p>
-                  <p className="text-[#475367]">{trackDetails?.duration}</p>
+                  <p className="text-[#475367]">
+                    {trackDetails?.duration || 'N/A'}
+                  </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Tag</p>
@@ -247,17 +249,8 @@ const TrackMetadata = () => {
                     className={`text-[#475367] ${
                       trackDetails?.tag === undefined ? 'cursor-pointer' : ''
                     }`}
-                    onClick={
-                      trackDetails?.tag === undefined
-                        ? handleUpgradeClick
-                        : undefined
-                    }
                   >
-                    {trackDetails?.tag === undefined
-                      ? 'Upgrade to see this info'
-                      : trackDetails.tag.length === 0
-                      ? 'N/A'
-                      : trackDetails.tag.join(', ')}
+                    {trackDetails?.tag || 'N/A'}
                   </p>
                 </span>
               </div>
@@ -277,24 +270,19 @@ const TrackMetadata = () => {
                   </p>
                 </span>
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Release Label</p>
+                  <p>Release Title</p>
                   <p
                     className={`text-[#475367] ${
-                      trackDetails?.releaseLabel === undefined
+                      trackDetails?.releaseTitle === undefined
                         ? 'cursor-pointer'
                         : ''
                     }`}
-                    onClick={
-                      trackDetails?.releaseLabel === undefined
-                        ? handleUpgradeClick
-                        : undefined
-                    }
                   >
-                    {trackDetails?.releaseLabel || 'Upgrade to see this info'}
+                    {trackDetails?.releaseTitle === '' || 'N/A'}
                   </p>
                 </span>
               </div>
-              <div className="flex  flex-col justify-between gap-8 lg:gap-6">
+              <div className="flex  flex-col  gap-8 lg:gap-6">
                 <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
                   <p>Produced by</p>
                   <p
@@ -303,11 +291,6 @@ const TrackMetadata = () => {
                         ? 'cursor-pointer'
                         : ''
                     }`}
-                    onClick={
-                      trackDetails?.producers === undefined
-                        ? handleUpgradeClick
-                        : undefined
-                    }
                   >
                     {trackDetails?.producers.join(', ') || 'N/A'}
                   </p>
@@ -321,39 +304,8 @@ const TrackMetadata = () => {
                         ? 'cursor-pointer'
                         : ''
                     }`}
-                    onClick={
-                      trackDetails?.featuredArtist === undefined
-                        ? handleUpgradeClick
-                        : undefined
-                    }
                   >
-                    {trackDetails?.featuredArtist === undefined
-                      ? 'Upgrade to see this info'
-                      : trackDetails.featuredArtist.length === 0
-                      ? 'N/A'
-                      : trackDetails.featuredArtist.join(', ')}
-                  </p>
-                </span>
-
-                <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
-                  <p>Release Title</p>
-                  <p
-                    className={`text-[#475367] ${
-                      trackDetails?.releaseTitle === undefined
-                        ? 'cursor-pointer'
-                        : ''
-                    }`}
-                    onClick={
-                      trackDetails?.releaseTitle === undefined
-                        ? handleUpgradeClick
-                        : undefined
-                    }
-                  >
-                    {trackDetails?.releaseTitle === undefined
-                      ? 'Upgrade to see this info'
-                      : trackDetails.releaseTitle.trim() === ''
-                      ? 'N/A'
-                      : trackDetails.releaseTitle}
+                    {trackDetails?.producers.join(', ') || 'N/A'}
                   </p>
                 </span>
               </div>
@@ -490,6 +442,24 @@ const TrackMetadata = () => {
                           : trackDetails.releaseType.trim() === ''
                           ? 'N/A'
                           : trackDetails.releaseType}
+                      </p>
+                    </span>
+                    <span className="text-left font-inter text-[14px] font-medium leading-6 text-[#98A2B3]">
+                      <p>Release Label</p>
+                      <p
+                        className={`text-[#475367] ${
+                          trackDetails?.releaseLabel === undefined
+                            ? 'cursor-pointer'
+                            : ''
+                        }`}
+                        onClick={
+                          trackDetails?.releaseLabel === undefined
+                            ? handleUpgradeClick
+                            : undefined
+                        }
+                      >
+                        {trackDetails?.releaseLabel ||
+                          'Upgrade to see this info'}
                       </p>
                     </span>
                   </div>
