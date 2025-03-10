@@ -63,6 +63,8 @@ export interface Track {
   associatedErrors: Track[];
   status: string;
   spotifyLink: string;
+  subGenre: string;
+  trackOwner: string;
 }
 
 interface Earnings {

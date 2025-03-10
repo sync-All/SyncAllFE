@@ -16,6 +16,7 @@ interface UploadProgressProps {
   status: string;
   currentRow?: number;
   totalRows?: number;
+
 }
 
 const UploadProgress: React.FC<UploadProgressProps> = ({
@@ -203,17 +204,19 @@ const BulkUpload = () => {
                   setUploadStats({
                     fileName: uploadedFile.name,
                     fileSize: formatFileSize(uploadedFile.size),
-                    totalTracks: data.failedCount + data.successCount,
+                    totalTracks:
+                      data?.failedCount ?? 0 + data?.successCount ?? 0,
                     failedUploads: data.failedCount,
-                    successfulUploads: data.successCount,
+                    bulkError_id: data.uploadErrorId,
+                    successfulUploads: data.successCount ?? 0,
                     errors: {
-                      duplicates: data.duplicateData || [],
-                      invalidSpotifyLink: data.invalidSpotifyLink || [],
+                      duplicates: data.errorData.duplicateData || [],
+                      duplicateTrackByAnother:
+                        data.errorData.duplicateTrackByAnother || [],
+                      invalidSpotifyLink:
+                        data.errorData.invalidSpotifyLink || [],
                     },
-                    
                   });
-
-                
                 }
               } catch (parseError) {
                 console.error('Error processing event:', event);
@@ -233,7 +236,6 @@ const BulkUpload = () => {
     },
     []
   );
-
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -291,7 +293,6 @@ const BulkUpload = () => {
                   Download CSV Template
                   <img src={Download} alt="" />
                 </a>
-                
               </div>
             </div>
 
@@ -372,6 +373,7 @@ const BulkUpload = () => {
         isOpen={showConfirmProceedModal}
         onClose={() => setShowConfirmProceedModal(false)}
         source="upload"
+        
       />
     </div>
   );

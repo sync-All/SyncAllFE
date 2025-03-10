@@ -11,6 +11,8 @@ import Right from '../../assets/images/right-arrow.svg';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SpotifyHelper from '../../utils/spotifyhelper';
 import getStatusColors from '../../utils/getStatusColors';
+import LoadingAnimation from '../../constants/loading-animation';
+import { useUploadHistory } from '../../Context/UploadHistoryContext';
 //
 // Types
 interface SortConfig {
@@ -254,26 +256,30 @@ const ErrorTracksTable: React.FC<TableProps> = ({
 
   const navigate = useNavigate();
 
-  const handleViewError = (associatedErrors: Track[]) => {
-    // Group the errors into the expected structure
-    const formattedErrors = {
-      duplicates: associatedErrors.filter(
-        (error) => error.err_type === 'duplicateTrack'
-      ),
-      invalidSpotifyLink: associatedErrors.filter(
-        (error) => error.err_type === 'InvalidSpotifyLink'
-      ),
-    };
+  const handleViewError = (trackId: string) => {
+    // Find the track by its ID (in case you need to display more info or errors based on the track)
+    // const selectedTrack = tracks.find((track) => track._id === trackId);
+
+    // // Now you can group the errors or pass them to the next page
+    // const formattedErrors = {
+    //   duplicates: selectedTrack?.associatedErrors.filter(
+    //     (error) => error.err_type === 'duplicateTrack'
+    //   ),
+    //   invalidSpotifyLink: selectedTrack?.associatedErrors.filter(
+    //     (error) => error.err_type === 'InvalidSpotifyLink'
+    //   ),
+    // };
 
     navigate('/dashboard/bulk-upload/resolve-errors', {
       state: {
         errorData: {
-          duplicates: formattedErrors.duplicates,
-          invalidSpotifyLink: formattedErrors.invalidSpotifyLink,
+          bulkError_id: trackId, // Pass the main track _id
         },
       },
     });
   };
+
+  console.log(tracks);
 
   return (
     <>
@@ -341,7 +347,7 @@ const ErrorTracksTable: React.FC<TableProps> = ({
               </td>
               <td className="py-4 px-8">
                 <button
-                  onClick={() => handleViewError(track.associatedErrors)}
+                  onClick={() => handleViewError(track._id)}
                   className="text-[#1671D9] hover:text-blue-800 font-inter"
                 >
                   View
@@ -414,8 +420,6 @@ const ErrorTracksTable: React.FC<TableProps> = ({
 const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
   const ThStyles =
     'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
-
- 
 
   return (
     <table className="w-full mt-5">
@@ -509,6 +513,8 @@ const TrackTable: React.FC<TableProps> = ({ tracks, sortConfig, onSort }) => {
 const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
   onTabChange,
 }) => {
+  const { errorTracks, loading } = useUploadHistory();
+
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
     direction: 'ascending',
@@ -516,9 +522,6 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
 
   const { dashboardData } = useDataContext();
   const allTracks = dashboardData?.dashboardDetails.totalTracks || [];
-  const errorTracks = dashboardData?.profileInfo.uploadErrors || [];
-  console.table(`errorTracks : ${JSON.stringify(errorTracks)}`);
-
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'All' | 'Error'>(
     location.state?.activeTab || 'All'
@@ -533,6 +536,10 @@ const MusicUploaderTracks: React.FC<MusicUploaderTracksProps> = ({
           : 'ascending',
     }));
   };
+
+  if (loading) {
+    <LoadingAnimation />;
+  }
 
   const renderContent = () => {
     if (activeTab === 'All') {

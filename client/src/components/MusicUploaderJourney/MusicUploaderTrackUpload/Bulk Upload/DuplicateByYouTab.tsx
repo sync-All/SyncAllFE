@@ -1,19 +1,20 @@
+import React, { useMemo, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
 import ArrowDown from '../../../../assets/images/arrowdown.svg';
 import ArrowUp from '../../../../assets/images/up-arrow.svg';
 import usePagination from '../../../../hooks/usePaginate';
 import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
-import React, { useMemo, useState } from 'react';
 import { TrackData } from '../../../../Context/UploadContext';
 
-// SortButton.tsx
+
 interface SortButtonProps {
   sortConfig: { key: string; direction: 'asc' | 'desc' } | null;
   sortKey: string;
   onSort: (key: string) => void;
-  ArrowUp: string; // Import path for up arrow
-  ArrowDown: string; // Import path for down arrow
+  ArrowUp: string;
+  ArrowDown: string;
 }
 
 const SortButton: React.FC<SortButtonProps> = ({
@@ -43,6 +44,9 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
     direction: 'asc' | 'desc';
   } | null>(null);
 
+  
+
+
   const handleSort = (key: string) => {
     setSortConfig((prevConfig) => ({
       key,
@@ -55,28 +59,19 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
 
   const sortedTracks = useMemo(() => {
     if (!sortConfig) return tracks;
-
     return [...tracks].sort((a, b) => {
-      const aValue = a[sortConfig.key as keyof TrackData];
-      const bValue = b[sortConfig.key as keyof TrackData];
-
+      const aValue = a[sortConfig.key as keyof TrackData] ?? '';
+      const bValue = b[sortConfig.key as keyof TrackData] ?? '';
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortConfig.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
-
       return 0;
     });
   }, [tracks, sortConfig]);
 
-  const active =
-    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-       const ThStyles =
-         'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
-
   const itemsPerPage = 30;
-
   const {
     currentPage,
     totalPages,
@@ -86,10 +81,15 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
     goToPage,
     getPaginationRange,
   } = usePagination(sortedTracks, itemsPerPage);
-
   const totaltracks = sortedTracks.length;
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+  const active =
+    'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6';
+
+ 
 
   return (
     <>
@@ -124,8 +124,8 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
               </tr>
             </thead>
             <tbody>
-              {paginatedItems.map((track, index) => (
-                <tr key={index} className="border-b border-[#EAECF0]">
+              {paginatedItems.map((track) => (
+                <tr key={track._id} className="border-b border-[#EAECF0]">
                   <td className="text-[#101828] font-inter font-medium text-[14px] leading-5 py-3 px-6">
                     {track.trackTitle}
                   </td>
@@ -139,7 +139,10 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
                     Replace or Ignore
                   </td>
                   <td className="py-4 px-4">
-                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded">
+                    <button
+                      className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded"
+                      
+                    >
                       Resolve
                     </button>
                   </td>
@@ -147,7 +150,6 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
               ))}
             </tbody>
           </table>
-
           <div className="flex items-center justify-between mx-[25%] gap-3 mt-5">
             <div className="flex gap-3 items-center">
               <p>
@@ -207,6 +209,8 @@ const DuplicateByYouTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
           </p>
         </div>
       )}
+
+     
     </>
   );
 };
