@@ -347,7 +347,13 @@ const trackBulkUpload = async(req,res,next)=>{
 
 const getUploadErrorHistory = async(req,res,next)=>{
   try {
-    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors').exec()
+    const {bulkErrorId} = req.query
+    let errorHistory
+    if(bulkErrorId){
+      errorHistory = await uploadErrorHistory.findById(bulkErrorId).populate('associatedErrors').exec()
+    }else{
+      errorHistory = await uploadErrorHistory.find({user : req.user.id}).exec()
+    }
     res.send({errorHistory})
   } catch (error) {
     throw new BadRequestError('An error occured while fetching error history')
