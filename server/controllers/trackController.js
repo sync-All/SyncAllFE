@@ -116,6 +116,7 @@ const ignoreBulkResolution = async(req,res,next)=>{
     throw new BadRequestError('Bad request, invalid parameters')
   }
 }
+
 const ignoreSingleResolution = async(req,res,next)=>{
   try {
     const {errorId} = req.query
@@ -135,6 +136,7 @@ const ignoreSingleResolution = async(req,res,next)=>{
     throw new BadRequestError('Bad request, invalid parameters')
   }
 }
+
 const bulkUploadFileDispute = async(req,res,next)=>{
   try {
     const {errorId, disputeType} = req.query
@@ -273,7 +275,7 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`event: warning duplicate data\n`);
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
-          if(confirmTrackUploaded.user._id == req.user_id){
+          if(confirmTrackUploaded.user._id.equals(req.user._id)){
             duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
           }else{
             duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
@@ -342,9 +344,10 @@ const trackBulkUpload = async(req,res,next)=>{
   });
   
 }
+
 const getUploadErrorHistory = async(req,res,next)=>{
   try {
-    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
+    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors').exec()
     res.send({errorHistory})
   } catch (error) {
     throw new BadRequestError('An error occured while fetching error history')
