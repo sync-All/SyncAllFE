@@ -298,7 +298,7 @@ const ContentReview = () => {
               Object.values(errors).forEach((error) => {
                 if (typeof error === 'string') {
                   toast.error(error);
-                }
+                } 
               });
               return;
             }

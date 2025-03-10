@@ -1,23 +1,20 @@
 // InvalidSpotifyTab.tsx
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ArrowDown from '../../../../assets/images/arrowdown.svg';
 import ArrowUp from '../../../../assets/images/up-arrow.svg';
 import usePagination from '../../../../hooks/usePaginate';
 import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
-import React, { useMemo, useState } from 'react';
 import { TrackData } from '../../../../Context/UploadContext';
-// import Download from '../../../../assets/images/download.svg';
-// import Upload from '../../../../assets/images/Upload.svg';
 
-
-// SortButton.tsx
 interface SortButtonProps {
   sortConfig: { key: string; direction: 'asc' | 'desc' } | null;
   sortKey: string;
   onSort: (key: string) => void;
-  ArrowUp: string; // Import path for up arrow
-  ArrowDown: string; // Import path for down arrow
+  ArrowUp: string;
+  ArrowDown: string;
 }
 
 const SortButton: React.FC<SortButtonProps> = ({
@@ -41,21 +38,29 @@ const SortButton: React.FC<SortButtonProps> = ({
   </button>
 );
 
-const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
-
-
-
-
-
+const InvalidSpotifyTab: React.FC<{ tracks: TrackData[]}> = ({ tracks }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
   } | null>(null);
 
+  // Initialize the navigate hook from React Router
+  const navigate = useNavigate();
+
+
+
+  const handleUpdateLink = (track: TrackData) => {
+    const trackWithErrorId = { ...track };
+    navigate('/dashboard/upload', {
+      state: { spotifyErrorTrack: trackWithErrorId },
+    });
+  };
+
+
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-    const ThStyles =
-      'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
   const handleSort = (key: string) => {
     setSortConfig((prevConfig) => ({
@@ -69,23 +74,19 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
 
   const sortedTracks = useMemo(() => {
     if (!sortConfig) return tracks;
-
     return [...tracks].sort((a, b) => {
       const aValue = a[sortConfig.key as keyof TrackData];
       const bValue = b[sortConfig.key as keyof TrackData];
-
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortConfig.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
-
       return 0;
     });
   }, [tracks, sortConfig]);
 
   const itemsPerPage = 30;
-
   const {
     currentPage,
     totalPages,
@@ -100,11 +101,8 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
 
-  console.log(tracks);
-
   return (
     <>
-      {' '}
       {paginatedItems.length > 0 ? (
         <div>
           <table className="w-full mt-5">
@@ -150,9 +148,11 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-3 px-6">
                     Correct Link
                   </td>
-
                   <td className="py-4 px-4">
-                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded">
+                    <button
+                      className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded"
+                      onClick={() => handleUpdateLink(track)}
+                    >
                       Update Link
                     </button>
                   </td>
@@ -160,21 +160,18 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
               ))}
             </tbody>
           </table>
-          <div></div>
-          <div className="flex items-center  justify-between mx-[25%] gap-3 mt-[196px] ">
+          <div className="flex items-center justify-between mx-[25%] gap-3 mt-[196px]">
             <div className="flex gap-3 items-center">
               <p>
                 {startIndex} - {endIndex} of {totaltracks}
               </p>
             </div>
-
             <div className="flex items-center mx-auto gap-3">
               <div className="gap-3 flex">
                 {getPaginationRange().map((page, index) =>
                   typeof page === 'number' ? (
-                    <div>
+                    <div key={index}>
                       <button
-                        key={index}
                         onClick={() => goToPage(page)}
                         className={
                           currentPage === page
@@ -192,7 +189,6 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
               </div>
             </div>
             <div className="flex gap-[40%] items-center">
-              {' '}
               <button
                 onClick={goToPreviousPage}
                 disabled={currentPage === 1}
@@ -224,30 +220,10 @@ const InvalidSpotifyTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
           <p className="font-Utile-medium mt-6 text-[16px] text-[#98A2B3]">
             No duplicate uploads by you found
           </p>
-
-          {/* <div className="text-center mt-6">
-            <div className="flex items-center justify-center space-x-4">
-              <button className="flex items-center text-blue-600 hover:underline">
-                <a href=""></a>
-                Download Error Sheet
-                <img src={Download} alt="" />
-              </button>
-
-              <button className="flex items-center text-gray-900 hover:underline">
-                Re-upload Corrected Sheet
-                <img src={Upload} alt="" />
-              </button>
-            </div>
-
-            <p className="text-gray-600 mt-2 text-sm">
-              Download the sheet to correct invalid Spotify links. Once
-              corrected, upload it here.
-            </p>
-          </div> */}
         </div>
       )}
     </>
   );
 };
 
-export default InvalidSpotifyTab
+export default InvalidSpotifyTab;

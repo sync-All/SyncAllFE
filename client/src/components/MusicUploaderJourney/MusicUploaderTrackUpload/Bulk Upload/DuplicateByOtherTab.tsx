@@ -7,6 +7,7 @@ import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
 import React, { useMemo, useState } from 'react';
 import { TrackData } from '../../../../Context/UploadContext';
+import DuplicateByOtherSingleError from './DuplicateByOthersResolveSingleError';
 
 // SortButton.tsx
 interface SortButtonProps {
@@ -39,6 +40,11 @@ const SortButton: React.FC<SortButtonProps> = ({
 );
 
 const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
+
+const [isOpen, setIsOpen] = useState(false);
+const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+
+
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
@@ -73,8 +79,8 @@ const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
-      const ThStyles =
-        'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
+  const ThStyles =
+    'text-[#667085] font-formular-medium text-[12px] leading-5 text-start pl-8 bg-grey-100 py-3 px-6 ';
 
   const itemsPerPage = 30;
 
@@ -91,6 +97,7 @@ const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
   const totaltracks = sortedTracks.length;
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totaltracks);
+
 
   return (
     <>
@@ -141,7 +148,14 @@ const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
                   </td>
 
                   <td className="py-4 px-4">
-                    <button className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded">
+                    <button
+                      onClick={() => {
+                        setSelectedTrackId(track._id);
+                        setIsOpen(true);
+                      }}
+                     
+                      className="text-white bg-black2 font-Utile-bold text-[14px] leading-[10px] py-[9px] px-[7px] rounded"
+                    >
                       Resolve
                     </button>
                   </td>
@@ -214,6 +228,11 @@ const DuplicateByOtherTab: React.FC<{ tracks: TrackData[] }> = ({ tracks }) => {
           </p>
         </div>
       )}
+      <DuplicateByOtherSingleError
+        trackId={selectedTrackId}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
     </>
   );
 };

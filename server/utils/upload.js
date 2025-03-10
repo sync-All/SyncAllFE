@@ -16,10 +16,11 @@ function fileFilter (req, file, cb) {
   }
 }
 
+
 const disputeFileFilter = (req, file, cb) => {
-    if(!file){
-      return
-    }
+  if(!file){
+    return
+  }
   const originalName = file.originalname
     const fileMime = originalName.endsWith('.pdf') ? 'application/pdf' : originalName.endsWith('.png') ? 'image/png' : ''
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];

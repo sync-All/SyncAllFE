@@ -4,27 +4,23 @@ import Warning from '../../../../assets/images/warning.svg';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
-interface DuplicateByOthersResolveBulkErrorProps {
+interface DuplicateByYouResolveBulkErrorProps {
   isOpen: boolean;
   onClose: () => void;
-  errorCount: number;
-  uploadId: string;
+  trackId: string | null;
 }
 
-const DuplicateByOthersResolveBulkError: React.FC<
-  DuplicateByOthersResolveBulkErrorProps
-> = ({ isOpen, onClose, errorCount, uploadId }) => {
-  const handleBulkResolution = async () => {
+const DuplicateByOtherSingleError: React.FC<
+  DuplicateByYouResolveBulkErrorProps
+> = ({ isOpen, onClose, trackId }) => {
+  const handleIgnoreResolution = async () => {
     try {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
-    
-      const apiUrl = `${urlVar}/ignore_bulk_resolution?bulkErrorId=${uploadId}&errorType=duplicateTrackByAnother`;
+      const apiUrl = `${urlVar}/ignore_single_resolution?errorId=${trackId}`;
       await axios.delete(apiUrl, { headers: { Authorization: token || '' } });
       toast.success('Error ignored successfully');
-      
-      onClose();
-      window.location.reload()
+      window.location.reload();
       // Optionally refresh or update the list here.
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ message: string }>;
@@ -36,13 +32,12 @@ const DuplicateByOthersResolveBulkError: React.FC<
     }
   };
 
-  
-  const fileBulkDisputeResolution = async () => {
+  const fileSingleDisputeResolution = async () => {
     try {
       const token = localStorage.getItem('token');
       const urlVar = import.meta.env.VITE_APP_API_URL;
       // Endpoint sample: api/v1/ignore_single_resolution?errorId=...
-      const apiUrl = `${urlVar}/bulkUploadFileDispute?errorId=${uploadId}&disputeType=bulk`;
+      const apiUrl = `${urlVar}/bulkUploadFileDispute?errorId=${trackId}&disputeType=single`;
       await axios.get(apiUrl, { headers: { Authorization: token || '' } });
       toast.success('Error ignored successfully');
 
@@ -79,29 +74,26 @@ const DuplicateByOthersResolveBulkError: React.FC<
             </p>
           </span>{' '}
           <h2 className="text-[56px] text-[#013131] font-Utile-bold  leading-[56px] tracking-[-2.24px] mt-[28px]">
-            Resolve Duplicate Uploads by another user in bulk
+            Resolve Duplicate Uploads by another user
           </h2>
           <p className="text-[24px] leading-[28px] font-Utile-regular  text-[#013131] tracking-[-0.96px] mt-[23px]">
-            We have identified{' '}
-            <span className="font-semibold">{errorCount}</span> duplicate tracks
-            that are already uploaded by another user. If you believe you own
-            the rights to these track, you can file dispute. Otherwise, you may
-            ignore the tracks and proceed with the other uploads.
+            We have identified this duplicate tracks that was already uploaded
+            by another user. If you believe you own the rights to this track,
+            you can file dispute. Otherwise, you may ignore the track and
+            proceed with the other uploads.
           </p>
           <div className="flex space-x-4 mt-[56px]">
             <button
-              onClick={() => {
-                handleBulkResolution();
-              }}
+              onClick={() => handleIgnoreResolution()}
               className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]"
             >
-              Ignore All Tracks
+              Ignore Track
             </button>
             <button
               className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] "
-              onClick={() => fileBulkDisputeResolution()}
+              onClick={() => fileSingleDisputeResolution()}
             >
-              File Dispute for All
+              File Dispute
             </button>
           </div>
         </div>
@@ -110,4 +102,4 @@ const DuplicateByOthersResolveBulkError: React.FC<
   );
 };
 
-export default DuplicateByOthersResolveBulkError;
+export default DuplicateByOtherSingleError;

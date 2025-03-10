@@ -347,7 +347,7 @@ const getUploadErrorHistory = async(req,res,next)=>{
     const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
     res.send({errorHistory})
   } catch (error) {
-    throw new BadRequestError('An error occured while  fetching error history')
+    throw new BadRequestError('An error occured while fetching error history')
   }
 }
 
@@ -402,7 +402,7 @@ const queryTrackInfo =async(req,res,next)=>{
   if(req.user.role == "Sync User"){
     try {
       if(req.user.billing.prod_id == "free"){
-        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate spotifyLink featuredArtist").exec()
+        const details = await Track.findOne({_id : trackId}, "genre mood producers trackTitle artWork trackLink mainArtist duration releaseDate spotifyLink featuredArtist releaseTitle tag").exec()
         console.log(details)
         return res.json({details})
       }else{

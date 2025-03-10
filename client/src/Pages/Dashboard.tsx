@@ -17,6 +17,8 @@ import MusicUploaderDispute from '../components/MusicUploaderJourney/Dispute/Mus
 import BulkUpload from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/BulkUpload';
 import { UploadProvider } from '../Context/UploadContext';
 import ResolveErrorWrapper from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
+// import DashboardDataProvider from '../Context/DashboardDataProvider';
+import UploadHistoryProvider from '../Context/UploadHistoryContext';
 
 const DashboardLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,7 +62,7 @@ const DashboardLayout = () => {
   return (
     <div className="flex">
       <div
-        className={`fixed inset-0 z-50 bg-white lg:bg-transparent lg:w-1/6 lg:h-screen lg:fixed lg:top-0 lg:left-0 ${
+        className={`fixed inset-0 bg-white lg:bg-transparent lg:w-1/6 lg:h-screen lg:fixed lg:top-0 lg:left-0 ${
           isMenuOpen ? 'block' : 'hidden'
         } lg:block`}
       >
@@ -85,14 +87,20 @@ const DashboardLayout = () => {
           <Route
             path="/bulk-upload/resolve-errors"
             element={
-              <UploadProvider>
-                <ResolveErrorWrapper />
-              </UploadProvider>
+              <UploadHistoryProvider>
+                <UploadProvider>
+                  <ResolveErrorWrapper />
+                </UploadProvider>
+              </UploadHistoryProvider>
             }
           />
           <Route
             path="tracks"
-            element={<MusicUploaderTracks onTabChange={handleTabChange} />}
+            element={
+              <UploadHistoryProvider>
+                <MusicUploaderTracks onTabChange={handleTabChange} />
+              </UploadHistoryProvider>
+            }
           />
           <Route path="earnings" element={<MusicUploaderEarnings />} />
           <Route path="profile" element={<ProfileMultiStep />} />

@@ -10,91 +10,90 @@ import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import { FlutterwaveConfig } from 'flutterwave-react-v3/dist/types';
 import clsx from 'clsx';
 
-const Pricing = () => {
+
+const PricingLoggedIn = () => {
   const { user } = useSyncUser();
-  const paymentInfo = user?.user?.billing
-  const [userPlan, setUserPlan] = useState('')
-  useEffect(()=>{
-    switch(paymentInfo?.prod_id){
-      case "68768":
-        setUserPlan("Premium")
+  const paymentInfo = user?.user?.billing;
+  const [userPlan, setUserPlan] = useState('');
+  useEffect(() => {
+    switch (paymentInfo?.prod_id) {
+      case '68768':
+        setUserPlan('Premium');
         break;
-      case "68767":
-        setUserPlan('Standard')
+      case '68767':
+        setUserPlan('Standard');
         break;
       default:
-        setUserPlan('Basic')
-
+        setUserPlan('Basic');
     }
-  },[user,paymentInfo])
+  }, [user, paymentInfo]);
   const configProps: FlutterwaveConfig = {
     public_key: '',
+    tx_ref: `tx_ref_${Date.now()}`,
+    amount: 0,
+    currency: 'USD',
+    payment_options: 'card',
+    payment_plan: '',
+    redirect_url: 'https://www.syncallmusic.com/payment/status/',
+    customer: {
+      email: `${user?.user.email}`,
+      phone_number: 'N/A',
+      name: `${user?.user.name}`,
+    },
+    meta: { counsumer_id: '7898', consumer_mac: 'kjs9s8ss7dd' },
+    customizations: {
+      title: `Syncall Payment Portal`,
+      description: `Payment for the  plan`,
+      logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+    },
+  };
+  const [configTools, setConfigTools] = useState(configProps);
+
+  const handleSelectPlan = (
+    plan: string,
+    planName: string,
+    planAmount: number
+  ) => {
+    setConfigTools({
+      public_key: import.meta.env.VITE_FL_TPK,
       tx_ref: `tx_ref_${Date.now()}`,
-      amount: 0,
+      amount: planAmount,
       currency: 'USD',
-      payment_options : "card",
-      payment_plan: '',
-      redirect_url: "https://www.syncallmusic.com/payment/status/",
+      payment_options: 'card',
+      payment_plan: plan,
+      redirect_url: 'https://www.syncallmusic.com/payment/status/',
       customer: {
         email: `${user?.user.email}`,
         phone_number: 'N/A',
         name: `${user?.user.name}`,
       },
-      meta : { counsumer_id: "7898", consumer_mac: "kjs9s8ss7dd" },
+      meta: { counsumer_id: '7898', consumer_mac: 'kjs9s8ss7dd' },
       customizations: {
         title: `Syncall Payment Portal`,
-        description: `Payment for the  plan`,
+        description: `Payment for the ${planName} plan`,
         logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
-    },
-  }
-  const [configTools, setConfigTools] = useState(configProps)
-
-
- const handleSelectPlan = (plan:string, planName:string, planAmount:number)=>{
-      setConfigTools({
-        public_key: import.meta.env.VITE_FL_TPK,
-        tx_ref: `tx_ref_${Date.now()}`,
-        amount: planAmount,
-        currency: 'USD',
-        payment_options : "card",
-        payment_plan : plan,
-        redirect_url: "https://www.syncallmusic.com/payment/status/",
-        customer: {
-          email: `${user?.user.email}`,
-          phone_number: 'N/A',
-          name: `${user?.user.name}`,
-        },
-        meta : { counsumer_id: "7898", consumer_mac: "kjs9s8ss7dd" },
-        customizations: {
-          title: `Syncall Payment Portal`,
-          description: `Payment for the ${planName} plan`,
-          logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
       },
-    })
-    
-  }
+    });
+  };
 
-  const handleFlutterPayment = useFlutterwave(configTools)
+  const handleFlutterPayment = useFlutterwave(configTools);
 
-  useEffect(()=>{
+  useEffect(() => {
     handleFlutterPayment({
       callback: (response) => {
-         console.log(response);
-          closePaymentModal() // this will close the modal programmatically
+        console.log(response);
+        closePaymentModal(); // this will close the modal programmatically
       },
       onClose: () => {},
+    });
+    console.log(1);
+  }, [configTools, handleFlutterPayment]);
 
-    })
-    console.log(1)
-  },[configTools, handleFlutterPayment])
-
-  
-  
   const pricingPlans = [
     {
       name: 'Basic',
       price: 'Free',
-      amount : 0,
+      amount: 0,
       buttonText: 'Get Basic',
       features: [
         'Limited Metadata access',
@@ -108,7 +107,7 @@ const Pricing = () => {
       name: 'Standard',
       dollar: '$',
       price: '20',
-      amount : 20,
+      amount: 20,
       bg: '#ECFDF5',
       btnBg: '#1B2128',
       btntext: '#FBFCFE',
@@ -129,7 +128,7 @@ const Pricing = () => {
       name: 'Premium',
       dollar: '$',
       price: '70',
-      amount : 70,
+      amount: 70,
       smallText: 'per month',
       buttonText: 'Get Premium',
       features: [
@@ -144,7 +143,7 @@ const Pricing = () => {
     {
       name: 'Enterprise',
       bg: '#013131',
-      amount : 0,
+      amount: 0,
       pricebtntext: '#FBFCFE',
       btntext: '#1B2128',
       price: 'Custom',
@@ -514,4 +513,4 @@ const Pricing = () => {
   );
 };
 
-export default Pricing;
+export default PricingLoggedIn;

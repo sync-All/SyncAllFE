@@ -48,8 +48,7 @@ const DisputeDetails = () => {
     ...associatedDispute,
     ...user,
   };
-  console.log(`assciate : ${associatedDispute?._id}`);
-  console.log(`parent : ${parentDispute?.tickId}`);
+ 
 
   const formatDate = (dateString: string | undefined): string => {
     if (!dateString) return 'N/A';
