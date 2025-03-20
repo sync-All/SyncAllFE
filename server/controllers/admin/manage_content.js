@@ -25,10 +25,10 @@ const contentReview = async(req,res,next)=>{
                 performedBy : req.user.id
             })
             await newRejectedTack.save()
-            attachNewNotification({title : `Oops Looks Like Your Song ~${trackDetails.trackTitle}~ Was Rejected`, message : reason, userId : trackDetails.user._id})
+            attachNewNotification({title : `Oops Looks Like Your Song ~${trackDetails.trackTitle}~ Was Rejected`, message : reason, userId : trackDetails.user._id,linkto :'/dashboard/tracks'})
         }
         if(actionTaken === "Approved"){
-            attachNewNotification({title : `Your Track ~${trackDetails.trackTitle}~ has been Approved 🎉`, message : '', userId : trackDetails.user._id})
+            attachNewNotification({title : `Your Track ~${trackDetails.trackTitle}~ has been Approved 🎉`, message : '', userId : trackDetails.user._id, linkto :'/dashboard/tracks'})
         }
         updateTrack = track.findByIdAndUpdate(contentId, {uploadStatus : actionTaken}).exec()
         const activityLog = new adminActivityLog({

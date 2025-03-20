@@ -75,7 +75,7 @@ const createNewSyncUser = async({name,email,hashpassword,role,userType})=>{
     }
 }
 
-const attachNewNotification = async({title, message, userId})=>{
+const attachNewNotification = async({title, message, linkto, userId})=>{
     try {
         const userInfo = await getUserInfo({_id : userId})
         const newNotifs = new notification({
@@ -83,6 +83,7 @@ const attachNewNotification = async({title, message, userId})=>{
             message,
             userRole : userInfo.role,
             user : userInfo.Id,
+            linkto,
             read : false
         })
         await newNotifs.save()
