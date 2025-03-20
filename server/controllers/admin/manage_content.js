@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
 const { track, rejectedTrack } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
+const { attachNewNotification } = require("../userControllers")
 
 const contentReview = async(req,res,next)=>{
     try {
@@ -24,6 +25,10 @@ const contentReview = async(req,res,next)=>{
                 performedBy : req.user.id
             })
             await newRejectedTack.save()
+            attachNewNotification({title : `Oops Looks Like Your Song ~${trackDetails.trackTitle}~ Was Rejected`, message : reason, userId : trackDetails.user._id})
+        }
+        if(actionTaken === "Approved"){
+            attachNewNotification({title : `Your Track ~${trackDetails.trackTitle}~ has been Approved 🎉`, message : '', userId : trackDetails.user._id})
         }
         updateTrack = track.findByIdAndUpdate(contentId, {uploadStatus : actionTaken}).exec()
         const activityLog = new adminActivityLog({
@@ -34,6 +39,7 @@ const contentReview = async(req,res,next)=>{
         await activityLog.save()
         res.status(201).send(`Post has been ${actionTaken} successfully`)
     } catch (error) {
+        console.log(error)
         throw new BadRequestError(error.message) 
     }
 }

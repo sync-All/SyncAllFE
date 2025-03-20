@@ -21,48 +21,57 @@ const findUserAndUpdate = async(searchParams, updateOptions)=>{
 const getUserInfo = async(searchParams,options="")=>{
     // options object includes {populate, select ....}
     try{
-        const userInfo = await Promise.any([ User.findOne(searchParams).populate(options.populate && options.populate).select(options.select && options.select).then(user => user || Promise.reject()), SyncUser.findOne(searchParams).select(options.select && options.select).populate(options.populate && options.populate).then(user => user || Promise.reject())])
+        const userInfo = await Promise.any([ User.findOne(searchParams).populate(options.populate || "").select(options.select || "").then(user => user || Promise.reject()), SyncUser.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject())])
         return userInfo
     }catch(error){
-        console.log(error)
         if (error instanceof AggregateError) {
             // Handle all promises failing
-            throw new BadRequestError("User not found in any collection");
+            return null
         } else {
             throw new BadRequestError(error.message || "Error occurred while fetching user info");
         }
     }
 }
 
-const createNewMusicUploader = async({name,email,password,role,userType})=>{
+const createNewMusicUploader = async({name,email,hashpassword,role,userType})=>{
+    const allowedRoleType = ['Music Uploader']
+    const allowedUserType = ['Individual', 'Company']
+    if(!allowedRoleType.includes(role)) throw new BadRequestError('role type not allowed')
+    if(!allowedUserType.includes(userType)) throw new BadRequestError('User type not allowed')
     try {
         const newUserData = new User({
             name,
             email : email.toLowerCase(),
-            password,
+            password : hashpassword,
             role,
             userType,
         })
         await newUserData.save()
         return newUserData
     } catch (error) {
-        throw new BadRequestError(error.message || 'Error occured while creating music uploader user')
+        console.log(error)
+        throw new BadRequestError(error.message || 'Error occured while creating your account')
     }
 }
 
-const createNewSyncUser = async({name,email,password,role,userType})=>{
+const createNewSyncUser = async({name,email,hashpassword,role,userType})=>{
+    const allowedRoleType = ['Sync User']
+    const allowedUserType = ['Individual', 'Company']
+    if(!allowedRoleType.includes(role)) throw new BadRequestError('role type not allowed')
+    if(!allowedUserType.includes(userType)) throw new BadRequestError('User type not allowed')
     try {
         const newUserData = new SyncUser({
             name,
             email : email.toLowerCase(),
-            password,
+            password : hashpassword,
             role,
             userType,
         })
         await newUserData.save()
         return newUserData
     } catch (error) {
-        throw new BadRequestError(error.message || 'Error occured while creating sync user')
+        console.log(error)
+       throw new BadRequestError(error.message || 'Error occured while creating your account')
     }
 }
 
@@ -78,7 +87,6 @@ const attachNewNotification = async({title, message, userId})=>{
         })
         await newNotifs.save()
         const doc = await findUserAndUpdate({_id : userId}, {$push : {notifications : newNotifs._id}})
-        console.log({newNotifs, doc})
         return
     } catch (error) {
         console.log(error)

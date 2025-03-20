@@ -246,12 +246,15 @@ const notificationSchema = new Schema({
     },
     message : {
         type : String,
-        required : true
     },
     userRole : {
         type : String,
         enum : ['Music Uploader', 'Sync User'],
         required : true
+    },
+    linkto : {
+        type : String,
+        required : false
     },
     user : {
         type : mongoose.Schema.Types.ObjectId,
