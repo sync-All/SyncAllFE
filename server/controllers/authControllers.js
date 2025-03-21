@@ -88,7 +88,7 @@ const signin = async(req,res,next)=> {
     return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
   }else{
     const toBeIssuedJwt = issueJwt.issueJwtLogin(userInfo)
-    const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').populate('notifications').exec()
+    const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
     const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').populate('notifications').exec()
 
