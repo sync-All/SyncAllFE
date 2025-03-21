@@ -18,7 +18,6 @@ import LoadingAnimation from '../../constants/loading-animation';
 
 const MusicUploaderDashboard = () => {
   const { dashboardData, loading } = useDataContext();
-  console.log(dashboardData);
 
   const { toPDF, targetRef } = usePDF({ filename: 'dashboard.pdf' });
 
@@ -40,7 +39,7 @@ const MusicUploaderDashboard = () => {
     { name: '29', uv: 0 },
   ];
 
-  const totalTracksCount = dashboardDetails?.totalTracks.length || 0;
+  const totalTracksCount = dashboardDetails?.totalTracks?.length || 0;
 
   const cardData = [
     {
@@ -59,13 +58,13 @@ const MusicUploaderDashboard = () => {
     {
       image: Earth,
       title: 'Total Tracks Licensed',
-      value: `${dashboardDetails?.totalLicensedTracks.length || 0}`,
+      value: `${dashboardDetails?.totalLicensedTracks?.length || 0}`,
       color: '#064e3b',
     },
     {
       image: Stream,
       title: 'Total Quotes Requested',
-      value: `${dashboardDetails?.totalQuotesRequested.length || 0}`,
+      value: `${dashboardDetails?.totalQuotesRequested?.length || 0}`,
       color: '#064e3b',
     },
   ];

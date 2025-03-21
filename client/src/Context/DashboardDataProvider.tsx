@@ -6,6 +6,8 @@ import React, {
   createContext,
   useCallback,
   useMemo,
+  Dispatch,
+  SetStateAction,
 } from 'react';
 import { toast } from 'react-toastify';
 
@@ -113,7 +115,16 @@ interface ProfileInfo {
   phoneNumber: number;
   representative: string;
   address: string;
+  notifications : notification[]
   uploadErrors: Track[];
+}
+
+export interface notification {
+  _id : string;
+  title :  string;
+  message : string;
+  createdAt : string | Date;
+  read : boolean;
 }
 
 interface transactions {
@@ -136,6 +147,7 @@ interface DataContextType {
   fetchDashboardData: () => void;
   dashboardData: DashboardData | null;
   setToken: (token: string) => void;
+  setRefresh: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
 }
 
@@ -160,6 +172,7 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_token, setToken] = useState(localStorage.getItem('token'));
+  const [refresh, setRefresh] = useState(false);
 
   const fetchDashboardData = useCallback(async () => {
     // const userId = localStorage.getItem('userId');
@@ -197,11 +210,11 @@ const DashboardDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchDashboardData();
-  }, [fetchDashboardData]);
+  }, [fetchDashboardData,refresh]);
 
   const contextValue = useMemo(
-    () => ({ fetchDashboardData, dashboardData, setToken, loading }),
-    [fetchDashboardData, dashboardData, setToken, loading]
+    () => ({ fetchDashboardData, dashboardData, setToken, loading, setRefresh }),
+    [fetchDashboardData, dashboardData, setToken, loading, setRefresh]
   );
 
   return (

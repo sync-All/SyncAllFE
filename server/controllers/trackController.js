@@ -140,8 +140,8 @@ const ignoreSingleResolution = async(req,res,next)=>{
 const bulkUploadFileDispute = async(req,res,next)=>{
   try {
     const {errorId, disputeType} = req.query
-  const allowedDisputeTypes = ['single','bulk']
-  let savedDispute;
+    const allowedDisputeTypes = ['single','bulk']
+    let savedDispute;
   if(!errorId || !allowedDisputeTypes.includes(disputeType)){
     throw new BadRequestError('Missing or invalid Parameters')
   }
