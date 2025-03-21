@@ -1,40 +1,50 @@
 import React from 'react';
 import Modal from 'react-modal';
 import Warning from '../../../../assets/images/warning.svg';
-import { useNavigate } from 'react-router-dom';
-import { useUpload } from '../../../../Context/UploadContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { Track } from '../../../../Context/DashboardDataProvider';
+// import { useUpload } from '../../../../Context/UploadContext';
 
+interface BulkUploadResultProps {
+  fileName: string;
+  fileSize: string;
+  totalTracks: number;
+  failedUploads: number;
+  successfulUploads: number;
+  
+  errors: {bulkError_id: string;
+    duplicates: Track[];
+    duplicateTrackByAnother: Track[];
+    invalidSpotifyLink: Track[];
+  };
+}
 
 interface ProceedBulkErrorProps {
   isOpen: boolean;
   onClose: () => void;
   errorCount?: number;
-  source: 'upload' | 'resolve';
+  bulkUploadResult?: BulkUploadResultProps | null;
   uploadId?: string;
+  source: string;
 }
 
 const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
   isOpen,
   onClose,
   errorCount,
+  bulkUploadResult,
   source,
 }) => {
-  const { uploadStats } = useUpload();
-   const isFromUpload = source === 'upload';
-   const isFromResolve = source === 'resolve';
+  const isFromUpload = source === 'upload';
+  const isFromResolve = source === 'resolve';
 
   const navigate = useNavigate();
 
-  const handleResolveErrors = () => {
-    navigate('/dashboard/bulk-upload/resolve-errors');
-    onClose();
-  };
+
 
   const handleErrorClick = () => {
     navigate('/dashboard/tracks', { state: { activeTab: 'Error' } });
   };
-
-
 
   return (
     <Modal
@@ -62,19 +72,20 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
               <p className="text-[24px] leading-[28px] font-Utile-regular  text-[#013131] tracking-[-0.96px] mt-[23px]">
                 You have{' '}
                 <span className="font-semibold">
-                  {uploadStats?.failedUploads}
+                  {bulkUploadResult?.failedUploads}
                 </span>{' '}
                 unresolved errors in your upload. Proceeding without fixing
                 these errors may result in incomplete or incorrect uploads. Are
                 you sure you want to continue?
               </p>
               <div className="flex space-x-4 mt-[56px]">
-                <button
-                  onClick={handleResolveErrors}
-                  className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]"
+                <Link
+                  to={`/dashboard/bulk-upload/resolve-errors/${bulkUploadResult?.errors.bulkError_id}`}
                 >
-                  Resolve Errors
-                </button>
+                  <button className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]">
+                    Resolve Errors
+                  </button>
+                </Link>
                 <button
                   className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] "
                   onClick={handleErrorClick}
@@ -93,10 +104,7 @@ const ProceedBulkError: React.FC<ProceedBulkErrorProps> = ({
                 you sure you want to continue?
               </p>
               <div className="flex space-x-4 mt-[56px]">
-                <button
-                  className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]"
-                  
-                >
+                <button className="text-[#013131] rounded-[8px] border border-[#013131] py-2.5 px-4 w-[176px]">
                   Resolve Errors
                 </button>
                 <button className="bg-yellow text-[#013131] rounded-[8px] py-2.5 px-4 hover:bg-yellow-600 w-[176px] ">

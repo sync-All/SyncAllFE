@@ -15,7 +15,6 @@ import MusicUploaderEarnings from '../components/MusicUploaderJourney/MusicUploa
 import ProfileMultiStep from '../components/MusicUploaderJourney/MusicUploaderUserProfile/ProfileMultiStep';
 import MusicUploaderDispute from '../components/MusicUploaderJourney/Dispute/MusicUploaderDispute';
 import BulkUpload from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/BulkUpload';
-import { UploadProvider } from '../Context/UploadContext';
 import ResolveErrorWrapper from '../components/MusicUploaderJourney/MusicUploaderTrackUpload/Bulk Upload/ResolveError';
 // import DashboardDataProvider from '../Context/DashboardDataProvider';
 import UploadHistoryProvider from '../Context/UploadHistoryContext';
@@ -76,23 +75,10 @@ const DashboardLayout = () => {
         <Routes>
           <Route index element={<MusicUploaderDashboard />} />
           <Route path="upload" element={<UploadTrackMultiForm />} />{' '}
+          <Route path="bulkupload" element={<BulkUpload />} />
           <Route
-            path="bulkupload"
-            element={
-              <UploadProvider>
-                <BulkUpload />
-              </UploadProvider>
-            }
-          />
-          <Route
-            path="/bulk-upload/resolve-errors"
-            element={
-              <UploadHistoryProvider>
-                <UploadProvider>
-                  <ResolveErrorWrapper />
-                </UploadProvider>
-              </UploadHistoryProvider>
-            }
+            path="/bulk-upload/resolve-errors/:id"
+            element={<ResolveErrorWrapper />}
           />
           <Route
             path="tracks"
