@@ -116,6 +116,7 @@ const ignoreBulkResolution = async(req,res,next)=>{
     throw new BadRequestError('Bad request, invalid parameters')
   }
 }
+
 const ignoreSingleResolution = async(req,res,next)=>{
   try {
     const {errorId} = req.query
@@ -135,6 +136,7 @@ const ignoreSingleResolution = async(req,res,next)=>{
     throw new BadRequestError('Bad request, invalid parameters')
   }
 }
+
 const bulkUploadFileDispute = async(req,res,next)=>{
   try {
     const {errorId, disputeType} = req.query
@@ -273,7 +275,7 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`event: warning duplicate data\n`);
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
-          if(confirmTrackUploaded.user._id == req.user_id){
+          if(confirmTrackUploaded.user._id.equals(req.user._id)){
             duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
           }else{
             duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
@@ -342,14 +344,48 @@ const trackBulkUpload = async(req,res,next)=>{
   });
   
 }
-const getUploadErrorHistory = async(req,res,next)=>{
+
+const getUploadErrorHistory = async (req, res, next) => {
   try {
-    const errorHistory = await uploadErrorHistory.find({user : req.user.id}).populate('associatedErrors')
-    res.send({errorHistory})
+    const { bulkErrorId, page = 1, limit = 10 } = req.query; // Pagination support
+    let errorHistory;
+
+    if (bulkErrorId) {
+      errorHistory = await uploadErrorHistory
+        .findById(bulkErrorId)
+        .populate("associatedErrors")
+        .exec();
+
+      if (!errorHistory) {
+        throw new BadRequestError("Error history not found for the provided ID");
+      }
+    } else {
+      const skip = (page - 1) * limit; // Calculate skip value for pagination
+      const totalErrors = await uploadErrorHistory.countDocuments({ user: req.user.id });
+
+      errorHistory = await uploadErrorHistory
+        .find({ user: req.user.id })
+        .populate("associatedErrors")
+        .sort({ createdAt: -1 }) // Sort by most recent first
+        .skip(skip)
+        .limit(Number(limit))
+        .exec();
+
+      return res.send({
+        success: true,
+        totalRecords: totalErrors,
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalErrors / limit),
+        errorHistory,
+      });
+    }
+    res.send({ success: true, errorHistory });
   } catch (error) {
-    throw new BadRequestError('An error occured while fetching error history')
+    console.error("Error fetching upload error history:", error);
+    next(new BadRequestError("An error occurred while fetching error history"));
   }
-}
+};
+
 
 const getAllSongs = async(req,res,next)=>{
   const allTracks = await Track.find({}, "artWork trackTitle mainArtist trackLink duration genre mood producers spotifyLink").where('uploadStatus').equals('Approved').exec()
