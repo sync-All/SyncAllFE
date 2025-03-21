@@ -24,8 +24,8 @@ next()
 }
 
 const checkUser = (req,res,next)=>{
+    const allowedTypes =  ["Music Uploader", "Sync User"]
     passport.authenticate('jwt',{session : false},(err,user,info)=>{
-        console.log({info})
         if(info && info.name == "TokenExpiredError"){
            return next(new TokenExpiredError('Session expired, proceed to login'))
         }
@@ -33,7 +33,7 @@ const checkUser = (req,res,next)=>{
             console.log(err)
             return next(new unauthorizedError('Authentication failed'));
         }
-        if (user.role !== 'Music Uploader' || user.role !== "Sync User") {
+        if (!allowedTypes.includes(user.role)) {
             return next(new ForbiddenError('Attempt Forbidden'));
         }
         req.user = user

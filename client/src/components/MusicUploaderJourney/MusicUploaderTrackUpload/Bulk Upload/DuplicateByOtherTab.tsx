@@ -6,7 +6,7 @@ import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
 import React, { useMemo, useState } from 'react';
-import { TrackData } from '../../../../Context/UploadContext';
+import { TrackData } from '../../../../declarations';
 import DuplicateByOtherSingleError from './DuplicateByOthersResolveSingleError';
 
 // SortButton.tsx

@@ -54,6 +54,12 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
 
   const profileInfo = useDataContext();
   const profileDetails = profileInfo.dashboardData?.profileInfo;
+  const notifications = profileInfo.dashboardData?.profileInfo.notifications
+  let unreadNotifs  = []
+  if (notifications) {
+    unreadNotifs = notifications.filter((item)=> !item.read)
+  }
+  
 
   return (
     <div>
@@ -69,12 +75,19 @@ const MusicUploaderNavbar: React.FC<MusicUploaderNavbarProp> = ({
           </div>
 
           <div className="flex gap-[17px] items-center">
-            <img
-              src={Notification}
-              alt=""
-              className="self-start mt-2 cursor-pointer"
-              onClick={toggleModal}
-            />
+            <div className='relative cursor-pointer'>
+              <img
+                src={Notification}
+                alt=""
+                className="self-start mt-2"
+                onClick={toggleModal}
+              />
+              {
+                unreadNotifs.length > 0 && (<p className='w-4 h-4 absolute top-1 bg-[#FFC107] border-2 border-white rounded-full flex items-center justify-center text-[#f2f2f2] text-xs -right-2'>
+                  {unreadNotifs.length}
+                </p>)
+              }
+            </div>
 
             <MusicUploaderNotification
               isOpen={modalIsOpen}

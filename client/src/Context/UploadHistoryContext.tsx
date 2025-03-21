@@ -35,7 +35,7 @@ export const UploadHistoryProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const res = await axios.get(
-        `${baseUrl}/get-upload-error-history`,
+        `${baseUrl}/get-upload-error-history?limit=30`,
         config
       );
       setErrorTracks(res.data.errorHistory);

@@ -4,7 +4,13 @@ const authcontroller = require("../../controllers/authControllers");
 const passport = require("passport");
 const multer = require("multer");
 const { testUpdate } = require("../../controllers/admin/users");
+const { checkUser } = require("../../utils/AuthenticateChecker");
+const { notification } = require("../../models/usermodel");
+const { Types } = require("mongoose");
+const { BadRequestError } = require("../../utils/CustomError");
 const uploadProfileImg = multer({ dest: "uploads/" }).single("img");
+const User = require('../../models/usermodel').uploader
+const SyncUser = require('../../models/usermodel').syncUser
 var router = express.Router();
 
 /* GET users listing. */
@@ -108,5 +114,50 @@ router.post(
 );
 
 router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
+router.get("/api/v1/readNotification", checkUser, asynchandler(async (req,res,next)=>{
+  const {markOne, markAll} = req.query
+  try{
+    if(markAll){
+      const unreadNotifications = await notification.find({read : false}).where('user').equals(req.user.id)
+      if(unreadNotifications.length > 0){
+        await Promise.all(unreadNotifications.map(async(item)=>{
+          await notification.findByIdAndUpdate(item._id,{read : true})
+        }))
+      }
+    }
+    else if(markOne){
+      if(!Types.ObjectId.isValid(markOne)){
+        throw new BadRequestError("Notification not found")
+      }
+      await notification.findByIdAndUpdate(markOne,{read : true}).exec()
+    }
+    res.send('Read Successfully')
+  }catch(error){
+    console.log(error)
+    throw new BadRequestError("Error Occured while reading your notification")
+  }
+}));
+
+router.get("/api/v1/clearAllNotification", checkUser, asynchandler(async (req,res,next)=>{
+  try{
+    const user = {req}
+    const allNotifications = await notification.find({user : user.id})
+    if(allNotifications.length > 0){
+      await Promise.all(allNotifications.map(async(item)=>{
+        if(user.role == "Music Uploader"){
+          User.findById(user.id,{$pull : {notification : item._id}})
+        }else if ( user.role == "Sync User"){
+          SyncUser.findById(user.id,{$pull : {notification : item._id}})
+        }
+        await notification.findByIdAndDelete(item._id)
+      }))
+    }
+    res.send('Cleared Successfully')
+  }catch(error){
+    console.log(error)
+    throw new BadRequestError("Error Occured while reading your notification")
+  }
+}));
+
 
 module.exports = router;

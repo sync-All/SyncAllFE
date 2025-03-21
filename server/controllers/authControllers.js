@@ -24,27 +24,21 @@ cloudinary.config({
 
 
 const signup = async function(req, res) {
-  const {name, email, password, role, userType} = req.body
-  if(!name || !email || !password || !role || !userType){
-    if(!name){
-      return res.status(401).json({success: false , message : "Name Field Missing, please review input"})
-    }else if(!email){
-      return res.status(401).json({success : false, message : "Email Field Missing, please review input"})
-    }else if(!password){
-      return res.status(401).json({success : false, message : "Password Field Missing, please review input"})
-    }else if(!role){
-      return res.status(401).json({success : false, message : "Role Field Missing, please review input"})
-    }else if(!userType){
-      return res.status(401).json({success : false, message : "UserType Field Missing, please review input"})
-    }
-  }else{
-    const userInfo = await getUserInfo({email : email.toLowerCase()})
-    if(userInfo){
-      res.status(401).json({success: false, message : "Email Already in use"})
+  try {
+    const {email, name, password, role, userType} = req.body
+    const allowedItems = ['name','email', 'password', 'role', 'userType']
+    const bodyKeys = Object.keys(req.body)
+    const missingItems = allowedItems.filter(item => !bodyKeys.includes(item));
+    if(missingItems.length > 1){
+      throw new BadRequestError(`Missing Parameter : ${missingItems[0]}`)
     }else{
-      if(role == "Music Uploader"){
-        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-          const newUserData = await createNewMusicUploader({name,email,password,role,userType})
+      const userInfo = await getUserInfo({email : email.toLowerCase()})
+      if(userInfo){
+        res.status(401).json({success: false, message : "Email Already in use"})
+      }else{
+        if(role == "Music Uploader"){
+          const hashpassword = bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+          const newUserData = await createNewMusicUploader({name,email,hashpassword,role,userType})
           const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
           const grabber = EmailDomain.grabEmailDomain(newUserData)
           await confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
@@ -54,18 +48,23 @@ const signup = async function(req, res) {
           await dashboard.save()
           await User.findByIdAndUpdate(newUserData.id, {dashboard : dashboard._id})
           res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber})
-        })
-      }else {
-        bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, password){
-          const newUserData = await createNewSyncUser({name,email,password,role,userType})
-          const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
-          const grabber = EmailDomain.grabEmailDomain(newUserData)
-          confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
-          res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
-        })
+
+        }else {
+          const hashpassword = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+          if(hashpassword){
+            const newUserData = await createNewSyncUser({name,email,hashpassword,role,userType})
+            if(!newUserData) throw new BadRequestError('An error occured while creating your account')
+            const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
+            const grabber = EmailDomain.grabEmailDomain(newUserData)
+            confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
+            res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
+          }
+        }
       }
-      
     }
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError(error.message)
   }
 }
 
@@ -89,7 +88,7 @@ const signin = async(req,res,next)=> {
     return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
   }else{
     const toBeIssuedJwt = issueJwt.issueJwtLogin(userInfo)
-    const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').populate('notifications').exec()
+    const userDetails = await User.findOne({email : email.toLowerCase()}).select('-password').exec()
 
     const syncUserDetails = await SyncUser.findOne({email : email.toLowerCase()}, "name email role").select('-tracklist').select('-password').populate('notifications').exec()
 

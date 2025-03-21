@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
 @layer base {
   @font-face {
     font-family: 'Git-sans';
@@ -104,8 +106,8 @@
 }
 
 .plus-jarkata-sans-light {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 300;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 300;
 }
 
 .plus-jarkata-sans-regular {
@@ -203,4 +205,9 @@ input::-webkit-inner-spin-button {
   text-orientation: sideways-right;
   transform: rotate(180deg); 
   justify-content: space-between;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

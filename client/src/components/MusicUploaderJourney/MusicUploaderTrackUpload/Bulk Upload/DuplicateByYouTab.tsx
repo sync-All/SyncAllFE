@@ -6,7 +6,7 @@ import usePagination from '../../../../hooks/usePaginate';
 import Left from '../../../../assets/images/left-arrow.svg';
 import Right from '../../../../assets/images/right-arrow.svg';
 import NoTrack from '../../.../../../../assets/images/no_track.svg';
-import { TrackData } from '../../../../Context/UploadContext';
+import { TrackData } from './ResolveError';
 
 
 interface SortButtonProps {

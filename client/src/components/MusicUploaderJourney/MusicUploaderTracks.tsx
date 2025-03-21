@@ -8,7 +8,7 @@ import NoTrack from '../../assets/images/no_track.svg';
 import usePagination from '../../hooks/usePaginate';
 import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SpotifyHelper from '../../utils/spotifyhelper';
 import getStatusColors from '../../utils/getStatusColors';
 import LoadingAnimation from '../../constants/loading-animation';
@@ -254,32 +254,7 @@ const ErrorTracksTable: React.FC<TableProps> = ({
     return text.slice(0, length);
   };
 
-  const navigate = useNavigate();
 
-  const handleViewError = (trackId: string) => {
-    // Find the track by its ID (in case you need to display more info or errors based on the track)
-    // const selectedTrack = tracks.find((track) => track._id === trackId);
-
-    // // Now you can group the errors or pass them to the next page
-    // const formattedErrors = {
-    //   duplicates: selectedTrack?.associatedErrors.filter(
-    //     (error) => error.err_type === 'duplicateTrack'
-    //   ),
-    //   invalidSpotifyLink: selectedTrack?.associatedErrors.filter(
-    //     (error) => error.err_type === 'InvalidSpotifyLink'
-    //   ),
-    // };
-
-    navigate('/dashboard/bulk-upload/resolve-errors', {
-      state: {
-        errorData: {
-          bulkError_id: trackId, // Pass the main track _id
-        },
-      },
-    });
-  };
-
-  console.log(tracks);
 
   return (
     <>
@@ -346,12 +321,15 @@ const ErrorTracksTable: React.FC<TableProps> = ({
                 {track.status}
               </td>
               <td className="py-4 px-8">
-                <button
-                  onClick={() => handleViewError(track._id)}
-                  className="text-[#1671D9] hover:text-blue-800 font-inter"
-                >
-                  View
-                </button>
+                <Link to={`/dashboard/bulk-upload/resolve-errors/${track._id}`}>
+                  {' '}
+                  <button
+                    
+                    className="text-[#1671D9] hover:text-blue-800 font-inter"
+                  >
+                    View
+                  </button>
+                </Link>
               </td>
             </tr>
           ))}
