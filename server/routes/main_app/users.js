@@ -143,14 +143,13 @@ router.get("/api/v1/clearAllNotification", checkUser, asynchandler(async (req,re
     const user = {req}
     const allNotifications = await notification.find({user : user.id})
     if(allNotifications.length > 0){
-      await Promise.all(allNotifications.map(async(item)=>{
-        if(user.role == "Music Uploader"){
-          User.findById(user.id,{$pull : {notifications : item._id}})
-        }else if ( user.role == "Sync User"){
-          SyncUser.findById(user.id,{$pull : {notifications : item._id}})
-        }
-        await notification.findByIdAndDelete(item._id)
-      }))
+      if (user.role === "Music Uploader") {
+        await User.findByIdAndUpdate(user.id, { $set: { notifications: [] } });
+      } else if (user.role === "Sync User") {
+        await SyncUser.findByIdAndUpdate(user.id, { $set: { notifications: [] } });
+      }
+      const notificationIds = allNotifications.map((item) => item._id);
+      await Notification.deleteMany({ _id: { $in: notificationIds } });
     }
     res.send('Cleared Successfully')
   }catch(error){
