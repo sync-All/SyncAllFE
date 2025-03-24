@@ -79,7 +79,6 @@ const fmtSchema = new Schema({
     ],
     license_duration :  { 
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     additional_info : {
@@ -241,7 +240,6 @@ const videosGamesSchema = new Schema({
     },
     license_duration :  { 
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     attachments : [
@@ -331,7 +329,6 @@ const samplingSchema = new Schema({
     ],
     license_duration : { 
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     media_formats : [
@@ -430,7 +427,6 @@ const interpolationSchema = new Schema({
     ],
     license_duration : { 
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     media_formats : [
@@ -506,7 +502,6 @@ const crbtSchema = new Schema({
     ],
     license_duration : {
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     media : {
@@ -574,7 +569,6 @@ const smcSchema = new Schema({
     ],
     license_duration : {
         type : String,
-        enum : ['Yearly'],
         required : true
     },
     media : {
