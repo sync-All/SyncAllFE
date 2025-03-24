@@ -110,7 +110,7 @@ const MusicUploaderNotification: React.FC<MusicUploaderNotificationProps> = ({
           <div className='flex items-center text-xs gap-3'>
             {
               unreadNotifs.length > 0 && (<p className='flex items-center gap-1 text-xs lg:text-base text-[#202020] cursor-pointer' onClick={()=>{markNotification(`markAll=true`)}}>
-                <img src={mark} alt="" className='w-4 lg:w-5' /> Mard all as read
+                <img src={mark} alt="" className='w-4 lg:w-5' /> Mark all as read
               </p>)
             }
             {
@@ -178,7 +178,7 @@ const NotificationCards = ({title, createdAt, read, id, markOne}: {title : strin
     <div className=''>
       {
         !read && (<p className='flex items-center gap-1 text-xs lg:text-base text-[#202020] cursor-pointer ' onClick={readANotif}>
-          <img src={mark} alt="" className='w-4 lg:w-5' /> Mard as read
+          <img src={mark} alt="" className='w-4 lg:w-5' /> Mark as read
         </p>)
       }
     </div>

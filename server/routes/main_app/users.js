@@ -145,9 +145,9 @@ router.get("/api/v1/clearAllNotification", checkUser, asynchandler(async (req,re
     if(allNotifications.length > 0){
       await Promise.all(allNotifications.map(async(item)=>{
         if(user.role == "Music Uploader"){
-          User.findById(user.id,{$pull : {notification : item._id}})
+          User.findById(user.id,{$pull : {notifications : item._id}})
         }else if ( user.role == "Sync User"){
-          SyncUser.findById(user.id,{$pull : {notification : item._id}})
+          SyncUser.findById(user.id,{$pull : {notifications : item._id}})
         }
         await notification.findByIdAndDelete(item._id)
       }))

@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const { grabSpotifyToken, spotifyResult } = require("../utils/spotify");
 const { uploadErrorHistory } = require("../models/track.model");
 const { dispute } = require("../models/dashboard.model");
+const { attachNewNotification } = require("../controllers/userControllers");
 require('dotenv').config
 
 
@@ -63,29 +64,12 @@ const duplicateList = [
   },
 ]
 
-const testing = async()=>{
-  const duplicateList = [
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-]
-  const savedData = duplicateList.map((track)=>{
-    return {
-      nameOfTrack : track.trackTitle,
-      issueType : 'claimRights',
-      isrc : track.isrc
-    }
-    
-  })
-  console.log(savedData)
+const sendNotif = async()=>{
+  try {
+    attachNewNotification({title : 'Just a test notification', message : 'A brief description of the test', userId : '66d35b34162b52ca6713aefc'})
+    console.log('notification sent')
+  } catch (error) {
+    console.log(error)
+  }
 }
-testing()
+sendNotif()
