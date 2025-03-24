@@ -140,13 +140,13 @@ router.get("/api/v1/readNotification", checkUser, asynchandler(async (req,res,ne
 
 router.get("/api/v1/clearAllNotification", checkUser, asynchandler(async (req,res,next)=>{
   try{
-    const user = {req}
+    const {user} = req
     const allNotifications = await Notification.find({user : user.id})
     if(allNotifications.length > 0){
       if (user.role === "Music Uploader") {
         await User.findByIdAndUpdate(user.id, { $set: { notifications: [] } });
       } else if (user.role === "Sync User") {
-        await SyncUser.findByIdAndUpdate(user.id, { $set: { notifications: [] } });
+        await SyncUser.findByIdAndUpdate(user.id, { $set: { notifications: []}});
       }
       const notificationIds = allNotifications.map((item) => item._id);
       await Notification.deleteMany({ _id: { $in: notificationIds } });
