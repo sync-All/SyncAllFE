@@ -18,20 +18,20 @@ cloudinary.config({
 })
 
 const dashboardcontrol = async (req,res,next)=>{
-        const userId = req.user.id
-        try {
-            if(req.user.role == "Music Uploader"){
-                const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').lean()
-                const profileInfo = await User.findById(userId).populate('notifications uploadErrors').populate({path : 'uploadErrors', populate : {path : 'associatedErrors', model : 'trackError'}}).lean()
-                const transactions = await Transaction.find({user : userId}).lean()
-                res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
-            }else{
-                res.status(401).json('Unauthorized access')
-            }
-        } catch (error) {
-            console.log(error)
-            res.status(401).json('User does not exists')
+    const userId = req.user.id
+    try {
+        if(req.user.role == "Music Uploader"){
+            const userDashboardDetails = await dashboard.findOne({user : userId}).populate('totalTracks').exec()
+            const profileInfo = await User.findById(userId).populate('notifications uploadErrors').populate({path : 'uploadErrors', populate : {path : 'associatedErrors', model : 'trackError'}}).exec()
+            const transactions = await Transaction.find({user : userId}).exec()
+            res.status(200).json({success : true, dashboardDetails : userDashboardDetails,profileInfo, transactions})
+        }else{
+            res.status(401).json('Unauthorized access')
         }
+    } catch (error) {
+        console.log(error)
+        res.status(401).json('User does not exists')
+    }
 
 }
 
