@@ -23,7 +23,7 @@ const MusicUploaderNotification: React.FC<MusicUploaderNotificationProps> = ({
   let unreadNotifs = []
   if(dashboardData){
     notifications = dashboardData.profileInfo.notifications
-    unreadNotifs = notifications.filter((item)=> !item.read)
+    unreadNotifs = notifications?.filter((item)=> !item.read)
   }
   useEffect(()=>{
     if(isOpen){
