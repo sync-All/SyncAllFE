@@ -20,22 +20,14 @@ const Authentic = () => {
         <br />
         effortless licensing.
       </h1>
-      <div className="flex gap-4 w-full justify-center items-center ">
-        <Link to="/explore-sounds">
-          <button className="py-4 px-6 border w-[172px] flex justify-center items-center h-[56px]">
-            <p className="text-[16px] font-inter font-semibold text-white leading-6 ">
-              Explore Sounds
-            </p>
-          </button>
+      <div className="flex gap-4 w-full justify-center items-center font-inter">
+        <Link to="/explore-sounds" className='py-4 px-6 text-[16px]  font-semibold text-white border rounded-md hover:border-yellow hover:text-yellow transition-all duration-500'>
+          Explore Sounds
         </Link>
-
-        <button className="py-4 px-6 bg-yellow w-[172px] flex justify-center items-center h-[56px]">
-          <p className="text-[16px] font-inter font-semibold text-black leading-6">
-            Get Started
-          </p>
-        </button>
+        <Link to={'/login'} className='py-4 px-6 bg-yellow border border-yellow text-[16px] font-inter font-semibold text-black leading-6 rounded-md hover:text-white/70 hover:bg-inherit transition-all duration-500'>
+          Get Started
+        </Link>
       </div>
-      {/* <PrimaryButton text="Join the waitlist" onClick={values.openModal} /> */}
     </div>
   );
 };
