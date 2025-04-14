@@ -196,13 +196,20 @@ const SyncUserHome = () => {
     if (!searchState.isSearching) return 'Browse Songs';
 
     if (searchState.type === 'text') {
-      return `Search Results for "${searchState.query}"`;
+      return (
+        <div>
+          Search Results for <span >{searchState.query}</span>
+        </div>
+      ); 
     }
 
     if (searchState.type) {
-      return `${
-        searchState.type.charAt(0).toUpperCase() + searchState.type.slice(1)
-      } Results: ${searchState.query}`;
+      return (
+        <div>
+          {searchState.type.charAt(0).toUpperCase() + searchState.type.slice(1)} Results: 
+          <span >  {searchState.query}</span>
+        </div>
+      );
     }
 
     return 'Search Results';
