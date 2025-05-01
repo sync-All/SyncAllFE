@@ -72,8 +72,9 @@ const SyncUserHome = () => {
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [likedTrack, setLikedTrack] = useState<{ [key: string]: boolean }>({});
 
-  const validDisplayedTracks = Array.isArray(displayedTracks) ? displayedTracks : [];
-
+  const validDisplayedTracks = Array.isArray(displayedTracks)
+    ? displayedTracks
+    : [];
 
   const itemsPerPage = 30;
   const {
@@ -87,7 +88,6 @@ const SyncUserHome = () => {
     totalItems,
     endIndex,
   } = usePagination<TrackDetails>(validDisplayedTracks, itemsPerPage);
-  
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
@@ -139,7 +139,6 @@ const SyncUserHome = () => {
 
       setDisplayedTracks(response.data.allTracks);
       setOriginalTracks(response.data.allTracks);
-
     } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
@@ -179,8 +178,6 @@ const SyncUserHome = () => {
       query: newSearchState.query,
     });
     setDisplayedTracks(results);
-   
-
   };
 
   const handleResetSearch = useCallback(() => {
@@ -197,23 +194,51 @@ const SyncUserHome = () => {
 
     if (searchState.type === 'text') {
       return (
-        <div>
-          Search Results for <span >{searchState.query}</span>
+        <div className="flex items-center gap-2">
+          <p className="text-[#27282A] text-base font-formular-regular lg:font-bold lg:text-[24px] w-fit">
+            {' '}
+            Search Results for
+          </p>
+          <span className="bg-[#013131] text-white rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-sm font-formular-regular">
+            {searchState.query}
+            <button
+              className="text-[10px] bg-white text-black rounded-full w-5 h-5 flex items-center justify-center"
+              onClick={handleResetSearch}
+            >
+              X
+            </button>
+          </span>
         </div>
-      ); 
+      );
     }
 
     if (searchState.type) {
       return (
-        <div>
-          {searchState.type.charAt(0).toUpperCase() + searchState.type.slice(1)} Results: 
-          <span >  {searchState.query}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-[#27282A] text-base font-formular-regular lg:font-bold lg:text-[24px] w-fit">
+            {searchState.type.charAt(0).toUpperCase() +
+              searchState.type.slice(1)}{' '}
+            Results:
+          </span>
+          <span className="bg-[#013131] text-white rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-base font-formular-regular">
+            {searchState.query}
+            <button
+              className="text-[10px] bg-white text-black rounded-full w-5 h-5 flex items-center justify-center"
+              onClick={handleResetSearch}
+            >
+              X
+            </button>
+          </span>
         </div>
       );
     }
 
     return 'Search Results';
   };
+
+  if (searchState.isSearching && tracksLoading) {
+    return <LoadingAnimation />;
+  }
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -252,8 +277,8 @@ const SyncUserHome = () => {
         </section>
 
         <section className="mt-[63px] relative">
-          <div className="flex justify-between items-center">
-            <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 mb-[45px]">
+          <div className="flex justify-between items-center  mb-[45px]">
+            <h3 className="text-[#27282A] text-[24px] font-formular-bold leading-6 ">
               {getHeaderText()}
             </h3>
             <div className="text-[12px] font-formular-regular">
