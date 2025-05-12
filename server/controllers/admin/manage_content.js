@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
 const { track, rejectedTrack } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
+const Dashboard = require('../../models/dashboard.model').dashboard
 const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser } = require("../userControllers")
 
 const contentReview = async(req,res,next)=>{
@@ -83,25 +84,53 @@ const contentUpdate = async(req,res,next)=>{
     }
 }
 
-const contentTransferOwnership = async(req,res,next)=>{
+const contentTransferOwnership = async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+  
     try {
-        const {trackIds, newTrackOwnerId} = req.body
-        const newTrackOwner = getUserInfo({_id : newTrackOwnerId})
-        if(!newTrackOwner){
-            throw new BadRequestError('Invalid new trackOwner id provided')
-        }
-        const ownedTracks = await checkForExistingOwnershipByUser(trackIds,newTrackOwnerId)
-
-        if(ownedTracks){
-            console.log(ownedTracks)
-            throw new BadRequestError('Looks like one or more track entries already belong to this trackowner, please review and try again!')
-        }
-        
-        res.send("Tracks transferred successfully")
-
+      const { trackIds, newTrackOwnerId } = req.body;
+  
+      const newTrackOwner = await getUserInfo({ _id: newTrackOwnerId });
+      if (!newTrackOwner) {
+        throw new BadRequestError('Invalid new trackOwner id provided');
+      }
+  
+      const ownedTracks = await checkForExistingOwnershipByUser(trackIds, newTrackOwnerId);
+      if (ownedTracks) {
+        throw new BadRequestError('One or more track entries already belong to this user');
+      }
+  
+      await Promise.all(trackIds.map(trackId => {
+        return Promise.all([
+          Dashboard.findOneAndUpdate(
+            { totalTracks: { $in: [trackId] } },
+            { $pull: { totalTracks: trackId } },
+            { new: true, session }
+          ).exec(),
+  
+          track.findOneAndUpdate(
+            { _id: trackId },
+            {
+              userRole: newTrackOwner.role,
+              user: newTrackOwner._id
+            },
+            { new: true, session }
+          ).exec()
+        ]);
+      }));
+  
+      await session.commitTransaction();
+      session.endSession();
+  
+      res.status(200).json({ success: true, message: "Tracks transferred successfully" });
+  
     } catch (error) {
-        console.log(error)
-        throw new BadRequestError(error.message || 'An error ocurred while trying to transfer ownership')
+      console.error(error);
+      await session.abortTransaction();
+      session.endSession();
+      next(new BadRequestError(error.message || 'An error occurred while transferring ownership'));
     }
-}
+};
+  
 module.exports = {contentReview, searchContent, contentUpdate,contentTransferOwnership}
