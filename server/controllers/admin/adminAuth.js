@@ -31,7 +31,6 @@ const Admin = require('../../models/usermodel').admin;
 //       const emailContent = `
 //       <p> Dear ${name}</p>
 //       <br/>
-//       <br/>
 //       <div>Your admin account has been created for you! Here are your login details</div>
 //       <br/>
 //       <div>Email : ${email}</div>
