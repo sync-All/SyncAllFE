@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
 const { track, rejectedTrack } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
-const { attachNewNotification } = require("../userControllers")
+const { attachNewNotification, getUserInfo } = require("../userControllers")
 
 const contentReview = async(req,res,next)=>{
     try {
@@ -62,7 +62,6 @@ const searchContent = async(req,res,next)=>{
 
 const contentUpdate = async(req,res,next)=>{
     try {
-        console.log(req.body)
         const {_id} = req.body
         if(!mongoose.Types.ObjectId.isValid(_id)){
             throw new BadRequestError("Track not available")
@@ -81,6 +80,16 @@ const contentUpdate = async(req,res,next)=>{
     } catch (error) {
         console.log(error)
         throw new BadRequestError(error.message)
+    }
+}
+
+const contentTransferOwnership = async(req,res,next)=>{
+    try {
+        const {trackIds, newTrackOwnerId} = req.body
+        const newTrackOwner = getUserInfo({_id : newTrackOwnerId})
+    } catch (error) {
+        console.log(error)
+        throw new BadRequestError('An error ocurred while trying to transfer ownership')
     }
 }
 module.exports = {contentReview, searchContent, contentUpdate}
