@@ -87,9 +87,19 @@ const contentTransferOwnership = async(req,res,next)=>{
     try {
         const {trackIds, newTrackOwnerId} = req.body
         const newTrackOwner = getUserInfo({_id : newTrackOwnerId})
+        if(!newTrackOwner){
+            throw new BadRequestError('Invalid new trackOwner id provided')
+        }
+        const ownedTracks = checkForExistingOwnershipByUser(trackIds,newTrackOwnerId)
+        if(ownedTracks){
+            console.log(ownedTracks)
+            throw new BadRequestError('Looks like one or more track entries already belong to this trackowner, please review and try again!')
+        }
+        res.send("Tracks transferred successfully")
+
     } catch (error) {
         console.log(error)
         throw new BadRequestError('An error ocurred while trying to transfer ownership')
     }
 }
-module.exports = {contentReview, searchContent, contentUpdate}
+module.exports = {contentReview, searchContent, contentUpdate,contentTransferOwnership}

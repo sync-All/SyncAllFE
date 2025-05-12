@@ -265,7 +265,7 @@ const trackBulkUpload = async(req,res,next)=>{
             failedCount++
             invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id})
           }else if (error instanceof mongoose.MongooseError){
-            console.log('here')
+            console.log('Mongoose Error', error)
           }
           continue;
         }
@@ -286,6 +286,7 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
         row.spotifyLink = spotifyresponse.spotifyLink
+        row.userRole = req.user.role
         row.user = req.user.id
         row.trackLink = spotifyresponse.preview_url
         row.artWork = spotifyresponse.artwork

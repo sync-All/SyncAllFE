@@ -36,13 +36,6 @@ function grabEmailDomain(user){
     }
 }
 
-const checkForExistingTrackOwnershipByUser = (trackIds, newOwnerId)=>{
-    try {
-        
-    } catch (error) {
-        
-    }
-}
 
 
 module.exports.grabEmailDomain = {grabEmailDomain}

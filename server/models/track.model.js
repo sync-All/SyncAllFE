@@ -177,10 +177,17 @@ const trackSchema = new Schema({
     duration : {
         type : String,
     },
-    user : {
-        type : Schema.Types.ObjectId,
-        ref : "user"
+    userRole : {
+        type : String,
+        enum : ['Music Uploader', 'ContentAdmin'],
+        required : true
     },
+    user : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : function(){
+            this.userRole == 'Music Uploader' ? 'user' : 'admin'
+        }
+    }
 },{timestamps : true})
 
 const rejectedTrackSchema = new Schema({
