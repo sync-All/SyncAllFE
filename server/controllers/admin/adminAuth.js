@@ -3,6 +3,7 @@ const issueJwt = require('../../utils/issueJwt');
 const { sendUserAnEmail } = require('../../utils/mailer');
 const Admin = require('../../models/usermodel').admin;
 
+
 const admin_signup = async function(req, res) {
   try {
     const {name, email,username, password, role} = req.body
@@ -12,10 +13,10 @@ const admin_signup = async function(req, res) {
     if(missingItems.length > 0){
       throw new BadRequestError(`Missing Parameter : ${missingItems[0]}`)
     }
-    const getAdminIdentity = await Admin.findOne({ $or : [
-      {email : email && email.toLowerCase()},
-      {username : username && username.toLowerCase()},
-    ]}).exec()
+    const orQuery = []
+    if (email) orQuery.push({email : email.toLowerCase()})
+    if(username) orQuery.push({ username: username.toLowerCase()})
+    const getAdminIdentity = await Admin.findOne({$or : orQuery}).exec()
     if(getAdminIdentity){
       res.status(401).json({success: false, message : "Email Already in use"})
     }else{
@@ -27,6 +28,7 @@ const admin_signup = async function(req, res) {
         role,
         password : hashpw
       })
+      console.log(admin)
       admin.save()
       const emailContent = `
       <p> Dear ${name}</p>
@@ -36,6 +38,7 @@ const admin_signup = async function(req, res) {
       <div>Email : ${email}</div>
       <div>Username : ${username || 'N/A'}</div>
       <div>Password : ${password}</div>
+      <div>Role : ${role || "Admin"}</div>
       <br/>
       <br/>
       <div style="font-size: 12px;font-style: italic;">${process.env.NODE_ENV == 'development' && 'If you are receiving this email, this account was created for development purpose, kindly disregard'}</div>
@@ -52,10 +55,10 @@ const admin_signup = async function(req, res) {
 
 const admin_signin = async(req,res,next)=>{
   const {email,password,username} = req.body
-  const admin = await Admin.findOne({$or : [
-    {email : email && email.toLowerCase()},
-    { username: username  && username.toLowerCase()}
-  ]}).exec()
+  const orQuery = []
+  if (email) orQuery.push({email : email.toLowerCase()})
+  else if(username) orQuery.push({ username: username.toLowerCase()})
+  const admin = await Admin.findOne({$or : orQuery}).exec()
   if(!admin){
     return res.status(401).json({success : false, message : "Invalid Credentials"})
   }

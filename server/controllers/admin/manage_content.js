@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
 const { track, rejectedTrack } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
-const { attachNewNotification, getUserInfo } = require("../userControllers")
+const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser } = require("../userControllers")
 
 const contentReview = async(req,res,next)=>{
     try {
@@ -90,16 +90,18 @@ const contentTransferOwnership = async(req,res,next)=>{
         if(!newTrackOwner){
             throw new BadRequestError('Invalid new trackOwner id provided')
         }
-        const ownedTracks = checkForExistingOwnershipByUser(trackIds,newTrackOwnerId)
+        const ownedTracks = await checkForExistingOwnershipByUser(trackIds,newTrackOwnerId)
+
         if(ownedTracks){
             console.log(ownedTracks)
             throw new BadRequestError('Looks like one or more track entries already belong to this trackowner, please review and try again!')
         }
+        
         res.send("Tracks transferred successfully")
 
     } catch (error) {
         console.log(error)
-        throw new BadRequestError('An error ocurred while trying to transfer ownership')
+        throw new BadRequestError(error.message || 'An error ocurred while trying to transfer ownership')
     }
 }
 module.exports = {contentReview, searchContent, contentUpdate,contentTransferOwnership}
