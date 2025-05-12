@@ -103,7 +103,7 @@ const BulkUpload = () => {
     setShowConfirmProceedModal(true); // Open the second modal
   };
 
-  const fileUrl = '../../../../assets/images/CSV Template.csv';
+  const fileUrl = '../../../../assets/images/testdoc.csv';
   const fileName = 'CSV Template.csv';
 
   const onDrop = useCallback(
@@ -270,7 +270,6 @@ const BulkUpload = () => {
   ];
 
 
-  console.log(bulkUploadResult?.errors.bulkError_id);
 
   return (
     <div className="lg:mx-8 ml-5">

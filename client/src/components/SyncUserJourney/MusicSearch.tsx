@@ -70,10 +70,11 @@ const MusicSearch: React.FC<MusicSearchProps> = ({
         });
         
 
-        onSearch(response.data.tracks, {
+        onSearch(response.data.allTracks, {
           type: searchType,
           query: query.trim(),
         });
+        console.log(response.data.allTracks);
       } catch (error) {
         const axiosError = error as AxiosError<ResponseData>;
         toast.error(

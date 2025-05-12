@@ -32,6 +32,9 @@ const SignupSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
+  terms: Yup.boolean()
+    .required('You must accept the terms and conditions')
+    .oneOf([true], 'You must accept the terms and conditions'),
 });
 
 interface ResponseData {
@@ -48,25 +51,28 @@ interface FormValues {
   name: string;
   password: string;
   email: string;
+  role: string | null;
+  terms: boolean;
 }
 interface ResponseData {
   message?: string;
-  user ?: object
+  user?: object;
 }
 
-
-
-const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) => {
+const Register: React.FC<RegisterProps> = ({
+  selectedRole,
+  setGoogleAuthData,
+}) => {
   const navigate = useNavigate();
   const handleRedirectionToEmailConfirmation = (emailDomain: string) => {
     navigate('/email-confirmation', { state: { emailDomain } });
   };
-  const handleNavigationTODashboard = (spotifyLink:string) => {
-      if(!spotifyLink){
-        navigate('/onboarding-details');
-      }else{
-        navigate('/dashboard');
-      }
+  const handleNavigationTODashboard = (spotifyLink: string) => {
+    if (!spotifyLink) {
+      navigate('/onboarding-details');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const handleSpecificActionForCompany = (phoneNumber: string) => {
@@ -76,7 +82,7 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
       navigate('/dashboard');
     }
   };
-  
+
   const { setUserRole } = useContext(UserContext);
   const { loading, setLoading } = useLoading();
 
@@ -88,48 +94,54 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/googleauth`;
 
-      const response = await signInWithGooglePopup();
-      // get concise information about logged in user
-      const userInfo = getAdditionalUserInfo(response);
-      // COlate values and assign to their proper fields
-      const values = {
-        name: userInfo?.profile?.name,
-        email: userInfo?.profile?.email,
-        img: userInfo?.profile?.picture,
-        emailConfirmedStatus: userInfo?.profile?.verified_email,
-        newUser: userInfo?.isNewUser,
-      };
-      // POst request to server to validate user
-      await axios
-        .post(apiUrl, values)
-        .then((response) => {
-          const spotifyLink = response.data.user.spotifyLink
-          setUserRole(response.data.user.role); // Set the user type here
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userRole', response.data.user.role);
-          localStorage.setItem('userId', response.data.user._id);
-          toast.success('Login successful');
-          if (response.data.user.role === 'Music Uploader' && response.data.user.userType === 'Company') {
-            handleSpecificActionForCompany(response.data.user.phoneNumber);
-          } else if (response.data.user.role === 'Music Uploader' && response.data.user.userType === 'Individual') {
-            handleNavigationTODashboard(spotifyLink);
-          } else {
-            navigate('/home');
-          }
-        })
-        .catch((err) => {
-          if(err.response.status == 302){
-            setGoogleAuthData({...values})
-            return navigate('/selectRole')
-          }
-          const axiosError = err as AxiosError<ResponseData>;
-          toast.error(
-            (axiosError.response && axiosError.response.data
-              ? axiosError.response.data.message || axiosError.response.data
-              : axiosError.message || 'An error occurred'
-            ).toString()
-          );
-        });
+    const response = await signInWithGooglePopup();
+    // get concise information about logged in user
+    const userInfo = getAdditionalUserInfo(response);
+    // COlate values and assign to their proper fields
+    const values = {
+      name: userInfo?.profile?.name,
+      email: userInfo?.profile?.email,
+      img: userInfo?.profile?.picture,
+      emailConfirmedStatus: userInfo?.profile?.verified_email,
+      newUser: userInfo?.isNewUser,
+    };
+    // POst request to server to validate user
+    await axios
+      .post(apiUrl, values)
+      .then((response) => {
+        const spotifyLink = response.data.user.spotifyLink;
+        setUserRole(response.data.user.role); // Set the user type here
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userRole', response.data.user.role);
+        localStorage.setItem('userId', response.data.user._id);
+        toast.success('Login successful');
+        if (
+          response.data.user.role === 'Music Uploader' &&
+          response.data.user.userType === 'Company'
+        ) {
+          handleSpecificActionForCompany(response.data.user.phoneNumber);
+        } else if (
+          response.data.user.role === 'Music Uploader' &&
+          response.data.user.userType === 'Individual'
+        ) {
+          handleNavigationTODashboard(spotifyLink);
+        } else {
+          navigate('/home');
+        }
+      })
+      .catch((err) => {
+        if (err.response.status == 302) {
+          setGoogleAuthData({ ...values });
+          return navigate('/selectRole');
+        }
+        const axiosError = err as AxiosError<ResponseData>;
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+      });
   };
 
   const handleFormSubmit = async (values: FormValues) => {
@@ -138,7 +150,7 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
     const apiUrl = `${urlVar}/signup`;
 
     try {
-      await delay(2000)
+      await delay(2000);
       const response = await axios.post(apiUrl, values);
       toast.success('Account created successfully');
       handleRedirectionToEmailConfirmation(response.data.emailDomain);
@@ -185,7 +197,7 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
               your fingertips.
             </p>
           </div>
-          <div className="mt-[56px]">
+          <div className="mt-[56px] w-[80%]">
             <Formik
               initialValues={{
                 userType: '',
@@ -193,11 +205,12 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
                 email: '',
                 password: '',
                 role: selectedRole,
+                terms: false,
               }}
               validationSchema={SignupSchema}
               onSubmit={handleFormSubmit}
             >
-              {({ handleSubmit }) => (
+              {({ handleSubmit, setFieldValue }) => (
                 <Form
                   onSubmit={handleSubmit}
                   className="flex flex-col gap-[32px]"
@@ -289,16 +302,43 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
                     />
                   </div>
 
-                  <div className="mt-[51px] ">
+                  <div className="">
+                    <div className="flex items-center gap-[8px] mb-[16px]">
+                      <input
+                        type="checkbox"
+                        name="terms"
+                        id=""
+                        onChange={(e) => {
+                          setFieldValue('terms', e.currentTarget.checked);
+                        }}
+                      />
+                      <label
+                        htmlFor="terms"
+                        className="font-inter text-[#344051] font-light text-[14px] leading-[18px]"
+                      >
+                        By creating an account you agree with our{' '}
+                        <a href="/termsOfService" className="underline">
+                          Terms of Service
+                        </a>{' '}
+                        , and{' '}
+                        <a href="/privacyPolicy" className="underline">
+                          Privacy Policy
+                        </a>
+                      </label>
+                    </div>
+                    <ErrorMessage
+                      name="terms"
+                      component="div"
+                      className="text-red-400 italic text-sm py-[4px] mb-2"
+                    />
                     <button
-                      className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px]  disabled:cursor-not-allowed"
+                      className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:cursor-not-allowed"
                       type="submit"
                       disabled={loading}
                     >
                       {loading ? 'Loading...' : 'Sign Up'}
-                      
                     </button>
-                    <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px] ">
+                    <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px]">
                       OR
                     </p>
                     <div
@@ -311,6 +351,7 @@ const Register: React.FC<RegisterProps> = ({ selectedRole, setGoogleAuthData }) 
                       </span>
                     </div>
                   </div>
+
                   <div className="my-[26px]  ">
                     <p className="poppins-medium text-[16px] leading-[24px] ">
                       Already have an account?{' '}
