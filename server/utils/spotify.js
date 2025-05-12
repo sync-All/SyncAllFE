@@ -16,7 +16,6 @@ const grabSpotifyToken = async()=>{
                 'Authorization' : 'Basic ' + BasicToken
             }
         })
-
         return result.data.access_token
     } catch (error) {
         throw new spotifyError(error)
@@ -49,9 +48,9 @@ const spotifyResult = async( trackLink, spotifyToken)=>{
             }
         })
 
-        if(!trackDetails.data.preview_url){
-            trackDetails.data.preview_url = await deezerIsrcSearch(trackDetails.data.external_ids.isrc)
-        }
+        // if(!trackDetails.data.preview_url){
+        //     trackDetails.data.preview_url = await deezerIsrcSearch(trackDetails.data.external_ids.isrc)
+        // }
 
         const minutes = Math.floor(trackDetails.data.duration_ms / 60000);
         const seconds = Math.floor((trackDetails.data.duration_ms % 60000) / 1000);
@@ -106,6 +105,7 @@ const SpotifyPreview = async(res, trackLink)=>{
         }
         
     } catch (error) {
+        console.log(error)
         throw new spotifyError('Invalid Track Link')
     }
 }

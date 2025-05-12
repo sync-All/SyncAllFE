@@ -29,7 +29,7 @@ const signup = async function(req, res) {
     const allowedItems = ['name','email', 'password', 'role', 'userType']
     const bodyKeys = Object.keys(req.body)
     const missingItems = allowedItems.filter(item => !bodyKeys.includes(item));
-    if(missingItems.length > 1){
+    if(missingItems.length > 0){
       throw new BadRequestError(`Missing Parameter : ${missingItems[0]}`)
     }else{
       const userInfo = await getUserInfo({email : email.toLowerCase()})

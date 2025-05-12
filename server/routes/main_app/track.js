@@ -9,12 +9,12 @@ const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
-const { checkUploader, allowUnauthentication, checkSyncUser } = require("../../utils/AuthenticateChecker");
+const { checkUploader, allowUnauthentication, checkSyncUser, checkRoles } = require("../../utils/AuthenticateChecker");
 
 
-router.get("/verifyTrackUploaded/",checkUploader,asyncHandler(trackController.verifyTrackUpload));
+router.get("/verifyTrackUploaded/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.verifyTrackUpload));
 
-router.post("/trackUpload/",checkUploader,upload,asyncHandler(trackController.trackUpload));
+router.post("/trackUpload/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.trackUpload));
 router.post("/invalid_spotify_resolution/",checkUploader,upload,asyncHandler(trackController.invalidSpotifyResolution));
 router.delete("/ignore_bulk_resolution/",checkUploader,asyncHandler(trackController.ignoreBulkResolution));
 router.delete("/ignore_single_resolution/",checkUploader,asyncHandler(trackController.ignoreSingleResolution));

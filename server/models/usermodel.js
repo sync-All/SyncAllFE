@@ -140,11 +140,8 @@ const syncUserSchema = new Schema({
         sub_id : {
             type : String
         },
-        sub_status : {
-            type : String
-        },
-        frequency : {
-            type : String
+        last_charge_date: {
+            type: String
         },
         next_billing_date : {
             type : String
@@ -224,12 +221,14 @@ const syncAdminSchema = new Schema({
         required : true,
         type : String
     },
+    uploadErrors : [{type : Schema.Types.ObjectId, ref : 'uploadErrorHistory'}],
     role : {
         type : String,
-        enum : ['Admin'],
+        enum : ['Admin','ContentAdmin','SuperAdmin'],
         default : 'Admin'
     },
 }, {timestamps : true})
+
 syncAdminSchema.add({
     notifications : [
         {

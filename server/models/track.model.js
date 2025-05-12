@@ -264,9 +264,16 @@ const uploadErrorHistorySchema =  new Schema({
     fileType : {
         type : String,
     },
+    userRole : {
+        type : String,
+        enum : ['Music Uploader', 'ContentAdmin'],
+        required : true
+    },
     user : {
-        type : Schema.Types.ObjectId,
-        ref : "user"
+        type : mongoose.Schema.Types.ObjectId,
+        ref : function(){
+            this.userRole == 'Music Uploader' ? 'user' : 'admin'
+        }
     }
 },{timestamps : true})
 

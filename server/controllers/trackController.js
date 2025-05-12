@@ -24,7 +24,7 @@ const verifyTrackUpload = async(req,res,next)=>{
   if(confirmTrackUploaded){
       res.status(401).json('Track already exists')
   }else{
-      res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc, explicit_content : response.explicit_content, release_date : response.release_date})
+    res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc, explicit_content : response.explicit_content, release_date : response.release_date})
   }
 }
 
@@ -317,6 +317,7 @@ const trackBulkUpload = async(req,res,next)=>{
           associatedErrors : errorIds,
           filename : req.file.originalname,
           fileBuffer,
+          userRole : req.user.role,
           user : req.user._id
         })
         await uploadHistory.save().then(async(res)=>{
