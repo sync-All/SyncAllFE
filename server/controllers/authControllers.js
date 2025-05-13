@@ -11,7 +11,7 @@ const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
 const fs = require('node:fs');
 const { BadRequestError } = require('../utils/CustomError');
-const { getUserInfo, createNewSyncUser, attachNewNotification } = require('./userControllers');
+const { getUserInfo, createNewSyncUser, attachNewNotification, findUserAndUpdate } = require('./userControllers');
 require('dotenv').config()
 
 
@@ -138,6 +138,17 @@ const googleAuth = async(req,res,next)=>{
       
 }
 
+const who_am_i = async(req,res,next)=>{
+  try {
+    const userInfo = req.user.toObject()
+    delete userInfo.password
+    res.json(userInfo)
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError("An error occurred while fetching your information")
+  }
+}
+
 const getsyncuserinfo = async (req,res,next)=>{
   try {
     const userId = req.user._id
@@ -146,7 +157,6 @@ const getsyncuserinfo = async (req,res,next)=>{
   } catch (error) {
     throw new BadRequestError('Error Fetching user data')
   }
- 
 }
 
 const profilesetup = async (req, res, next) => {
@@ -245,49 +255,61 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-const changePassword = async(req,res,next)=>{
-  const {password, confirmassword} = req.body
- if(req.isAuthenticated()){
+const resetPassword = async(req,res,next)=>{
+  const {password, confirmPassword} = req.body
   const userId = req.user.id
   if(password !== confirmPassword){
     return res.status(422).send('Password Mismatch please try again')
   }
   try {
-    if(req.user.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
-        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
-    }else if(req.user.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
-
-        await SyncUser.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
-    }
+    const hashPw = bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+    await findUserAndUpdate({_id : userId}, {password : hashPw})
+    res.status(200).json({success : true, message : 'Password Successfully Updated'})
   } catch (error) {
-    res.status(422).send("Invalid Email Address")
+    console.log(error)
+    res.status(422).send("Error Occurred while Performing action")
   }
- }else{
-  res.status(400).send("Link Expired")
- }
+}
+
+const changePassword = async (req,res,next)=>{
+  try {
+      if(req.user.role == "Music Uploader"){
+      const userId = req.user.id
+      const {oldPassword, newPassword} = req.body
+      const userInfo = await User.findById(userId).exec()
+      const match = await bcrypt.compare(oldPassword, userInfo.password)
+      if(!match){
+          res.status(401).json('Password Incorrect')
+      }else{
+          bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS), async(error, hashPw)=>{
+              await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+
+              res.status(200).json({success : true, message : 'Password Successfully Updated'})
+          })
+      }
+      }else{
+          res.status(401).json('Unauthorized Access')
+      }
+
+  } catch (error) {
+      res.status(404).json('User not Found')
+  }
 }
 
 const requestForgotPw = async (req,res,next)=>{
   const {email} = req.body
 
     const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
-    console.log(user)
 
     if(user){
       const {token} = issueJwtForgotPassword(user)
       requestForgotPassword(user, token)
       res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
     }else{
-      res.status(422).send("Invalid Emailee Address")
+      res.status(422).send("Invalid Email Address")
     }
 }
 
-module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
+module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword,resetPassword, requestForgotPw, getsyncuserinfo, profilesetup,who_am_i}
 
   
