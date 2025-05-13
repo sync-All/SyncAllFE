@@ -262,7 +262,7 @@ const resetPassword = async(req,res,next)=>{
     return res.status(422).send('Password Mismatch please try again')
   }
   try {
-    const hashPw = bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+    const hashPw = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
     await findUserAndUpdate({_id : userId}, {password : hashPw})
     res.status(200).json({success : true, message : 'Password Successfully Updated'})
   } catch (error) {
@@ -273,26 +273,19 @@ const resetPassword = async(req,res,next)=>{
 
 const changePassword = async (req,res,next)=>{
   try {
-      if(req.user.role == "Music Uploader"){
-      const userId = req.user.id
-      const {oldPassword, newPassword} = req.body
-      const userInfo = await User.findById(userId).exec()
-      const match = await bcrypt.compare(oldPassword, userInfo.password)
-      if(!match){
-          res.status(401).json('Password Incorrect')
-      }else{
-          bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS), async(error, hashPw)=>{
-              await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
+    const userInfo = req.user
+    const {oldPassword, newPassword} = req.body
+    const match = await bcrypt.compare(oldPassword, userInfo.password)
+    if(!match){
+      res.status(401).json('Password Incorrect')
+    }else{
+      const hashPw = await bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS))
+      await findUserAndUpdate({_id : userInfo.id},{password : hashPw})
 
-              res.status(200).json({success : true, message : 'Password Successfully Updated'})
-          })
-      }
-      }else{
-          res.status(401).json('Unauthorized Access')
-      }
-
+      res.status(200).json({success : true, message : 'Password Successfully Updated'})
+    }
   } catch (error) {
-      res.status(404).json('User not Found')
+    res.status(404).json('User not Found')
   }
 }
 
