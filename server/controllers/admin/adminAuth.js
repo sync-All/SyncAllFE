@@ -3,8 +3,6 @@ const issueJwt = require('../../utils/issueJwt');
 const { sendUserAnEmail } = require('../../utils/mailer');
 const Admin = require('../../models/usermodel').admin;
 
-const isLive = process.env.NODE_ENV;
-
 const admin_signup = async function(req, res) {
   try {
     const {name, email,username, password, role} = req.body
@@ -72,13 +70,14 @@ const admin_signin = async(req,res,next)=>{
     const toBeIssuedJwt = issueJwt.issueJwtAdminLogin(admin)
     const details = admin.toObject()
     delete details.password
-    console.log(isLive)
+
+    console.log(req.secure)
 
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
       httpOnly: true,
-      secure: false, // true in production
-      sameSite: 'Lax',       // Allows cross-subdomain usage
+      secure: req.secure, // true in production
+      sameSite: req.secure ? 'None': 'Lax',       // Allows cross-subdomain usage
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
