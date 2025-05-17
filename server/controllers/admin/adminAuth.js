@@ -77,7 +77,7 @@ const admin_signin = async(req,res,next)=>{
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
       httpOnly: true,
-      secure: isLive ? true : false, // true in production
+      secure: false, // true in production
       sameSite: isLive ? 'None' : 'Lax',       // Allows cross-subdomain usage
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
