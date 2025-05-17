@@ -72,6 +72,7 @@ const admin_signin = async(req,res,next)=>{
     const toBeIssuedJwt = issueJwt.issueJwtAdminLogin(admin)
     const details = admin.toObject()
     delete details.password
+    console.log(isLive)
 
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
