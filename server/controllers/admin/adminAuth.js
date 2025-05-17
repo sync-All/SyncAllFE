@@ -3,7 +3,7 @@ const issueJwt = require('../../utils/issueJwt');
 const { sendUserAnEmail } = require('../../utils/mailer');
 const Admin = require('../../models/usermodel').admin;
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isLive = process.env.NODE_ENV;
 
 const admin_signup = async function(req, res) {
   try {
@@ -76,8 +76,8 @@ const admin_signin = async(req,res,next)=>{
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
       httpOnly: true,
-      secure: isProduction ? true : false, // true in production
-      sameSite: isProduction ? 'None' : 'Lax',       // Allows cross-subdomain usage
+      secure: isLive ? true : false, // true in production
+      sameSite: isLive ? 'None' : 'Lax',       // Allows cross-subdomain usage
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
