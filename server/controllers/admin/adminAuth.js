@@ -78,7 +78,7 @@ const admin_signin = async(req,res,next)=>{
       path: '/',
       httpOnly: true,
       secure: false, // true in production
-      sameSite: isLive ? 'None' : 'Lax',       // Allows cross-subdomain usage
+      sameSite: 'Lax',       // Allows cross-subdomain usage
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
