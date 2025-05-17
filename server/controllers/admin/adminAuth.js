@@ -76,8 +76,8 @@ const admin_signin = async(req,res,next)=>{
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
       httpOnly: true,
-      secure: true, // true in production
-      sameSite: 'None',       // Allows cross-subdomain usage
+      secure: false, // true in production
+      sameSite: 'Lax',       // Allows cross-subdomain usage
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
