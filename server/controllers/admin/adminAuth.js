@@ -68,7 +68,7 @@ const admin_signin = async(req,res,next)=>{
   if(!match){
     return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
   }else{
-    res.clearCookie("sync_token", { path: '/', httpOnly: true, signed: true, sameSite: isProduction ? 'None' : 'Lax', secure: true });
+    // res.clearCookie("sync_token", { path: '/', httpOnly: true, signed: true, sameSite: isProduction ? 'None' : 'Lax', secure: true });
     const toBeIssuedJwt = issueJwt.issueJwtAdminLogin(admin)
     const details = admin.toObject()
     delete details.password
@@ -76,10 +76,9 @@ const admin_signin = async(req,res,next)=>{
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
       httpOnly: true,
-      secure: isProduction, // true in production
+      secure: isProduction ? true : false, // true in production
       sameSite: isProduction ? 'None' : 'Lax',       // Allows cross-subdomain usage
       signed : true,
-      ...(isProduction && { domain: '.syncallmusic.com' }),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
     res.status(200).json({success : true, user : details, message : 'Welcome back'})
