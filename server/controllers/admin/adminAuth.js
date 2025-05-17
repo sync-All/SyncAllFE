@@ -77,7 +77,7 @@ const admin_signin = async(req,res,next)=>{
       path: '/',
       httpOnly: true,
       secure: true,
-      sameSite: 'Lax',
+      sameSite: 'none',
       signed : true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
