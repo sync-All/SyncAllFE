@@ -241,7 +241,6 @@ trackErrorSchema.add(trackSchema).add({
     userRole : {
         type : String,
         enum : ['Music Uploader', 'ContentAdmin'],
-        required : true
     },
     userModel : {
         type: String,
@@ -267,7 +266,6 @@ trackErrorSchema.add(trackSchema).add({
         default : 'user'
     },
     trackOwner : {
-        type : mongoose.Schema.Types.ObjectId,
         type : mongoose.Schema.Types.ObjectId,
         refPath: 'userModel'
     }

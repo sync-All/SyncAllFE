@@ -266,7 +266,7 @@ const trackBulkUpload = async(req,res,next)=>{
           if(error instanceof spotifyError){
             res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
             failedCount++
-            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id,userRole: req.user.role})
+            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id,userRole: req.user.role,userModel : req.user.role == "Music Uploader" ? 'user' : 'admin'})
           }else if (error instanceof mongoose.MongooseError){
             console.log('Mongoose Error', error)
           }
@@ -279,9 +279,9 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
           if(confirmTrackUploaded.user._id.equals(req.user._id)){
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userRole: req.user.role, user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerRole : confirmTrackUploaded.user.role})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }else{
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userRole: req.user.role, user : req.user._id, trackOwner : confirmTrackUploaded.user._id,trackOwnerRole : confirmTrackUploaded.user.role})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }
           continue;
         }
