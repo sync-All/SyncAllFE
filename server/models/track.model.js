@@ -180,13 +180,18 @@ const trackSchema = new Schema({
     userRole : {
         type : String,
         enum : ['Music Uploader', 'ContentAdmin'],
+        default : 'Music Uploader',
         required : true
+    },
+    userModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
     },
     user : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : function(){
-            this.userRole == 'Music Uploader' ? 'user' : 'admin'
-        }
+        refPath: 'userModel'
     }
 },{timestamps : true})
 
@@ -238,11 +243,15 @@ trackErrorSchema.add(trackSchema).add({
         enum : ['Music Uploader', 'ContentAdmin'],
         required : true
     },
+    userModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
+    },
     user : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : function(){
-            this.userRole == 'Music Uploader' ? 'user' : 'admin'
-        }
+        refPath: 'userModel'
     },
     err_type : {
         type : String
@@ -251,11 +260,16 @@ trackErrorSchema.add(trackSchema).add({
         type : String,
         enum : ['Music Uploader', 'ContentAdmin'],
     },
+    trackOwnerModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
+    },
     trackOwner : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : function(){
-            this.trackOwnerRole == 'Music Uploader' ? 'user' : 'admin'
-        }
+        type : mongoose.Schema.Types.ObjectId,
+        refPath: 'userModel'
     }
     
 })
@@ -290,12 +304,16 @@ const uploadErrorHistorySchema =  new Schema({
         enum : ['Music Uploader', 'ContentAdmin'],
         required : true
     },
+    userModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
+    },
     user : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : function(){
-            this.userRole == 'Music Uploader' ? 'user' : 'admin'
-        }
-    }
+        refPath: 'userModel'
+    },
 },{timestamps : true})
 
 

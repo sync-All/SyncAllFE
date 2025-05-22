@@ -289,7 +289,7 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
         row.spotifyLink = spotifyresponse.spotifyLink
-        row.userRole = req.user.role
+        row.userModel = req.user.role == "Music Uploader" ? 'user' : 'admin'
         row.user = req.user.id
         row.trackLink = spotifyresponse.preview_url
         row.artWork = spotifyresponse.artwork
