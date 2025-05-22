@@ -97,6 +97,7 @@ export const DisputeProvider: React.FC<{ children: ReactNode }> = ({
       headers: {
         Authorization: `${token}`,
       },
+      withCredentials: true,
     };
 
     try {

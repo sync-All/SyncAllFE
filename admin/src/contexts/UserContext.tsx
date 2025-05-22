@@ -129,6 +129,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       headers: {
         Authorization: `${token}`,
       },
+      withCredentials: true,
     };
 
     try {

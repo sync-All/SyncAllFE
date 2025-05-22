@@ -94,6 +94,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({
       headers: {
         Authorization: `${token}`,
       },
+      withCredentials: true,
     };
 
     try {
