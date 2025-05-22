@@ -276,9 +276,9 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
           if(confirmTrackUploaded.user._id.equals(req.user._id)){
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userRole: req.user.role, user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerRole : confirmTrackUploaded.user.role})
           }else{
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userRole: req.user.role, user : req.user._id, trackOwner : confirmTrackUploaded.user._id,trackOwnerRole : confirmTrackUploaded.user.role})
           }
           continue;
         }
