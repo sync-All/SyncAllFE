@@ -15,9 +15,9 @@ const { checkUploader, allowUnauthentication, checkSyncUser, checkRoles } = requ
 router.get("/verifyTrackUploaded/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.verifyTrackUpload));
 
 router.post("/trackUpload/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.trackUpload));
-router.post("/invalid_spotify_resolution/",checkUploader,upload,asyncHandler(trackController.invalidSpotifyResolution));
-router.delete("/ignore_bulk_resolution/",checkUploader,asyncHandler(trackController.ignoreBulkResolution));
-router.delete("/ignore_single_resolution/",checkUploader,asyncHandler(trackController.ignoreSingleResolution));
+router.post("/invalid_spotify_resolution/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.invalidSpotifyResolution));
+router.delete("/ignore_bulk_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreBulkResolution));
+router.delete("/ignore_single_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreSingleResolution));
 
 router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));
 
