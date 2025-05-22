@@ -52,7 +52,16 @@ async function main(){
 const bulkOperation = async()=>{
   const bulkOps = await Track.find().then(tracks =>
     tracks.map(track => {
-      let userModel = track.userRole === 'Music Uploader' ? 'user' : 'admin';
+      // if(track.userRole){
+      //   let userModel = track.userRole === 'Music Uploader' ? 'user' : 'admin';
+      // }
+      let userModel;
+
+      if(track.user.equals('66ffcf8e3bbc86bd5da85486')){
+        console.log('object')
+        userModel = 'admin';
+      }
+      
       return {
         updateOne: {
           filter: { _id: track._id },
@@ -64,12 +73,14 @@ const bulkOperation = async()=>{
   
   if (bulkOps.length) {
     try {
+      console.log(bulkOps.length)
       await Track.bulkWrite(bulkOps);
       console.log('done')
     } catch (error) {
       console.log(error)
     }
   }
+  return;
 }
 bulkOperation()
 

@@ -56,9 +56,7 @@ const invalidSpotifyResolution = async(req,res,next)=>{
     if(!trackDetails || trackDetails.err_type != 'InvalidSpotifyLink'){
       throw new BadRequestError('Bad request, Only SpotifyLink Fixes are allowed')
     }
-    console.log({itemId : _id, userId1 : req.user.id, userId2 : req.user._id})
     const uploadHistory = await uploadErrorHistory.findOne({associatedErrors : {$in : [_id]}}).where('user').equals(req.user._id)
-    console.log({uploadHistory})
     if(!uploadHistory){
       throw new BadRequestError('Bad request, Error track not found')
     }
@@ -79,7 +77,12 @@ const invalidSpotifyResolution = async(req,res,next)=>{
     if(newuploadHistory.associatedErrors.length < 1){
       await uploadErrorHistory.findOneAndUpdate({user : req.user._id},{status : 'Processed'},{new : true})
       .then(async({_id})=>{
-        await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : _id}},{new : true})
+        if(req.user.role == 'Music Uploader'){
+          await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : _id}},{new : true})
+        }else{
+          await Admin.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : _id}},{new : true})
+        }
+        
       })
     }
 
@@ -109,7 +112,12 @@ const ignoreBulkResolution = async(req,res,next)=>{
     const errorHistory = await uploadErrorHistory.findById(bulkErrorId).populate('associatedErrors').exec()
     if(errorHistory.associatedErrors.length < 1){
       await uploadErrorHistory.findByIdAndDelete(bulkErrorId).exec()
-      await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+      if(req.user.role == "Music Uploader"){
+        await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+      }else{
+        await Admin.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : bulkErrorId}},{new : true})
+      }
+      
     }
     res.send({message : 'Errors cleared successfully',errorHistory})
   } catch (error) {
@@ -121,14 +129,19 @@ const ignoreBulkResolution = async(req,res,next)=>{
 const ignoreSingleResolution = async(req,res,next)=>{
   try {
     const {errorId} = req.query
+
     await trackError.findByIdAndDelete(errorId).exec()
+
     const newuploadHistory = await uploadErrorHistory.findOneAndUpdate({associatedErrors : {$in : [errorId]}}, {$pull : {associatedErrors : errorId}},{new : true}).where('user').equals(req.user._id)
+
     if(newuploadHistory.associatedErrors.length < 1){
       await uploadErrorHistory.findByIdAndUpdate(newuploadHistory._id,{status : 'Processed'},{new : true})
       .then(async(item)=>{
-        console.log(item._id)
-        const newDetails = await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : item._id}},{new : true})
-        console.log(newDetails);
+        if(req.user.role == "Music Uploader"){
+          await User.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : item._id}},{new : true})
+        }else{
+          await Admin.findByIdAndUpdate(req.user._id,{$pull : {uploadErrors : item._id}},{new : true})
+        }
       })
     }
     res.send('Track disposed successfully')
@@ -323,7 +336,7 @@ const trackBulkUpload = async(req,res,next)=>{
           associatedErrors : errorIds,
           filename : req.file.originalname,
           fileBuffer,
-          userRole : req.user.role,
+          userModel : req.user.role == "Music Uploader" ? 'user' : 'admin',
           user : req.user._id
         })
         await uploadHistory.save({session}).then(async(res)=>{
