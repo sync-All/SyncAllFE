@@ -250,7 +250,6 @@ trackErrorSchema.add(trackSchema).add({
     trackOwnerRole : {
         type : String,
         enum : ['Music Uploader', 'ContentAdmin'],
-        required : true,
     },
     trackOwner : {
         type : mongoose.Schema.Types.ObjectId,

@@ -7,7 +7,6 @@ require("dotenv").config()
 
 const pubKey = process.env.PUB_KEY
 const cookieExtractor = (req) => {
-    console.log(req.signedCookies.sync_token)
     return req.signedCookies.sync_token || null;
 }
 
