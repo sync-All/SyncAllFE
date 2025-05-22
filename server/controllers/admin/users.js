@@ -12,7 +12,7 @@ const allUsers = async (req,res,next) =>{
   try {
     const {userTypes} = req.query
     const allowedFilters = ['all','uploaders','syncUsers']
-    if(userTypes && allowedFilters.includes(userTypes)){
+    if(userTypes && !allowedFilters.includes(userTypes)){
       throw new BadRequestError('Invalid query parameters')
     }
     if(userTypes == 'all' || !userTypes){
@@ -23,11 +23,11 @@ const allUsers = async (req,res,next) =>{
       const allusers = [...Users1, ...Users2]
       res.json({success : true, message : allusers})
     }else if(userTypes == 'uploaders'){
-      const allusers = User.find().populate('dashboard')
+      const allusers = await User.find().populate('dashboard')
       .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec()
       res.json({success : true, message : allusers})
     }else if (userTypes == 'syncUsers'){
-      const allusers = SyncUser.find().populate('totalLicensedTracks')
+      const allusers = await SyncUser.find().populate('totalLicensedTracks')
       .populate('pendingLicensedTracks').select('-password').exec()
       res.json({success : true, message : allusers})
     }
