@@ -21,7 +21,7 @@ router.delete("/ignore_single_resolution/",checkUploader,asyncHandler(trackContr
 
 router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));
 
-router.post("/trackBulkUpload/",checkUploader,bulkUpload,asyncHandler(trackController.trackBulkUpload));
+router.post("/trackBulkUpload/",checkRoles(['ContentAdmin','Music Uploader']),bulkUpload,asyncHandler(trackController.trackBulkUpload));
 
 router.get("/get-upload-error-history", checkUploader, asyncHandler(trackController.getUploadErrorHistory))
 

@@ -71,7 +71,6 @@ const admin_signin = async(req,res,next)=>{
     const details = admin.toObject()
     delete details.password
 
-    console.log(req.secure)
 
     res.cookie('sync_token', toBeIssuedJwt.token, {
       path: '/',
