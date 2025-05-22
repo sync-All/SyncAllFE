@@ -177,12 +177,6 @@ const trackSchema = new Schema({
     duration : {
         type : String,
     },
-    userRole : {
-        type : String,
-        enum : ['Music Uploader', 'ContentAdmin'],
-        default : 'Music Uploader',
-        required : true
-    },
     userModel : {
         type: String,
         required: true,
@@ -238,10 +232,6 @@ trackErrorSchema.add(trackSchema).add({
         required : false
         }, 
     message : String, 
-    userRole : {
-        type : String,
-        enum : ['Music Uploader', 'ContentAdmin'],
-    },
     userModel : {
         type: String,
         required: true,
@@ -254,10 +244,6 @@ trackErrorSchema.add(trackSchema).add({
     },
     err_type : {
         type : String
-    },
-    trackOwnerRole : {
-        type : String,
-        enum : ['Music Uploader', 'ContentAdmin'],
     },
     trackOwnerModel : {
         type: String,
@@ -296,11 +282,6 @@ const uploadErrorHistorySchema =  new Schema({
     },
     fileType : {
         type : String,
-    },
-    userRole : {
-        type : String,
-        enum : ['Music Uploader', 'ContentAdmin'],
-        required : true
     },
     userModel : {
         type: String,
