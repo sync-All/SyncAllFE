@@ -37,4 +37,5 @@ function grabEmailDomain(user){
 }
 
 
+
 module.exports.grabEmailDomain = {grabEmailDomain}

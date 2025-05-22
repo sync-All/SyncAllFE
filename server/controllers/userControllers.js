@@ -3,6 +3,8 @@ const { BadRequestError } = require('../utils/CustomError');
 
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;
+const Admin = require('../models/usermodel').admin;
+const Track = require('../models/track.model').track;
 
 
 const findUserAndUpdate = async(searchParams, updateOptions)=>{
@@ -21,7 +23,7 @@ const findUserAndUpdate = async(searchParams, updateOptions)=>{
 const getUserInfo = async(searchParams,options="")=>{
     // options object includes {populate, select ....}
     try{
-        const userInfo = await Promise.any([ User.findOne(searchParams).populate(options.populate || "").select(options.select || "").then(user => user || Promise.reject()), SyncUser.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject())])
+        const userInfo = await Promise.any([ User.findOne(searchParams).populate(options.populate || "").select(options.select || "").then(user => user || Promise.reject()), SyncUser.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject()), Admin.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject())])
         return userInfo
     }catch(error){
         if (error instanceof AggregateError) {
@@ -95,4 +97,20 @@ const attachNewNotification = async({title, message, linkto, userId})=>{
     }
 }
 
-module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification}
+const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
+    try {
+        for (const trackId of trackIds) {
+            const ownedTrack = await Track.findOne({ _id: trackId, user: newOwnerId }).select('_id').exec();
+            if (ownedTrack) {
+              return ownedTrack._id;
+            }
+        }
+        return null; // no owned tracks found
+    } catch (error) {
+        throw new BadRequestError(error.message || "Error occurred while processing your request");
+    }
+
+};
+
+
+module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification,checkForExistingOwnershipByUser}

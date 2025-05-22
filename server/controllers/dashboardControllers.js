@@ -36,31 +36,6 @@ const dashboardcontrol = async (req,res,next)=>{
 }
 
 
-const passwordreset = async (req,res,next)=>{
-    try {
-        if(req.user.role == "Music Uploader"){
-        const userId = req.user.id
-        const {oldPassword, newPassword} = req.body
-        const userInfo = await User.findById(userId).exec()
-        const match = await bcrypt.compare(oldPassword, userInfo.password)
-        if(!match){
-            res.status(401).json('Password Incorrect')
-        }else{
-            bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS), async(error, hashPw)=>{
-                await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-
-                res.status(200).json({success : true, message : 'Password Successfully Updated'})
-            })
-        }
-        }else{
-            res.status(401).json('Unauthorized Access')
-        }
-
-    } catch (error) {
-        res.status(404).json('User not Found')
-    }
-}
-
 const fileDispute = async (req,res,next)=>{
     if(req.user.role == "Music Uploader"){
         if(req.file){
@@ -135,4 +110,4 @@ const updatePaymentInfo = async (req,res,next)=>{
 }
 
 
-module.exports = {dashboardcontrol, passwordreset, fileDispute, updatePaymentInfo, allDispute}
+module.exports = {dashboardcontrol, fileDispute, updatePaymentInfo, allDispute}

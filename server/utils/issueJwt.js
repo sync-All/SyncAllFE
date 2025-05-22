@@ -51,7 +51,7 @@ function issueJwtAdminLogin(user){
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
 
     return {
-        token : "Bearer " + signedToken,
+        token : signedToken,
         expires : expiresIn
     }
 }

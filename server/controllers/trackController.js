@@ -1,6 +1,7 @@
 const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/track.model").track
 const User = require('../models/usermodel').uploader
+const Admin = require('../models/usermodel').admin
 const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
@@ -24,7 +25,7 @@ const verifyTrackUpload = async(req,res,next)=>{
   if(confirmTrackUploaded){
       res.status(401).json('Track already exists')
   }else{
-      res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc, explicit_content : response.explicit_content, release_date : response.release_date})
+    res.status(200).json({success : true, message : 'Specific track with ISRC is not available', isrc : response.isrc, explicit_content : response.explicit_content, release_date : response.release_date})
   }
 }
 
@@ -201,6 +202,8 @@ const trackBulkUpload = async(req,res,next)=>{
   if(!req.file){
     throw new ForbiddenError('Kindly input a valid file type')
   }
+  const session = await mongoose.startSession();
+  session.startTransaction();
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -263,9 +266,9 @@ const trackBulkUpload = async(req,res,next)=>{
           if(error instanceof spotifyError){
             res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
             failedCount++
-            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id})
+            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id,userRole: req.user.role,userModel : req.user.role == "Music Uploader" ? 'user' : 'admin'})
           }else if (error instanceof mongoose.MongooseError){
-            console.log('here')
+            console.log('Mongoose Error', error)
           }
           continue;
         }
@@ -276,9 +279,9 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
           if(confirmTrackUploaded.user._id.equals(req.user._id)){
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }else{
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', user : req.user._id, trackOwner : confirmTrackUploaded.user._id})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }
           continue;
         }
@@ -286,6 +289,7 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
         row.spotifyLink = spotifyresponse.spotifyLink
+        row.userModel = req.user.role == "Music Uploader" ? 'user' : 'admin'
         row.user = req.user.id
         row.trackLink = spotifyresponse.preview_url
         row.artWork = spotifyresponse.artwork
@@ -294,9 +298,11 @@ const trackBulkUpload = async(req,res,next)=>{
         sortedMusicData.push(row)
       }
       const uploadedTracks = await Track.insertMany(sortedMusicData)
-      await Promise.all(uploadedTracks.map(async (track)=>{
-        await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }}).exec()
-      }))
+      if(req.user.role == 'Music Uploader'){
+        await Promise.all(uploadedTracks.map(async (track)=>{
+          await dashboard.findOneAndUpdate({user : req.user.id},{ $push: { totalTracks: track._id }},{session}).exec()
+        }))
+      }
       let fileBuffer;
       if(invalidSpotifyLink.length > 0 || duplicateData.length > 0){
         if(invalidSpotifyLink.length > 0){
@@ -308,8 +314,8 @@ const trackBulkUpload = async(req,res,next)=>{
         }
         res.write(`event: progress\n`);
         res.write(`data: Cleaning up\n\n`);
-        invalidSpotifyLink = await trackError.insertMany(invalidSpotifyLink)
-        duplicateData = await trackError.insertMany(duplicateData)
+        invalidSpotifyLink = await trackError.insertMany(invalidSpotifyLink,{session})
+        duplicateData = await trackError.insertMany(duplicateData,{session})
         const errorRes = [...invalidSpotifyLink, ...duplicateData]
         const errorIds = errorRes.map((error)=> error._id)
         const uploadHistory = new uploadErrorHistory({
@@ -317,15 +323,23 @@ const trackBulkUpload = async(req,res,next)=>{
           associatedErrors : errorIds,
           filename : req.file.originalname,
           fileBuffer,
+          userRole : req.user.role,
           user : req.user._id
         })
-        await uploadHistory.save().then(async(res)=>{
+        await uploadHistory.save({session}).then(async(res)=>{
           uploadErrorId = res._id
-          await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}}).exec()
+          if(req.user.role == 'Music Uploader'){
+            await User.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}},{session}).exec()
+          }else {
+            await Admin.findOneAndUpdate({_id : req.user._id},{$push : {uploadErrors : res._id}},{session}).exec()
+          }
+          
         })
       }
 
       const errorCsv = invalidSpotifyLink.length > 0 && {fileBuffer, filename : `${req.file.originalname}`, fileType : 'text/csv'}
+      await session.commitTransaction();
+      session.endSession();
 
       res.write(`event: done\n`);
       res.write(`data: ${JSON.stringify({failedCount, errorData : {uploadErrorId,invalidSpotifyLink, duplicateData}, errorCsv })}\n\n`);
@@ -334,11 +348,11 @@ const trackBulkUpload = async(req,res,next)=>{
       res.end();
   
     } catch (error) {
-      if(error.name == 'MongoBulkWriteError'){
-        res.status(400).write(`event: error\n`);
-        res.end()
-      }
-      console.log(error)
+      await session.abortTransaction();
+      session.endSession();
+      res.status(400).write(`event: error\n\n`);
+      res.status(400).write(`data: ${JSON.stringify({ message : error.message })}\n\n`);
+      res.end()
       fs.unlinkSync(req.file.path)
     }
   });
