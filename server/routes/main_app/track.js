@@ -23,7 +23,7 @@ router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.
 
 router.post("/trackBulkUpload/",checkRoles(['ContentAdmin','Music Uploader']),bulkUpload,asyncHandler(trackController.trackBulkUpload));
 
-router.get("/get-upload-error-history", checkUploader, asyncHandler(trackController.getUploadErrorHistory))
+router.get("/get-upload-error-history", checkRoles(['ContentAdmin','Music Uploader']), asyncHandler(trackController.getUploadErrorHistory))
 
 router.get(
   "/allsongs",allowUnauthentication,checkSyncUser,
