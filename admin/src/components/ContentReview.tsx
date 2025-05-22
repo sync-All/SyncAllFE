@@ -135,6 +135,7 @@ const ContentReview = () => {
       headers: {
         Authorization: `${token}`,
       },
+      withCredentials: true,
     };
 
     try {
@@ -290,6 +291,7 @@ const ContentReview = () => {
               headers: {
                 Authorization: `${token}`,
               },
+              withCredentials: true,
             };
 
             const errors = await validateForm(values);

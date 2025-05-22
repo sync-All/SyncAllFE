@@ -119,6 +119,7 @@ const DisputeDetails = () => {
       headers: {
         Authorization: `${token}`,
       },
+      withCredentials: true,
     };
 
     try {
@@ -151,6 +152,7 @@ const DisputeDetails = () => {
       setIsLoading(true);
       const res = await axios.get(apiUrl, {
         headers: { Authorization: `${token}` },
+        withCredentials: true,
       });
       setAdmins(res.data.admins); // Access the admins array from response
     } catch (error: unknown) {
@@ -175,6 +177,7 @@ const DisputeDetails = () => {
     try {
       await axios.get(apiUrl, {
         headers: { Authorization: `${token}` },
+        withCredentials: true,
       });
       toast.success('Dispute assigned successfully');
     } catch (error: unknown) {
@@ -196,6 +199,7 @@ const DisputeDetails = () => {
     try {
       await axios.get(apiUrl, {
         headers: { Authorization: `${token}` },
+        withCredentials: true,
       });
       toast.success('Additional info requested successfully');
     } catch (error: unknown) {

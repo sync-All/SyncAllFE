@@ -149,7 +149,7 @@ const ManageContent = () => {
     try {
       setIsLoading(true);
       const response = await axios.get<TableData[]>(apiUrl, {
-        headers: { Authorization: token },
+        headers: { Authorization: token }, withCredentials: true
       });
       setSearchResults(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
