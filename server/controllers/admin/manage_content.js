@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const { adminActivityLog } = require("../../models/activity.model")
-const { track, rejectedTrack } = require("../../models/track.model")
+const { track, rejectedTrack, ownershipTransfer } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
 const Dashboard = require('../../models/dashboard.model').dashboard
 const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser, checkTrackStatus } = require("../userControllers")
@@ -88,8 +88,15 @@ const contentTransferOwnership = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     const allowedTrackOwnerRoles = ['Music Uploader', 'ContentAdmin']
+    const requiredItems = ["trackIds","newTrackOwnerId", "comment"]
     try {
-      const { trackIds, newTrackOwnerId } = req.body;
+      const { trackIds, newTrackOwnerId,comment} = req.body;
+
+      const missingItems = requiredItems.filter(item => Object.keys(req.body).includes(item))
+
+      if (missingItems){
+        throw new BadRequestError('Invalid or missing parameters')
+      }
 
       const invalidTracks =  await checkTrackStatus(trackIds)
 
@@ -125,6 +132,11 @@ const contentTransferOwnership = async (req, res, next) => {
           ).exec()
         ]);
       }));
+
+    //   const newownershipTransfer = new ownershipTransfer({
+    //     trackIds,
+    //     from
+    //   })
   
       await session.commitTransaction();
       session.endSession();

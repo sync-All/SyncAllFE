@@ -335,14 +335,14 @@ const trackLicenseSchema = new Schema({
 },{timestamps : true})
 
 const transferOwnershipSchema = new Schema({
-    trackId : {
+    trackIds : [{
         type : Schema.Types.ObjectId,
         ref : "track"
-    },
-    fromUser : {
+    }],
+    fromUsers : [{
         type : Schema.Types.ObjectId,
         refPath : "fromUserModel"
-    },
+    }],
     fromUserModel : {
         type: String,
         required: true,
@@ -378,4 +378,4 @@ const uploadErrorHistory = mongoose.model('uploadErrorHistory', uploadErrorHisto
 const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 const rejectedTrack = mongoose.model('rejectedTrack', rejectedTrackSchema)
 
-module.exports = {track, trackLicense, trackError, uploadErrorHistory, rejectedTrack}
+module.exports = {track, trackLicense, trackError, uploadErrorHistory, rejectedTrack,ownershipTransfer}
