@@ -372,6 +372,16 @@ const trackBulkUpload = async(req,res,next)=>{
   
 }
 
+const myTracks = async(req,res,next)=>{
+  try {
+    const myTracks = await Track.find({user : req.user.id})
+    res.json({message : 'Tracks successfully gotten', tracks : myTracks})
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError('An error occurred while fetching your tracks')
+  }
+}
+
 const getUploadErrorHistory = async (req, res, next) => {
   try {
     const { bulkErrorId, page = 1, limit = 10 } = req.query; // Pagination support
@@ -494,4 +504,4 @@ const freequerySong = async(req,res,next)=>{
   }
 }
 
-module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute, getUploadErrorHistory}
+module.exports = {verifyTrackUpload, trackUpload, getAllSongs, getTracksByGenre, getTracksByInstrument, getTracksByMood, querySongsByIndex, queryTrackInfo, trackBulkUpload,invalidSpotifyResolution,freequerySong, ignoreBulkResolution, ignoreSingleResolution,bulkUploadFileDispute, getUploadErrorHistory,myTracks}
