@@ -361,6 +361,7 @@ const trackBulkUpload = async(req,res,next)=>{
       res.end();
   
     } catch (error) {
+      console.log(error)
       await session.abortTransaction();
       session.endSession();
       res.status(400).write(`event: error\n\n`);
