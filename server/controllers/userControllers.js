@@ -97,6 +97,21 @@ const attachNewNotification = async({title, message, linkto, userId})=>{
     }
 }
 
+const checkTrackStatus = async (trackIds) => {
+    try {
+        for (const trackId of trackIds) {
+            const trackDetail = await Track.findOne({ _id: trackId }).select('_id').exec();
+            if (trackDetail.uploadStatus !== 'Approved') {
+              return trackDetail._id;
+            }
+        }
+        return null; // no owned tracks found
+    } catch (error) {
+        throw new BadRequestError(error.message || "Error occurred while processing your request");
+    }
+
+};
+
 const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
     try {
         for (const trackId of trackIds) {
@@ -113,4 +128,4 @@ const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
 };
 
 
-module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification,checkForExistingOwnershipByUser}
+module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification,checkForExistingOwnershipByUser,checkTrackStatus}

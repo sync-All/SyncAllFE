@@ -3,7 +3,7 @@ const { adminActivityLog } = require("../../models/activity.model")
 const { track, rejectedTrack } = require("../../models/track.model")
 const { BadRequestError } = require("../../utils/CustomError")
 const Dashboard = require('../../models/dashboard.model').dashboard
-const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser } = require("../userControllers")
+const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser, checkTrackStatus } = require("../userControllers")
 
 const contentReview = async(req,res,next)=>{
     try {
@@ -87,12 +87,18 @@ const contentUpdate = async(req,res,next)=>{
 const contentTransferOwnership = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-  
+    const allowedTrackOwnerRoles = ['Music Uploader', 'ContentAdmin']
     try {
       const { trackIds, newTrackOwnerId } = req.body;
-  
+
+      const invalidTracks =  await checkTrackStatus(trackIds)
+
+      if (invalidTracks) {
+        throw new BadRequestError('Tracks must be approved before they can be transferred to another user');
+      }
+
       const newTrackOwner = await getUserInfo({ _id: newTrackOwnerId });
-      if (!newTrackOwner) {
+      if (!newTrackOwner || !allowedTrackOwnerRoles.includes(newTrackOwner.role)) {
         throw new BadRequestError('Invalid new trackOwner id provided');
       }
   
