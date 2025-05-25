@@ -114,13 +114,16 @@ const checkTrackStatus = async (trackIds) => {
 
 const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
     try {
+        let infos = []
         for (const trackId of trackIds) {
-            const ownedTrack = await Track.findOne({ _id: trackId, user: newOwnerId }).select('_id').exec();
-            if (ownedTrack) {
-              return ownedTrack._id;
+            const ownedTrack = await Track.findOne({_id: trackId}).select('_id user userModel').exec();
+            if (ownedTrack.user.equals(newOwnerId)) {
+              return {existing : true};
+            }else{
+                infos.push(ownedTrack)
             }
         }
-        return null; // no owned tracks found
+        return {existing : false, infos};
     } catch (error) {
         throw new BadRequestError(error.message || "Error occurred while processing your request");
     }

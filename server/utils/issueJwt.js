@@ -63,7 +63,8 @@ function issueJwtForgotPassword(user){
 
     const payload = {
         sub : _id,
-        // iat : Date.now()
+        purpose : 'reset',
+        role : user.role
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})

@@ -1,3 +1,5 @@
+const { getUserInfo } = require('../controllers/userControllers')
+
 const User = require('../models/usermodel').uploader
 const SyncUser = require('../models/usermodel').syncUser
 const Admin = require('../models/usermodel').admin
@@ -11,35 +13,56 @@ const cookieExtractor = (req) => {
 }
 
 const options = {
-    jwtFromRequest : extractJwt.fromExtractors([extractJwt.fromUrlQueryParameter('token'),extractJwt.fromAuthHeaderAsBearerToken(),cookieExtractor]),
+    jwtFromRequest : extractJwt.fromExtractors([cookieExtractor]),
     secretOrKey : pubKey,
     algorithms : ['RS256']
 };
 
+const resetJwtOptions = {
+    jwtFromRequest: extractJwt.fromExtractors([
+      extractJwt.fromUrlQueryParameter('token'),
+      extractJwt.fromAuthHeaderAsBearerToken(),
+    ]),
+    secretOrKey: pubKey,
+    algorithms: ['RS256'],
+  };
+
 
 const strategy = new jwtStrategy(options, async (payload, done)=>{
-    let admin, uploader, syncUser = {}
-    let item = {}
-   try {
-    if(payload.kid && payload.kid == "admin"){
-        admin = await Admin.findById(payload.sub).exec()
-        item = admin
-    }else{
-        uploader = await User.findOne({_id : payload.sub}).exec()
-        syncUser = await SyncUser.findOne({_id : payload.sub}).exec()
-        item = uploader || syncUser
-        
-    }
-    if(item) {
-        return done(null, item)
-    }else {
-        return done(null, false)
-    }
-   } catch (error) {    
-    return done(error, false)
-   }
+  let item = null
+  try {
+  if(payload.purpose && payload.purpose ==  'reset'){
+    return done(null, item)
+  }
+  if(payload.kid && payload.kid == "admin"){
+    item = await Admin.findById(payload.sub).exec()
+  }else{
+    item = await getUserInfo({_id : payload.sub})  
+  }
+  if(item) {
+    return done(null, item)
+  }else {
+    return done(null, false)
+  }
+  } catch (error) {    
+  return done(error, false)
+  }
 })
 
+const resetStrategy = new jwtStrategy(resetJwtOptions, async (payload, done) => {
+  try {
+    if (!payload.purpose || payload.purpose !== 'reset') {
+      return done(null, false); // not a reset token
+    }
+    const user = await getUserInfo({_id : payload.sub})
+    return user ? done(null, user) : done(null, false);
+  } catch (err) {
+    return done(err, false);
+  }
+});
+  
+
 module.exports = (passport)=>{
-    passport.use(strategy)
+  passport.use(strategy)
+  passport.use('jwt-reset',resetStrategy)
 }

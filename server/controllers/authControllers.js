@@ -251,7 +251,7 @@ const verifyEmail =  async (req,res,next)=>{
     }
       
   }else{
-      res.redirect('/notConfirmed')
+    res.redirect('/notConfirmed')
   }
 }
 
@@ -292,15 +292,16 @@ const changePassword = async (req,res,next)=>{
 const requestForgotPw = async (req,res,next)=>{
   const {email} = req.body
 
-    const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
+  const user = await getUserInfo({email})
 
-    if(user){
-      const {token} = issueJwtForgotPassword(user)
-      requestForgotPassword(user, token)
-      res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
-    }else{
-      res.status(422).send("Invalid Email Address")
-    }
+  if(user){
+    const {token} = issueJwtForgotPassword(user)
+    console.log(token)
+    requestForgotPassword(user, token)
+    res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
+  }else{
+    res.status(422).send("Invalid Email Address")
+  }
 }
 
 module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword,resetPassword, requestForgotPw, getsyncuserinfo, profilesetup,who_am_i}

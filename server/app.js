@@ -6,6 +6,8 @@ var logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose')
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 require('dotenv').config()
 
@@ -38,6 +40,14 @@ var corsOptionsDelegate = function (req, callback) {
 
 // cors setup
 app.use(cors(corsOptionsDelegate))
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+
+app.use(helmet());
+app.use(limiter);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

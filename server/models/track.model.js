@@ -335,14 +335,14 @@ const trackLicenseSchema = new Schema({
 },{timestamps : true})
 
 const transferOwnershipSchema = new Schema({
-    trackIds : [{
+    trackId : {
         type : Schema.Types.ObjectId,
         ref : "track"
-    }],
-    fromUsers : [{
+    },
+    fromUser : {
         type : Schema.Types.ObjectId,
         refPath : "fromUserModel"
-    }],
+    },
     fromUserModel : {
         type: String,
         required: true,

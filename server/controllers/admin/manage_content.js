@@ -85,70 +85,80 @@ const contentUpdate = async(req,res,next)=>{
 }
 
 const contentTransferOwnership = async (req, res, next) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    const allowedTrackOwnerRoles = ['Music Uploader', 'ContentAdmin']
-    const requiredItems = ["trackIds","newTrackOwnerId", "comment"]
-    try {
-      const { trackIds, newTrackOwnerId,comment} = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  const allowedTrackOwnerRoles = ['Music Uploader', 'ContentAdmin']
+  const requiredItems = ["trackIds","newTrackOwnerId", "comment"]
+  try {
+    const { trackIds, newTrackOwnerId,comment} = req.body;
 
-      const missingItems = requiredItems.filter(item => Object.keys(req.body).includes(item))
+    const missingItems = requiredItems.filter(item => Object.keys(req.body).includes(item))
 
-      if (missingItems){
-        throw new BadRequestError('Invalid or missing parameters')
-      }
-
-      const invalidTracks =  await checkTrackStatus(trackIds)
-
-      if (invalidTracks) {
-        throw new BadRequestError('Tracks must be approved before they can be transferred to another user');
-      }
-
-      const newTrackOwner = await getUserInfo({ _id: newTrackOwnerId });
-      if (!newTrackOwner || !allowedTrackOwnerRoles.includes(newTrackOwner.role)) {
-        throw new BadRequestError('Invalid new trackOwner id provided');
-      }
-  
-      const ownedTracks = await checkForExistingOwnershipByUser(trackIds, newTrackOwnerId);
-      if (ownedTracks) {
-        throw new BadRequestError('One or more track entries already belong to this user');
-      }
-  
-      await Promise.all(trackIds.map(trackId => {
-        return Promise.all([
-          Dashboard.findOneAndUpdate(
-            { totalTracks: { $in: [trackId] } },
-            { $pull: { totalTracks: trackId } },
-            { new: true, session }
-          ).exec(),
-  
-          track.findOneAndUpdate(
-            { _id: trackId },
-            {
-              userRole: newTrackOwner.role,
-              user: newTrackOwner._id
-            },
-            { new: true, session }
-          ).exec()
-        ]);
-      }));
-
-    //   const newownershipTransfer = new ownershipTransfer({
-    //     trackIds,
-    //     from
-    //   })
-  
-      await session.commitTransaction();
-      session.endSession();
-  
-      res.status(200).json({ success: true, message: "Tracks transferred successfully" });
-  
-    } catch (error) {
-      console.error(error);
-      await session.abortTransaction();
-      session.endSession();
-      next(new BadRequestError(error.message || 'An error occurred while transferring ownership'));
+    if (missingItems){
+      throw new BadRequestError('Invalid or missing parameters')
     }
+
+    const invalidTracks =  await checkTrackStatus(trackIds)
+
+    if (invalidTracks) {
+      throw new BadRequestError('Tracks must be approved before they can be transferred to another user');
+    }
+
+    const newTrackOwner = await getUserInfo({ _id: newTrackOwnerId });
+    if (!newTrackOwner || !allowedTrackOwnerRoles.includes(newTrackOwner.role)) {
+      throw new BadRequestError('Invalid new trackOwner id provided');
+    }
+
+    const trackDetails = await checkForExistingOwnershipByUser(trackIds, newTrackOwnerId);
+    if (trackDetails.existing) {
+      throw new BadRequestError('One or more track entries already belong to this user');
+    }
+
+    await Promise.all(trackIds.map(trackId => {
+      return Promise.all([
+        Dashboard.findOneAndUpdate(
+          { totalTracks: { $in: [trackId] } },
+          { $pull: { totalTracks: trackId } },
+          { new: true, session }
+        ).exec(),
+
+        track.findOneAndUpdate(
+          { _id: trackId },
+          {
+            userModel: newTrackOwner.role == "Music Uploader" ? "user" : 'admin',
+            user: newTrackOwner._id
+          },
+          { new: true, session }
+        ).exec()
+      ]);
+    }));
+
+    await Promise.all(trackDetails.infos.map(async (item) =>{
+      const newownershipTransfer = new ownershipTransfer({
+        trackId : item._id,
+        fromUser : item.user,
+        fromUserModel : item.userModel,
+        toUser : newTrackOwnerId,
+        toUserModel : newTrackOwner.userModel,
+        comment,
+        performedBy : req.user.id
+      })
+
+      await newownershipTransfer.save({session})
+
+    }))
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({ success: true, message: "Tracks transferred successfully" });
+
+  } catch (error) {
+    console.error(error);
+    await session.abortTransaction();
+    session.endSession();
+    next(new BadRequestError(error.message || 'An error occurred while transferring ownership'));
+  }
 };
   
 module.exports = {contentReview, searchContent, contentUpdate,contentTransferOwnership}
