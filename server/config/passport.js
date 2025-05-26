@@ -9,11 +9,12 @@ require("dotenv").config()
 
 const pubKey = process.env.PUB_KEY
 const cookieExtractor = (req) => {
-    return req.signedCookies.sync_token || null;
+  return req.signedCookies.sync_token || null;
 }
 
 const options = {
-    jwtFromRequest : extractJwt.fromExtractors([cookieExtractor]),
+    jwtFromRequest : extractJwt.fromExtractors([cookieExtractor,extractJwt.fromUrlQueryParameter('token'),
+    extractJwt.fromAuthHeaderAsBearerToken(),]),
     secretOrKey : pubKey,
     algorithms : ['RS256']
 };
