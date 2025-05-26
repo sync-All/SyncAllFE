@@ -17,7 +17,7 @@ var router = express.Router();
 /* GET users listing. */
 router.post("/api/v1/signup", asynchandler(authcontroller.signup));
 
-router.post("/api/v1/signin", loginLimiter, asynchandler(authcontroller.signin));
+router.post("/api/v1/signin",asynchandler(loginLimiter), asynchandler(authcontroller.signin));
 
 router.post("/api/v1/googleauth",loginLimiter, asynchandler(authcontroller.googleAuth));
 

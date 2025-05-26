@@ -1,11 +1,9 @@
-const confirmEmail = require('../utils/mailer');
+const emailTools = require('../utils/mailer');
 const issueJwt = require('../utils/issueJwt')
 const EmailDomain = require('../utils/userUtils').grabEmailDomain
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;
-const issueJwtForgotPassword = require('../utils/issueJwt').issueJwtForgotPassword
-const requestForgotPassword = require('../utils/mailer').requestForgotPassword
 const Dashboard = require('../models/dashboard.model').dashboard;
 const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
@@ -41,7 +39,7 @@ const signup = async function(req, res) {
           const newUserData = await createNewMusicUploader({name,email,hashpassword,role,userType})
           const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
           const grabber = EmailDomain.grabEmailDomain(newUserData)
-          await confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
+          await emailTools.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
           const dashboard = new Dashboard({
           user : newUserData._id
           })
@@ -56,7 +54,7 @@ const signup = async function(req, res) {
             if(!newUserData) throw new BadRequestError('An error occured while creating your account')
             const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(newUserData)
             const grabber = EmailDomain.grabEmailDomain(newUserData)
-            confirmEmail.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
+            emailTools.sendConfirmationMail(newUserData,toBeIssuedJwt.token)
             res.status(200).json({success : true, message : "Account successfully created", emailDomain : grabber.link})
           }
         }
@@ -84,7 +82,7 @@ const signin = async(req,res,next)=> {
     return res.status(401).json({success : false, message : "Invalid Email or Password"})
   }else if(!userInfo.emailConfirmedStatus){
     const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(userInfo)
-    confirmEmail.sendConfirmationMail(userInfo,toBeIssuedJwt.token)
+    emailTools.sendConfirmationMail(userInfo,toBeIssuedJwt.token)
     return res.status(401).json({success : false, message : 'Oops.., Your email is yet to be confirmed, Kindly check your email for new confirmation Link'})
   }else{
     const toBeIssuedJwt = issueJwt.issueJwtLogin(userInfo)
@@ -295,9 +293,9 @@ const requestForgotPw = async (req,res,next)=>{
   const user = await getUserInfo({email})
 
   if(user){
-    const {token} = issueJwtForgotPassword(user)
+    const {token} = issueJwt.issueJwtResetPassword(user)
     console.log(token)
-    requestForgotPassword(user, token)
+    emailTools.mailResetPassword(user, token)
     res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
   }else{
     res.status(422).send("Invalid Email Address")

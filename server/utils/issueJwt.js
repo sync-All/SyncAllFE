@@ -56,7 +56,7 @@ function issueJwtAdminLogin(user){
     }
 }
 
-function issueJwtForgotPassword(user){
+function issueJwtResetPassword(user){
     const _id = user._id
 
     const expiresIn = 5 * 60 * 1000
@@ -75,4 +75,4 @@ function issueJwtForgotPassword(user){
     }
 }
 
-module.exports = {issueJwtConfirmEmail, issueJwtAdminLogin, issueJwtLogin, issueJwtForgotPassword}
+module.exports = {issueJwtConfirmEmail, issueJwtAdminLogin, issueJwtLogin, issueJwtResetPassword}

@@ -97,7 +97,7 @@ async function sendConfirmationMail(user, issuedJwt){
   });
 }
 
-function requestForgotPassword(user, issuedJwt){
+function mailResetPassword(user, issuedJwt){
 
 const pathtofile = path.join(__dirname, '..', '/views/forgotPassword.ejs')
 
@@ -279,4 +279,4 @@ async function sendUserAnEmail(email, subject, content,files){
 }
 
 
-module.exports = {sendConfirmationMail, requestForgotPassword, informQuoteRequest,additionalDocRequest, sendUserAnEmail}
+module.exports = {sendConfirmationMail, mailResetPassword, informQuoteRequest,additionalDocRequest, sendUserAnEmail}
