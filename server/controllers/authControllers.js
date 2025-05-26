@@ -12,6 +12,7 @@ const cloudinary = require("cloudinary").v2
 const fs = require('node:fs');
 const { BadRequestError } = require('../utils/CustomError');
 const { getUserInfo, createNewSyncUser, attachNewNotification, findUserAndUpdate } = require('./userControllers');
+const { userDeviceInfo } = require('../utils/DeviceInfo');
 require('dotenv').config()
 
 
@@ -72,16 +73,18 @@ const signin = async(req,res,next)=> {
   let {email,password} = req.body
   email = email.toLowerCase()
   const userInfo = await getUserInfo({email})
+  const deviceInfo = userDeviceInfo(req)
+  console.log(deviceInfo)
   if(!userInfo){
-    return res.status(401).json({success : false, message : "User doesn't Exists"})
+    return res.status(401).json({success : false, message : "Invalid Email or Password"})
   }
   if(!userInfo.password){
-    return res.status(401).json({success : false, message : "Invalid Email or Password, Try another sign in option"})
+    return res.status(401).json({success : false, message : "Invalid Email or Password"})
     
   }
   const match = await bcrypt.compare(password, userInfo.password);
   if(!match){
-    return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
+    return res.status(401).json({success : false, message : "Invalid Email or Password"})
   }else if(!userInfo.emailConfirmedStatus){
     const toBeIssuedJwt = issueJwt.issueJwtConfirmEmail(userInfo)
     confirmEmail.sendConfirmationMail(userInfo,toBeIssuedJwt.token)
