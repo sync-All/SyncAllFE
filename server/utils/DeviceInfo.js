@@ -1,6 +1,7 @@
 const UAParser = require('ua-parser-js');
 const userDeviceInfo = (req)=>{
-    const ip = req.ip;
+    const forwardedFor = req.headers['x-forwarded-for'];
+    const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : req.ip;
     const uaString = req.headers['user-agent'];
     const parser = new UAParser();
     const ua = parser.setUA(uaString).getResult();
