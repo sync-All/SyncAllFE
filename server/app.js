@@ -27,7 +27,7 @@ const adminManageDispute = require('./routes/admin_routes/dispute')
 
 var app = express();
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 var allowlist = ['http://localhost:5173','http://localhost:5174','https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com','https://sync-all-admin-git-development-sync-alls-projects.vercel.app','https://sync-all-fe-git-development-sync-alls-projects.vercel.app', 'https://admin.syncallmusic.com']
 var corsOptionsDelegate = function (req, callback) {
