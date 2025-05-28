@@ -8,35 +8,101 @@ const User = require('../../models/usermodel').uploader;
 const SyncUser = require('../../models/usermodel').syncUser;
 const Admin = require('../../models/usermodel').admin
 
-const allUsers = async (req,res,next) =>{
-  try {
-    const {userTypes} = req.query
-    const allowedFilters = ['all','uploaders','syncUsers']
-    if(userTypes && !allowedFilters.includes(userTypes)){
-      throw new BadRequestError('Invalid query parameters')
-    }
-    if(userTypes == 'all' || !userTypes){
-      const [Users1, Users2] = await Promise.all([User.find().populate('dashboard')
-        .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
-      SyncUser.find().populate('totalLicensedTracks')
-      .populate('pendingLicensedTracks').select('-password').exec()])
-      const allusers = [...Users1, ...Users2]
-      res.json({success : true, message : allusers})
-    }else if(userTypes == 'uploaders'){
-      const allusers = await User.find().populate('dashboard')
-      .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec()
-      res.json({success : true, message : allusers})
-    }else if (userTypes == 'syncUsers'){
-      const allusers = await SyncUser.find().populate('totalLicensedTracks')
-      .populate('pendingLicensedTracks').select('-password').exec()
-      res.json({success : true, message : allusers})
-    }
+// const allUsers = async (req,res,next) =>{
+//   try {
+//     const {userTypes} = req.query
+//     const allowedFilters = ['all','uploaders','syncUsers']
+//     if(userTypes && !allowedFilters.includes(userTypes)){
+//       throw new BadRequestError('Invalid query parameters')
+//     }
+//     if(userTypes == 'all' || !userTypes){
+//       const [Users1, Users2] = await Promise.all([User.find().populate('dashboard')
+//         .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec(), 
+//       SyncUser.find().populate('totalLicensedTracks')
+//       .populate('pendingLicensedTracks').select('-password').exec()])
+//       const allusers = [...Users1, ...Users2]
+//       res.json({success : true, message : allusers})
+//     }else if(userTypes == 'uploaders'){
+//       const allusers = await User.find().populate('dashboard')
+//       .populate({path : 'dashboard', populate : [{path : 'totalTracks', model : 'track'}, {path : 'accountInfo', model : 'uploaderAccountInfo'}]}).select('-password').exec()
+//       res.json({success : true, message : allusers})
+//     }else if (userTypes == 'syncUsers'){
+//       const allusers = await SyncUser.find().populate('totalLicensedTracks')
+//       .populate('pendingLicensedTracks').select('-password').exec()
+//       res.json({success : true, message : allusers})
+//     }
     
-  } catch (error) {
-    throw new BadRequestError('An Error Occurred While fetching users')
-  }
+//   } catch (error) {
+//     throw new BadRequestError('An Error Occurred While fetching users')
+//   }
   
-}
+// }
+
+const allUsers = async (req, res, next) => {
+  try {
+    const { userTypes } = req.query;
+
+    const allowedTypes = ['uploaders', 'syncUsers', 'ContentAdmin', 'SuperAdmin', 'Admin'];
+    const typesRequested = userTypes
+      ? userTypes.split(',').filter(type => allowedTypes.includes(type))
+      : allowedTypes; // Default to all if not specified
+
+    if (userTypes && typesRequested.length === 0) {
+      return next(new BadRequestError('Invalid query parameter: userTypes'));
+    }
+
+    const promises = [];
+
+    // Uploaders
+    if (typesRequested.includes('uploaders')) {
+      promises.push(
+        User.find()
+          .select('-password')
+          .populate({
+            path: 'dashboard',
+            populate: [
+              { path: 'totalTracks', model: 'track' },
+              { path: 'accountInfo', model: 'uploaderAccountInfo' },
+            ],
+          })
+          .exec()
+      );
+    }
+
+    // Sync Users
+    if (typesRequested.includes('syncUsers')) {
+      promises.push(
+        SyncUser.find()
+          .select('-password')
+          .populate('totalLicensedTracks')
+          .populate('pendingLicensedTracks')
+          .exec()
+      );
+    }
+
+    // Admin Roles
+    if (typesRequested.includes('ContentAdmin')) {
+      promises.push(Admin.find({ role: 'ContentAdmin' }).select('name email role').exec());
+    }
+
+    if (typesRequested.includes('SuperAdmin')) {
+      promises.push(Admin.find({ role: 'SuperAdmin' }).select('name email role').exec());
+    }
+
+    if (typesRequested.includes('Admin')) {
+      promises.push(Admin.find({ role: 'Admin' }).select('name email role').exec());
+    }
+
+    const results = await Promise.all(promises);
+    const allUsers = results.flat();
+
+    res.json({ success: true, message: allUsers });
+  } catch (error) {
+    next(new BadRequestError('An error occurred while fetching users'));
+  }
+};
+
+
 
 const allAdmin = async (req,res,next)=>{
   try {
