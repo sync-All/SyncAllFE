@@ -33,7 +33,8 @@ router.get(
         'explicitCont',
         'releaseLabel',
         'uploadStatus',
-        'userModel'
+        'userModel',
+        'user'
       ];
   
       allowedFields.forEach((field) => {
