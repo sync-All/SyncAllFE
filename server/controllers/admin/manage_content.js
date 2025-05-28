@@ -69,7 +69,7 @@ const all_content = async (req, res, next) => {
     }
   }
 
-  const items = await Tracks.find(queryObj)
+  const items = await track.find(queryObj)
     .populate('user', 'name email')
     .exec();
 
