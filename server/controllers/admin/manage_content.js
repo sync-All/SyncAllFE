@@ -163,9 +163,10 @@ const contentTransferOwnership = async (req, res, next) => {
   try {
     const { trackIds, newTrackOwnerId,comment} = req.body;
 
-    const missingItems = requiredItems.filter(item => Object.keys(req.body).includes(item))
+    const missingItems = requiredItems.filter(item => !Object.keys(req.body).includes(item))
 
-    if (missingItems){
+
+    if (missingItems.length > 0){
       throw new BadRequestError('Invalid or missing parameters')
     }
 
