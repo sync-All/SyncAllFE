@@ -5,6 +5,77 @@ const { BadRequestError } = require("../../utils/CustomError")
 const Dashboard = require('../../models/dashboard.model').dashboard
 const { attachNewNotification, getUserInfo, checkForExistingOwnershipByUser, checkTrackStatus } = require("../userControllers")
 
+const all_content = async (req, res, next) => {
+  const queryObj = {};
+
+  // Dynamically include only fields that are present in the query string
+  const allowedFields = [
+    'mainArtist',
+    'releaseType',
+    'releaseTitle',
+    'trackTitle',
+    'isrc',
+    'upc',
+    'genre',
+    'recordingVersion',
+    'countryOfRecording',
+    'claimingUser',
+    'role',
+    'copyrightName',
+    'copyrightYear',
+    'releaseDate',
+    'countryOfRelease',
+    'audioLang',
+    'explicitCont',
+    'releaseLabel',
+    'uploadStatus',
+    'userModel',
+    'user'
+  ];
+
+  allowedFields.forEach((field) => {
+    if (req.query[field] !== undefined) {
+      queryObj[field] = req.query[field];
+    }
+  });
+
+  // For array-based filters, use $in if provided as comma-separated values
+  const arrayFields = [
+    'featuredArtist',
+    'featuredInstrument',
+    'producers',
+    'writers',
+    'composers',
+    'publishers',
+    'mood',
+    'tag',
+    'spotifyArtistIds'
+  ];
+
+  arrayFields.forEach((field) => {
+    if (req.query[field]) {
+      queryObj[field] = { $in: req.query[field].split(',') };
+    }
+  });
+
+  // Date range filtering (e.g. ?fromDate=2024-01-01&toDate=2024-12-31)
+  if (req.query.fromDate || req.query.toDate) {
+    queryObj.recordingDate = {};
+    if (req.query.fromDate) {
+      queryObj.recordingDate.$gte = new Date(req.query.fromDate);
+    }
+    if (req.query.toDate) {
+      queryObj.recordingDate.$lte = new Date(req.query.toDate);
+    }
+  }
+
+  const items = await Tracks.find(queryObj)
+    .populate('user', 'name email')
+    .exec();
+
+  res.send(items);
+}
+
 const contentReview = async(req,res,next)=>{
     try {
         const {actionTaken,contentId,reason} = req.query
@@ -161,4 +232,4 @@ const contentTransferOwnership = async (req, res, next) => {
   }
 };
   
-module.exports = {contentReview, searchContent, contentUpdate,contentTransferOwnership}
+module.exports = {contentReview, searchContent, all_content, contentUpdate,contentTransferOwnership}
