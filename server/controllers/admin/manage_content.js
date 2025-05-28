@@ -47,13 +47,13 @@ const contentReview = async(req,res,next)=>{
 
 const searchContent = async(req,res,next)=>{
     try {
-        const {filter} = req.query
-        const regex = new RegExp(filter, 'i');
-        const tracks =  await track.find({$or : [
-            {trackTitle : {$regex : regex}},
-            {mainArtist : {$regex : regex}},
-        ]}).populate('user','name email').exec()
-        res.send(tracks)
+      const {filter} = req.query
+      const regex = new RegExp(filter, 'i');
+      const tracks =  await track.find({$or : [
+          {trackTitle : {$regex : regex}},
+          {mainArtist : {$regex : regex}},
+      ]}).populate('user','name email').exec()
+      res.send(tracks)
     } catch (error) {
         console.log(error)
         throw new BadRequestError('An error Occured, contact dev team')
