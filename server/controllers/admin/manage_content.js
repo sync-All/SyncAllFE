@@ -217,7 +217,6 @@ const contentTransferOwnership = async (req, res, next) => {
       })
 
       await newownershipTransfer.save({session})
-
     }))
 
     await session.commitTransaction();
