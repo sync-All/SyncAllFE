@@ -2,7 +2,10 @@ var express = require("express");
 
 const multer = require("multer");
 const { fileFilter } = require("../../utils/upload");
-const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}}).single("artWork");
+const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}}).fields([
+  { name: "artWork", maxCount: 1 },
+  { name: "lyricsFile", maxCount: 1 }
+]);
 const bulkUpload = multer({ dest: "bulkUploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}, fileFilter}).single("bulkUpload")
 const asyncHandler = require("express-async-handler");
 const passport = require("passport");

@@ -38,8 +38,8 @@ const trackUpload = async(req,res,next)=>{
       throw new unauthorizedError('Track already exists')
     }
     let songInfo = req.body
-    let fileInfo = req.file
-    await trackProcessing(songInfo,fileInfo,spotifyresponse,req)
+    let fileInfos = req.files
+    await trackProcessing(songInfo,fileInfos,spotifyresponse,req)
     res.status(201).json({success : true, message : 'Music Information has been successfully added'})
   } catch (error) {
     throw new BadRequestError(error.message)

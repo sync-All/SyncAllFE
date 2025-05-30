@@ -100,7 +100,8 @@ const attachNewNotification = async({title, message, linkto, userId})=>{
 const checkTrackStatus = async (trackIds) => {
     try {
         for (const trackId of trackIds) {
-            const trackDetail = await Track.findOne({ _id: trackId }).select('_id').exec();
+            const trackDetail = await Track.findOne({ _id: trackId }).select('_id uploadStatus').exec();
+            console.log(trackDetail)
             if (trackDetail.uploadStatus !== 'Approved') {
               return trackDetail._id;
             }
