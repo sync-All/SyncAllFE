@@ -1,8 +1,8 @@
 var express = require("express");
 
 const multer = require("multer");
-const { fileFilter } = require("../../utils/upload");
-const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}}).fields([
+const { fileFilter,trackUploadFIlter } = require("../../utils/upload");
+const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 2},trackUploadFIlter}).fields([
   { name: "artWork", maxCount: 1 },
   { name: "lyricsFile", maxCount: 1 }
 ]);

@@ -4,6 +4,7 @@ const Track = require("../models/track.model").track
 const dashboard = require("../models/dashboard.model").dashboard
 const { trackError, uploadErrorHistory } = require("../models/track.model")
 const fs = require('fs')
+const path = require("path");
 
 function fileFilter (req, file, cb) {
   if(!file){
@@ -85,14 +86,31 @@ const trackProcessing = async (songInfo,fileInfos,spotifyresponse,request)=>{
         fs.unlinkSync(artFile.path)
       }
       if(fileInfos.lyricsFile?.[0]){
-
+        const lyricsFile = fileInfos.lyricsFile[0];
+        const ext = path.extname(lyricsFile.originalname).toLowerCase();
+        const rawContent = fs.readFileSync(lyricsFile.path, "utf-8");
+        let parsedLyrics = rawContent.trim();
+        if (ext === ".lrc") parsedLyrics = parseLRC(rawContent);
+        const uploadedLyrics = await cloudinary.uploader.upload(lyricsFile.path, {
+          folder: "track_lyrics_files",
+          resource_type: "raw",
+        });
+  
+        fs.unlinkSync(lyricsFile.path);
+  
+        songInfo.lyrics = parsedLyrics;
+        songInfo.lyricsFileUrl = uploadedLyrics.secure_url
+        songInfo.lyricsFileType = ext.replace(".", "");
       }
       const adjustedsongInfo = {...songInfo, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
-        const track = new Track(adjustedsongInfo)
-        const trackInfo = await track.save()
-        if(request.user.role == 'Music Uploader'){
-          await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
-        }
+
+      const track = new Track(adjustedsongInfo)
+      const trackInfo = await track.save()
+      if(request.user.role == 'Music Uploader'){
+        await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
+      }
+      console.log(trackInfo)
+
     }else{
       const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
       const track = new Track(adjustedsongInfo)
@@ -100,15 +118,13 @@ const trackProcessing = async (songInfo,fileInfos,spotifyresponse,request)=>{
       if(request.user.role == 'Music Uploader'){
         await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
       }
-      await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
     }
     return;
   } catch (err) {
-    console.log(err)
     throw new BadRequestError(err)
   }
 
 }
 
 
-module.exports = {fileFilter,disputeFileFilter, trackProcessing,lyricsFilter,parseLRC}
+module.exports = {fileFilter,disputeFileFilter, trackProcessing,lyricsFilter,parseLRC,trackUploadFIlter}

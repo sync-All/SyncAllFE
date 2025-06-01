@@ -134,6 +134,12 @@ const trackSchema = new Schema({
         type : String,
         // required : true
     },
+    lyricsFileType : {
+        type : String,
+    },
+    lyricsFileUrl : {
+        type : String,
+    },
     audioLang : {
         type : String,
         // required : true
