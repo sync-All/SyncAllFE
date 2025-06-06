@@ -346,7 +346,7 @@ const ManageContent = () => {
                       {item.mainArtist}
                     </td>
                     <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
-                      {item.user.name}
+                      {item.user?.name}
                     </td>
                     <td className="py-4 px-8">
                       <span

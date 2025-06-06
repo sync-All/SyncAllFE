@@ -21,6 +21,9 @@ import { useLocation } from 'react-router-dom';
 import BulkUpload from '../components/Upload Track/Bulk Upload/BulkUpload';
 import ResolveErrorWrapper from '../components/Upload Track/Bulk Upload/ResolveError';
 import Transfer from '../components/Ownership Transfer/Transfer';
+import UserTransferrableTracks from '../components/Ownership Transfer/UserTransferrableTracks';
+import UploadedTracks from '../components/UploadedTracks';
+import UploadHistoryProvider from '../contexts/UploadHistoryContext';
 
 const tabByPath: { [key: string]: string } = {
   '/admin/dashboard': 'Dashboard',
@@ -29,6 +32,7 @@ const tabByPath: { [key: string]: string } = {
   '/admin/upload-contents': 'Upload Content',
   '/admin/tickets': 'Manage Tickets',
   '/admin/transfer': 'Ownership Transfer',
+  '/admin/tracks': 'Tracks',
 };
 
 const AdminDashboard = () => {
@@ -84,7 +88,7 @@ const AdminDashboard = () => {
             path="dashboard"
             element={
               <ProtectedRoute
-                allowedRoles={['Admin']}
+                allowedRoles={['Admin', 'ContentAdmin']}
                 element={<AdminDashboardHome />}
               />
             }
@@ -108,11 +112,10 @@ const AdminDashboard = () => {
               <ProtectedRoute
                 allowedRoles={['Admin']}
                 element={
-                                    <UserProvider>
-
-                  <ContentProvider>
-                    <SingleUserPage />
-                  </ContentProvider>
+                  <UserProvider>
+                    <ContentProvider>
+                      <SingleUserPage />
+                    </ContentProvider>
                   </UserProvider>
                 }
               />
@@ -194,6 +197,19 @@ const AdminDashboard = () => {
               />
             }
           />
+          <Route
+            path="tracks"
+            element={
+              <ProtectedRoute
+                allowedRoles={['Admin', 'ContentAdmin']}
+                element={
+                  <UploadHistoryProvider>
+                    <UploadedTracks />
+                  </UploadHistoryProvider>
+                }
+              />
+            }
+          />
 
           <Route
             path="bulkupload"
@@ -217,6 +233,22 @@ const AdminDashboard = () => {
 
           <Route
             path="/transfer"
+            element={
+              <ProtectedRoute
+                allowedRoles={['ContentAdmin']}
+                element={
+                  <UserProvider>
+                    <ContentProvider>
+                      <UserTransferrableTracks />
+                    </ContentProvider>
+                  </UserProvider>
+                }
+              />
+            }
+          />
+
+          <Route
+            path="/transfer/:id"
             element={
               <ProtectedRoute
                 allowedRoles={['ContentAdmin']}
