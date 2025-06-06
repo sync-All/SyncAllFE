@@ -105,7 +105,7 @@ const BulkUpload = () => {
     setShowConfirmProceedModal(true); // Open the second modal
   };
 
-  const fileUrl = '../../../../assets/images/testdoc.csv';
+  const fileUrl = '/assets/testdoc.csv';
   const fileName = 'CSV Template.csv';
 
   const onDrop = useCallback(
@@ -308,6 +308,7 @@ const BulkUpload = () => {
                   href={fileUrl}
                   download={fileName}
                   className="text-[#1671D9] hover:text-blue-700 font-medium font-inter flex gap-2 items-center"
+                  type='text/csv'
                 >
                   Download CSV Template
                   <img src={Download} alt="" />
