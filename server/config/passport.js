@@ -6,9 +6,12 @@ const extractJwt = require('passport-jwt').ExtractJwt
 require("dotenv").config()
 
 const pubKey = process.env.PUB_KEY
+const cookieExtractor = (req) => {
+    return req.signedCookies.sync_token || null;
+}
 
 const options = {
-    jwtFromRequest : extractJwt.fromExtractors([extractJwt.fromUrlQueryParameter('token'),extractJwt.fromAuthHeaderAsBearerToken()]),
+    jwtFromRequest : extractJwt.fromExtractors([extractJwt.fromUrlQueryParameter('token'),extractJwt.fromAuthHeaderAsBearerToken(),cookieExtractor]),
     secretOrKey : pubKey,
     algorithms : ['RS256']
 };

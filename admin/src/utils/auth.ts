@@ -1,10 +1,10 @@
-// client/src/utils/auth.ts
-export const isTokenExpired = (token: string | null): boolean => {
-  if (!token) return true;
+// // client/src/utils/auth.ts
+// export const isTokenExpired = (token: string | null): boolean => {
+//   if (!token) return true;
 
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  const expiry = payload.exp;
-  const now = Math.floor(Date.now() / 1000);
+//   const payload = JSON.parse(atob(token.split('.')[1]));
+//   const expiry = payload.exp;
+//   const now = Math.floor(Date.now() / 1000);
 
-  return now > expiry;
-};
+//   return now > expiry;
+// };

@@ -40,6 +40,7 @@ const RejectPostModal: React.FC<RejectPostModal> = ({
       headers: {
         Authorization: token || '',
       },
+      withCredentials: true,
     };
 
     try {

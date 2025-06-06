@@ -49,27 +49,39 @@ async function main(){
 
 // Utwa()
 
-const duplicateList = [
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-  {
-    trackTitle : 'unrverve',
-    isrc : '12ed2324g34h4gw'
-  },
-]
+const bulkOperation = async()=>{
+  const bulkOps = await Track.find().then(tracks =>
+    tracks.map(track => {
+      // if(track.userRole){
+      //   let userModel = track.userRole === 'Music Uploader' ? 'user' : 'admin';
+      // }
+      let userModel;
 
-const sendNotif = async()=>{
-  try {
-    attachNewNotification({title : 'Just a test notification', message : 'A brief description of the test', userId : '66d35b34162b52ca6713aefc'})
-    console.log('notification sent')
-  } catch (error) {
-    console.log(error)
+      if(track.user.equals('66ffcf8e3bbc86bd5da85486')){
+        console.log('object')
+        userModel = 'admin';
+      }
+      
+      return {
+        updateOne: {
+          filter: { _id: track._id },
+          update: { userModel }
+        }
+      };
+    })
+  );
+  
+  if (bulkOps.length) {
+    try {
+      console.log(bulkOps.length)
+      await Track.bulkWrite(bulkOps);
+      console.log('done')
+    } catch (error) {
+      console.log(error)
+    }
   }
+  return;
 }
-sendNotif()
+bulkOperation()
+
+

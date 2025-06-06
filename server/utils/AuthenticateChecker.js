@@ -19,8 +19,8 @@ const checkAdmin = (req,res,next)=>{
 }
 
 const allowUnauthentication = (req,res,next)=>{
-req.allowUnauthentication = true
-next()
+    req.allowUnauthentication = true
+    next()
 }
 
 const checkUser = (req,res,next)=>{
@@ -78,4 +78,46 @@ const checkSyncUser = (req,res,next)=>{
         return next();
     })(req,res,next)
 }
-module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser,allowUnauthentication}
+
+const checkAllUsers = (req,res,next)=>{
+    passport.authenticate('jwt',{session : false},(err,user,info)=>{
+        if(info && info.name == "TokenExpiredError"){
+           return next(new TokenExpiredError('Session expired, proceed to login'))
+        }
+        if(err || !user){
+            if(req.allowUnauthentication){
+                return next()
+            }
+            return next(new unauthorizedError('Authentication failed'));
+        }
+        req.user = user
+        return next();
+    })(req,res,next)
+}
+
+const checkRoles = (allowedRoles = []) => {
+    return (req, res, next) => {
+      passport.authenticate('jwt', { session: false }, (err, user, info) => {
+        if (info && info.name === 'TokenExpiredError') {
+          return next(new TokenExpiredError('Session expired, proceed to login'));
+        }
+  
+        if (err || !user) {
+          if (req.allowUnauthentication) {
+            return next();
+          }
+          return next(new unauthorizedError('Authentication failed'))
+        }
+        const role = user.role;
+  
+        if (!allowedRoles.includes(role)) {
+          return next(new ForbiddenError('Attempt Forbidden'));
+        }
+  
+        req.user = user;
+        return next();
+      })(req, res, next);
+    };
+  };
+  
+module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser,allowUnauthentication, checkRoles,checkAllUsers}

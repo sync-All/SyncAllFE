@@ -4,7 +4,7 @@ const authcontroller = require("../../controllers/authControllers");
 const passport = require("passport");
 const multer = require("multer");
 const { testUpdate } = require("../../controllers/admin/users");
-const { checkUser } = require("../../utils/AuthenticateChecker");
+const { checkUser, checkRoles, checkAllUsers, checkSyncUser } = require("../../utils/AuthenticateChecker");
 const Notification = require("../../models/usermodel").notification;
 const { Types } = require("mongoose");
 const { BadRequestError } = require("../../utils/CustomError");
@@ -20,14 +20,10 @@ router.post("/api/v1/signin", asynchandler(authcontroller.signin));
 
 router.post("/api/v1/googleauth", asynchandler(authcontroller.googleAuth));
 
-router.post("/api/v1/signin", asynchandler(authcontroller.signin));
+router.get("/api/v1/who_am_i",checkAllUsers, asynchandler(authcontroller.who_am_i));
 
 router.get(
-  "/api/v1/getsyncuserinfo",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
+  "/api/v1/getsyncuserinfo",checkRoles(['Sync User']),
   asynchandler(authcontroller.getsyncuserinfo)
 );
 router.post(
@@ -107,13 +103,17 @@ router.get(
   }
 );
 
+router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
+
 router.post(
-  "/api/v1/changePassword",
-  passport.authenticate("jwt", { session: false }),
-  authcontroller.changePassword
+  "/api/v1/resetPassword",
+  checkAllUsers,
+  authcontroller.resetPassword
 );
 
-router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
+
+router.post('/api/v1/changePassword/',checkAllUsers,asynchandler(authcontroller.changePassword))
+
 router.get("/api/v1/readNotification", checkUser, asynchandler(async (req,res,next)=>{
   const {markOne, markAll} = req.query
   try{

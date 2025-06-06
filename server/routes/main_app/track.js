@@ -9,21 +9,21 @@ const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
-const { checkUploader, allowUnauthentication, checkSyncUser } = require("../../utils/AuthenticateChecker");
+const { checkUploader, allowUnauthentication, checkSyncUser, checkRoles } = require("../../utils/AuthenticateChecker");
 
 
-router.get("/verifyTrackUploaded/",checkUploader,asyncHandler(trackController.verifyTrackUpload));
+router.get("/verifyTrackUploaded/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.verifyTrackUpload));
 
-router.post("/trackUpload/",checkUploader,upload,asyncHandler(trackController.trackUpload));
-router.post("/invalid_spotify_resolution/",checkUploader,upload,asyncHandler(trackController.invalidSpotifyResolution));
-router.delete("/ignore_bulk_resolution/",checkUploader,asyncHandler(trackController.ignoreBulkResolution));
-router.delete("/ignore_single_resolution/",checkUploader,asyncHandler(trackController.ignoreSingleResolution));
+router.post("/trackUpload/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.trackUpload));
+router.post("/invalid_spotify_resolution/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.invalidSpotifyResolution));
+router.delete("/ignore_bulk_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreBulkResolution));
+router.delete("/ignore_single_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreSingleResolution));
 
 router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));
 
-router.post("/trackBulkUpload/",checkUploader,bulkUpload,asyncHandler(trackController.trackBulkUpload));
+router.post("/trackBulkUpload/",checkRoles(['ContentAdmin','Music Uploader']),bulkUpload,asyncHandler(trackController.trackBulkUpload));
 
-router.get("/get-upload-error-history", checkUploader, asyncHandler(trackController.getUploadErrorHistory))
+router.get("/get-upload-error-history", checkRoles(['ContentAdmin','Music Uploader']), asyncHandler(trackController.getUploadErrorHistory))
 
 router.get(
   "/allsongs",allowUnauthentication,checkSyncUser,

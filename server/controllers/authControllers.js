@@ -11,7 +11,7 @@ const spotifyChecker = require('../utils/spotify')
 const cloudinary = require("cloudinary").v2
 const fs = require('node:fs');
 const { BadRequestError } = require('../utils/CustomError');
-const { getUserInfo, createNewSyncUser, attachNewNotification } = require('./userControllers');
+const { getUserInfo, createNewSyncUser, attachNewNotification, findUserAndUpdate } = require('./userControllers');
 require('dotenv').config()
 
 
@@ -29,7 +29,7 @@ const signup = async function(req, res) {
     const allowedItems = ['name','email', 'password', 'role', 'userType']
     const bodyKeys = Object.keys(req.body)
     const missingItems = allowedItems.filter(item => !bodyKeys.includes(item));
-    if(missingItems.length > 1){
+    if(missingItems.length > 0){
       throw new BadRequestError(`Missing Parameter : ${missingItems[0]}`)
     }else{
       const userInfo = await getUserInfo({email : email.toLowerCase()})
@@ -138,6 +138,17 @@ const googleAuth = async(req,res,next)=>{
       
 }
 
+const who_am_i = async(req,res,next)=>{
+  try {
+    const userInfo = req.user.toObject()
+    delete userInfo.password
+    res.json(userInfo)
+  } catch (error) {
+    console.log(error)
+    throw new BadRequestError("An error occurred while fetching your information")
+  }
+}
+
 const getsyncuserinfo = async (req,res,next)=>{
   try {
     const userId = req.user._id
@@ -146,7 +157,6 @@ const getsyncuserinfo = async (req,res,next)=>{
   } catch (error) {
     throw new BadRequestError('Error Fetching user data')
   }
- 
 }
 
 const profilesetup = async (req, res, next) => {
@@ -245,49 +255,54 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-const changePassword = async(req,res,next)=>{
-  const {password, confirmassword} = req.body
- if(req.isAuthenticated()){
+const resetPassword = async(req,res,next)=>{
+  const {password, confirmPassword} = req.body
   const userId = req.user.id
   if(password !== confirmPassword){
     return res.status(422).send('Password Mismatch please try again')
   }
   try {
-    if(req.user.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
-        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
-    }else if(req.user.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+    const hashPw = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+    await findUserAndUpdate({_id : userId}, {password : hashPw})
+    res.status(200).json({success : true, message : 'Password Successfully Updated'})
+  } catch (error) {
+    console.log(error)
+    res.status(422).send("Error Occurred while Performing action")
+  }
+}
 
-        await SyncUser.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
+const changePassword = async (req,res,next)=>{
+  try {
+    const userInfo = req.user
+    const {oldPassword, newPassword} = req.body
+    const match = await bcrypt.compare(oldPassword, userInfo.password)
+    if(!match){
+      res.status(401).json('Password Incorrect')
+    }else{
+      const hashPw = await bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS))
+      await findUserAndUpdate({_id : userInfo.id},{password : hashPw})
+
+      res.status(200).json({success : true, message : 'Password Successfully Updated'})
     }
   } catch (error) {
-    res.status(422).send("Invalid Email Address")
+    res.status(404).json('User not Found')
   }
- }else{
-  res.status(400).send("Link Expired")
- }
 }
 
 const requestForgotPw = async (req,res,next)=>{
   const {email} = req.body
 
     const user = await User.findOne({email}).exec() || await SyncUser.findOne({email}).exec()
-    console.log(user)
 
     if(user){
       const {token} = issueJwtForgotPassword(user)
       requestForgotPassword(user, token)
       res.status(200).send({success :  true, message : 'Kindly Check your Mail to Proceed'})
     }else{
-      res.status(422).send("Invalid Emailee Address")
+      res.status(422).send("Invalid Email Address")
     }
 }
 
-module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
+module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword,resetPassword, requestForgotPw, getsyncuserinfo, profilesetup,who_am_i}
 
   
