@@ -39,7 +39,6 @@ const AdminDashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
   const role = user?.role;
-  console.log('role', role);
   const [activeTab, setActiveTab] = useState<string>(''); // empty at first
 
   const handleTabChange = (tab: string) => {
