@@ -9,7 +9,8 @@ import LogoutIcon from '../assets/images/Login 2.svg';
 // import { useDataContext } from '../../Context/DashboardDataProvider';
 import Placeholder from '../assets/images/placeholder.png';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { User } from '../contexts/UserContext';
 
 interface AdminDashboardSidebarProps {
   activeItem: string;
@@ -20,17 +21,23 @@ interface AdminDashboardSidebarProps {
 const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
   activeItem,
   onTabChange,
-  toggleMenu,
-}) => {
+  toggleMenu }) => {
   // const profileInfo = useDataContext();
   // const profileDetails = profileInfo.dashboardData?.profileInfo;
-  const { user } = useAuth();
-  const role = user?.role;
+   const [user, setUser] = useState<User | null>(null);
 
   const logout = () => {
     localStorage.clear();
     window.location.href = '/';
   };
+
+
+   useEffect(() => {
+     const userData = localStorage.getItem('adminData');
+     if (userData) {
+       setUser(JSON.parse(userData) as User);
+     }
+   }, []);
 
   const pStyle = (item: string) => ({
     color: item === activeItem ? 'var(--black2)' : 'var(--Grey-500, #667185)',
@@ -49,7 +56,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
     cursor: 'pointer',
   });
 
-  const hasRole = (roles: string[]) => roles.includes(role || '');
+
 
   //
 
@@ -63,92 +70,51 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
       </div>
       <div className=" mt-[53px]">
         <ul>
-          {hasRole(['Admin', 'ContentAdmin']) && (
-            <li onClick={() => onTabChange('Dashboard')}>
-              <Link to="/admin/dashboard" style={liStyle('Dashboard')}>
-                <img src={DashboardIcon} alt="" />
-                <p style={pStyle('Dashboard')}>Dashboard</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin']) && (
-            <li onClick={() => onTabChange('Manage Users')}>
-              <Link to="/admin/manage-users" style={liStyle('Manage Users')}>
-                <img src={ManageUser} alt="" />
-                <p style={pStyle('Manage Users')}>Manage Users</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin', 'ContentAdmin']) && (
-            <li onClick={() => onTabChange('Manage Content')}>
-              <Link
-                to="/admin/manage-contents"
-                style={liStyle('Manage Content')}
-              >
-                <img src={TrackIcon} alt="" />
-                <p style={pStyle('Manage Content')}>Manage Content</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin', 'ContentAdmin']) && (
-            <li onClick={() => onTabChange('Tracks')}>
-              <Link
-                to="/admin/tracks"
-                style={liStyle('Tracks')}
-              >
-                <img src={TrackIcon} alt="" />
-                <p style={pStyle('Tracks')}>Tracks</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin', 'ContentAdmin']) && (
-            <li onClick={() => onTabChange('Upload Content')}>
-              <Link
-                to="/admin/upload-contents"
-                style={liStyle('Upload Content')}
-              >
-                <img src={TrackIcon} alt="" />
-                <p style={pStyle('Upload Content')}>Upload Content</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin']) && (
-            <li onClick={() => onTabChange('Manage Tickets')}>
-              <Link to="/admin/tickets" style={liStyle('Manage Tickets')}>
-                <img src={DisputeIcon} alt="" />
-                <p style={pStyle('Manage Tickets')}>Manage Tickets</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['ContentAdmin']) && (
-            <li onClick={() => onTabChange('Ownership Transfer')}>
-              <Link to="/admin/transfer" style={liStyle('Ownership Transfer')}>
-                <img src={DisputeIcon} alt="" />
-                <p style={pStyle('Ownership Transfer')}>Ownership Transfer</p>
-              </Link>
-            </li>
-          )}
-
-          {hasRole(['Admin']) && (
-            <Link
-              to="https://airtable.com/appaKCViIID5q3ZBE/tbl1HhPFmva6zI048/viwL0YjZSdLvWFNFX?blocks=hide"
-              className="flex gap-4 cursor-pointer pt-4 pl-[33px] pb-4"
-              target="_blank"
-            >
-              <img src={QuotesIcon} alt="" />
-              <p className="text-[#667185] leading-[145%]">Quotes</p>
+          <li onClick={() => onTabChange('Dashboard')}>
+            <Link to="/admin/dashboard" style={liStyle('Dashboard')}>
+              <img src={DashboardIcon} alt="" />
+              <p style={pStyle('Dashboard')}>Dashboard</p>
             </Link>
-          )}
+          </li>
+          <li onClick={() => onTabChange('Manage Users')}>
+            <Link to="/admin/manage-users" style={liStyle('Manage Users')}>
+              <img src={ManageUser} alt="" />
+              <p style={pStyle('Manage Users')}>Manage Users</p>
+            </Link>
+          </li>
+
+          <li onClick={() => onTabChange('Manage Content')}>
+            <Link to="/admin/manage-contents" style={liStyle('Manage Content')}>
+              <img src={TrackIcon} alt="" />
+              <p style={pStyle('Manage Content')}>Manage Content</p>
+            </Link>
+          </li>
+
+          <li onClick={() => onTabChange('Manage Tickets')}>
+            <Link to="/admin/tickets" style={liStyle('Manage Tickets')}>
+              {' '}
+              <img src={DisputeIcon} alt="" />
+              <p style={pStyle('Manage Tickets')}>Manage Tickets</p>
+            </Link>
+          </li>
+
+          {/* <li onClick={() => onTabChange('Music Quotes')}>
+            <Link to="/admin/music-quotes" style={liStyle('Music Quotes')}>
+              <img src={QuotesIcon} alt="" />
+              <p style={pStyle('Music Quotes')}>Quotes</p>
+            </Link>
+          </li> */}
+          <Link
+            to="https://airtable.com/appaKCViIID5q3ZBE/tbl1HhPFmva6zI048/viwL0YjZSdLvWFNFX?blocks=hide"
+            className="flex gap-4 cursor-pointer pt-4 pl-[33px] pb-4"
+            target="_blank"
+          >
+            <img src={QuotesIcon} alt="" />
+            <p className="text-[#667185] leading-[145%]">Quotes</p>
+          </Link>
         </ul>
       </div>
-
-      <div className="mt-auto">
+      <div className=" mt-auto ">
         <div className="border border-[#E4E7EC] bg-[#F2F4F7] m-[10px] pl-3 pt-3">
           <div className="flex gap-[9px]">
             <span>
@@ -165,12 +131,12 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
           </div>
 
           <a href="mailto:info@syncallmusic.com">
-            <button className="mt-4 py-1 mr-3 mb-3 text-[14px] leading-5 font-formular-medium text-center bg-white w-full rounded-md">
+            <button className="mt-4 py-1 mr-3 mb-3 text-[14px] leading-5 font-formular-medium text-center bg-white w-full  rounded-md">
               Contact Us
             </button>
           </a>
         </div>
-        <div className="flex items-center mx-3 mt-6 mb-9">
+        <div className="flex items-center mx-3 mt-6 mb-9 ">
           <span>
             <img
               src={Placeholder}

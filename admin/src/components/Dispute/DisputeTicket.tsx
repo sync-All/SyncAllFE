@@ -71,7 +71,6 @@ const DisputeTicket = () => {
       headers: {
         Authorization: `${token}`,
       },
-      withCredentials: true,
     };
 
     try {

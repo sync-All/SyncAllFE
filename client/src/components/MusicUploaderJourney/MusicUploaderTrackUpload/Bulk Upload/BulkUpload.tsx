@@ -103,7 +103,7 @@ const BulkUpload = () => {
     setShowConfirmProceedModal(true); // Open the second modal
   };
 
-  const fileUrl = '/assets/testdoc.csv';
+  const fileUrl = '../../../../assets/images/testdoc.csv';
   const fileName = 'CSV Template.csv';
 
   const onDrop = useCallback(
@@ -305,7 +305,6 @@ const BulkUpload = () => {
                 <a
                   href={fileUrl}
                   download={fileName}
-                  type="text/csv"
                   className="text-[#1671D9] hover:text-blue-700 font-medium font-inter flex gap-2 items-center"
                 >
                   Download CSV Template
@@ -392,7 +391,7 @@ const BulkUpload = () => {
         isOpen={showConfirmProceedModal}
         onClose={() => setShowConfirmProceedModal(false)}
         bulkUploadResult={bulkUploadResult}
-        source="upload"
+        source='upload'
       />
     </div>
   );
