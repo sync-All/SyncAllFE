@@ -81,7 +81,6 @@ const ManageUsers = () => {
       headers: {
         Authorization: `${token}`,
       },
-      withCredentials: true,
     };
 
     try {

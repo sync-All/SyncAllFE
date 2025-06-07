@@ -177,16 +177,10 @@ const trackSchema = new Schema({
     duration : {
         type : String,
     },
-    userModel : {
-        type: String,
-        required: true,
-        enum: ['user', 'admin'],
-        default : 'user'
-    },
     user : {
-        type : mongoose.Schema.Types.ObjectId,
-        refPath: 'userModel'
-    }
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    },
 },{timestamps : true})
 
 const rejectedTrackSchema = new Schema({
@@ -206,54 +200,41 @@ const rejectedTrackSchema = new Schema({
 },{timestamps : true})
 
 const trackErrorSchema = new Schema()
-trackErrorSchema.add(trackSchema).add({
-    mainArtist : {
+trackErrorSchema.add(trackSchema).add({mainArtist : {
+    type : String,
+    required : false
+},
+releaseType : {
+    type : String,
+    required : false
+},
+releaseTitle: {
     type : String,
     required : false
     },
-    releaseType : {
-        type : String,
-        required : false
+trackTitle : {
+    type : String,
+    required : false
     },
-    releaseTitle: {
-        type : String,
-        required : false
-        },
-    trackTitle : {
-        type : String,
-        required : false
-        },
-    trackLink : {
-        type : String,
-        required : false
-        },
-    isrc : {
-        type : String,
-        required : false
-        }, 
+trackLink : {
+    type : String,
+    required : false
+    },
+isrc : {
+    type : String,
+    required : false
+    }, 
     message : String, 
-    userModel : {
-        type: String,
-        required: true,
-        enum: ['user', 'admin'],
-        default : 'user'
-    },
     user : {
-        type : mongoose.Schema.Types.ObjectId,
-        refPath: 'userModel'
-    },
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    }, 
     err_type : {
         type : String
-    },
-    trackOwnerModel : {
-        type: String,
-        required: true,
-        enum: ['user', 'admin'],
-        default : 'user'
-    },
+    }, 
     trackOwner : {
-        type : mongoose.Schema.Types.ObjectId,
-        refPath: 'userModel'
+        type : Schema.Types.ObjectId,
+        ref : "user"
     }
     
 })
@@ -283,16 +264,10 @@ const uploadErrorHistorySchema =  new Schema({
     fileType : {
         type : String,
     },
-    userModel : {
-        type: String,
-        required: true,
-        enum: ['user', 'admin'],
-        default : 'user'
-    },
     user : {
-        type : mongoose.Schema.Types.ObjectId,
-        refPath: 'userModel'
-    },
+        type : Schema.Types.ObjectId,
+        ref : "user"
+    }
 },{timestamps : true})
 
 

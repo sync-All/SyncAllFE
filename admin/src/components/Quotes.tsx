@@ -93,7 +93,6 @@ const Quotes = () => {
         headers: {
           Authorization: `${token}`,
         },
-        withCredentials: true,
       };
 
       try {

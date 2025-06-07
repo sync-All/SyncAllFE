@@ -2,7 +2,7 @@ var express = require('express');
 const router = express.Router()
 const asynchandler = require('express-async-handler');
 const kpi = require('../../utils/kpi')
-const {checkAdmin, checkRoles} = require('../../utils/AuthenticateChecker')
+const {checkAdmin} = require('../../utils/AuthenticateChecker')
 const userControllers = require('../../controllers/admin/users')
 const { BadRequestError } = require('../../utils/CustomError');
 const multer = require("multer");
@@ -18,7 +18,7 @@ router.get('/get_key_metrics/', checkAdmin, asynchandler(async(req,res,next)=>{
     }
 }))
 
-router.get('/allusers',checkRoles(['ContentAdmin', "SuperAdmin", "Admin"]), asynchandler(userControllers.allUsers));
+router.get('/allusers',checkAdmin, asynchandler(userControllers.allUsers));
 
 router.get('/userSearch', checkAdmin, asynchandler(userControllers.userSearch))
 router.put('/suspenduser', checkAdmin, asynchandler(userControllers.suspendUser))

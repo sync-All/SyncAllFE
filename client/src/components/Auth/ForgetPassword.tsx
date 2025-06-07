@@ -29,7 +29,7 @@ const ForgetPassword = () => {
       await delay(2000);
       const response = await axios.post(apiUrl, {
         email: values['email'],
-      }, );
+      });
       toast.success(response.data.message);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;

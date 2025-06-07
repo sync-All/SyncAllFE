@@ -54,7 +54,7 @@ const refreshPage = () => {
     setLoading(true)
     const token = localStorage.getItem('token');
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/changePassword/`;
+    const apiUrl = `${urlVar}/passwordreset/`;
 
     const config = {
       headers: {
