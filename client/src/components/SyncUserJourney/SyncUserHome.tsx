@@ -197,9 +197,9 @@ const SyncUserHome = () => {
         <div className="flex items-center gap-2">
           <p className="text-[#27282A] text-base font-formular-regular lg:font-bold lg:text-[24px] w-fit">
             {' '}
-            Search Results for
+            Search results for
           </p>
-          <span className="bg-[#013131] text-white rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-sm font-formular-regular">
+          <span className="outline outline-[#013131] text-[#27282A] rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-sm font-formular-regular">
             {searchState.query}
             <button
               className="text-[10px] bg-white text-black rounded-full w-5 h-5 flex items-center justify-center"
@@ -218,9 +218,9 @@ const SyncUserHome = () => {
           <span className="text-[#27282A] text-base font-formular-regular lg:font-bold lg:text-[24px] w-fit">
             {searchState.type.charAt(0).toUpperCase() +
               searchState.type.slice(1)}{' '}
-            Results:
+            results for:
           </span>
-          <span className="bg-[#013131] text-white rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-base font-formular-regular">
+          <span className="outline outline-[#013131] text-[#27282A] rounded-[10px] px-3 py-1 flex items-center gap-2 capitalize  text-base font-formular-regular">
             {searchState.query}
             <button
               className="text-[10px] bg-white text-black rounded-full w-5 h-5 flex items-center justify-center"

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useContent } from '../../contexts/ContentContext';
 import debounce from 'lodash/debounce';
 import { useState, useMemo, useEffect } from 'react';
 import ArrowDown from '../../assets/images/arrowdown.svg';
@@ -12,24 +11,19 @@ import NoTrack from '../../assets/images/no_track.svg';
 import Search from '../../assets/images/search-1.svg';
 import Left from '../../assets/images/left-arrow.svg';
 import Right from '../../assets/images/right-arrow.svg';
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import TransferModal from './TransferModal';
-
-interface Content {
-  _id: string;
-  trackTitle: string;
-  mainArtist: string;
-  uploadStatus: string;
-  user: {
-    _id: string;
-    name: string;
-  };
-}
+import { Track } from '../../declaration';
 
 // Remove duplicate TableData interface since we're not using its additional fields
-type TableData = Content;
+type TableData = Track;
 
-type SortableFields = 'trackTitle' | 'mainArtist' | 'name';
+type SortableFields =
+  | 'trackTitle'
+  | 'mainArtist'
+  | 'name'
+  | 'createdAt'
+  | 'earnings';
 
 interface SortConfig {
   key: SortableFields | null;
@@ -66,7 +60,7 @@ const SortButton: React.FC<SortButtonProps> = ({
 const ITEMS_PER_PAGE = 100;
 
 const Transfer = () => {
-  const { content, loading } = useContent();
+  const [uploaderContent, setUploaderContent] = useState<Track[]>([]);
   const [searchResults, setSearchResults] = useState<TableData[]>([]);
   const [contentSearch, setContentSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +68,10 @@ const Transfer = () => {
     { contentId: string; user: string }[]
   >([]);
 
+  const { id } = useParams<{ id: string }>();
+  if (!id) {
+    throw new Error('User ID is required');
+  }
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -81,9 +79,45 @@ const Transfer = () => {
     direction: 'ascending',
   });
 
+  useEffect(() => {
+    fetchUploaderContent();
+  }, []);
+
+  const fetchUploaderContent = async () => {
+    const token = localStorage.getItem('token');
+    const urlVar = import.meta.env.VITE_APP_API_URL;
+    const apiUrl = `${urlVar}/all_content?user=${id}`;
+
+    try {
+      setIsLoading(true);
+      const response = await axios.get(apiUrl, {
+        headers: { Authorization: token },
+        withCredentials: true,
+      });
+
+      // Filter out items with uploadStatus: 'pending'
+      const filteredContent = response.data.filter(
+        (item: Track) => item.uploadStatus !== 'Pending'
+      );
+
+      setUploaderContent(filteredContent);
+      console.log(`filteredContent : `, filteredContent);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          'An error occurred'
+      );
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const baseData = useMemo(() => {
-    return contentSearch.trim() === '' ? content : searchResults;
-  }, [content, searchResults, contentSearch]);
+    return contentSearch.trim() === '' ? uploaderContent : searchResults;
+  }, [uploaderContent, searchResults, contentSearch]);
 
   const sortedData = useMemo(() => {
     if (!Array.isArray(baseData) || !baseData.length || !sortConfig.key) {
@@ -186,7 +220,7 @@ const Transfer = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const endIndex = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingAnimation />;
   }
 
@@ -195,6 +229,7 @@ const Transfer = () => {
 
   const active =
     'text-[#F9F6FF] bg-[#013131] font-bold flex items-center flex-col h-8 w-8 rounded-[4px] p-1';
+
   return (
     <div className="lg:mx-8 ml-5 mt-[29px] mb-[96px]">
       <div className="flex justify-between">
@@ -228,8 +263,9 @@ const Transfer = () => {
             />
           </div>{' '}
           <button
-            className="bg-[#667085]  text-[#F9F6FF] font-formular-normal text-[14px] leading-5 py-2.5 px-4 rounded-lg"
+            className="disabled:bg-[#667085] disabled:cursor-not-allowed cursor-default bg-black  text-[#F9F6FF] font-formular-normal text-[14px] leading-5 py-2.5 px-4 rounded-lg "
             onClick={() => setIsModalOpen(true)}
+            disabled={!selectedContent || selectedContent.length === 0}
           >
             Transfer Ownership
           </button>
@@ -260,8 +296,25 @@ const Transfer = () => {
                     onSort={handleSort}
                   />
                 </th>
+                <th className={ThStyles}>
+                  Upload Date
+                  <SortButton
+                    sortConfig={sortConfig}
+                    sortKey="createdAt"
+                    onSort={handleSort}
+                  />
+                </th>
 
-                <th className={ThStyles}>Actions</th>
+                <th className={ThStyles}>
+                  Earnings{' '}
+                  <SortButton
+                    sortConfig={sortConfig}
+                    sortKey="earnings"
+                    onSort={handleSort}
+                  />
+                </th>
+
+               
               </tr>
             </thead>
             <tbody>
@@ -297,12 +350,19 @@ const Transfer = () => {
                   <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
                     {item.mainArtist}
                   </td>
-
-                  <td className="text-[#1671D9] font-formular-medium text-[14px] leading-5 py-4 px-8">
-                    <Link to={`/admin/manage-contents/${item._id}`}>
-                      Review
-                    </Link>
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                    {new Date(item.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })}
                   </td>
+
+                  <td className="text-[#667085] font-inter text-[14px] font-medium leading-5 py-4 px-8">
+                    ${item.earnings}
+                  </td>
+
+                  
                 </tr>
               ))}
             </tbody>
