@@ -1,22 +1,30 @@
 var express = require("express");
 
 const multer = require("multer");
-const { fileFilter } = require("../../utils/upload");
-const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}}).single("artWork");
+const { fileFilter,trackUploadFIlter } = require("../../utils/upload");
+const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 2},trackUploadFIlter}).fields([
+  { name: "artWork", maxCount: 1 },
+  { name: "lyricsFile", maxCount: 1 }
+]);
 const bulkUpload = multer({ dest: "bulkUploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 1}, fileFilter}).single("bulkUpload")
 const asyncHandler = require("express-async-handler");
 const passport = require("passport");
 const SyncUser = require("../../models/usermodel").syncUser;
 var router = express.Router();
 const trackController = require("../../controllers/trackController");
+
 const { checkUploader, allowUnauthentication, checkSyncUser, checkRoles } = require("../../utils/AuthenticateChecker");
 
+router.get('/myTracks',checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.myTracks))
 
 router.get("/verifyTrackUploaded/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.verifyTrackUpload));
 
 router.post("/trackUpload/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.trackUpload));
+
 router.post("/invalid_spotify_resolution/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.invalidSpotifyResolution));
+
 router.delete("/ignore_bulk_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreBulkResolution));
+
 router.delete("/ignore_single_resolution/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.ignoreSingleResolution));
 
 router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));

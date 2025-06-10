@@ -134,6 +134,12 @@ const trackSchema = new Schema({
         type : String,
         // required : true
     },
+    lyricsFileType : {
+        type : String,
+    },
+    lyricsFileUrl : {
+        type : String,
+    },
     audioLang : {
         type : String,
         // required : true
@@ -334,12 +340,48 @@ const trackLicenseSchema = new Schema({
     },
 },{timestamps : true})
 
+const transferOwnershipSchema = new Schema({
+    trackId : {
+        type : Schema.Types.ObjectId,
+        ref : "track"
+    },
+    fromUser : {
+        type : Schema.Types.ObjectId,
+        refPath : "fromUserModel"
+    },
+    fromUserModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
+    },
+    toUser : {
+        type : Schema.Types.ObjectId,
+        refPath : "toUserModel"
+    },
+    toUserModel : {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default : 'user'
+    },
+    comment : {
+        type : String,
+        required : true
+    },
+    performedBy : {
+        type : Schema.Types.ObjectId,
+        ref : "admin"
+    }
+},{timestamps : true})
+
 trackSchema.index({lyrics : 'text', trackTitle : "text", mood : 'text', genre : 'text', featuredInstrument : 'text'})
 
 const track = mongoose.model('track', trackSchema)
+const ownershipTransfer = mongoose.model('ownershipTransfer', transferOwnershipSchema)
 const trackError = mongoose.model('trackError', trackErrorSchema)
 const uploadErrorHistory = mongoose.model('uploadErrorHistory', uploadErrorHistorySchema)
 const trackLicense = mongoose.model('track_license', trackLicenseSchema)
 const rejectedTrack = mongoose.model('rejectedTrack', rejectedTrackSchema)
 
-module.exports = {track, trackLicense, trackError, uploadErrorHistory, rejectedTrack}
+module.exports = {track, trackLicense, trackError, uploadErrorHistory, rejectedTrack,ownershipTransfer}

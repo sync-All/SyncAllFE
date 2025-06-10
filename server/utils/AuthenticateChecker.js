@@ -95,6 +95,22 @@ const checkAllUsers = (req,res,next)=>{
     })(req,res,next)
 }
 
+const checkAllUsersReset = (req,res,next)=>{
+    passport.authenticate('jwt-reset',{session : false},(err,user,info)=>{
+        if(info && info.name == "TokenExpiredError"){
+           return next(new TokenExpiredError('Link Expired, kindly proceed to generate a new one'))
+        }
+        if(err || !user){
+            if(req.allowUnauthentication){
+                return next()
+            }
+            return next(new unauthorizedError('Authentication failed'));
+        }
+        req.user = user
+        return next();
+    })(req,res,next)
+}
+
 const checkRoles = (allowedRoles = []) => {
     return (req, res, next) => {
       passport.authenticate('jwt', { session: false }, (err, user, info) => {
@@ -120,4 +136,4 @@ const checkRoles = (allowedRoles = []) => {
     };
   };
   
-module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser,allowUnauthentication, checkRoles,checkAllUsers}
+module.exports = {checkAdmin, checkUser, checkUploader, checkSyncUser,allowUnauthentication, checkRoles,checkAllUsers,checkAllUsersReset}

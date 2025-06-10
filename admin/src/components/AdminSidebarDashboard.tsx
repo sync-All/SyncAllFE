@@ -20,20 +20,17 @@ interface AdminDashboardSidebarProps {
 const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
   activeItem,
   onTabChange,
-  toggleMenu }) => {
+  toggleMenu,
+}) => {
   // const profileInfo = useDataContext();
   // const profileDetails = profileInfo.dashboardData?.profileInfo;
-     const { user } = useAuth();
+  const { user } = useAuth();
   const role = user?.role;
-   
 
   const logout = () => {
     localStorage.clear();
     window.location.href = '/';
   };
-
-
-  
 
   const pStyle = (item: string) => ({
     color: item === activeItem ? 'var(--black2)' : 'var(--Grey-500, #667185)',
@@ -52,9 +49,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
     cursor: 'pointer',
   });
 
-
   const hasRole = (roles: string[]) => roles.includes(role || '');
-
 
   //
 
@@ -68,7 +63,7 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
       </div>
       <div className=" mt-[53px]">
         <ul>
-          {hasRole(['Admin']) && (
+          {hasRole(['Admin', 'ContentAdmin']) && (
             <li onClick={() => onTabChange('Dashboard')}>
               <Link to="/admin/dashboard" style={liStyle('Dashboard')}>
                 <img src={DashboardIcon} alt="" />
@@ -94,6 +89,18 @@ const AdminSidebarDashboard: React.FC<AdminDashboardSidebarProps> = ({
               >
                 <img src={TrackIcon} alt="" />
                 <p style={pStyle('Manage Content')}>Manage Content</p>
+              </Link>
+            </li>
+          )}
+
+          {hasRole(['Admin', 'ContentAdmin']) && (
+            <li onClick={() => onTabChange('Tracks')}>
+              <Link
+                to="/admin/tracks"
+                style={liStyle('Tracks')}
+              >
+                <img src={TrackIcon} alt="" />
+                <p style={pStyle('Tracks')}>Tracks</p>
               </Link>
             </li>
           )}

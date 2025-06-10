@@ -4,15 +4,16 @@ const Track = require("../models/track.model").track
 const dashboard = require("../models/dashboard.model").dashboard
 const { trackError, uploadErrorHistory } = require("../models/track.model")
 const fs = require('fs')
+const path = require("path");
 
 function fileFilter (req, file, cb) {
   if(!file){
     return
   }
   if(file.mimetype === "text/csv"){
-      cb(null, true)
+    cb(null, true)
   }else{
-      cb(new ForbiddenError('Upload forbidden'))
+    cb(new ForbiddenError('Upload forbidden'))
   }
 }
 
@@ -33,17 +34,83 @@ const disputeFileFilter = (req, file, cb) => {
     }
 };
 
-const trackProcessing = async (songInfo,fileInfo,spotifyresponse,request)=>{
+const lyricsFilter = (req, file, cb) => {
+  const allowedExt = ['.txt', '.lrc'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!allowedExt.includes(ext)) {
+    return cb(new Error('Only .txt and .lrc files are allowed'), false);
+  }
+  cb(null, true);
+};
+
+const trackUploadFIlter = (req,file,cb) =>{
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (file.fieldname === "artWork") {
+    // Accept only image files
+    const allowedImageTypes = [".jpg", ".jpeg", ".png", ".webp"];
+    if (allowedImageTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed for artWork (JPG, PNG, WEBP)"));
+    }
+  }else if (file.fieldname === "lyricsFile") {
+    // Accept only .txt or .lrc
+    const allowedLyricsTypes = [".txt", ".lrc"];
+    if (allowedLyricsTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only .lrc or .txt files are allowed for lyrics"));
+    }
+
+  } else {
+    cb(new Error("Unexpected file field"));
+  }
+}
+
+const parseLRC = (raw) => {
+  return raw
+  .split('\n')
+  .map(line => line.replace(/\[\d{1,2}:\d{1,2}(?:\.\d{1,3})?\]/g, '').trim()) // remove timestamp
+  .filter(line => line.length > 0)
+  .join('\n');
+};
+
+const trackProcessing = async (songInfo,fileInfos,spotifyresponse,request)=>{
   try {
-    if(fileInfo){
-      var artWork = await cloudinary.uploader.upload(fileInfo.path,{folder:  "track_artwork"})
-      const adjustedsongInfo = {...songInfo, artWork : artWork.secure_url, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
+    if(fileInfos){
+      if(fileInfos.artWork?.[0]){
+        const artFile = fileInfos.artWork?.[0]
+        var artWork = await cloudinary.uploader.upload(artFile.path,{folder:  "track_artwork"})
+        songInfo.artWork = artWork.secure_url
+        
+        fs.unlinkSync(artFile.path)
+      }
+      if(fileInfos.lyricsFile?.[0]){
+        const lyricsFile = fileInfos.lyricsFile[0];
+        const ext = path.extname(lyricsFile.originalname).toLowerCase();
+        const rawContent = fs.readFileSync(lyricsFile.path, "utf-8");
+        let parsedLyrics = rawContent.trim();
+        if (ext === ".lrc") parsedLyrics = parseLRC(rawContent);
+        const uploadedLyrics = await cloudinary.uploader.upload(lyricsFile.path, {
+          folder: "track_lyrics_files",
+          resource_type: "raw",
+        });
+  
+        fs.unlinkSync(lyricsFile.path);
+  
+        songInfo.lyrics = parsedLyrics;
+        songInfo.lyricsFileUrl = uploadedLyrics.secure_url
+        songInfo.lyricsFileType = ext.replace(".", "");
+      }
+      const adjustedsongInfo = {...songInfo, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration , spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
+
       const track = new Track(adjustedsongInfo)
       const trackInfo = await track.save()
       if(request.user.role == 'Music Uploader'){
         await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
       }
-      fs.unlinkSync(fileInfo.path)
+      console.log(trackInfo)
+
     }else{
       const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
       const track = new Track(adjustedsongInfo)
@@ -51,15 +118,13 @@ const trackProcessing = async (songInfo,fileInfo,spotifyresponse,request)=>{
       if(request.user.role == 'Music Uploader'){
         await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
       }
-      await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
     }
     return;
   } catch (err) {
-    console.log(err)
     throw new BadRequestError(err)
   }
 
 }
 
 
-module.exports = {fileFilter,disputeFileFilter, trackProcessing}
+module.exports = {fileFilter,disputeFileFilter, trackProcessing,lyricsFilter,parseLRC,trackUploadFIlter}

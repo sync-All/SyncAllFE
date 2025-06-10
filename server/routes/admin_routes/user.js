@@ -8,7 +8,7 @@ const { BadRequestError } = require('../../utils/CustomError');
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" , limits : {fileSize : 1048576, fieldNameSize: 300, files : 2}}).array("attachments");
 
-router.get('/get_key_metrics/', checkAdmin, asynchandler(async(req,res,next)=>{
+router.get('/get_key_metrics/', checkRoles(['ContentAdmin','Admin','SuperAdmin']), asynchandler(async(req,res,next)=>{
     const filterReq = Number(req.query?.filter)
     if(filterReq  > 0 ){
         const kpiDetails = await kpi(filterReq)
@@ -26,7 +26,7 @@ router.put('/activateuser', checkAdmin, asynchandler(userControllers.activateUse
 
 router.get('/allAdmins',checkAdmin, asynchandler(userControllers.allAdmin))
 
-router.post('/send-user-email',checkAdmin,asynchandler(upload), asynchandler(userControllers.sendUserEmail))
+router.post('/send-user-email',checkRoles(['ContentAdmin', "SuperAdmin", "Admin"]),asynchandler(upload), asynchandler(userControllers.sendUserEmail))
 
 module.exports = router
 

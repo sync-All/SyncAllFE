@@ -6,10 +6,12 @@ const asynchandler = require('express-async-handler')
 const { checkRoles } = require('../../utils/AuthenticateChecker')
 
 
-router.get('/all_content',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(async(req,res,next)=>{
-    const items = await Tracks.find({}).populate('user','name email').exec()
-    res.send(items)
-}))
+router.get(
+    '/all_content',
+    checkRoles(['ContentAdmin', 'SuperAdmin']),
+    asynchandler(contentManager.all_content)
+);
+  
 router.get('/manage_content/review',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.contentReview))
 
 router.get('/manage_content/search',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.searchContent))

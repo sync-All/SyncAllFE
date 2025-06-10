@@ -56,14 +56,15 @@ function issueJwtAdminLogin(user){
     }
 }
 
-function issueJwtForgotPassword(user){
+function issueJwtResetPassword(user){
     const _id = user._id
 
     const expiresIn = 5 * 60 * 1000
 
     const payload = {
         sub : _id,
-        // iat : Date.now()
+        purpose : 'reset',
+        role : user.role
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
@@ -74,4 +75,4 @@ function issueJwtForgotPassword(user){
     }
 }
 
-module.exports = {issueJwtConfirmEmail, issueJwtAdminLogin, issueJwtLogin, issueJwtForgotPassword}
+module.exports = {issueJwtConfirmEmail, issueJwtAdminLogin, issueJwtLogin, issueJwtResetPassword}

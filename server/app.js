@@ -6,6 +6,8 @@ var logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose')
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 require('dotenv').config()
 
@@ -25,6 +27,8 @@ const adminManageDispute = require('./routes/admin_routes/dispute')
 
 var app = express();
 
+app.set('trust proxy', 1);
+
 var allowlist = ['http://localhost:5173','http://localhost:5174','https://sync-all-fe-1brn.vercel.app', 'https://sync-all-fe.vercel.app','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com','https://sync-all-admin-git-development-sync-alls-projects.vercel.app','https://sync-all-fe-git-development-sync-alls-projects.vercel.app', 'https://admin.syncallmusic.com']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
@@ -38,6 +42,14 @@ var corsOptionsDelegate = function (req, callback) {
 
 // cors setup
 app.use(cors(corsOptionsDelegate))
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+});
+
+app.use(helmet());
+app.use(limiter);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

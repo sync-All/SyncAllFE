@@ -38,6 +38,14 @@ const TokenExpiredError = class TokenExpiredError extends Error {
   }
 }
 
-module.exports = {spotifyError, BadRequestError,unauthorizedError, ForbiddenError, TokenExpiredError}
+const TooManyRequestError = class TooManyRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 429;
+    this.name = "TooManyRequestError";
+  }
+}
+
+module.exports = {spotifyError, BadRequestError,unauthorizedError, ForbiddenError, TokenExpiredError,TooManyRequestError}
 
   

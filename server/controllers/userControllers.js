@@ -97,12 +97,13 @@ const attachNewNotification = async({title, message, linkto, userId})=>{
     }
 }
 
-const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
+const checkTrackStatus = async (trackIds) => {
     try {
         for (const trackId of trackIds) {
-            const ownedTrack = await Track.findOne({ _id: trackId, user: newOwnerId }).select('_id').exec();
-            if (ownedTrack) {
-              return ownedTrack._id;
+            const trackDetail = await Track.findOne({ _id: trackId }).select('_id uploadStatus').exec();
+            console.log(trackDetail)
+            if (trackDetail.uploadStatus !== 'Approved') {
+              return trackDetail._id;
             }
         }
         return null; // no owned tracks found
@@ -112,5 +113,23 @@ const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
 
 };
 
+const checkForExistingOwnershipByUser = async (trackIds, newOwnerId) => {
+    try {
+        let infos = []
+        for (const trackId of trackIds) {
+            const ownedTrack = await Track.findOne({_id: trackId}).select('_id user userModel').exec();
+            if (ownedTrack.user.equals(newOwnerId)) {
+              return {existing : true};
+            }else{
+                infos.push(ownedTrack)
+            }
+        }
+        return {existing : false, infos};
+    } catch (error) {
+        throw new BadRequestError(error.message || "Error occurred while processing your request");
+    }
 
-module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification,checkForExistingOwnershipByUser}
+};
+
+
+module.exports = {findUserAndUpdate, getUserInfo,createNewMusicUploader, createNewSyncUser, attachNewNotification,checkForExistingOwnershipByUser,checkTrackStatus}

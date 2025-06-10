@@ -4,10 +4,11 @@ const authcontroller = require("../../controllers/authControllers");
 const passport = require("passport");
 const multer = require("multer");
 const { testUpdate } = require("../../controllers/admin/users");
-const { checkUser, checkRoles, checkAllUsers, checkSyncUser } = require("../../utils/AuthenticateChecker");
+const { checkRoles, checkAllUsers, checkAllUsersReset } = require("../../utils/AuthenticateChecker");
 const Notification = require("../../models/usermodel").notification;
 const { Types } = require("mongoose");
 const { BadRequestError } = require("../../utils/CustomError");
+const { loginLimiter } = require("../../utils/rateLimit");
 const uploadProfileImg = multer({ dest: "uploads/" }).single("img");
 const User = require('../../models/usermodel').uploader
 const SyncUser = require('../../models/usermodel').syncUser
@@ -16,9 +17,9 @@ var router = express.Router();
 /* GET users listing. */
 router.post("/api/v1/signup", asynchandler(authcontroller.signup));
 
-router.post("/api/v1/signin", asynchandler(authcontroller.signin));
+router.post("/api/v1/signin",asynchandler(loginLimiter), asynchandler(authcontroller.signin));
 
-router.post("/api/v1/googleauth", asynchandler(authcontroller.googleAuth));
+router.post("/api/v1/googleauth",loginLimiter, asynchandler(authcontroller.googleAuth));
 
 router.get("/api/v1/who_am_i",checkAllUsers, asynchandler(authcontroller.who_am_i));
 
@@ -92,29 +93,19 @@ router.get(confirmationEmailPaths, (req, res, next) => {
   }
 });
 
-router.get(
-  "/api/v1/validateToken",
-  passport.authenticate("jwt", {
-    session: false,
-    failureRedirect: "/unauthorized",
-  }),
-  (req, res, next) => {
-    res.status(200).send("Valid Token");
-  }
-);
 
 router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
 
 router.post(
   "/api/v1/resetPassword",
-  checkAllUsers,
+  checkAllUsersReset,
   authcontroller.resetPassword
 );
 
 
 router.post('/api/v1/changePassword/',checkAllUsers,asynchandler(authcontroller.changePassword))
 
-router.get("/api/v1/readNotification", checkUser, asynchandler(async (req,res,next)=>{
+router.get("/api/v1/readNotification", checkAllUsers, asynchandler(async (req,res,next)=>{
   const {markOne, markAll} = req.query
   try{
     if(markAll){
@@ -138,7 +129,7 @@ router.get("/api/v1/readNotification", checkUser, asynchandler(async (req,res,ne
   }
 }));
 
-router.get("/api/v1/clearAllNotification", checkUser, asynchandler(async (req,res,next)=>{
+router.get("/api/v1/clearAllNotification", checkAllUsers, asynchandler(async (req,res,next)=>{
   try{
     const {user} = req
     const allNotifications = await Notification.find({user : user.id})
