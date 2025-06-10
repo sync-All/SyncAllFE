@@ -8,8 +8,8 @@ const { issueJwtResetPassword } = require('./issueJwt');
 const notifiedUsers = new Map(); 
 
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  windowMs: 15 * 60 * 1000,
+  max: 4,
   message: 'Too many login attempts. Please try again after 15 minutes.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -20,7 +20,9 @@ const loginLimiter = rateLimit({
     if(userInfo){
       if (!notifiedUsers.has(userInfo.email)) {
         const deviceInfo = userDeviceInfo(req)
+
         const now = new Date(Date.now());
+
         const date = now.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -39,6 +41,7 @@ const loginLimiter = rateLimit({
         const formattedDate = `${date} – ${time}`;
 
         const resetJwt = issueJwtResetPassword(userInfo)
+        
         const resetLink = `https://www.syncallmusic.com/requestforgotpw/?token=${resetJwt.token}&email=${userInfo.email}`
 
         const emailContent = `
