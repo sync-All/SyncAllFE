@@ -17,6 +17,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
       </Routes>
+      
     </AuthProvider>
   );
 }
