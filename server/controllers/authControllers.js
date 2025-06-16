@@ -1,6 +1,6 @@
 const emailTools = require('../utils/mailer');
 const issueJwt = require('../utils/issueJwt')
-const EmailDomain = require('../utils/userUtils').grabEmailDomain
+const EmailDomain = require('../utils/userUtils')
 const bcrypt = require('bcrypt');
 const User = require('../models/usermodel').uploader;
 const SyncUser = require('../models/usermodel').syncUser;

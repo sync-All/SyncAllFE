@@ -9,7 +9,7 @@ const Track = require('../models/track.model').track;
 
 const findUserAndUpdate = async(searchParams, updateOptions)=>{
     try {
-        const update = await Promise.any([User.findOneAndUpdate(searchParams,updateOptions,{new : true}).select('name email role').then(user => user || Promise.reject()),SyncUser.findOneAndUpdate(searchParams,updateOptions, {new : true}).select('name email role').then(user => user || Promise.reject())])
+        const update = await Promise.any([User.findOneAndUpdate(searchParams,updateOptions,{new : true}).select('name email role').then(user => user || Promise.reject()),SyncUser.findOneAndUpdate(searchParams,updateOptions, {new : true}).select('name email role').then(user => user || Promise.reject()),Admin.findOneAndUpdate(searchParams,updateOptions, {new : true}).select('name email role').then(user => user || Promise.reject())])
         if(!update){
             throw new BadRequestError('User not found')
         }

@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require('uuid');
+
 function grabEmailDomain(user){
     // get user email domain from string
     const emailDomain = user.email.split('@')[1]
@@ -37,5 +39,9 @@ function grabEmailDomain(user){
 }
 
 
+function generateTempPassword() {
+  return uuidv4().slice(0, 12); 
+}
 
-module.exports.grabEmailDomain = {grabEmailDomain}
+
+module.exports = {grabEmailDomain,generateTempPassword}
