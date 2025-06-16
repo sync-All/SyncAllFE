@@ -3,7 +3,7 @@ const Tracks = require('../../models/track.model').track
 const contentManager = require('../../controllers/admin/manage_content')
 
 const asynchandler = require('express-async-handler')
-const { checkAdmin } = require('../../utils/AuthenticateChecker')
+const { checkAdmin, checkRoles } = require('../../utils/AuthenticateChecker')
 
 
 router.get(

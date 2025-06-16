@@ -55,22 +55,38 @@ const admin_signup = async function(req, res) {
     console.log(error)
     res.status(400).send('An Error Occured, Invalid Input')
   }
+}
 
 const admin_signin = async(req,res,next)=>{
-    const {email,password} = req.body
-    const admin = await Admin.findOne({email : email.toLowerCase()}).exec()
-    if(!admin){
-      return res.status(401).json({success : false, message : "Invalid Credentials"})
-    }
-    const match = await bcrypt.compare(password, admin.password);
+  const {email,password} = req.body
+  const admin = await Admin.findOne({$or : [
+  {email : email.toLowerCase()},
+  { username: email.toLowerCase()}
+  ]}).exec()
+  if(!admin){
+    return res.status(401).json({success : false, message : "Invalid Credentials"})
+  }
+  const match = await bcrypt.compare(password, admin.password);
 
-    if(!match){
-      return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
-    }else{
-      const toBeIssuedJwt = issueJwt.issueJwtAdminLogin(admin)
-      const adminDetails = await Admin.findOne({email : email.toLowerCase()}).select('-password').exec()
-      res.status(200).json({success : true, user : adminDetails, message : 'Welcome back',token : toBeIssuedJwt.token, expires : toBeIssuedJwt.expires})
-    }
+  if(!match){
+    return res.status(401).json({success : false, message : "Incorrect Password, Please check again and retry"})
+  }else{
+    // res.clearCookie("sync_token", { path: '/', httpOnly: true, signed: true, sameSite: isProduction ? 'None' : 'Lax', secure: true });
+    const toBeIssuedJwt = issueJwt.issueJwtAdminLogin(admin)
+    const details = admin.toObject()
+    delete details.password
+
+
+    res.cookie('sync_token', toBeIssuedJwt.token, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      signed : true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    res.status(200).json({success : true, user : details, message : 'Welcome back'})
+  }
 }
 
 

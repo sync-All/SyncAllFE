@@ -243,32 +243,38 @@ const verifyEmail =  async (req,res,next)=>{
   }
 }
 
-const changePassword = async(req,res,next)=>{
-  const {password, confirmassword} = req.body
- if(req.isAuthenticated()){
+const resetPassword = async(req,res,next)=>{
+  const {password, confirmPassword} = req.body
   const userId = req.user.id
   if(password !== confirmPassword){
     return res.status(422).send('Password Mismatch please try again')
   }
   try {
-    if(req.user.role == "Music Uploader"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
-        await User.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
-    }else if(req.user.role == "Sync User"){
-      bcrypt.hash(password, Number(process.env.SALT_ROUNDS), async function(err, hashPw){
+    const hashPw = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+    await findUserAndUpdate({_id : userId}, {password : hashPw})
+    res.status(200).json({success : true, message : 'Password Successfully Updated'})
+  } catch (error) {
+    console.log(error)
+    res.status(422).send("Error Occurred while Performing action")
+  }
+}
 
-        await SyncUser.findByIdAndUpdate(userId, {password : hashPw}, {new : true})
-        res.status(200).json({success : true, message : 'Password Successfully Updated'})
-      })
+const changePassword = async (req,res,next)=>{
+  try {
+    const userInfo = req.user
+    const {oldPassword, newPassword} = req.body
+    const match = await bcrypt.compare(oldPassword, userInfo.password)
+    if(!match){
+      res.status(401).json('Password Incorrect')
+    }else{
+      const hashPw = await bcrypt.hash(newPassword,Number(process.env.SALT_ROUNDS))
+      await findUserAndUpdate({_id : userInfo.id},{password : hashPw})
+
+      res.status(200).json({success : true, message : 'Password Successfully Updated'})
     }
   } catch (error) {
-    res.status(422).send("Invalid Email Address")
+    res.status(404).json('User not Found')
   }
- }else{
-  res.status(400).send("Link Expired")
- }
 }
 
 const requestForgotPw = async (req,res,next)=>{
@@ -286,6 +292,6 @@ const requestForgotPw = async (req,res,next)=>{
   }
 }
 
-module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword, requestForgotPw, getsyncuserinfo, profilesetup}
+module.exports = {signup, signin, googleAuth, profileUpdate, verifyEmail, changePassword,resetPassword, requestForgotPw, getsyncuserinfo, profilesetup}
 
   
