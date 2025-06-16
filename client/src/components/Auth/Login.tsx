@@ -33,6 +33,45 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   const navigate = useNavigate();
   const { loading, setLoading } = useLoading();
   const [showPassword, setShowPassword] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+
+  React.useEffect(() => {
+    const blockData = JSON.parse(
+      localStorage.getItem('loginBlockData') || '{}'
+    );
+    if (blockData && blockData.blockUntil) {
+      const now = Date.now();
+      if (now < blockData.blockUntil) {
+        const remaining = Math.floor((blockData.blockUntil - now) / 1000);
+        setIsBlocked(true);
+        setCountdown(remaining);
+      } else {
+        localStorage.removeItem('loginBlockData');
+      }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (isBlocked && countdown > 0) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setIsBlocked(false);
+            localStorage.removeItem('loginBlockData');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isBlocked, countdown]);
+  
+  
+
 
   const handleNavigationTODashboard = (spotifyLink: string) => {
     if (!spotifyLink) {
@@ -57,6 +96,13 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
   }
 
   const handleLogin = async (values: { email: string; password: string }) => {
+    if (isBlocked) {
+      toast.error(
+        'Too many login attempts. Please try again after 15 minutes.'
+      );
+      return;
+    }
+
     setLoading(true);
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/signin`;
@@ -66,42 +112,80 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
         email: values['email'],
         password: values['password'],
       });
-      if (response && response.data) {
-        console.log(response);
 
-        localStorage.clear();
-        sessionStorage.clear();
-        const spotifyLink = response.data.user.spotifyLink;
-        const phoneNumber = response.data.user.phoneNumber;
+      // Successful login: clear attempts
+      localStorage.removeItem('loginAttempts');
+      localStorage.removeItem('loginBlockData');
 
-        setToken(response.data.token);
+      // Your existing success logic...
+      localStorage.clear();
+      sessionStorage.clear();
+      const spotifyLink = response.data.user.spotifyLink;
+      const phoneNumber = response.data.user.phoneNumber;
 
-        localStorage.setItem('token', response.data.token);
-        const { role, userType } = response.data.user;
+      setToken(response.data.token);
+      localStorage.setItem('token', response.data.token);
 
-        toast.success('Login successful');
-        if (role === 'Music Uploader' && userType === 'Company') {
-          handleSpecificActionForCompany(phoneNumber);
-        } else if (role === 'Music Uploader' && userType === 'Individual') {
-          handleNavigationTODashboard(spotifyLink);
-        } else {
-          navigate('/home');
-        }
+      toast.success('Login successful');
+
+      const { role, userType } = response.data.user;
+      if (role === 'Music Uploader' && userType === 'Company') {
+        handleSpecificActionForCompany(phoneNumber);
+      } else if (role === 'Music Uploader' && userType === 'Individual') {
+        handleNavigationTODashboard(spotifyLink);
       } else {
-        throw new Error('Response or response data is undefined');
+        navigate('/home');
       }
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
-      toast.error(
-        (axiosError.response && axiosError.response.data
-          ? axiosError.response.data.message || axiosError.response.data
-          : axiosError.message || 'An error occurred'
-        ).toString()
-      );
+      const status = axiosError.response?.status;
+
+      // Handle rate limit from backend
+      if (status === 429) {
+        const blockUntil = Date.now() + 15 * 60 * 1000;
+        localStorage.setItem('loginBlockData', JSON.stringify({ blockUntil }));
+        setIsBlocked(true);
+        setCountdown(15 * 60);
+        toast.error(
+          'Too many login attempts. Please try again after 15 minutes.'
+        );
+      } else {
+        // Handle normal errors
+        toast.error(
+          (axiosError.response && axiosError.response.data
+            ? axiosError.response.data.message || axiosError.response.data
+            : axiosError.message || 'An error occurred'
+          ).toString()
+        );
+
+        // Track attempt
+        const attemptsData = JSON.parse(
+          localStorage.getItem('loginAttempts') || '[]'
+        );
+        const newAttempts = [...attemptsData, Date.now()];
+        const recentAttempts = newAttempts.filter(
+          (timestamp: number) => Date.now() - timestamp <= 15 * 60 * 1000
+        );
+        if (recentAttempts.length >= 4) {
+          const blockUntil = Date.now() + 15 * 60 * 1000;
+          localStorage.setItem(
+            'loginBlockData',
+            JSON.stringify({ blockUntil })
+          );
+          setIsBlocked(true);
+          setCountdown(15 * 60);
+          toast.error(
+            'Too many login attempts. Please try again after 15 minutes.'
+          );
+        } else {
+          localStorage.setItem('loginAttempts', JSON.stringify(recentAttempts));
+        }
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const logGoogleUser = async () => {
     const urlVar = import.meta.env.VITE_APP_API_URL;
@@ -253,10 +337,17 @@ const Login: React.FC<LoginProps> = ({ setToken, setGoogleAuthData }) => {
                       <button
                         type="submit"
                         className="w-full bg-black bg-opacity-80 text-white rounded-[4px] py-[16px] poppins-medium text-[16px] leading-[18.5px] tracking-[0.4px] disabled:cursor-not-allowed"
-                        disabled={loading}
+                        disabled={loading || isBlocked}
                       >
-                        {loading ? 'Loading...' : 'Sign In'}
+                        {isBlocked
+                          ? `Try again in ${Math.floor(
+                              countdown / 60
+                            )}:${String(countdown % 60).padStart(2, '0')}`
+                          : loading
+                          ? 'Loading...'
+                          : 'Sign In'}
                       </button>
+
                       <p className="poppins-regular text-[16px] leading-[24px] text-center mt-[32px]">
                         OR
                       </p>

@@ -169,6 +169,10 @@ const Login = () => {
                         className="text-red-400 italic text-sm py-3"
                       />
                     </div>
+                    <p className="-mt-7 text-start text-sm text-blue-600 hover:underline cursor-pointer" 
+                    onClick={() => navigate('/forget-password')}>
+                      Forget Password?
+                    </p>
 
                     <div className="mt-[51px]">
                       <button

@@ -1,5 +1,5 @@
 import forgotPasswordImg from '../../assets/images/email-confirmation-img.png';
-import syncLogo from '../../assets/logo-black.png';
+import syncLogo from '../../assets/images/logo-black.png';
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
@@ -31,10 +31,10 @@ interface ResponseData {
   message?: string;
 }
 
-const SetNewPassword = () => {
- const location = useLocation();
- const queryParams = new URLSearchParams(location.search);
- const token = queryParams.get('token');
+const ResetPassword = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get('token');
 
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -46,13 +46,12 @@ const SetNewPassword = () => {
     setLoading(true);
     const urlVar = import.meta.env.VITE_APP_API_URL;
     const apiUrl = `${urlVar}/resetPassword`;
-     const config = {
-       headers: {
-         Authorization: `Bearer ${token}`,
-       },
-     };
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-     
     try {
       await delay(2000);
       const response = await axios.post(apiUrl, values, config);
@@ -75,14 +74,13 @@ const SetNewPassword = () => {
   const applyLabelStyles =
     'font-inter font-normal text-[14px] leading-4 tracking-[0.4px] text-[#3A434B] mb-2';
   const applyErrorStyles = 'italic text-red-600';
-  const input = 'w-[367px] flex flex-col gap-2 mb-4';
-
+  const input = ' flex flex-col gap-2 mb-4';
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
-      <div className="w-[60%]">
+      <div className=" hidden lg:block w-[60%]">
         <div
-          className="hidden lg:block h-screen bg-center bg-no-repeat bg-cover relative"
+          className=" h-screen bg-center bg-no-repeat bg-cover relative"
           style={{
             backgroundImage: `url(${forgotPasswordImg})`,
           }}
@@ -97,10 +95,10 @@ const SetNewPassword = () => {
 
           <div className="text-center">
             <h2 className="text-[32px] leading-[18.5px] font-formular-regular">
-             Reset Password
+              Reset Password
             </h2>
             <p className="mt-[16px] text-[16px] leading-[24px] font-formular-light">
-    Input new password to reset your password.
+              Input new password to reset your password.
             </p>
             <div className="mt-[56px]">
               <Formik
@@ -161,5 +159,4 @@ const SetNewPassword = () => {
   );
 };
 
-export default SetNewPassword;
-
+export default ResetPassword;
