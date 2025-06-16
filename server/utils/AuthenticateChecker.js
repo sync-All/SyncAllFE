@@ -19,8 +19,8 @@ const checkAdmin = (req,res,next)=>{
 }
 
 const allowUnauthentication = (req,res,next)=>{
-    req.allowUnauthentication = true
-    next()
+req.allowUnauthentication = true
+next()
 }
 
 const checkUser = (req,res,next)=>{

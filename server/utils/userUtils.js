@@ -38,10 +38,10 @@ function grabEmailDomain(user){
     }
 }
 
-
 function generateTempPassword() {
   return uuidv4().slice(0, 12); 
 }
 
 
 module.exports = {grabEmailDomain,generateTempPassword}
+

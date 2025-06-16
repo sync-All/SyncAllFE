@@ -110,9 +110,8 @@ const trackProcessing = async (songInfo,fileInfos,spotifyresponse,request)=>{
         await dashboard.findOneAndUpdate({user : request.user.id},{ $push: { totalTracks: trackInfo._id }}).exec()
       }
       console.log(trackInfo)
-
     }else{
-      const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds,userModel : request.user.role == 'Music Uploader' ? 'user' : 'admin'}
+      const adjustedsongInfo = {...songInfo, artWork : spotifyresponse.artwork, user : request.user.id, trackLink : spotifyresponse.preview_url, spotifyLink : spotifyresponse.spotifyLink, duration : spotifyresponse.duration, spotifyArtistIds : spotifyresponse.artistIds}
       const track = new Track(adjustedsongInfo)
       const trackInfo = await track.save()
       if(request.user.role == 'Music Uploader'){
@@ -126,5 +125,11 @@ const trackProcessing = async (songInfo,fileInfos,spotifyresponse,request)=>{
 
 }
 
+// response.status(200).json({success : true, message : 'Music Information has been successfully added'})
+
+// if(songInfo.err_type && songInfo._id){
+//   await trackError.findByIdAndDelete(songInfo._id)
+//   await uploadErrorHistory.findByIdAndUpdate({user : request.user._id},{$pull : {associatedErrors : songInfo._id}, status : 'Partially Processed'})
+// }
 
 module.exports = {fileFilter,disputeFileFilter, trackProcessing,lyricsFilter,parseLRC,trackUploadFIlter}

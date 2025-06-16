@@ -45,7 +45,7 @@ const SetNewPassword = () => {
   const handlePasswordChange = async (values: FormValues) => {
     setLoading(true);
     const urlVar = import.meta.env.VITE_APP_API_URL;
-    const apiUrl = `${urlVar}/resetPassword`;
+    const apiUrl = `${urlVar}/changePassword`;
      const config = {
        headers: {
          Authorization: `Bearer ${token}`,

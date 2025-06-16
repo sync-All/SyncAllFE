@@ -21,10 +21,14 @@ router.post("/api/v1/signin",asynchandler(loginLimiter), asynchandler(authcontro
 
 router.post("/api/v1/googleauth",loginLimiter, asynchandler(authcontroller.googleAuth));
 
-router.get("/api/v1/who_am_i",checkAllUsers, asynchandler(authcontroller.who_am_i));
+router.post("/api/v1/signin", asynchandler(authcontroller.signin));
 
 router.get(
-  "/api/v1/getsyncuserinfo",checkRoles(['Sync User']),
+  "/api/v1/getsyncuserinfo",
+  passport.authenticate("jwt", {
+    session: false,
+    failureRedirect: "/unauthorized",
+  }),
   asynchandler(authcontroller.getsyncuserinfo)
 );
 router.post(
@@ -94,8 +98,6 @@ router.get(confirmationEmailPaths, (req, res, next) => {
 });
 
 
-router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
-
 router.post(
   "/api/v1/resetPassword",
   checkAllUsersReset,
@@ -104,6 +106,7 @@ router.post(
 
 
 router.post('/api/v1/changePassword/',checkAllUsers,asynchandler(authcontroller.changePassword))
+router.post("/api/v1/request/forgotPassword", authcontroller.requestForgotPw);
 
 router.get("/api/v1/readNotification", checkAllUsers, asynchandler(async (req,res,next)=>{
   const {markOne, markAll} = req.query

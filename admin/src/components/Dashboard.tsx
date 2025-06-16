@@ -62,7 +62,7 @@ interface KpiData {
   totalCurrentUsers?: number;
 }
 
-const AdminDashboardHome = () => {
+const Dashboard = () => {
   const { loading, setLoading } = useLoading();
   const [kpidata, setKpiData] = useState<KpiData>();
   const [users, setUsers] = useState<User[]>([]);
@@ -103,7 +103,6 @@ const AdminDashboardHome = () => {
         headers: {
           Authorization: `${token}`,
         },
-        withCredentials: true,
       };
 
       try {
@@ -134,7 +133,6 @@ const AdminDashboardHome = () => {
         headers: {
           Authorization: `${token}`,
         },
-        withCredentials: true,
       };
 
       try {
@@ -261,6 +259,7 @@ const AdminDashboardHome = () => {
     },
   ];
 
+ 
   const getColor = (index: number) => {
     const colors = ['#037847', '#FF9152', '#5C9BFF', '#9933FF', '#45CFB6'];
     return colors[index % colors.length]; // Repeats colors if there are more segments than colors
@@ -525,4 +524,4 @@ const AdminDashboardHome = () => {
   );
 };
 
-export default AdminDashboardHome;
+export default Dashboard;

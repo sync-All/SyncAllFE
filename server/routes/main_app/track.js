@@ -17,7 +17,7 @@ const { checkUploader, allowUnauthentication, checkSyncUser, checkRoles } = requ
 
 router.get('/myTracks',checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.myTracks))
 
-router.get("/verifyTrackUploaded/",checkRoles(['ContentAdmin','Music Uploader']),asyncHandler(trackController.verifyTrackUpload));
+router.get("/verifyTrackUploaded/",checkUploader,asyncHandler(trackController.verifyTrackUpload));
 
 router.post("/trackUpload/",checkRoles(['ContentAdmin','Music Uploader']),upload,asyncHandler(trackController.trackUpload));
 
@@ -29,9 +29,9 @@ router.delete("/ignore_single_resolution/",checkRoles(['ContentAdmin','Music Upl
 
 router.get("/bulkUploadFileDispute/",checkUploader,asyncHandler(trackController.bulkUploadFileDispute));
 
-router.post("/trackBulkUpload/",checkRoles(['ContentAdmin','Music Uploader']),bulkUpload,asyncHandler(trackController.trackBulkUpload));
+router.post("/trackBulkUpload/",checkUploader,bulkUpload,asyncHandler(trackController.trackBulkUpload));
 
-router.get("/get-upload-error-history", checkRoles(['ContentAdmin','Music Uploader']), asyncHandler(trackController.getUploadErrorHistory))
+router.get("/get-upload-error-history", checkUploader, asyncHandler(trackController.getUploadErrorHistory))
 
 router.get(
   "/allsongs",allowUnauthentication,checkSyncUser,

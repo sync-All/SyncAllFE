@@ -28,7 +28,9 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  
+  const handleNavigationTODashboard = () => {
+    navigate('/admin/dashboard');
+  };
 
   useEffect(() => {
     if (token) {
@@ -46,16 +48,10 @@ const Login = () => {
     const apiUrl = `${urlVar}/admin_signin`;
     try {
       await delay(2000);
-      const response = await axios.post(
-        apiUrl,
-        {
-          email: values['email'],
-          password: values['password'],
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(apiUrl, {
+        email: values['email'],
+        password: values['password'],
+      });
       if (response && response.data) {
         localStorage.clear();
         sessionStorage.clear();
@@ -70,9 +66,6 @@ const Login = () => {
      
         
           navigate('/admin/dashboard');
-
-       
-
       } else {
         throw new Error('Response or response data is undefined');
       }

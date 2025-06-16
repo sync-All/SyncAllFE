@@ -3,7 +3,7 @@ const Tracks = require('../../models/track.model').track
 const contentManager = require('../../controllers/admin/manage_content')
 
 const asynchandler = require('express-async-handler')
-const { checkRoles } = require('../../utils/AuthenticateChecker')
+const { checkAdmin } = require('../../utils/AuthenticateChecker')
 
 
 router.get(
@@ -14,10 +14,8 @@ router.get(
   
 router.get('/manage_content/review',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.contentReview))
 
-router.get('/manage_content/search',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.searchContent))
+router.get('/manage_content/search',checkAdmin,asynchandler(contentManager.searchContent))
 
-router.post('/manage_content/trackupdate',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.contentUpdate))
-
-router.post('/manage_content/transferownership',checkRoles(['ContentAdmin','SuperAdmin']),asynchandler(contentManager.contentTransferOwnership))
+router.post('/manage_content/trackupdate',checkAdmin,asynchandler(contentManager.contentUpdate))
 
 module.exports = router

@@ -58,7 +58,6 @@ const EmailModal: React.FC<EmailModalProps> = ({
           Authorization: `${token}`,
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true,
       };
 
       const response = await axios.post(apiUrl, formData, config);

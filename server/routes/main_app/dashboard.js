@@ -9,6 +9,7 @@ const router = express.Router()
 
 router.get('/api/v1/dashboardhome',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.dashboardcontrol))
 
+router.post('/api/v1/passwordreset/',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),asyncHandler(dashbordControllers.passwordreset))
 
 router.get('/api/v1/alldispute',passport.authenticate('jwt',{session : false, failureRedirect : '/unauthorized'}),dashbordControllers.allDispute)
 
