@@ -76,7 +76,7 @@ export interface Track {
   upc: number;
   updatedAt: string;
   uploadStatus: string;
-  user: string;
+  user: User;
   writers: string[];
   __v: number;
   uploadId: string;
@@ -87,4 +87,18 @@ export interface Track {
   spotifyLink: string;
   subGenre: string;
   trackOwner: string;
+  
+}
+
+export interface User {
+  _id: string;
+  fullName: string;
+  name: string;
+  email: string;
+  username: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  profilePicture?: string;
 }

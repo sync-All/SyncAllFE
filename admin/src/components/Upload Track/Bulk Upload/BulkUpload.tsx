@@ -11,9 +11,6 @@ import ProceedBulkError from './ProceedBulkError';
 import { Track } from '../../../declaration';
 // import { useUpload } from '../../../../Context/UploadContext';
 
-
-
-
 interface UploadProgressProps {
   progress: number;
   fileName: string;
@@ -28,8 +25,9 @@ interface BulkUploadResultProps {
   totalTracks: number;
   failedUploads: number;
   successfulUploads: number;
- 
-  errors: { bulkError_id: string;
+
+  errors: {
+    bulkError_id: string;
     duplicates: Track[];
     duplicateTrackByAnother: Track[];
     invalidSpotifyLink: Track[];
@@ -89,7 +87,8 @@ const BulkUpload = () => {
   const [currentRow, setCurrentRow] = useState<number>(0);
   const [totalRows, setTotalRows] = useState<number>(0);
 
-  const [bulkUploadResult, setBulkUploadResult] = useState<BulkUploadResultProps | null>(null);
+  const [bulkUploadResult, setBulkUploadResult] =
+    useState<BulkUploadResultProps | null>(null);
 
   const resetUploadUI = () => {
     setFile(null);
@@ -106,7 +105,7 @@ const BulkUpload = () => {
     setShowConfirmProceedModal(true); // Open the second modal
   };
 
-  const fileUrl = '../../../../assets/images/testdoc.csv';
+  const fileUrl = '/assets/testdoc.csv';
   const fileName = 'CSV Template.csv';
 
   const onDrop = useCallback(
@@ -226,9 +225,9 @@ const BulkUpload = () => {
                     totalTracks:
                       data?.failedCount ?? 0 + data?.successCount ?? 0,
                     failedUploads: data.failedCount,
-                   
+
                     successfulUploads: data.successCount ?? 0,
-                    errors: { 
+                    errors: {
                       bulkError_id: data.errorData.uploadErrorId,
                       duplicates: data.errorData.duplicateData || [],
                       duplicateTrackByAnother:
@@ -274,8 +273,6 @@ const BulkUpload = () => {
     'Review Errors (if any): After uploading, review any errors that may appear. Suggested actions will be provided for each error type.',
   ];
 
-
-
   return (
     <div className="lg:mx-8 ml-5">
       <div className="flex justify-between">
@@ -311,6 +308,7 @@ const BulkUpload = () => {
                   href={fileUrl}
                   download={fileName}
                   className="text-[#1671D9] hover:text-blue-700 font-medium font-inter flex gap-2 items-center"
+                  type='text/csv'
                 >
                   Download CSV Template
                   <img src={Download} alt="" />

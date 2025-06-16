@@ -68,13 +68,10 @@ const Login = () => {
         localStorage.setItem('adminData', JSON.stringify(user));
         toast.success('Login successful');
      
-        if (user?.role === 'Admin') {
+        
           navigate('/admin/dashboard');
-        } else if (user?.role === 'ContentAdmin') {
-          navigate('/admin/manage-contents');
-        } else {
-          navigate('/'); // fallback or unauthorized
-        }
+
+       
 
       } else {
         throw new Error('Response or response data is undefined');

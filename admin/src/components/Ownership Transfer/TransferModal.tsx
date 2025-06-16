@@ -16,7 +16,9 @@ const TransferModal: React.FC<TransferModalProps> = ({
   selectedContents,
 }) => {
   const [selectedToUser, setSelectedToUser] = useState('');
+  const [comment, setComment] = useState('');
   const { users } = useUsers();
+  const [loading, setLoading] = useState(false);
 
   const handleTransfer = async () => {
     const trackIds = selectedContents.map((content) => content.contentId);
@@ -31,9 +33,10 @@ const TransferModal: React.FC<TransferModalProps> = ({
     const apiUrl = `${urlVar}/manage_content/transferownership`;
 
     try {
+      setLoading(true);
       const response = await axios.post(
         apiUrl,
-        { trackIds, newTrackOwnerId },
+        { trackIds, newTrackOwnerId, comment },
         { withCredentials: true }
       );
 
@@ -43,12 +46,15 @@ const TransferModal: React.FC<TransferModalProps> = ({
       } else {
         toast.error('Failed to transfer ownership. Please try again.');
       }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error('Error transferring ownership:', error);
       toast.error('An error occurred while transferring ownership.');
     }
   };
 
+  const musicUploaderUsers = users.filter((user) => user.role === 'Music Uploader');
   return (
     <ReactModal
       isOpen={isOpen}
@@ -91,12 +97,23 @@ const TransferModal: React.FC<TransferModalProps> = ({
             className="w-full border border-gray-300 text-[#667085] font-Utile-medium text-[16px] py-2 px-3 rounded-md bg-white focus:outline-none"
           >
             <option value="">Select user</option>
-            {users.map((user) => (
+            {musicUploaderUsers.map((user) => (
               <option key={user._id} value={user._id}>
-                {user.name} (<strong>{user.email}</strong>) 
+                {user.name} (<strong>{user.email}</strong>)
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mb-6 text-left">
+          <label className="text-[14px] text-[#344054] font-formular-medium block mb-2">
+            Comment
+          </label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="w-full border border-black h-20 p-2 rounded-md"
+          ></textarea>
         </div>
 
         <div className="flex justify-between mt-4">
@@ -111,7 +128,8 @@ const TransferModal: React.FC<TransferModalProps> = ({
             disabled={!selectedToUser || selectedContents.length === 0}
             className="bg-[#101828] text-[#F9F6FF] font-formular-medium text-[14px] px-6 py-2 rounded-lg disabled:opacity-50"
           >
-            Transfer Ownership
+           
+            {loading ? 'Transferring' : ' Transfer Ownership'}
           </button>
         </div>
       </div>
