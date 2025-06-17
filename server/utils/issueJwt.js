@@ -28,7 +28,6 @@ function issueJwtLogin(user){
 
     const payload = {
         sub : _id,
-        // iat : Date.now()
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
