@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const SigninSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Email is required'),
+  email: Yup.string().required('Email/Username is required'),
   password: Yup.string()
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
@@ -27,8 +27,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-
-  
 
   useEffect(() => {
     if (token) {
@@ -67,12 +65,8 @@ const Login = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('adminData', JSON.stringify(user));
         toast.success('Login successful');
-     
-        
-          navigate('/admin/dashboard');
 
-       
-
+        navigate('/admin/dashboard');
       } else {
         throw new Error('Response or response data is undefined');
       }
@@ -123,13 +117,12 @@ const Login = () => {
                         htmlFor="email"
                         className="poppins-medium text-[16px] leading-[16px] tracking-[0.4px]"
                       >
-                        Email*
+                        Email/Username*
                       </label>
                       <Field
-                        type="email"
                         name="email"
                         id="email"
-                        placeholder="Enter email address"
+                        placeholder="Enter email address/username"
                         required
                         className="w-full border rounded-[4px] py-[16px] px-[16px] poppins-light text-black text-opacity-70 placeholder-black placeholder-opacity-70"
                       />
@@ -169,8 +162,10 @@ const Login = () => {
                         className="text-red-400 italic text-sm py-3"
                       />
                     </div>
-                    <p className="-mt-7 text-start text-sm text-blue-600 hover:underline cursor-pointer" 
-                    onClick={() => navigate('/forget-password')}>
+                    <p
+                      className="-mt-7 text-start text-sm text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => navigate('/forget-password')}
+                    >
                       Forget Password?
                     </p>
 
