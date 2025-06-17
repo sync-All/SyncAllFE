@@ -9,6 +9,7 @@ const { checkRoles } = require('../../utils/AuthenticateChecker')
 router.get(
     '/all_content',
     checkRoles(['ContentAdmin', 'SuperAdmin']),
+    
     asynchandler(contentManager.all_content)
 );
   
