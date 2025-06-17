@@ -59,7 +59,7 @@ function issueJwtAdminLogin(user){
 function issueJwtResetPassword(user){
     const _id = user._id
 
-    const expiresIn = 5 * 60 * 1000
+    const expiresIn = 5 * 60 
 
     const payload = {
         sub : _id,
