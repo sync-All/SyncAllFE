@@ -9,16 +9,25 @@ import ForgetPassword from './components/Auth/ForgetPassword';
 
 function App() {
   return (
-    <AuthProvider>
+    <>
       <ToastContainer />
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/" element={<Login />} />
+
+        <Route
+          path="/*"
+          element={
+            <AuthProvider>
+              <Routes>
+                <Route path="/admin/*" element={<AdminDashboard />} />
+              </Routes>
+            </AuthProvider>
+          }
+        />
       </Routes>
-      
-    </AuthProvider>
+    </>
   );
 }
 
