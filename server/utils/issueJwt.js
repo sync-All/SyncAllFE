@@ -28,7 +28,6 @@ function issueJwtLogin(user){
 
     const payload = {
         sub : _id,
-        // iat : Date.now()
     }
 
     const signedToken = jsonwebtoken.sign(payload, privKey, {expiresIn : expiresIn, algorithm : 'RS256'})
@@ -59,7 +58,7 @@ function issueJwtAdminLogin(user){
 function issueJwtResetPassword(user){
     const _id = user._id
 
-    const expiresIn = 5 * 60 * 1000
+    const expiresIn = 5 * 60 
 
     const payload = {
         sub : _id,

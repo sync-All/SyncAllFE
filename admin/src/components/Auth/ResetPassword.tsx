@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { Formik, Field, ErrorMessage, Form } from 'formik';
 import useLoading from '../../constants/loading';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -35,6 +35,7 @@ const ResetPassword = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
+  const navigate = useNavigate();
 
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,6 +57,7 @@ const ResetPassword = () => {
       await delay(2000);
       const response = await axios.post(apiUrl, values, config);
       toast.success(response.data.message);
+      navigate('/'); // Redirect to login page after successful password reset
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
