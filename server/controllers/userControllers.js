@@ -21,7 +21,6 @@ const findUserAndUpdate = async(searchParams, updateOptions)=>{
 }
 
 const getUserInfo = async(searchParams,options="")=>{
-    // options object includes {populate, select ....}
     try{
         const userInfo = await Promise.any([ User.findOne(searchParams).populate(options.populate || "").select(options.select || "").then(user => user || Promise.reject()), SyncUser.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject()), Admin.findOne(searchParams).select(options.select || "").populate(options.populate || "").then(user => user || Promise.reject())])
         return userInfo
