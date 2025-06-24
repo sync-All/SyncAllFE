@@ -3,13 +3,27 @@ import Plus from '../../../assets/images/plus.svg';
 import Download from '../../../assets/images/download.svg';
 import Upload from '../../../assets/images/file upload states.svg';
 import FileType from '../../../assets/images/filetype.svg';
-import { useCallback, useState } from 'react';
+import { useCallback, useReducer } from 'react';
 import { useDropzone, FileRejection } from 'react-dropzone';
 import { toast } from 'react-toastify';
 import UploadCompletionModal from './UploadCompletionModal';
 import ProceedBulkError from './ProceedBulkError';
 import { Track } from '../../../declaration';
-// import { useUpload } from '../../../../Context/UploadContext';
+
+// Constants for event types
+const EVENT_TYPES = {
+  CONNECTION_CLOSED: 'Connection closed',
+  TRACK_ERROR: 'trackError validation failed',
+  PROCESSING: 'event: processing',
+  TOTAL: 'event: total',
+  WARNING_DUPLICATE: 'event: warning duplicate data',
+  PROGRESS: 'parsedRows',
+  DONE: 'event: done',
+  ERROR: 'event: error',
+} as const;
+
+const MAX_BUFFER_SIZE = 1024 * 1024; // 1MB buffer limit
+const UPLOAD_TIMEOUT = 300000; // 5 minutes timeout
 
 interface UploadProgressProps {
   progress: number;
@@ -25,13 +39,120 @@ interface BulkUploadResultProps {
   totalTracks: number;
   failedUploads: number;
   successfulUploads: number;
-
   errors: {
     bulkError_id: string;
     duplicates: Track[];
     duplicateTrackByAnother: Track[];
     invalidSpotifyLink: Track[];
   };
+}
+
+// Upload state management with useReducer
+interface UploadState {
+  file: File | null;
+  isUploading: boolean;
+  uploadProgress: number;
+  uploadStatus: string;
+  currentRow: number;
+  totalRows: number;
+  showCompletionModal: boolean;
+  showConfirmProceedModal: boolean;
+  bulkUploadResult: BulkUploadResultProps | null;
+  retryCount: number;
+}
+
+type UploadAction =
+  | { type: 'SET_FILE'; payload: File }
+  | { type: 'START_UPLOAD' }
+  | {
+      type: 'UPDATE_PROGRESS';
+      payload: {
+        progress: number;
+        status: string;
+        currentRow?: number;
+        totalRows?: number;
+      };
+    }
+  | { type: 'UPLOAD_COMPLETE'; payload: BulkUploadResultProps }
+  | { type: 'UPLOAD_ERROR'; payload: string }
+  | { type: 'RESET_UPLOAD' }
+  | { type: 'SHOW_COMPLETION_MODAL' }
+  | { type: 'SHOW_PROCEED_MODAL' }
+  | { type: 'HIDE_MODALS' }
+  | { type: 'INCREMENT_RETRY' }
+  | { type: 'RESET_RETRY' };
+
+const initialState: UploadState = {
+  file: null,
+  isUploading: false,
+  uploadProgress: 0,
+  uploadStatus: '',
+  currentRow: 0,
+  totalRows: 0,
+  showCompletionModal: false,
+  showConfirmProceedModal: false,
+  bulkUploadResult: null,
+  retryCount: 0,
+};
+
+function uploadReducer(state: UploadState, action: UploadAction): UploadState {
+  switch (action.type) {
+    case 'SET_FILE':
+      return { ...state, file: action.payload };
+    case 'START_UPLOAD':
+      return {
+        ...state,
+        isUploading: true,
+        uploadStatus: 'Processing file...',
+        uploadProgress: 0,
+      };
+    case 'UPDATE_PROGRESS':
+      return {
+        ...state,
+        uploadProgress: action.payload.progress,
+        uploadStatus: action.payload.status,
+        currentRow: action.payload.currentRow || state.currentRow,
+        totalRows: action.payload.totalRows || state.totalRows,
+      };
+    case 'UPLOAD_COMPLETE':
+      return {
+        ...state,
+        uploadProgress: 100,
+        uploadStatus: 'Upload complete!',
+        bulkUploadResult: action.payload,
+        showCompletionModal: true,
+        isUploading: false,
+      };
+    case 'UPLOAD_ERROR':
+      return {
+        ...state,
+        isUploading: false,
+        uploadProgress: 0,
+        uploadStatus: action.payload,
+      };
+    case 'RESET_UPLOAD':
+      return initialState;
+    case 'SHOW_COMPLETION_MODAL':
+      return { ...state, showCompletionModal: true };
+    case 'SHOW_PROCEED_MODAL':
+      return {
+        ...state,
+        showCompletionModal: false,
+        showConfirmProceedModal: true,
+      };
+    case 'HIDE_MODALS':
+      return {
+        ...state,
+        showCompletionModal: false,
+        showConfirmProceedModal: false,
+      };
+    case 'INCREMENT_RETRY':
+      return { ...state, retryCount: state.retryCount + 1 };
+    case 'RESET_RETRY':
+      return { ...state, retryCount: 0 };
+    default:
+      return state;
+  }
 }
 
 const UploadProgress: React.FC<UploadProgressProps> = ({
@@ -44,12 +165,10 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
   return (
     <div className="border-2 border-dashed border-green-200 rounded-lg p-8 max-w-md mx-auto">
       <div className="flex flex-col items-center gap-4">
-        {/* CSV Icon */}
         <div className="w-16 h-16 bg-white shadow-sm rounded-lg flex items-center justify-center">
           <img src={FileType} alt="" />
         </div>
 
-        {/* Progress percentage and fraction */}
         <div className="flex items-center gap-2 text-xl font-medium text-gray-700">
           <span>{progress}%</span>
           {currentRow !== undefined && totalRows !== undefined && (
@@ -59,7 +178,6 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
           )}
         </div>
 
-        {/* Progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-green-600 h-2 rounded-full transition-all duration-300 ease-in-out"
@@ -67,7 +185,6 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
           />
         </div>
 
-        {/* Upload status text */}
         <div className="text-center">
           <div className="font-medium text-gray-700">{status}</div>
           <div className="text-sm text-gray-500">{fileName}</div>
@@ -78,35 +195,238 @@ const UploadProgress: React.FC<UploadProgressProps> = ({
 };
 
 const BulkUpload = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState<string>('');
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const [showConfirmProceedModal, setShowConfirmProceedModal] = useState(false);
-  const [currentRow, setCurrentRow] = useState<number>(0);
-  const [totalRows, setTotalRows] = useState<number>(0);
+  const [state, dispatch] = useReducer(uploadReducer, initialState);
 
-  const [bulkUploadResult, setBulkUploadResult] =
-    useState<BulkUploadResultProps | null>(null);
+  const formatFileSize = useCallback((bytes: number): string => {
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `${Math.round(kb)}KB`;
+    } else {
+      const mb = kb / 1024;
+      return `${mb.toFixed(1)}MB`;
+    }
+  }, []);
 
-  const resetUploadUI = () => {
-    setFile(null);
-    setIsUploading(false);
-    setUploadProgress(0);
-    setUploadStatus('');
-    setCurrentRow(0);
-    setTotalRows(0);
-    setShowCompletionModal(false);
-  };
+  const handleEventData = useCallback(
+    (event: string, data: any) => {
+      if (event.includes(EVENT_TYPES.CONNECTION_CLOSED)) {
+        console.error('Connection was closed unexpectedly.');
+        toast.error('Connection was closed unexpectedly. Please try again.');
+        dispatch({
+          type: 'UPLOAD_ERROR',
+          payload: 'Upload failed due to connection closure.',
+        });
+        return;
+      }
 
-  const handleProceed = () => {
-    setShowCompletionModal(false); // Close the first modal
-    setShowConfirmProceedModal(true); // Open the second modal
-  };
+      if (event.includes(EVENT_TYPES.TRACK_ERROR)) {
+        toast.error(data.message);
+        dispatch({
+          type: 'UPDATE_PROGRESS',
+          payload: {
+            progress: state.uploadProgress,
+            status: 'Validation failed on some rows.',
+          },
+        });
+        resetUploadUI();
+        return;
+      }
 
-  const fileUrl = '/assets/testdoc.csv';
-  const fileName = 'CSV Template.csv';
+      if (event.includes(EVENT_TYPES.PROCESSING)) {
+        dispatch({
+          type: 'UPDATE_PROGRESS',
+          payload: {
+            progress: state.uploadProgress,
+            status: data.message || 'Processing file...',
+          },
+        });
+        return;
+      }
+
+      if (event.includes(EVENT_TYPES.TOTAL)) {
+        const totalRows = data.totalRows;
+        dispatch({
+          type: 'UPDATE_PROGRESS',
+          payload: {
+            progress: state.uploadProgress,
+            status: `Total valid rows parsed: ${totalRows}`,
+          },
+        });
+        return;
+      }
+
+      if (event.includes(EVENT_TYPES.WARNING_DUPLICATE)) {
+        const warningData = data;
+        dispatch({
+          type: 'UPDATE_PROGRESS',
+          payload: {
+            progress: state.uploadProgress,
+            status: `Warning: Duplicate ISRC found for row: ${warningData.parsedRows}`,
+          },
+        });
+        return;
+      }
+
+      if (event.includes('data:') && event.includes(EVENT_TYPES.PROGRESS)) {
+        const currentRow = data.parsedRows;
+        const totalRows = data.rowCount;
+        const percentage = Math.round((currentRow / totalRows) * 100);
+
+        dispatch({
+          type: 'UPDATE_PROGRESS',
+          payload: {
+            progress: percentage,
+            status: `Processing ${currentRow} of ${totalRows} rows...`,
+            currentRow,
+            totalRows,
+          },
+        });
+        return;
+      }
+
+      if (event.includes(EVENT_TYPES.DONE)) {
+        const uploadResult: BulkUploadResultProps = {
+          fileName: state.file?.name || '',
+          fileSize: formatFileSize(state.file?.size || 0),
+          totalTracks: (data?.failedCount ?? 0) + (data?.successCount ?? 0),
+          failedUploads: data.failedCount,
+          successfulUploads: data.successCount ?? 0,
+          errors: {
+            bulkError_id: data.errorData.uploadErrorId,
+            duplicates: data.errorData.duplicateData || [],
+            duplicateTrackByAnother:
+              data.errorData.duplicateTrackByAnother || [],
+            invalidSpotifyLink: data.errorData.invalidSpotifyLink || [],
+          },
+        };
+
+        dispatch({ type: 'UPLOAD_COMPLETE', payload: uploadResult });
+        dispatch({ type: 'RESET_RETRY' });
+        return;
+      }
+
+      if (event.includes(EVENT_TYPES.ERROR)) {
+        toast.error(`Error: ${data.message || 'An unknown error occurred'}`);
+        return;
+      }
+
+      if (data.message) {
+        toast.error(data.message);
+      }
+    },
+    [state.file, state.uploadProgress, formatFileSize]
+  );
+
+  const processUploadStream = useCallback(
+    async (response: Response) => {
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('Failed to get response reader');
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // Prevent buffer from growing too large
+          if (buffer.length > MAX_BUFFER_SIZE) {
+            console.warn('Buffer size exceeded limit, truncating...');
+            buffer = buffer.slice(-MAX_BUFFER_SIZE / 2);
+          }
+
+          const events = buffer.split('\n\n');
+
+          for (let i = 0; i < events.length - 1; i++) {
+            const event = events[i];
+            if (!event.trim()) continue;
+
+            try {
+              const dataLine = event.split('data:')[1]?.trim();
+              if (dataLine) {
+                const data = JSON.parse(dataLine);
+                handleEventData(event, data);
+              }
+            } catch (parseError) {
+            
+              dispatch({
+                type: 'UPDATE_PROGRESS',
+                payload: {
+                  progress: state.uploadProgress,
+                  status: event,
+                },
+              });
+            }
+          }
+
+          buffer = events[events.length - 1];
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    },
+    [handleEventData]
+  );
+
+  const uploadWithRetry = useCallback(
+    async (uploadedFile: File) => {
+
+      const urlVar = import.meta.env.VITE_APP_API_URL;
+      const apiUrl = `${urlVar}/trackBulkUpload`;
+
+      const formData = new FormData();
+      formData.append('bulkUpload', uploadedFile);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT);
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+         
+          credentials: 'include',
+          body: formData,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        await processUploadStream(response);
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            toast.error('Upload timed out. Please try again.');
+          } else if (state.retryCount < 3) {
+            console.warn(
+              `Upload attempt ${state.retryCount + 1} failed, retrying...`
+            );
+            dispatch({ type: 'INCREMENT_RETRY' });
+            setTimeout(
+              () => uploadWithRetry(uploadedFile),
+              2000 * (state.retryCount + 1)
+            );
+            return;
+          } else {
+            toast.error(
+              'Upload failed after multiple attempts. Please try again later.'
+            );
+          }
+        }
+
+        dispatch({ type: 'UPLOAD_ERROR', payload: 'Upload failed' });
+      }
+    },
+    [state.retryCount, processUploadStream]
+  );
 
   const onDrop = useCallback(
     async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -125,135 +445,16 @@ const BulkUpload = () => {
         return;
       }
 
-      const formatFileSize = (bytes: number): string => {
-        const kb = bytes / 1024;
-
-        if (kb < 1024) {
-          // If less than 1MB, show in KB
-          return `${Math.round(kb)}KB`;
-        } else {
-          // If 1MB or more, show in MB
-          const mb = kb / 1024;
-          return `${mb.toFixed(1)}MB`;
-        }
-      };
-
       if (acceptedFiles.length > 0) {
         const uploadedFile = acceptedFiles[0];
-        setFile(uploadedFile);
+        dispatch({ type: 'SET_FILE', payload: uploadedFile });
+        dispatch({ type: 'START_UPLOAD' });
+        dispatch({ type: 'RESET_RETRY' });
 
-        const token = localStorage.getItem('token');
-        const urlVar = import.meta.env.VITE_APP_API_URL;
-        const apiUrl = `${urlVar}/trackBulkUpload`;
-
-        const formData = new FormData();
-        formData.append('bulkUpload', uploadedFile);
-
-        setIsUploading(true);
-        setUploadStatus('Processing file...');
-
-        try {
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              Authorization: `${token}`,
-            },
-            credentials: 'include',
-            body: formData,
-          });
-
-          const reader = response.body?.getReader();
-          const decoder = new TextDecoder();
-          let buffer = '';
-
-          while (reader) {
-            const { value, done } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const events = buffer.split('\n\n');
-
-            for (let i = 0; i < events.length - 1; i++) {
-              const event = events[i];
-              if (!event.trim()) continue;
-
-              try {
-                // For processing status events
-                if (event.includes('event: processing')) {
-                  const dataLine = event.split('data:')[1]?.trim();
-                  if (dataLine) {
-                    setUploadStatus(dataLine); // Will show "Scanning and Sorting..." or "No Duplicates Found"
-                  }
-                }
-                // For progress events with row counts
-                else if (
-                  event.includes('data:') &&
-                  event.includes('parsedRows')
-                ) {
-                  const dataLine = event.split('data:')[1].trim();
-                  const data = JSON.parse(dataLine);
-
-                  if (
-                    data.parsedRows !== undefined &&
-                    data.rowCount !== undefined
-                  ) {
-                    const currentRow = data.parsedRows;
-                    const totalRows = data.rowCount;
-
-                    const percentage = (currentRow / totalRows) * 100;
-                    setUploadProgress(Math.round(percentage));
-                    setUploadStatus(
-                      `Processing ${currentRow} of ${totalRows} rows...`
-                    );
-                    setCurrentRow(currentRow);
-                    setTotalRows(totalRows);
-                  }
-                }
-                // For completion event
-                else if (event.includes('event: done')) {
-                  const dataLine = event.split('data:')[1].trim();
-                  const data = JSON.parse(dataLine);
-
-                  setUploadProgress(100);
-                  setUploadStatus('Upload complete!');
-                  console.log('Upload complete:', data);
-
-                  setShowCompletionModal(true);
-                  setBulkUploadResult({
-                    fileName: uploadedFile.name,
-                    fileSize: formatFileSize(uploadedFile.size),
-                    totalTracks:
-                      data?.failedCount ?? 0 + data?.successCount ?? 0,
-                    failedUploads: data.failedCount,
-
-                    successfulUploads: data.successCount ?? 0,
-                    errors: {
-                      bulkError_id: data.errorData.uploadErrorId,
-                      duplicates: data.errorData.duplicateData || [],
-                      duplicateTrackByAnother:
-                        data.errorData.duplicateTrackByAnother || [],
-                      invalidSpotifyLink:
-                        data.errorData.invalidSpotifyLink || [],
-                    },
-                  });
-                }
-              } catch (parseError) {
-                console.error('Error processing event:', event);
-              }
-            }
-
-            buffer = events[events.length - 1];
-          }
-        } catch (error) {
-          console.error('Upload error:', error);
-          toast.error('An error occurred during upload');
-          setIsUploading(false);
-          setUploadProgress(0);
-          setUploadStatus('');
-        }
+        await uploadWithRetry(uploadedFile);
       }
     },
-    []
+    [uploadWithRetry]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -264,6 +465,17 @@ const BulkUpload = () => {
     maxSize: 100 * 1024 * 1024, // 100MB
     multiple: false,
   });
+
+  const handleProceed = () => {
+    dispatch({ type: 'SHOW_PROCEED_MODAL' });
+  };
+
+  const resetUploadUI = () => {
+    dispatch({ type: 'RESET_UPLOAD' });
+  };
+
+  const fileUrl = '/assets/testdoc.csv';
+  const fileName = 'CSV Template.csv';
 
   const instructions = [
     'Download the CSV Template: Start by downloading the pre-formatted CSV file to ensure compatibility with our system.',
@@ -300,7 +512,6 @@ const BulkUpload = () => {
       <div className="mt-4 border border-t-[#D7DCE0] w-full"></div>
       <div className=" mx-auto mt-[46px] space-y-6">
         <div className="flex justify-between items-start gap-8">
-          {/* Left side - Upload area */}
           <div className="max-w-[509px] space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -308,7 +519,7 @@ const BulkUpload = () => {
                   href={fileUrl}
                   download={fileName}
                   className="text-[#1671D9] hover:text-blue-700 font-medium font-inter flex gap-2 items-center"
-                  type='text/csv'
+                  type="text/csv"
                 >
                   Download CSV Template
                   <img src={Download} alt="" />
@@ -321,13 +532,13 @@ const BulkUpload = () => {
               you're done filling
             </div>
 
-            {isUploading ? (
+            {state.isUploading ? (
               <UploadProgress
-                progress={uploadProgress}
-                fileName={file?.name || 'Bulk Uploaded Track.csv'}
-                status={uploadStatus}
-                currentRow={currentRow}
-                totalRows={totalRows}
+                progress={state.uploadProgress}
+                fileName={state.file?.name || 'Bulk Uploaded Track.csv'}
+                status={state.uploadStatus}
+                currentRow={state.currentRow}
+                totalRows={state.totalRows}
               />
             ) : (
               <div
@@ -361,7 +572,6 @@ const BulkUpload = () => {
             )}
           </div>
 
-          {/* Right side - Instructions */}
           <div className=" max-w-[425px] border border-[#D0D5DD] bg-[#F9F9F9] rounded-lg p-6 font-inter text-black">
             <h3 className="font-medium text-[16px] mb-4">
               Instructions for Bulk Track Upload
@@ -382,18 +592,18 @@ const BulkUpload = () => {
         </div>
       </div>
       <UploadCompletionModal
-        isOpen={showCompletionModal}
+        isOpen={state.showCompletionModal}
         onClose={() => {
-          setShowCompletionModal(false);
+          dispatch({ type: 'HIDE_MODALS' });
           resetUploadUI();
         }}
         onProceed={handleProceed}
-        bulkUploadResult={bulkUploadResult}
+        bulkUploadResult={state.bulkUploadResult}
       />
       <ProceedBulkError
-        isOpen={showConfirmProceedModal}
-        onClose={() => setShowConfirmProceedModal(false)}
-        bulkUploadResult={bulkUploadResult}
+        isOpen={state.showConfirmProceedModal}
+        onClose={() => dispatch({ type: 'HIDE_MODALS' })}
+        bulkUploadResult={state.bulkUploadResult}
         source="upload"
       />
     </div>

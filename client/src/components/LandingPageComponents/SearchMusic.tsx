@@ -34,8 +34,9 @@ const SearchMusic = () => {
     try {
       setLoading(true);
       const response = await axios.get(apiUrl);
-      setFullData(response.data.tracks);
-      setSearchData(response.data.tracks?.slice(0, 3));
+      
+      setFullData(response.data.allTracks);
+      setSearchData(response.data.allTracks?.slice(0, 3));
     } catch (error) {
       const axiosError = error as AxiosError<ResponseData>;
       toast.error(
