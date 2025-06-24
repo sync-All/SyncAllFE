@@ -89,7 +89,7 @@ const ExplorePage = () => {
         setLoading(false);
       }
     },
-    [setIsSearching, setSearchData, setLoading] // Add necessary state setters as dependencies
+    [setIsSearching, setSearchData, setLoading] 
   );
 
   // Create a debounced version of handleSearch
