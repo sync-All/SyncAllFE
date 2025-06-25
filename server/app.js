@@ -29,7 +29,7 @@ var app = express();
 
 app.set('trust proxy', 1);
 
-var allowlist = ['http://localhost:5173','http://localhost:5174','https://sync-all-admin.vercel.app', 'https://www.syncallmusic.com','https://syncallmusic.com','https://sync-all-admin-git-development-sync-alls-projects.vercel.app','https://development.d2ur0gnmy45rn.amplifyapp.com	', 'https://admin.syncallmusic.com']
+var allowlist = ['http://localhost:5173','http://localhost:5174', 'https://www.syncallmusic.com','https://syncallmusic.com','https://development.d2ur0gnmy45rn.amplifyapp.com	', 'https://admin.syncallmusic.com', 'https://development.do2zdkre36zvw.amplifyapp.com']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header('Origin')) !== -1) {
