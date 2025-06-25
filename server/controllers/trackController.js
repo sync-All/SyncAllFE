@@ -2,7 +2,7 @@ const dashboard = require("../models/dashboard.model").dashboard
 const Track = require("../models/track.model").track
 const User = require('../models/usermodel').uploader
 const Admin = require('../models/usermodel').admin
-const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError } = require("../utils/CustomError")
+const { BadRequestError, unauthorizedError, ForbiddenError, spotifyError, formatMongooseError } = require("../utils/CustomError")
 const spotifyCheck = require('../utils/spotify')
 const fs = require("node:fs")
 const csv = require('fast-csv');
@@ -285,7 +285,7 @@ const trackBulkUpload = async(req,res,next)=>{
           }
           continue;
         }
-        confirmTrackUploaded = await Track.findOne({isrc : spotifyresponse.isrc}).populate('user').exec()
+        confirmTrackUploaded = await Track.findOne({$or : [{isrc : spotifyresponse.isrc},{trackLink : row.trackLink}]}).populate('user').exec()
 
         if(confirmTrackUploaded){
           res.write(`event: warning duplicate data\n`);
@@ -302,6 +302,7 @@ const trackBulkUpload = async(req,res,next)=>{
         res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
 
         row.spotifyLink = spotifyresponse.spotifyLink
+        row.isrc = spotifyresponse.isrc
         row.userModel = req.user.role == "Music Uploader" ? 'user' : 'admin'
         row.user = req.user.id
         row.trackLink = spotifyresponse.preview_url
@@ -361,11 +362,13 @@ const trackBulkUpload = async(req,res,next)=>{
       res.end();
   
     } catch (error) {
-      console.log(error)
       await session.abortTransaction();
       session.endSession();
-      res.status(400).write(`event: error\n\n`);
-      res.status(400).write(`data: ${JSON.stringify({ message : error.message })}\n\n`);
+      if(error instanceof mongoose.MongooseError){
+        res.status(400).write(`data: ${JSON.stringify({ message : formatMongooseError(error)})}\n\n`);
+      }else{
+        res.status(400).write(`data: ${JSON.stringify({ message : error.message })}\n\n`);
+      }
       res.end()
       fs.unlinkSync(req.file.path)
     }
