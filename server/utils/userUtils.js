@@ -43,5 +43,11 @@ function generateTempPassword() {
   return uuidv4().slice(0, 12); 
 }
 
+function camelCaseToNormal(str) {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between camelCase words
+    .replace(/^./, match => match.toUpperCase()); // Capitalize first character
+}
 
-module.exports = {grabEmailDomain,generateTempPassword}
+
+module.exports = {grabEmailDomain,generateTempPassword,camelCaseToNormal}

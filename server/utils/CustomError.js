@@ -1,3 +1,5 @@
+const { camelCaseToNormal } = require("./userUtils");
+
 const spotifyError = class CustomSpotifyError extends Error {
     constructor(message) {
       super(message);
@@ -46,6 +48,21 @@ const TooManyRequestError = class TooManyRequestError extends Error {
   }
 }
 
-module.exports = {spotifyError, BadRequestError,unauthorizedError, ForbiddenError, TokenExpiredError,TooManyRequestError}
+function formatMongooseError(error) {
+  if (error.name === 'ValidationError') {
+    const errorItems = Object.values(error.errors).map(val =>{
+      console.log(val)
+      return `Invalid ${val.kind} value for ${camelCaseToNormal(val.path)}: '${val.value}'. Expected a valid ${val.kind}`
+    })
+    return errorItems[0]
+  }
+  if (error.code && error.code === 11000) {
+    const key = Object.keys(error.keyValue)[0];
+    return `Duplicate data ${key} already exists.`
+  }
+  return `Error, ${error.message}`
+}
+
+module.exports = {spotifyError, BadRequestError,unauthorizedError, ForbiddenError, TokenExpiredError,TooManyRequestError,formatMongooseError}
 
   
