@@ -231,6 +231,7 @@ const trackBulkUpload = async(req,res,next)=>{
   let failedCount = 0
   let successCount = 0
   let uploadErrorId = ''
+  const userModel = req.user.role === "Music Uploader" ? 'user' : 'admin';
   const seen = new Set();
   const duplicates = new Set();
   const allowedHeaders = ['releaseType', 'releaseTitle', 'mainArtist', 'featuredArtist', 'trackTitle', 'upc', 'isrc', 'trackLink', 'genre', 'subGenre','claimBasis', 'role', 'percentClaim', 'recordingVersion', 'featuredInstrument', 'producers', 'recordingDate', 'countryOfRecording', 'writers', 'composers', 'publishers', 'copyrightName', 'copyrightYear', 'releaseDate', 'countryOfRelease', 'mood', 'tag', 'lyrics', 'audioLang', 'releaseLabel', 'releaseDesc']
@@ -251,10 +252,10 @@ const trackBulkUpload = async(req,res,next)=>{
     }
   })
   .on('error', (err) => {
-    res.status(400).write(`event: error\n`);
-    res.status(400).write(`data: ${JSON.stringify({ error: err.message})}\n\n`);
+    res.write(`event: error\n`);
+    res.write(`data: ${JSON.stringify({ status : 400, message: err.message})}\n\n`);
     fs.unlinkSync(req.file.path)
-    res.status(400).end()
+    res.end()
 
   })
   .on('end', async () => {
@@ -279,7 +280,7 @@ const trackBulkUpload = async(req,res,next)=>{
           if(error instanceof spotifyError){
             res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
             failedCount++
-            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id,userRole: req.user.role,userModel : req.user.role == "Music Uploader" ? 'user' : 'admin'})
+            invalidSpotifyLink.push({...row, message  : error.message, err_type : 'InvalidSpotifyLink', user : req.user._id,userRole: req.user.role,userModel})
           }else if (error instanceof mongoose.MongooseError){
             console.log('Mongoose Error', error)
           }
@@ -292,9 +293,9 @@ const trackBulkUpload = async(req,res,next)=>{
           res.write(`data: ${JSON.stringify({ parsedRows, rowCount })}\n\n`);
           failedCount++
           if(confirmTrackUploaded.user._id.equals(req.user._id)){
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrack', userModel, user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }else{
-            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userModel : req.user.role == "Music Uploader" ? 'user' : 'admin', user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
+            duplicateData.push({...row, message : 'Duplicate data found', err_type : 'duplicateTrackByAnother', userModel, user : req.user._id, trackOwner : confirmTrackUploaded.user._id, trackOwnerModel : confirmTrackUploaded.user.role == "Music Uploader" ? 'user' : 'admin'})
           }
           continue;
         }
@@ -303,7 +304,7 @@ const trackBulkUpload = async(req,res,next)=>{
 
         row.spotifyLink = spotifyresponse.spotifyLink
         row.isrc = spotifyresponse.isrc
-        row.userModel = req.user.role == "Music Uploader" ? 'user' : 'admin'
+        row.userModel = userModel
         row.user = req.user.id
         row.trackLink = spotifyresponse.preview_url
         row.artWork = spotifyresponse.artwork
@@ -337,7 +338,7 @@ const trackBulkUpload = async(req,res,next)=>{
           associatedErrors : errorIds,
           filename : req.file.originalname,
           fileBuffer,
-          userModel : req.user.role == "Music Uploader" ? 'user' : 'admin',
+          userModel,
           user : req.user._id
         })
         await uploadHistory.save({session}).then(async(res)=>{
@@ -365,9 +366,9 @@ const trackBulkUpload = async(req,res,next)=>{
       await session.abortTransaction();
       session.endSession();
       if(error instanceof mongoose.MongooseError){
-        res.status(400).write(`data: ${JSON.stringify({ message : formatMongooseError(error)})}\n\n`);
+        res.write(`data: ${JSON.stringify({ status : 400, message : formatMongooseError(error)})}\n\n`);
       }else{
-        res.status(400).write(`data: ${JSON.stringify({ message : error.message })}\n\n`);
+        res.write(`data: ${JSON.stringify({ status : 400, message : error.message })}\n\n`);
       }
       res.end()
       fs.unlinkSync(req.file.path)
